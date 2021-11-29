@@ -3,6 +3,17 @@
 The project "Synthesizing ML training data in the IT security domain
 for VMI-based attack detection and analysis" (SmartVMI) is a research project funded by the [BMBF](https://www.bmbf.de/) and [DLR](https://www.dlr.de/).
 
+    BMBF support code: 01IS21063A-C
+    Project Runtime: 01.10.2021 - 30.09.2023
+
+The consortium working on the project consists of three entities. The [G DATA CyberDefense AG](https://www.gdata.de/), [Innowerk GmbH](https://www.innowerk-it.de/) and [University of Passau](https://www.fim.uni-passau.de).
+
+
+<a href="https://www.gdata.de/"><img src="assets/logos/gdata.jpg" height="80"></a>
+<a href="https://www.innowerk-it.de/"><img src="assets/logos/innowerk.png" height="80"></a>
+<a href="https://www.fim.uni-passau.de/"><img src="assets/logos/unipassau.png" height="80"></a>
+
+___
 
 ## Attack pattern generation for trace detection
 
@@ -19,34 +30,11 @@ The tools as well as the generated and validated training data will be released 
 
 In the German economy alone, computer crime causes damage of more than 10 billion euros every year. Securing IT systems against cyber attacks and cyber espionage is therefore crucial for the economy and society to be able to take advantage of the progress and opportunities offered by digitization. In the funded project, procedures are being researched that, on the one hand, use innovative forensic reconnaissance methods to investigate and understand attack scenarios. On the other hand, these findings will be used to create new possibilities for detecting and preventing such attacks in advance and in real time.
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+___
 
-```markdown
-Syntax highlighted code block
+With funding from the [BMBF](https://www.bmbf.de/) and organisational execution by the [DLR](https://www.dlr.de/).
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/GDATASoftwareAG/smartvmi/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+<a href="https://www.bmbf.de/"><img src="assets/logos/bmbf.svg" height="80"></a>
+<a href="https://www.dlr.de/"><img src="assets/logos/dlr.jpg" height="80"></a>
