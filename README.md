@@ -6,7 +6,7 @@ for VMI-based attack detection and analysis" (SmartVMI) is a research project fu
     BMBF support code: 01IS21063A-C
     Project Runtime: 01.10.2021 - 30.09.2023
 
-The consortium working on the project consists of three entities. The [G DATA CyberDefense AG](https://www.gdata.de/), [Innowerk GmbH](https://www.innowerk-it.de/) and [University of Passau](https://www.fim.uni-passau.de).
+The consortium working on the project consists of three entities. The [G DATA CyberDefense AG](https://www.gdata.de/), [Innowerk-IT GmbH](https://www.innowerk-it.de/) and [University of Passau](https://www.fim.uni-passau.de).
 
 
 <a href="https://www.gdata.de/"><img src="assets/logos/gdata.jpg" height="80"></a>
