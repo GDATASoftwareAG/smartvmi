@@ -36,5 +36,5 @@ ___
 With funding from the [BMBF](https://www.bmbf.de/) and organisational execution by the [DLR](https://www.dlr.de/).
 
 
-<a href="https://www.bmbf.de/"><img src="assets/logos/bmbf.svg" height="80"></a>
+<a href="https://www.bmbf.de/"><img src="assets/logos/bmbf.jpg" height="80"></a>
 <a href="https://www.dlr.de/"><img src="assets/logos/dlr.jpg" height="80"></a>
