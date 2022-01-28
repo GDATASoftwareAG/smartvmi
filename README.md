@@ -1,4 +1,4 @@
-# SmartVMI
+<center><img src="assets/logos/smartvmi.svg" width="500"></center>
 
 The project "Synthesizing ML training data in the IT security domain
 for VMI-based attack detection and analysis" (SmartVMI) is a research project funded by the [BMBF](https://www.bmbf.de/) and [DLR](https://www.dlr.de/).
