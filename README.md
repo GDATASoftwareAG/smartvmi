@@ -1,3 +1,7 @@
+<head>
+    <link rel="shortcut icon" type="image/png" href="assets/logos/favicon.png">
+</head>
+
 <center><img src="assets/logos/smartvmi.svg" width="500"></center>
 
 The project "Synthesizing ML training data in the IT security domain
