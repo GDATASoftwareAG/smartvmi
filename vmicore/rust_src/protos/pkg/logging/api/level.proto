@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package hiveOperations.logging;
+
+enum LogLevel {
+    LOG_LEVEL_INFO = 0;
+    LOG_LEVEL_DEBUG = 1;
+    LOG_LEVEL_WARN = 2;
+    LOG_LEVEL_ERROR = 3;
+    LOG_LEVEL_DPANIC = 4;
+    LOG_LEVEL_PANIC = 5;
+    LOG_LEVEL_FATAL = 6;
+    LOG_LEVEL_UNKNOWN = 7;
+}

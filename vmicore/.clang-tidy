@@ -1,0 +1,14 @@
+---
+Checks: '
+  bugprone-*,
+  cert-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-special-member-functions
+  google-*,
+  llvm-*,
+  -llvm-header-guard,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  performance-*'

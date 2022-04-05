@@ -1,0 +1,31 @@
+{
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "clang-debug",
+            "displayName": "Debug Clang",
+            "description": "Use Clang toolchain",
+            "generator": "CodeBlocks - Unix Makefiles",
+            "binaryDir": "build-debug/",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "clang-build-debug",
+            "displayName": "Build Clang Debug",
+            "configurePreset": "clang-debug"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "clang-test",
+            "displayName": "Test Clang",
+            "configurePreset": "clang-debug"
+        }
+    ]
+}
