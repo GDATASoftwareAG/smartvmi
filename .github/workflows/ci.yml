@@ -1,0 +1,99 @@
+---
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  rust-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Annotate commit with clippy warnings
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --manifest-path vmicore/rust_src/Cargo.toml -- -D warnings
+
+      - name: Rustfmt check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path vmicore/rust_src/Cargo.toml -- --check
+
+  cpp-lint:
+    runs-on: ubuntu-latest
+    container:
+      image: gdatacyberdefense/clang-format:14
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Perform C++ format check
+        run: |
+          cd vmicore
+          find src/ test/ -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt-get install -y clang cmake libxen-dev libtclap-dev clang-tidy
+
+      - name: Clone libkvmi
+        uses: actions/checkout@v2
+        with:
+          repository: bitdefender/libkvmi
+          path: libkvmi
+
+      - name: Build and install libkvmi
+        run: |
+          ./bootstrap
+          ./configure
+          make
+          sudo make install
+        working-directory: libkvmi
+
+      - uses: actions/checkout@v2
+
+      - name: Get latest git tag
+        id: latesttag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        with:
+          fallback: v0.0.0
+
+      - name: Build vmicore
+        run: |
+          cd vmicore
+          cmake --preset clang-debug \
+          -D PROGRAM_VERSION='${{ steps.latesttag.outputs.tag }}' \
+          -D PROGRAM_BUILD_NUMBER='${{ github.run_number }}'
+          cmake --build --preset clang-build-debug --target vmicore
+
+      - name: Test vmicore
+        run: |
+          cd vmicore
+          cmake --build --preset clang-build-debug --target vmicore-test
+          ctest --preset clang-test
+
+      - name: Generate clang-tidy output for codacy
+        run: |
+          set -o pipefail
+          cd vmicore
+          clang-tidy -p build-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
+
+      - name: Upload clang tidy results
+        uses: codacy/codacy-analysis-cli-action@master
+        with:
+          clang-tidy-output: vmicore/clang-tidy-output
+          run-docker-tools: false
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          upload: true
