@@ -1,0 +1,29 @@
+[package]
+name = "rust_grpc_server"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["staticlib"]
+
+[[bin]]
+name = "rust_grpc_server"
+path = "src/main.rs"
+
+[dependencies]
+tonic = "0.6.1"
+prost = "0.9.0"
+prost-types = "0.9.0"
+tokio = { version = "1.10", features = ["macros", "rt-multi-thread", "net"] }
+cxx = "1.0"
+triggered = "0.1.2"
+async-std = "1.9"
+async-stream = "0.3.2"
+futures-core = "0.3.16"
+chrono = "0.4.19"
+thiserror = "1"
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
+
+[build-dependencies]
+tonic-build = "0.6.0"
+cxx-build = "1.0"

@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package hiveOperations.vmi;
+
+import "google/protobuf/timestamp.proto";
+
+message DumpMsgToFileRequest {}
+message DumpMsgToFileResponse {
+    string filename = 1;
+    bytes message = 2;
+}
+
+enum Event{
+    EVENT_VM_PROCESS_START = 0;
+    EVENT_VM_PROCESS_END = 1;
+    EVENT_VMI_READY = 2;
+    EVENT_VMI_FINISHED = 3;
+    EVENT_BSOD_DETECTED = 4;
+    EVENT_ERROR = 5;
+    EVENT_IN_MEM_DETECTION = 6;
+}
+
+message VmProcessStart {
+    string process_name = 1;
+    uint32 process_id = 2;
+    string cr3 = 3;
+}
+
+message VmProcessEnd {
+    string process_name = 1;
+    uint32 process_id = 2;
+    string cr3 = 3;
+}
+
+message VmiReady {
+}
+
+message VmiFinished {
+}
+
+message BSODDetected {
+    int64 code = 1;
+}
+
+message Error {
+    string message = 1;
+}
+
+message InMemDetection {
+    string detection = 1;
+}
+
+message ListenForEventsRequest {}
+message ListenForEventsResponse {
+    Event event = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    oneof message {
+        VmProcessStart vm_process_start = 3;
+        VmProcessEnd vm_process_end = 4;
+        VmiReady ready = 5;
+        VmiFinished finished = 6;
+        BSODDetected bsod_detected = 7;
+        Error error = 8;
+        InMemDetection in_mem_detection = 9;
+    };
+}
+
+service VmiService {
+    rpc DumpMsgToFile(stream DumpMsgToFileRequest) returns (stream DumpMsgToFileResponse);
+    rpc ListenForEvents(stream ListenForEventsRequest) returns (stream ListenForEventsResponse);
+}

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package hiveOperations.logging;
+
+import "pkg/logging/api/level.proto";
+import "pkg/logging/api/field.proto";
+
+message LogMessage {
+    fixed64 time_unix = 1;
+    LogLevel level = 2;
+    string msg = 3;
+    repeated LogField fields = 4;
+}
+
+message ReadLogRequest {
+    LogLevel level = 1;
+}
+
+message ReadLogResponse {
+    LogMessage log = 1;
+    bytes trace_id = 2;
+    bytes span_id = 3;
+}

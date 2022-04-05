@@ -1,0 +1,17 @@
+---
+results_directory: ./results
+log_level: info
+vm:
+  name: some_vm
+  offsets_file: offsets.json
+plugin_system:
+  directory: /usr/local/lib/
+  plugins:
+    libinmemory.so:
+      signature_file: /usr/local/share/inmemsigs/sigs.sig
+      dump_memory: false
+      scan_all_regions: false
+      output_path: ""
+      ignored_processes:
+        - SearchUI.exe
+        - system
