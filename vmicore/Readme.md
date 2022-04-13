@@ -1,19 +1,19 @@
 # VMICore
 
-*VMICore* is a VM Introsepction tool capable of dynamic malware analysis.
+_VMICore_ is a VM Introsepction tool capable of dynamic malware analysis.
 
 ## How to Build
 
-  * Install Build Requirements
-    * g++ or clang++
-    * cmake
-    * tclap
+-   Install Build Requirements
+    -   g++ or clang++
+    -   cmake
+    -   tclap
 
-  * Clone this repository
+-   Clone this repository
 
-  * **\[Optionally\]** Create an output directory
+-   **\[Optionally]** Create an output directory
 
-  * Inside the output directory (or your current working directory for that matter), run:
+-   Inside the output directory (or your current working directory for that matter), run:
 
 ```console
 [user@localhost output_dir]$ cmake <path_to_top_level_project_dir>
