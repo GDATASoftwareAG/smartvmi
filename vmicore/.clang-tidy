@@ -4,11 +4,12 @@ Checks: '
   cert-*,
   concurrency-*,
   cppcoreguidelines-*,
-  -cppcoreguidelines-non-private-member-variables-in-classes,
-  -cppcoreguidelines-special-member-functions
+  -cppcoreguidelines-pro-type-union-access,
   google-*,
   llvm-*,
   -llvm-header-guard,
+  -llvm-namespace-comment,
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*'
+FormatStyle: 'file'
