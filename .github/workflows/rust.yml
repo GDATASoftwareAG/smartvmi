@@ -1,0 +1,34 @@
+---
+name: Rust CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.rs'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.rs'
+
+jobs:
+  rust-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Annotate commit with clippy warnings
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --manifest-path vmicore/rust_src/Cargo.toml -- -D warnings
+
+      - name: Rustfmt check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path vmicore/rust_src/Cargo.toml -- --check
+
