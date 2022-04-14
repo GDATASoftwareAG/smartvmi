@@ -1,0 +1,29 @@
+---
+name: Codacy
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - '**.h'
+      - '**.cpp'
+  pull_request:
+    branches:
+      - "main"
+    paths-ignore:
+      - '**.h'
+      - '**.cpp'
+
+jobs:
+  codacy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run Codacy Analysis CLI
+        uses: codacy/codacy-analysis-cli-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          upload: true

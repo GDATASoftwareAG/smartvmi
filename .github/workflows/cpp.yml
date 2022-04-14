@@ -1,34 +1,22 @@
 ---
-name: CI
+name: C++ CI
 
 on:
   push:
     branches:
       - "main"
+    paths:
+      - '**.h'
+      - '**.cpp'
   pull_request:
     branches:
       - "main"
+    paths:
+      - '**.h'
+      - '**.cpp'
 
 jobs:
-  rust-lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Annotate commit with clippy warnings
-        uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --manifest-path vmicore/rust_src/Cargo.toml -- -D warnings
-
-      - name: Rustfmt check
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --manifest-path vmicore/rust_src/Cargo.toml -- --check
-
-  cpp-lint:
+  format:
     runs-on: ubuntu-latest
     container:
       image: gdatacyberdefense/clang-format:14
@@ -90,10 +78,9 @@ jobs:
           cd vmicore
           clang-tidy -p build-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
 
-      - name: Upload clang tidy results
+      - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@master
         with:
           clang-tidy-output: vmicore/clang-tidy-output
-          run-docker-tools: false
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           upload: true
