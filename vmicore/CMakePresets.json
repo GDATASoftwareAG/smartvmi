@@ -6,11 +6,23 @@
             "displayName": "Debug Clang",
             "description": "Use Clang toolchain",
             "generator": "CodeBlocks - Unix Makefiles",
-            "binaryDir": "build-debug/",
+            "binaryDir": "build-clang-debug/",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "gcc-debug",
+            "displayName": "Debug G++",
+            "description": "Use gcc toolchain",
+            "generator": "CodeBlocks - Unix Makefiles",
+            "binaryDir": "build-gcc-debug/",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
             }
         }
     ],
@@ -19,6 +31,11 @@
             "name": "clang-build-debug",
             "displayName": "Build Clang Debug",
             "configurePreset": "clang-debug"
+        },
+        {
+            "name": "gcc-build-debug",
+            "displayName": "Build G++ Debug",
+            "configurePreset": "gcc-debug"
         }
     ],
     "testPresets": [
@@ -26,6 +43,11 @@
             "name": "clang-test",
             "displayName": "Test Clang",
             "configurePreset": "clang-debug"
+        },
+        {
+            "name": "gcc-test",
+            "displayName": "Test G++",
+            "configurePreset": "gcc-debug"
         }
     ]
 }
