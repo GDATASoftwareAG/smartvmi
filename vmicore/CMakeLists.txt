@@ -101,22 +101,15 @@ file(GLOB_RECURSE test_files "test/*.h" "test/*.cpp")
 
 # End variable section
 
-add_library(_vmicore OBJECT ${source_files})
-target_compile_options(_vmicore PUBLIC ${core_compile_flags} ${extra_compile_flags})
-target_link_libraries(_vmicore ${libraries} ${extra_libraries})
-
-add_executable(vmicore "src/main.cpp" $<TARGET_OBJECTS:_vmicore>)
+add_executable(vmicore "src/main.cpp" ${source_files})
+target_compile_options(vmicore PRIVATE ${core_compile_flags} ${extra_compile_flags})
 target_compile_definitions(vmicore PRIVATE "INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
-target_link_libraries(vmicore _vmicore)
+target_link_libraries(vmicore ${libraries} ${extra_libraries})
 
-add_executable(vmicore-test $<TARGET_OBJECTS:_vmicore> ${test_files})
-target_compile_options(vmicore-test PRIVATE -ggdb)
-target_link_libraries(vmicore-test _vmicore ${test_libraries})
-
-add_executable(vmicore-test-cov EXCLUDE_FROM_ALL $<TARGET_OBJECTS:_vmicore> ${test_files})
-target_compile_options(vmicore-test-cov PRIVATE -ggdb -fprofile-arcs -ftest-coverage)
-target_link_options(vmicore-test-cov PRIVATE --coverage)
-target_link_libraries(vmicore-test-cov _vmicore ${test_libraries} gcov)
+add_executable(vmicore-test EXCLUDE_FROM_ALL ${source_files} ${test_files})
+target_compile_options(vmicore-test PRIVATE -g -O0 --coverage)
+target_link_options(vmicore-test PRIVATE --coverage)
+target_link_libraries(vmicore-test ${libraries} ${test_libraries})
 
 # Setup test discovery
 

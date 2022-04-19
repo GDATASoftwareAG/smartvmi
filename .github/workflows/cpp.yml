@@ -8,12 +8,20 @@ on:
     paths:
       - '**.h'
       - '**.cpp'
+      - '**/CMakeLists.txt'
+      - '**/CMakePresets.json'
+      - '**/.clang-tidy'
+      - '**/.clang-format'
   pull_request:
     branches:
       - "main"
     paths:
       - '**.h'
       - '**.cpp'
+      - '**/CMakeLists.txt'
+      - '**/CMakePresets.json'
+      - '**/.clang-tidy'
+      - '**/.clang-format'
 
 jobs:
   format:
@@ -28,6 +36,46 @@ jobs:
         run: |
           cd vmicore
           find src/ test/ -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt-get install -y cmake libxen-dev libtclap-dev gcovr
+
+      - name: Clone libkvmi
+        uses: actions/checkout@v2
+        with:
+          repository: bitdefender/libkvmi
+          path: libkvmi
+
+      - name: Build and install libkvmi
+        run: |
+          ./bootstrap
+          ./configure
+          make
+          sudo make install
+        working-directory: libkvmi
+
+      - uses: actions/checkout@v2
+
+      - name: Test vmicore
+        run: |
+          cd vmicore
+          cmake --preset gcc-debug
+          cmake --build --preset gcc-build-debug --target vmicore-test
+          ctest --preset gcc-test
+          cd build-gcc-debug
+          gcovr -r .. -x -o cobertura.xml
+
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: vmicore/build-gcc-debug/cobertura.xml
+          language: CPP
+          force-coverage-parser: cobertura
 
   build:
     runs-on: ubuntu-latest
@@ -66,21 +114,16 @@ jobs:
           -D PROGRAM_BUILD_NUMBER='${{ github.run_number }}'
           cmake --build --preset clang-build-debug --target vmicore
 
-      - name: Test vmicore
-        run: |
-          cd vmicore
-          cmake --build --preset clang-build-debug --target vmicore-test
-          ctest --preset clang-test
-
       - name: Generate clang-tidy output for codacy
         run: |
           set -o pipefail
           cd vmicore
-          clang-tidy -p build-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
+          clang-tidy -p build-clang-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
 
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@master
         with:
+          run-docker-tools: false
           clang-tidy-output: vmicore/clang-tidy-output
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           upload: true
