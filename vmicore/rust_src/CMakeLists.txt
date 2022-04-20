@@ -27,5 +27,6 @@ add_custom_command(
 
 
 add_library(${RUST_TARGET_NAME} STATIC ${RUST_BRIDGE_CXX})
+set_property(TARGET ${RUST_TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 target_include_directories(${RUST_TARGET_NAME} INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(${RUST_TARGET_NAME} pthread dl ${RUST_LIB})
