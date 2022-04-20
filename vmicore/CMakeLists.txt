@@ -19,6 +19,12 @@ set(core_compile_flags -m64 -Wall)
 set(extra_compile_flags -Wunused -Wunreachable-code -Wextra -fPIE -Wpedantic)
 set(libraries vmi_shared dl yaml-cpp)
 
+# Toolchain checks
+
+include(CheckPIESupported)
+check_pie_supported()
+
+
 find_library(libubsan_static libubsan.a HINTS /usr/lib/gcc/*/*/)
 find_library(libasan_static libasan.a HINTS /usr/lib/gcc/*/*/)
 if (VMI_SANITIZERS)
@@ -76,6 +82,7 @@ FetchContent_Declare(
         GIT_TAG yaml-cpp-0.7.0
 )
 FetchContent_MakeAvailable(yaml-cpp)
+set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 
 # Setup Boost DI
 
@@ -102,6 +109,7 @@ file(GLOB_RECURSE test_files "test/*.h" "test/*.cpp")
 # End variable section
 
 add_executable(vmicore "src/main.cpp" ${source_files})
+set_property(TARGET vmicore PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 target_compile_options(vmicore PRIVATE ${core_compile_flags} ${extra_compile_flags})
 target_compile_definitions(vmicore PRIVATE "INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 target_link_libraries(vmicore ${libraries} ${extra_libraries})
