@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#define VMI_PLUGIN_API_VERSION 9
+#define VMI_PLUGIN_API_VERSION 10
 
 namespace Plugin
 {
@@ -38,8 +38,8 @@ namespace Plugin
     struct PluginDetails
     {
         unsigned int apiVersion;
-        std::string pluginName;
-        std::string pluginVersion;
+        const char* pluginName;
+        const char* pluginVersion;
     } __attribute__((aligned(128)));
 
     struct MemoryRegion
