@@ -1,0 +1,15 @@
+---
+Checks: '
+  bugprone-*,
+  cert-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-pro-type-union-access,
+  google-*,
+  llvm-*,
+  -llvm-header-guard,
+  -llvm-namespace-comment,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  performance-*'
+FormatStyle: 'file'

@@ -1,0 +1,21 @@
+---
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+Language: Cpp
+BasedOnStyle: LLVM
+ColumnLimit: 120
+IndentWidth: 4
+PointerAlignment: Left
+BreakBeforeBraces: Allman
+BinPackArguments: false
+BinPackParameters: false
+NamespaceIndentation: All
+FixNamespaceComments: false
+# Is deprecated and replaced by 'PackConstructorInitializersStyle: PCIS_CurrentLine' in clang-format 14
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+IndentCaseLabels: true
