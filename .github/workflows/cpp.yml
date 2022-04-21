@@ -33,97 +33,158 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Perform C++ format check
-        run: |
-          cd vmicore
-          find src/ test/ -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
+        run: find . -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
 
-  test:
+  test_core:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
 
     steps:
-      - name: Install dependencies
-        run: sudo apt-get install -y cmake libxen-dev libtclap-dev gcovr
-
-      - name: Clone libkvmi
-        uses: actions/checkout@v2
-        with:
-          repository: bitdefender/libkvmi
-          path: libkvmi
-
-      - name: Build and install libkvmi
-        run: |
-          ./bootstrap
-          ./configure
-          make
-          sudo make install
-        working-directory: libkvmi
-
       - uses: actions/checkout@v2
 
       - name: Test vmicore
         run: |
-          cd vmicore
           cmake --preset gcc-debug
           cmake --build --preset gcc-build-debug --target vmicore-test
           ctest --preset gcc-test
           cd build-gcc-debug
           gcovr -r .. -x -o cobertura.xml
+        working-directory: vmicore
 
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@v1
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v3
         with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: vmicore/build-gcc-debug/cobertura.xml
-          language: CPP
-          force-coverage-parser: cobertura
+          name: coverage_vmicore
+          path: vmicore/build-gcc-debug/cobertura.xml
 
-  build:
+  build_core:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
 
     steps:
-      - name: Install dependencies
-        run: sudo apt-get install -y clang cmake libxen-dev libtclap-dev clang-tidy
-
-      - name: Clone libkvmi
-        uses: actions/checkout@v2
-        with:
-          repository: bitdefender/libkvmi
-          path: libkvmi
-
-      - name: Build and install libkvmi
-        run: |
-          ./bootstrap
-          ./configure
-          make
-          sudo make install
-        working-directory: libkvmi
-
       - uses: actions/checkout@v2
-
-      - name: Get latest git tag
-        id: latesttag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-        with:
-          fallback: v0.0.0
 
       - name: Build vmicore
         run: |
-          cd vmicore
-          cmake --preset clang-debug \
-          -D PROGRAM_VERSION='${{ steps.latesttag.outputs.tag }}' \
-          -D PROGRAM_BUILD_NUMBER='${{ github.run_number }}'
+          cmake --preset clang-debug
           cmake --build --preset clang-build-debug --target vmicore
+        working-directory: vmicore
 
       - name: Generate clang-tidy output for codacy
+        run: clang-tidy -p build-clang-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
+        working-directory: vmicore
+
+      - name: Upload clang-tidy artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: clang_tidy_vmicore
+          path: vmicore/clang-tidy-output
+
+  test_inmemoryscanner:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Test inmemoryscanner
         run: |
-          set -o pipefail
-          cd vmicore
-          clang-tidy -p build-clang-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
+          cmake --preset gcc-debug
+          cmake --build --preset gcc-build-debug --target inmemoryscanner-test
+          ctest --preset gcc-test
+          cd build-gcc-debug
+          gcovr -r .. -x -o cobertura.xml
+        working-directory: plugins/inmemoryscanner
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage_inmemoryscanner
+          path: plugins/inmemoryscanner/build-gcc-debug/cobertura.xml
+
+  build_inmemoryscanner:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build inmemoryscanner
+        run: |
+          cmake --preset clang-debug
+          cmake --build --preset clang-build-debug --target inmemoryscanner
+        working-directory: plugins/inmemoryscanner
+
+      - name: Generate clang-tidy output for codacy
+        run: clang-tidy -p build-clang-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
+        working-directory: plugins/inmemoryscanner
+
+      - name: Upload clang-tidy artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: clang_tidy_inmemoryscanner
+          path: plugins/inmemoryscanner/clang-tidy-output
+
+  clang_tidy_upload:
+    needs: [build_core, build_inmemoryscanner]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Show cwd
+        run: pwd
+
+      - name: Download vmicore clang-tidy artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: clang_tidy_vmicore
+          path: vmicore
+
+      - name: Download inmemoryscanner clang-tidy artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: clang_tidy_inmemoryscanner
+          path: plugins/inmemoryscanner
+
+      - name: Consolidate clang-tidy output
+        run: |
+          cat vmicore/clang-tidy-output > clang-tidy-output
+          cat plugins/inmemoryscanner/clang-tidy-output >> clang-tidy-output
 
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@master
         with:
           run-docker-tools: false
-          clang-tidy-output: vmicore/clang-tidy-output
+          clang-tidy-output: clang-tidy-output
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           upload: true
+
+  test_coverage_upload:
+    needs: [test_core, test_inmemoryscanner]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download vmicore coverage artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage_vmicore
+          path: vmicore
+
+      - name: Download inmemoryscanner coverage artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage_inmemoryscanner
+          path: plugins/inmemoryscanner
+
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: vmicore/cobertura.xml,plugins/inmemoryscanner/cobertura.xml
+          language: CPP
+          force-coverage-parser: cobertura
