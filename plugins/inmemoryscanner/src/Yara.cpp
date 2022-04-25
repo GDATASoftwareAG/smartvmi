@@ -42,17 +42,18 @@ int Yara::yaraCallback(YR_SCAN_CONTEXT* context, int message, void* message_data
     int ret;
     switch (message)
     {
-    case CALLBACK_MSG_RULE_MATCHING:
-        ret = handleRuleMatch(context, static_cast<YR_RULE*>(message_data), static_cast<std::vector<Rule>*>(user_data));
-        break;
-    case CALLBACK_MSG_RULE_NOT_MATCHING:
-        [[fallthrough]];
-    case CALLBACK_MSG_SCAN_FINISHED:
-        ret = CALLBACK_CONTINUE;
-        break;
-    default:
-        ret = CALLBACK_ERROR;
-        break;
+        case CALLBACK_MSG_RULE_MATCHING:
+            ret = handleRuleMatch(
+                context, static_cast<YR_RULE*>(message_data), static_cast<std::vector<Rule>*>(user_data));
+            break;
+        case CALLBACK_MSG_RULE_NOT_MATCHING:
+            [[fallthrough]];
+        case CALLBACK_MSG_SCAN_FINISHED:
+            ret = CALLBACK_CONTINUE;
+            break;
+        default:
+            ret = CALLBACK_ERROR;
+            break;
     }
 
     return ret;

@@ -41,54 +41,54 @@ std::unique_ptr<std::string> Dumping::protectionToString(ProtectionValues protec
     auto protectionAsString = std::make_unique<std::string>();
     switch (protection)
     {
-    case ProtectionValues::PAGE_NOACCESS:
-    case ProtectionValues::PAGE_NOACCESS_2:
-    case ProtectionValues::PAGE_NOACCESS_3:
-    case ProtectionValues::PAGE_NOACCESS_4:
-        protectionAsString->append("N");
-        break;
-    case ProtectionValues::PAGE_READONLY:
-    case ProtectionValues::PAGE_NOCACHE_PAGE_READONLY:
-    case ProtectionValues::PAGE_GUARD_PAGE_READONLY:
-    case ProtectionValues::PAGE_WRITECOMBINE_PAGE_READONLY:
-        protectionAsString->append("R");
-        break;
-    case ProtectionValues::PAGE_READWRITE:
-    case ProtectionValues::PAGE_NOCACHE_PAGE_READWRITE:
-    case ProtectionValues::PAGE_GUARD_PAGE_READWRITE:
-    case ProtectionValues::PAGE_WRITECOMBINE_PAGE_READWRITE:
-        protectionAsString->append("RW");
-        break;
-    case ProtectionValues::PAGE_EXECUTE:
-    case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE:
-    case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE:
-    case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE:
-        protectionAsString->append("X");
-        break;
-    case ProtectionValues::PAGE_EXECUTE_READ:
-    case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_READ:
-    case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_READ:
-    case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_READ:
-        protectionAsString->append("RX");
-        break;
-    case ProtectionValues::PAGE_EXECUTE_READWRITE:
-    case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_READWRITE:
-    case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_READWRITE:
-    case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_READWRITE:
-        protectionAsString->append("RWX");
-        break;
-    case ProtectionValues::PAGE_WRITECOPY:
-    case ProtectionValues::PAGE_NOCACHE_PAGE_WRITECOPY:
-    case ProtectionValues::PAGE_GUARD_PAGE_WRITECOPY:
-    case ProtectionValues::PAGE_WRITECOMBINE_PAGE_WRITECOPY:
-        protectionAsString->append("WC");
-        break;
-    case ProtectionValues::PAGE_EXECUTE_WRITECOPY:
-    case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_WRITECOPY:
-    case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_WRITECOPY:
-    case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_WRITECOPY:
-        protectionAsString->append("WCX");
-        break;
+        case ProtectionValues::PAGE_NOACCESS:
+        case ProtectionValues::PAGE_NOACCESS_2:
+        case ProtectionValues::PAGE_NOACCESS_3:
+        case ProtectionValues::PAGE_NOACCESS_4:
+            protectionAsString->append("N");
+            break;
+        case ProtectionValues::PAGE_READONLY:
+        case ProtectionValues::PAGE_NOCACHE_PAGE_READONLY:
+        case ProtectionValues::PAGE_GUARD_PAGE_READONLY:
+        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_READONLY:
+            protectionAsString->append("R");
+            break;
+        case ProtectionValues::PAGE_READWRITE:
+        case ProtectionValues::PAGE_NOCACHE_PAGE_READWRITE:
+        case ProtectionValues::PAGE_GUARD_PAGE_READWRITE:
+        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_READWRITE:
+            protectionAsString->append("RW");
+            break;
+        case ProtectionValues::PAGE_EXECUTE:
+        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE:
+        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE:
+        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE:
+            protectionAsString->append("X");
+            break;
+        case ProtectionValues::PAGE_EXECUTE_READ:
+        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_READ:
+        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_READ:
+        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_READ:
+            protectionAsString->append("RX");
+            break;
+        case ProtectionValues::PAGE_EXECUTE_READWRITE:
+        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_READWRITE:
+        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_READWRITE:
+        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_READWRITE:
+            protectionAsString->append("RWX");
+            break;
+        case ProtectionValues::PAGE_WRITECOPY:
+        case ProtectionValues::PAGE_NOCACHE_PAGE_WRITECOPY:
+        case ProtectionValues::PAGE_GUARD_PAGE_WRITECOPY:
+        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_WRITECOPY:
+            protectionAsString->append("WC");
+            break;
+        case ProtectionValues::PAGE_EXECUTE_WRITECOPY:
+        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_WRITECOPY:
+        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_WRITECOPY:
+        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_WRITECOPY:
+            protectionAsString->append("WCX");
+            break;
     }
     return protectionAsString;
 }

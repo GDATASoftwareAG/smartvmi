@@ -1,11 +1,11 @@
-# VmiInMemoryScannerPlugin
+# InMemoryScanner Plugin
 
 A plugin for _VMICore_ capable of scanning as well as dumping process memory from live VMs.
 
 ## What processes are scanned?
 
-The _VmiInMemoryScannerPlugin_ scans each and every process which is terminated during runtime.
-When the analysis run should end the _VmiInMemoryScannerPlugin_ also scans all processes which are running at this point, except the ones excluded in the config.
+The _InMemoryScanner_ plugin scans each and every process which is terminated during runtime.
+When the analysis run should end the _InMemoryScanner_ also scans all processes which are running at this point, except the ones excluded in the config.
 
 ## Memory dumps
 
@@ -65,7 +65,7 @@ For additional information see https://www.codemachine.com/article_protopte.html
 Each VAD entry represents a coherent memory region. Shared memory regions that are not the base image of the process are skipped by default in order to reduce scanning time (`scan_all_regions="false"`).
 To further optimize scan duration, memory regions >50MB will be ignored as well.
 
-The _VmiInMemoryScannerPlugin_ extracts every region and scans it independently of other memory regions.
+The _InMemoryScanner_ extracts every region and scans it independently of other memory regions.
 This means that _Yara_ rules which need to be applied to several memory regions at once can never match.
 Within these memory regions not every page has to actually be present in memory. Therefore, non-mapped page ranges are substituted by
 a single nulled page in order to avoid false positives during _Yara_ rule matching.
@@ -115,13 +115,13 @@ if updates for those are available.
 
 # How to Run
 
-The _VmiInMemoryScannerPlugin_ has to be used as a plugin in conjunction with the _VMICore_ project.
+The _InMemoryScanner_ has to be used as a plugin in conjunction with the _VMICore_ project.
 For this, add the following parts to the _VMICore_ config and tweak them to your requirements:
 
 | Parameter | Description |
 |------------|-------------|
 | `directory` | Path to the folder where the compiled _VMICore_ plugins are located. |
-| `plugins` | Add your plugin here by the exact name of your shared library (e.g. `libinmemory.so`). All plugin specific config keys should be added as sub-keys under this name. |
+| `plugins` | Add your plugin here by the exact name of your shared library (e.g. `libinmemoryscanner.so`). All plugin specific config keys should be added as sub-keys under this name. |
 | `signature_file` | Path to the compiled signatures with which to scan the memory regions. |
 | `output_path` | Optional output path. If this is a relative path it is interpreted relatively to the _VMICore_ results directory. |
 | `scan_all_regions` | Optional boolean (defaults to `false`). Indicates whether to eagerly scan all memory regions as opposed to ignoring shared memory. |
@@ -135,7 +135,7 @@ Example configuration:
 plugin_system:
   directory: /usr/local/lib/
   plugins:
-    libinmemory.so:
+    libinmemoryscanner.so:
       signature_file: /usr/local/share/inmemsigs/sigs.sig
       dump_memory: false
       scan_all_regions: false

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-project(vmiinmemoryscannerplugin)
+project(inmemoryscanner)
 
 set(PROGRAM_VERSION "2.5.0" CACHE STRING "Program version.")
 set(PROGRAM_BUILD_NUMBER "testbuild" CACHE STRING "Build number.")
-set(VMICORE_DIRECTORY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../vmicore" CACHE PATH "Path to directory root of VMICore project.")
+set(VMICORE_DIRECTORY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../vmicore" CACHE PATH "Path to directory root of VMICore project.")
 
 # Dependencies
 
@@ -47,20 +47,20 @@ add_definitions(-DBUILD_VERSION="${PROGRAM_BUILD_NUMBER}")
 file(GLOB_RECURSE source_files "src/*.h" "src/*.cpp")
 file(GLOB test_files "test/*.h" "test/*.cpp")
 
-add_library(inmemory MODULE ${source_files})
+add_library(inmemoryscanner MODULE ${source_files})
 
-target_compile_options(inmemory PRIVATE ${compile_flags})
-target_link_libraries(inmemory ${libraries})
+target_compile_options(inmemoryscanner PRIVATE ${compile_flags})
+target_link_libraries(inmemoryscanner ${libraries})
 
-add_executable(inmemory-test ${source_files} ${test_files})
+add_executable(inmemoryscanner-test ${source_files} ${test_files})
 
-target_compile_options(inmemory-test PRIVATE ${compile_flags} -g -O0 --coverage)
-target_link_options(inmemory-test PRIVATE --coverage)
-target_link_libraries(inmemory-test ${libraries} pthread gtest gmock gmock_main)
+target_compile_options(inmemoryscanner-test PRIVATE ${compile_flags} -g -O0 --coverage)
+target_link_options(inmemoryscanner-test PRIVATE --coverage)
+target_link_libraries(inmemoryscanner-test ${libraries} pthread gtest gmock gmock_main)
 
 # Setup test discovery
 
 include(GoogleTest)
 
 enable_testing()
-gtest_discover_tests(inmemory-test)
+gtest_discover_tests(inmemoryscanner-test)
