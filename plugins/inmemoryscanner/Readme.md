@@ -1,11 +1,8 @@
 # InMemoryScanner Plugin
 
-A plugin for _VMICore_ capable of scanning as well as dumping process memory from live VMs.
-
-## What Processes are Scanned?
-
-The _InMemoryScanner_ plugin scans each and every process which is terminated during runtime.
-When the analysis run should end the _InMemoryScanner_ also scans all processes which are running at this point, except the ones excluded in the config.
+A plugin for _VMICore_ capable of scanning as well as dumping process memory from live VMs.\
+The _InMemoryScanner_ scans each and every process that is terminated during runtime.
+As soon as the shutdown of _VMICore_ is requested the _InMemoryScanner_ also scans all processes which are running at this point, except the ones excluded in the config.
 
 ## Memory Dumps
 
@@ -32,7 +29,9 @@ The content of the `MemoryRegionInformation.json` looks like the following:
 In order to simplify automated analysis of memory dumps each _json_ dictionary references the file containing the corresponding memory region in the `DumpFileName` key.
 The dump filenames adhere to the following naming schema:
 
-    {TruncatedProcessName}-{ProcessId}-{AccessRights}-{StartAddress}-{EndAddress}-{Uid}
+```console
+{TruncatedProcessName}-{ProcessId}-{AccessRights}-{StartAddress}-{EndAddress}-{Uid}
+```
 
 The value of `ProcessName` is truncated to a maximum length of 14 characters and the `Uid` key is simply a counter starting at 0 and increasing by 1 for each scanned memory region.
 
@@ -90,16 +89,22 @@ This region has a size of `0x1f43b599000` - `0x1f43b593000` = `0x6000`.
 However the pages from `0x1f43b596000` to `0x1f43b598000` (size `0x2000`) are not mapped into memory.
 Therefore, the resulting files will have the size of `0x5000` (mapped size + one zero-page). Note that the start and end address however are the original ones.
 
-    winlogon.exe-488-private-RW-1f43b593000-1f43b599000-BeingDeleted_FALSE
+```console
+winlogon.exe-488-private-RW-1f43b593000-1f43b599000-BeingDeleted_FALSE
+```
 
-# How to Build
+## How to Build
 
 -   Install Build Requirements
+
     -   g++ or clang
     -   cmake
     -   libyara (with headers)
+
 -   Clone this repository
+
 -   **\[Optionally]** Create an output directory
+
 -   Inside the output directory (or your current working directory for that matter), run:
 
 ```console
@@ -112,7 +117,7 @@ Therefore, the resulting files will have the size of `0x5000` (mapped size + one
 -   External headers will only be downloaded if they are missing, so a clean rebuild is advised
     if updates for those are available.
 
-# How to Run
+## How to Run
 
 The _InMemoryScanner_ has to be used as a plugin in conjunction with the _VMICore_ project.
 For this, add the following parts to the _VMICore_ config and tweak them to your requirements:
