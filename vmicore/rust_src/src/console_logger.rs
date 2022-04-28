@@ -65,11 +65,13 @@ impl ConsoleLogger {
             .chain(fields.iter().cloned().map(|v| *v))
             .collect();
         println!(
-            "{} {} {} {:?}",
+            "{} {} {} {}",
             Utc::now().to_rfc3339(),
             level,
             message,
             combined_fields
+                .iter()
+                .fold(String::new(), |acc, el| acc + "\n\t" + &el.to_string())
         );
         Ok(())
     }

@@ -55,3 +55,30 @@ impl fmt::Display for Level {
         write!(f, "{:?}", self)
     }
 }
+
+impl fmt::Display for LogField {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}: {}",
+            self.name,
+            self.field.as_ref().map(|f| f.to_string()).unwrap_or_default()
+        )
+    }
+}
+
+impl fmt::Display for Field {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Field::StrField(s) => write!(f, "{s}"),
+            Field::FloatField(fl) => write!(f, "{fl}"),
+            Field::IntField(i) => write!(f, "{i}"),
+            Field::UintField(u) => write!(f, "{u}"),
+            Field::BoolField(b) => write!(f, "{b}"),
+            Field::BinaryField(b) => write!(f, "{b:?}"),
+            Field::ByteStringField(b) => write!(f, "{b:?}"),
+            Field::TimeField(t) => write!(f, "{t:?}"),
+            Field::DurationField(d) => write!(f, "{d:?}"),
+        }
+    }
+}
