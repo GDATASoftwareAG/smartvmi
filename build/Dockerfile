@@ -20,6 +20,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     make \
     pkg-config \
     sudo \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/bitdefender/libkvmi.git \
