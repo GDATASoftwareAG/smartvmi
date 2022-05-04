@@ -195,7 +195,10 @@ int main(int argc, const char* argv[])
     }
 
     GlobalControl::uninit();
-    logging->stop(5000);
+    if (logging)
+    {
+        logging->stop(5000);
+    }
 
     return exitCode;
 }
