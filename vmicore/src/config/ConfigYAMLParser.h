@@ -23,6 +23,10 @@ class ConfigYAMLParser : public IConfigParser
 
     void setVmName(const std::string& vmName) override;
 
+    [[nodiscard]] std::filesystem::path getSocketPath() override;
+
+    void setSocketPath(const std::filesystem::path& socketPath) override;
+
     [[nodiscard]] std::string getOffsetsFile() const override;
 
     [[nodiscard]] std::filesystem::path getPluginDirectory() const override;
@@ -36,6 +40,7 @@ class ConfigYAMLParser : public IConfigParser
         std::filesystem::path resultsDirectory;
         std::string logLevel;
         std::string vmName;
+        std::filesystem::path socketPath;
         std::string offsetsFile;
         std::filesystem::path pluginDirectory;
         std::map<const std::string, const std::shared_ptr<Plugin::IPluginConfig>> plugins{};

@@ -21,6 +21,10 @@ class MockConfigInterface : public IConfigParser
 
     MOCK_METHOD(void, setVmName, (const std::string&), (override));
 
+    MOCK_METHOD(std::filesystem::path, getSocketPath, (), (override));
+
+    MOCK_METHOD(void, setSocketPath, (const std::filesystem::path&), (override));
+
     MOCK_METHOD(std::string, getOffsetsFile, (), (const override));
 
     MOCK_METHOD(std::filesystem::path, getPluginDirectory, (), (const override));

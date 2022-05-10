@@ -2,6 +2,7 @@
 #include "../GlobalControl.h"
 #include "../io/grpc/GRPCLogger.h"
 #include "../os/PagingDefinitions.h"
+#include "VmiInitData.h"
 #include <utility>
 
 namespace
@@ -36,11 +37,12 @@ void LibvmiInterface::initializeVmi(const std::function<void()>& postInitializat
     logger->info("Initialize successfully initialized", {logfield::create("domain", configInterface->getVmName())});
 
     auto configString = createConfigString(configInterface->getOffsetsFile());
+    auto initData = VmiInitData(configInterface->getSocketPath());
     vmi_init_error initError;
     if (vmi_init_complete(&vmiInstance,
                           reinterpret_cast<const void*>(configInterface->getVmName().c_str()),
                           VMI_INIT_DOMAINNAME | VMI_INIT_EVENTS,
-                          nullptr,
+                          initData.data,
                           VMI_CONFIG_STRING,
                           reinterpret_cast<void*>(const_cast<char*>(configString->c_str())),
                           &initError) == VMI_FAILURE)

@@ -26,6 +26,10 @@ class IConfigParser
 
     virtual void setVmName(const std::string& vmName) = 0;
 
+    [[nodiscard]] virtual std::filesystem::path getSocketPath() = 0;
+
+    virtual void setSocketPath(const std::filesystem::path& socketPath) = 0;
+
     [[nodiscard]] virtual std::string getOffsetsFile() const = 0;
 
     [[nodiscard]] virtual std::filesystem::path getPluginDirectory() const = 0;

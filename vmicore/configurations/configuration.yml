@@ -3,6 +3,7 @@ results_directory: ./results
 log_level: info
 vm:
   name: some_vm
+  socket: /tmp/introspector
   offsets_file: offsets.json
 plugin_system:
   directory: /usr/local/lib/
