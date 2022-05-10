@@ -8,6 +8,10 @@ void ConfigYAMLParser::extractConfiguration(const std::filesystem::path& configu
     configuration.resultsDirectory = configRootNode["results_directory"].as<std::string>();
     configuration.logLevel = configRootNode["log_level"].as<std::string>();
     configuration.vmName = configRootNode["vm"]["name"].as<std::string>();
+    if (configRootNode["vm"]["socket"].IsDefined())
+    {
+        configuration.socketPath = configRootNode["vm"]["socket"].as<std::string>();
+    }
     configuration.offsetsFile = configRootNode["vm"]["offsets_file"].as<std::string>();
     configuration.pluginDirectory = configRootNode["plugin_system"]["directory"].as<std::string>();
 
@@ -46,6 +50,16 @@ std::string ConfigYAMLParser::getVmName() const
 void ConfigYAMLParser::setVmName(const std::string& vmName)
 {
     configuration.vmName = vmName;
+}
+
+std::filesystem::path ConfigYAMLParser::getSocketPath()
+{
+    return configuration.socketPath;
+}
+
+void ConfigYAMLParser::setSocketPath(const std::filesystem::path& socketPath)
+{
+    configuration.socketPath = socketPath;
 }
 
 std::string ConfigYAMLParser::getOffsetsFile() const

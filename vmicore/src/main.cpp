@@ -43,6 +43,8 @@ int main(int argc, const char* argv[])
                                                     cmd);
     TCLAP::ValueArg<std::string> domainNameArgument(
         "n", "name", "Name of the domain to introspect.", false, "", "domain_name", cmd);
+    TCLAP::ValueArg<std::filesystem::path> kvmiSocketArgument(
+        "s", "socket", "KVMi socket path (required for introspecting on kvm).", false, "", "/path/to/socket", cmd);
     TCLAP::ValueArg<std::string> resultsDirectoryArgument(
         "r", "results", "Path to top level directory for results.", false, "./results", "results_directory", cmd);
     TCLAP::ValueArg<std::string> gRPCListenAddressArgument(
@@ -55,7 +57,7 @@ int main(int argc, const char* argv[])
                                                   "Log level",
                                                   cmd);
     TCLAP::SwitchArg dumpMemoryArgument("d", "dump", "Dump memory if the inmemory scanner plugin is loaded.", cmd);
-    TCLAP::SwitchArg enableDebugArgument("e", "enable-debug", "Enable additional console logs for gRPC mode", cmd);
+    TCLAP::SwitchArg enableDebugArgument("", "grpc-debug", "Enable additional console logs for gRPC mode.", cmd);
 
     std::shared_ptr<ILogging> logging;
     std::shared_ptr<IEventStream> eventStream;
@@ -114,6 +116,10 @@ int main(int argc, const char* argv[])
         if (domainNameArgument.isSet())
         {
             configInterface->setVmName(domainNameArgument.getValue());
+        }
+        if (kvmiSocketArgument.isSet())
+        {
+            configInterface->setSocketPath(kvmiSocketArgument.getValue());
         }
         if (resultsDirectoryArgument.isSet())
         {

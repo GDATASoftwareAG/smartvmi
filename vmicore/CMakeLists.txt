@@ -17,7 +17,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(core_compile_flags -m64 -Wall)
 set(extra_compile_flags -Wunused -Wunreachable-code -Wextra -Wpedantic -Wno-dollar-in-identifier-extension)
-set(libraries vmi_shared dl yaml-cpp)
 
 # Toolchain checks
 
@@ -57,8 +56,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-set(test_libraries pthread gtest gmock gmock_main)
-
 # Setup libvmi
 
 FetchContent_Declare(
@@ -94,13 +91,21 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(boost-di)
 include_directories(BEFORE SYSTEM ${boost-di_SOURCE_DIR}/include)
 
+# Setup Guideline Support Library
+
+FetchContent_Declare(
+        gsl
+        GIT_REPOSITORY https://github.com/microsoft/GSL.git
+        GIT_TAG v4.0.0
+)
+FetchContent_MakeAvailable(gsl)
+
 # Rust grpc server
 
 add_subdirectory(rust_src)
 include_directories(${CMAKE_BINARY_DIR}/rust_src)
-list(APPEND libraries rust_grpc_server)
 
-# Discover project source files
+# Project source files
 
 set(source_files
         src/GlobalControl.cpp
@@ -122,6 +127,7 @@ set(source_files
         src/vmi/InterruptGuard.cpp
         src/vmi/LibvmiInterface.cpp
         src/vmi/SingleStepSupervisor.cpp
+        src/vmi/VmiInitData.cpp
         src/vmi/VmiInitError.cpp)
 
 set(test_files
@@ -132,6 +138,11 @@ set(test_files
         test/vmi/LibvmiInterface_UnitTest.cpp
         test/vmi/SingleStepSupervisor_UnitTest.cpp)
 
+# Link libraries
+
+set(libraries rust_grpc_server vmi_shared dl yaml-cpp GSL)
+set(test_libraries pthread gtest gmock gmock_main)
+
 # End variable section
 
 add_executable(vmicore "src/main.cpp" ${source_files})
@@ -140,7 +151,7 @@ target_compile_options(vmicore PRIVATE ${core_compile_flags} ${extra_compile_fla
 target_compile_definitions(vmicore PRIVATE "INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 target_link_libraries(vmicore ${libraries} ${extra_libraries})
 
-add_executable(vmicore-test EXCLUDE_FROM_ALL ${source_files} ${test_files})
+add_executable(vmicore-test ${source_files} ${test_files})
 target_compile_options(vmicore-test PRIVATE -g -O0 --coverage)
 target_link_options(vmicore-test PRIVATE --coverage)
 target_link_libraries(vmicore-test ${libraries} ${test_libraries})
