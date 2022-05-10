@@ -16,7 +16,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(core_compile_flags -m64 -Wall)
-set(extra_compile_flags -Wunused -Wunreachable-code -Wextra -fPIE -Wpedantic)
+set(extra_compile_flags -Wunused -Wunreachable-code -Wextra -Wpedantic -Wno-dollar-in-identifier-extension)
 set(libraries vmi_shared dl yaml-cpp)
 
 # Toolchain checks
