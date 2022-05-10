@@ -102,9 +102,35 @@ list(APPEND libraries rust_grpc_server)
 
 # Discover project source files
 
-file(GLOB_RECURSE source_files "src/*.h" "src/*.cpp")
-list(FILTER source_files EXCLUDE REGEX "main\.cpp")
-file(GLOB_RECURSE test_files "test/*.h" "test/*.cpp")
+set(source_files
+        src/GlobalControl.cpp
+        src/VmiHub.cpp
+        src/config/ConfigYAMLParser.cpp
+        src/config/PluginConfig.cpp
+        src/io/console/ConsoleLogger.cpp
+        src/io/console/ConsoleLoggerBuilder.cpp
+        src/io/file/LegacyLogging.cpp
+        src/io/grpc/GRPCLogger.cpp
+        src/io/grpc/GRPCServer.cpp
+        src/os/windows/ActiveProcessesSupervisor.cpp
+        src/os/windows/KernelObjectExtractorWin10.cpp
+        src/os/windows/SystemEventSupervisor.cpp
+        src/os/windows/VadTreeWin10.cpp
+        src/plugins/PluginSystem.cpp
+        src/vmi/InterruptEvent.cpp
+        src/vmi/InterruptFactory.cpp
+        src/vmi/InterruptGuard.cpp
+        src/vmi/LibvmiInterface.cpp
+        src/vmi/SingleStepSupervisor.cpp
+        src/vmi/VmiInitError.cpp)
+
+set(test_files
+        test/os/windows/ActiveProcessesSupervisor_UnitTest.cpp
+        test/os/windows/SystemEventSupervisor_UnitTest.cpp
+        test/plugins/PluginSystem_UnitTest.cpp
+        test/vmi/InterruptEvent_UnitTest.cpp
+        test/vmi/LibvmiInterface_UnitTest.cpp
+        test/vmi/SingleStepSupervisor_UnitTest.cpp)
 
 # End variable section
 
