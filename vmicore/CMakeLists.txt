@@ -61,26 +61,26 @@ set(test_libraries pthread gtest gmock gmock_main)
 
 # Setup libvmi
 
-option(ENABLE_STATIC "Build libvmi static library" OFF)
-option(BUILD_EXAMPLES "Build the examples" OFF)
-
 FetchContent_Declare(
         libvmi
         GIT_REPOSITORY https://github.com/libvmi/libvmi
         GIT_TAG b34cb61
 )
+set(libvmi_ENABLE_STATIC OFF)
+set(libvmi_BUILD_EXAMPLES OFF)
 FetchContent_MakeAvailable(libvmi)
 
 include_directories(BEFORE SYSTEM ${libvmi_SOURCE_DIR})
 
 # Setup yaml-cpp
 
-set(YAML_BUILD_SHARED_LIBS OFF CACHE BOOL "")
 FetchContent_Declare(
         yaml-cpp
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
         GIT_TAG yaml-cpp-0.7.0
 )
+set(yaml-cpp_YAML_BUILD_SHARED_LIBS OFF)
+set(yaml-cpp_YAML_CPP_BUILD_TOOLS OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 
