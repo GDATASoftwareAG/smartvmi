@@ -13,6 +13,8 @@ class ISingleStepSupervisor
 
     virtual void initializeSingleStepEvents() = 0;
 
+    virtual void teardown() = 0;
+
     virtual void setSingleStepCallback(uint vcpuId, const std::function<void(vmi_event_t*)>& eventCallback) = 0;
 
   protected:
@@ -27,6 +29,8 @@ class SingleStepSupervisor : public ISingleStepSupervisor
     ~SingleStepSupervisor() override;
 
     void initializeSingleStepEvents() override;
+
+    void teardown() override;
 
     static event_response_t _defaultSingleStepCallback(vmi_instance_t vmiInstance, vmi_event_t* event);
 

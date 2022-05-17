@@ -1,8 +1,8 @@
 #include "SingleStepSupervisor.h"
 #include "../GlobalControl.h"
-#include "../io/ILogging.h"
 #include "../io/grpc/GRPCLogger.h"
 #include "VmiException.h"
+#include <cmath>
 
 namespace
 {
@@ -26,17 +26,6 @@ SingleStepSupervisor::SingleStepSupervisor(std::shared_ptr<ILibvmiInterface> vmi
 SingleStepSupervisor::~SingleStepSupervisor()
 {
     singleStepSupervisorSingleton = nullptr;
-    try
-    {
-        for (auto& event : singleStepEvents)
-        {
-            vmiInterface->clearEvent(event, false);
-        }
-    }
-    catch (const VmiException&)
-    {
-        SingleStepSupervisor::logger->warning("Unable to clear single step event during object destruction");
-    }
     logger.reset();
 }
 
@@ -46,6 +35,30 @@ void SingleStepSupervisor::initializeSingleStepEvents()
     SingleStepSupervisor::logger->debug("initialize callbacks", {logfield::create("vcpus", uint64_t(numberOfVCPUs))});
     singleStepEvents = std::vector<vmi_event_t>(numberOfVCPUs);
     callbacks = std::vector<std::function<void(vmi_event_t*)>>(numberOfVCPUs);
+}
+
+void SingleStepSupervisor::teardown()
+{
+
+    for (auto& event : singleStepEvents)
+    {
+        if (event.ss_event.enable)
+        {
+            auto vcpu_index = static_cast<uint32_t>(log2(event.ss_event.vcpus));
+            callbacks[vcpu_index] = nullptr;
+            event.callback = nullptr;
+            try
+            {
+                vmiInterface->stopSingleStepForVcpu(&event, vcpu_index);
+            }
+            catch (const VmiException& e)
+            {
+                SingleStepSupervisor::logger->error("Unable to clear single step event during teardown",
+                                                    {logfield::create("exception", e.what())});
+            }
+            event.ss_event.enable = false;
+        }
+    }
 }
 
 event_response_t SingleStepSupervisor::singleStepCallback(vmi_event_t* event)

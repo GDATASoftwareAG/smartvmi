@@ -21,6 +21,7 @@ void InterruptFactory::initialize()
 void InterruptFactory::teardown()
 {
     InterruptEvent::clearInterruptEventHandling(*vmiInterface);
+    singleStepSupervisor->teardown();
 }
 
 std::shared_ptr<InterruptEvent> InterruptFactory::createInterruptEvent(
