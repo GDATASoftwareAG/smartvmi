@@ -12,6 +12,12 @@ class VmiInitData
 
     explicit VmiInitData(const std::filesystem::path& socketPath);
 
+    // do not allow copy construction therefore avoiding multiple free() calls to the same memory location during object
+    // destruction
+    VmiInitData(const VmiInitData&) = delete;
+
+    VmiInitData(VmiInitData&& vmiInitData) noexcept;
+
     ~VmiInitData();
 };
 
