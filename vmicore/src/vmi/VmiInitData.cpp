@@ -27,6 +27,11 @@ VmiInitData::VmiInitData(const std::filesystem::path& socketPath)
     }
 }
 
+VmiInitData::VmiInitData(VmiInitData&& vmiInitData) noexcept : data(vmiInitData.data)
+{
+    vmiInitData.data = nullptr;
+}
+
 VmiInitData::~VmiInitData()
 {
     if (data != nullptr)
