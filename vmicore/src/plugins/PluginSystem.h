@@ -6,7 +6,7 @@
 #include "../io/ILogging.h"
 #include "../io/file/LegacyLogging.h"
 #include "../os/windows/ActiveProcessesSupervisor.h"
-#include "../os/windows/KernelObjectExtractorWin10.h"
+#include "../os/windows/KernelAccess.h"
 #include "../vmi/LibvmiInterface.h"
 #include "PluginInterface.h"
 #include <vector>

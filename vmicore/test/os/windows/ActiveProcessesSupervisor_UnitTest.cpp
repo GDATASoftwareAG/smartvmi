@@ -1,4 +1,5 @@
 #include "../../vmi/ProcessesMemoryState.h"
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 using testing::Contains;
@@ -11,11 +12,7 @@ class ActiveProcessesSupervisorFixture : public ProcessesMemoryStateFixture
     void SetUp() override
     {
         ProcessesMemoryStateFixture::SetUp();
-
-        setupActiveProcessList({process0, process4, process248});
-
-        setupReturnsForFullProcess248Name();
-        setupReturnsForFullProcess332Name();
+        ProcessesMemoryStateFixture::setupActiveProcesses();
     }
 };
 
@@ -43,20 +40,20 @@ TEST_F(ActiveProcessesSupervisorFixture, initialize_preexistingProcesses_process
     EXPECT_CALL(*mockEventStream,
                 sendProcessEvent(::grpc::ProcessState::Started,
                                  StrEq(emptyFileName),
-                                 process0Pid,
-                                 StrEq(Convenience::intToHex(process0Cr3))))
+                                 process0.processId,
+                                 StrEq(Convenience::intToHex(process0.cr3))))
         .Times(1);
     EXPECT_CALL(*mockEventStream,
                 sendProcessEvent(::grpc::ProcessState::Started,
-                                 StrEq(process4FileName),
-                                 process4Pid,
-                                 StrEq(Convenience::intToHex(systemCr3))))
+                                 StrEq(process4.imageFileName),
+                                 process4.processId,
+                                 StrEq(Convenience::intToHex(systemCR3))))
         .Times(1);
     EXPECT_CALL(*mockEventStream,
                 sendProcessEvent(::grpc::ProcessState::Started,
-                                 StrEq(process248FileName),
-                                 process248Pid,
-                                 StrEq(Convenience::intToHex(process248CR3))))
+                                 StrEq(process248.imageFileName),
+                                 process248.processId,
+                                 StrEq(Convenience::intToHex(process248.cr3))))
         .Times(1);
 
     EXPECT_NO_THROW(activeProcessesSupervisor->initialize());
@@ -67,7 +64,7 @@ TEST_F(ActiveProcessesSupervisorFixture, addNewProcess_process332_processAdded)
     EXPECT_NO_THROW(activeProcessesSupervisor->initialize());
     setupProcessWithLink(process332, process0.eprocessBase);
 
-    EXPECT_NO_THROW(activeProcessesSupervisor->addNewProcess(process332EprocessBase));
+    EXPECT_NO_THROW(activeProcessesSupervisor->addNewProcess(process332.eprocessBase));
 
     std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> activeProcesses;
     EXPECT_NO_THROW(activeProcesses = activeProcessesSupervisor->getActiveProcesses());
@@ -81,18 +78,18 @@ TEST_F(ActiveProcessesSupervisorFixture, addNewProcess_process332_processStartEv
 
     EXPECT_CALL(*mockEventStream,
                 sendProcessEvent(::grpc::ProcessState::Started,
-                                 StrEq(process332FileName),
-                                 process332Pid,
-                                 StrEq(Convenience::intToHex(process332CR3))))
+                                 StrEq(process332.imageFileName),
+                                 process332.processId,
+                                 StrEq(Convenience::intToHex(process332.cr3))))
         .Times(1);
-    EXPECT_NO_THROW(activeProcessesSupervisor->addNewProcess(process332EprocessBase));
+    EXPECT_NO_THROW(activeProcessesSupervisor->addNewProcess(process332.eprocessBase));
 }
 
 TEST_F(ActiveProcessesSupervisorFixture, removeActiveProcess_presentProcess_processRemoved)
 {
     EXPECT_NO_THROW(activeProcessesSupervisor->initialize());
 
-    EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process248EprocessBase));
+    EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process248.eprocessBase));
 
     std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> activeProcesses;
     EXPECT_NO_THROW(activeProcesses = activeProcessesSupervisor->getActiveProcesses());
@@ -105,18 +102,18 @@ TEST_F(ActiveProcessesSupervisorFixture, removeActiveProcess_presentProcess_proc
 
     EXPECT_CALL(*mockEventStream,
                 sendProcessEvent(::grpc::ProcessState::Terminated,
-                                 StrEq(process248FileName),
-                                 process248Pid,
-                                 StrEq(Convenience::intToHex(process248CR3))))
+                                 StrEq(process248.imageFileName),
+                                 process248.processId,
+                                 StrEq(Convenience::intToHex(process248.cr3))))
         .Times(1);
-    EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process248EprocessBase));
+    EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process248.eprocessBase));
 }
 
 TEST_F(ActiveProcessesSupervisorFixture, removeNotActiveProcess_inactiveProcess_noChange)
 {
     EXPECT_NO_THROW(activeProcessesSupervisor->initialize());
 
-    EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process332EprocessBase));
+    EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process332.eprocessBase));
 
     std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> activeProcesses;
     EXPECT_NO_THROW(activeProcesses = activeProcessesSupervisor->getActiveProcesses());

@@ -3,6 +3,7 @@
 #include "../io/grpc/GRPCLogger.h"
 #include "../os/PagingDefinitions.h"
 #include "VmiInitData.h"
+#include <fmt/core.h>
 #include <utility>
 
 namespace
@@ -78,12 +79,12 @@ void LibvmiInterface::waitForCR3Event()
     cr3Event.reg_event.onchange = true;
     if (vmi_register_event(vmiInstance, &cr3Event) != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Unable to register cr3 event.");
+        throw VmiException(fmt::format("{}: Unable to register cr3 event.", __func__));
     }
     if (cr3Trigger)
     {
-        throw std::runtime_error(std::string(__func__) +
-                                 ": Initial value of cr3Trigger is 'true'. This should not occur.");
+        throw std::runtime_error(
+            fmt::format("{}: Initial value of cr3Trigger is 'true'. This should not occur", __func__));
     }
     for (auto i = 5; i > 0; --i)
     {
@@ -103,7 +104,7 @@ void LibvmiInterface::waitForCR3Event()
         {
             logger->warning(e.what());
         }
-        throw VmiException(std::string(__func__) + ": No cr3 event caught after 5 tries.");
+        throw VmiException(fmt::format("{}: No cr3 event caught after 5 tries.", __func__));
     }
     else
     {
@@ -137,7 +138,7 @@ void LibvmiInterface::cr3Callback(vmi_event_t* event)
 {
     if (vmi_clear_event(vmiInstance, event, nullptr) != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Unable to clear cr3 event.");
+        throw VmiException(fmt::format("{}: Unable to clear cr3 event.", __func__));
     }
     cr3EventHandler();
 }
@@ -146,45 +147,54 @@ void LibvmiInterface::clearEvent(vmi_event_t& event, bool deallocate)
 {
     if (vmi_clear_event(vmiInstance, &event, deallocate ? &LibvmiInterface::freeEvent : nullptr) != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Unable to clear event.");
+        throw VmiException(fmt::format("{}: Unable to clear event.", __func__));
     }
 }
 
 uint8_t LibvmiInterface::read8PA(const uint64_t physicalAddress)
 {
-    uint8_t extractedValue;
+    uint8_t extractedValue = 0;
     auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
     std::lock_guard<std::mutex> lock(libvmiLock);
     if (vmi_read_8(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
     {
-        throw VmiException(std::string(__func__) + ": Unable to read one byte from PA " +
-                           Convenience::intToHex(physicalAddress));
+        throw VmiException(fmt::format("{}: Unable to read one byte from PA: {:#x}", __func__, physicalAddress));
+    }
+    return extractedValue;
+}
+
+uint8_t LibvmiInterface::read8VA(const uint64_t virtualAddress, const uint64_t cr3)
+{
+    uint8_t extractedValue = 0;
+    auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
+    std::lock_guard<std::mutex> lock(libvmiLock);
+    if (vmi_read_8(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
+    {
+        throw VmiException(fmt::format("{}: Unable to read one byte from VA: {:#x}", __func__, virtualAddress));
     }
     return extractedValue;
 }
 
 uint32_t LibvmiInterface::read32VA(const uint64_t virtualAddress, const uint64_t cr3)
 {
-    uint32_t extractedValue;
+    uint32_t extractedValue = 0;
     auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
     std::lock_guard<std::mutex> lock(libvmiLock);
     if (vmi_read_32(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
     {
-        throw VmiException(std::string(__func__) + ": Unable to read 4 bytes from VA " +
-                           Convenience::intToHex(virtualAddress));
+        throw VmiException(fmt::format("{}: Unable to read 4 bytes from VA {:#x}", __func__, virtualAddress));
     }
     return extractedValue;
 }
 
 uint64_t LibvmiInterface::read64VA(const uint64_t virtualAddress, const uint64_t cr3)
 {
-    uint64_t extractedValue;
+    uint64_t extractedValue = 0;
     auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
     std::lock_guard<std::mutex> lock(libvmiLock);
     if (vmi_read_64(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
     {
-        throw VmiException(std::string(__func__) + ": Unable to read 8 bytes from VA " +
-                           Convenience::intToHex(virtualAddress));
+        throw VmiException(fmt::format("{}: Unable to read 8 bytes from VA {:#x}", __func__, virtualAddress));
     }
     return extractedValue;
 }
@@ -206,8 +216,7 @@ void LibvmiInterface::write8PA(const uint64_t physicalAddress, uint8_t value)
     std::lock_guard<std::mutex> lock(libvmiLock);
     if (vmi_write_8(vmiInstance, &accessContext, &value) == VMI_FAILURE)
     {
-        throw VmiException(std::string(__func__) + ": Unable to write " + Convenience::intToHex(value) + " to PA " +
-                           Convenience::intToHex(physicalAddress));
+        throw VmiException(fmt::format("{}: Unable to write {:#x} to PA {:#x}", __func__, value, physicalAddress));
     }
 }
 
@@ -235,7 +244,7 @@ void LibvmiInterface::waitForEvent()
     auto status = vmi_events_listen(vmiInstance, 500);
     if (status != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Error while waiting for vmi events.");
+        throw VmiException(fmt::format("{}: Error while waiting for vmi events.", __func__));
     }
 }
 
@@ -256,8 +265,8 @@ std::string eventTypeToString(vmi_event_type_t eventType)
         }
         default:
         {
-            throw std::invalid_argument(std::string(__func__) +
-                                        ": Event type unknown. Type = " + std::to_string(eventType));
+            throw std::invalid_argument(
+                fmt::format("{}: Event type unknown. Type = {}", __func__, std::to_string(eventType)));
         }
     }
     return typeAsString;
@@ -267,8 +276,8 @@ void LibvmiInterface::registerEvent(vmi_event_t& event)
 {
     if (vmi_register_event(vmiInstance, &event) == VMI_FAILURE)
     {
-        throw VmiException(std::string(__func__) +
-                           "Unable to register event with type: " + eventTypeToString(event.type));
+        throw VmiException(
+            fmt::format("{}: Unable to register event with type: {}", __func__, eventTypeToString(event.type)));
     }
 }
 
@@ -284,28 +293,28 @@ uint LibvmiInterface::getNumberOfVCPUs()
 
 uint64_t LibvmiInterface::translateKernelSymbolToVA(const std::string& kernelSymbolName)
 {
-    uint64_t kernelSymbolAddress;
+    uint64_t kernelSymbolAddress = 0;
     if (vmi_translate_ksym2v(vmiInstance, kernelSymbolName.c_str(), &kernelSymbolAddress) != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Unable to find kernel symbol " + kernelSymbolName);
+        throw VmiException(fmt::format("{}: Unable to find kernel symbol {}", __func__, kernelSymbolName));
     }
     return kernelSymbolAddress;
 }
 
 uint64_t LibvmiInterface::convertVAToPA(uint64_t virtualAddress, uint64_t processCr3)
 {
-    uint64_t physicalAddress;
+    uint64_t physicalAddress = 0;
     if (vmi_pagetable_lookup(vmiInstance, processCr3, virtualAddress, &physicalAddress) != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Conversion of address " + Convenience::intToHex(virtualAddress) +
-                           " with cr3 " + Convenience::intToHex(processCr3) + " not possible.");
+        throw VmiException(fmt::format(
+            "{}: Conversion of address {:#x} with cr3 {:#x} not possible.", __func__, virtualAddress, processCr3));
     }
     return physicalAddress;
 }
 
 uint64_t LibvmiInterface::convertPidToDtb(pid_t processID)
 {
-    uint64_t dtb;
+    uint64_t dtb = 0;
     if (vmi_pid_to_dtb(vmiInstance, processID, &dtb) != VMI_SUCCESS)
     {
         throw VmiException("Unable to obtain the dtb for pid " + Convenience::intToDec(processID));
@@ -315,7 +324,7 @@ uint64_t LibvmiInterface::convertPidToDtb(pid_t processID)
 
 pid_t LibvmiInterface::convertDtbToPid(uint64_t dtb)
 {
-    pid_t pid;
+    pid_t pid = 0;
     if (vmi_dtb_to_pid(vmiInstance, dtb, &pid) != VMI_SUCCESS)
     {
         throw VmiException("Unable obtain the pid for dtb " + Convenience::intToHex(dtb));
@@ -328,7 +337,7 @@ void LibvmiInterface::pauseVm()
     auto status = vmi_pause_vm(vmiInstance);
     if (status != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Unable to pause the vm");
+        throw VmiException(fmt::format("{}: Unable to pause the vm", __func__));
     }
 }
 
@@ -337,7 +346,7 @@ void LibvmiInterface::resumeVm()
     auto status = vmi_resume_vm(vmiInstance);
     if (status != VMI_SUCCESS)
     {
-        throw VmiException(std::string(__func__) + ": Unable to resume the vm");
+        throw VmiException(fmt::format("{}: Unable to resume the vm", __func__));
     }
 }
 
@@ -371,8 +380,8 @@ bool LibvmiInterface::areEventsPending()
     auto areEventsPendingReturn = vmi_are_events_pending(vmiInstance);
     if (areEventsPendingReturn == -1)
     {
-        throw VmiException(std::string(__func__) + ": Error while checking for pending events. Libvmi returned " +
-                           Convenience::intToDec(areEventsPendingReturn));
+        throw VmiException(fmt::format(
+            "{}: Error while checking for pending events. Libvmi returned {}", __func__, areEventsPendingReturn));
     }
     if (areEventsPendingReturn > 0)
     {
@@ -381,37 +390,22 @@ bool LibvmiInterface::areEventsPending()
     return pending;
 }
 
-/*
- * TODO: Replace this function with libvmi functions.
- * The new libvmi version has got convenience functions for Windows unicode string extraction as well as conversion to
- * utf-8.
- */
-std::unique_ptr<std::string>
-LibvmiInterface::extractWStringAtVA(const uint64_t wstringVA, const size_t sizeInBytes, const uint64_t cr3)
+std::unique_ptr<std::string> LibvmiInterface::extractUnicodeStringAtVA(const uint64_t stringVA, const uint64_t cr3)
 {
-    std::unique_ptr<std::string> convertedString;
-    try
+    auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
+    std::lock_guard<std::mutex> lock(libvmiLock);
+    auto* extractedUnicodeString = vmi_read_unicode_str(vmiInstance, &accessContext);
+    auto convertedUnicodeString = unicode_string_t{};
+    auto success = vmi_convert_str_encoding(extractedUnicodeString, &convertedUnicodeString, "UTF-8");
+    vmi_free_unicode_str(extractedUnicodeString);
+    if (success != VMI_SUCCESS)
     {
-        auto byteBuffer = std::vector<uint8_t>(sizeInBytes);
-        if (!readXVA(wstringVA, cr3, byteBuffer))
-        {
-            throw VmiException(std::string(__func__) + ": Unable to read " + std::to_string(sizeInBytes) +
-                               " bytes from VA " + Convenience::intToHex(wstringVA) + " with cr3 " +
-                               Convenience::intToHex(cr3));
-        }
-        /*
-         * readXVA returns a byte array from memory agnostic to the respective context in memory.
-         * However, Windows uses utf16 to store wide strings.
-         * Since utf16 chars are 2 bytes long, the length of the string is ArrayLength / 2.
-         */
-        std::u16string unicodeString(reinterpret_cast<char16_t*>(byteBuffer.data()), byteBuffer.size() / 2);
-        convertedString = std::make_unique<std::string>(wstringConverter.to_bytes(unicodeString));
+        throw VmiException(fmt::format("{}: Unable to convert unicode string", __func__));
     }
-    catch (const std::range_error&)
-    {
-        throw VmiException(std::string(__func__) + ": Unable to convert unicode string");
-    }
-    return convertedString;
+    auto result = std::make_unique<std::string>(reinterpret_cast<char*>(convertedUnicodeString.contents),
+                                                convertedUnicodeString.length);
+    free(convertedUnicodeString.contents); // NOLINT(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
+    return result;
 }
 
 std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(const uint64_t virtualAddress, const uint64_t cr3)
@@ -421,8 +415,7 @@ std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(const uint64_t v
     auto rawString = vmi_read_str(vmiInstance, &accessContext);
     if (rawString == nullptr)
     {
-        throw VmiException(std::string(__func__) + ": Unable to read string at VA " +
-                           Convenience::intToHex(virtualAddress));
+        throw VmiException(fmt::format("{}: Unable to read string at VA {:#x}", __func__, virtualAddress));
     }
     auto result = std::make_unique<std::string>(rawString);
     free(rawString);
@@ -433,7 +426,7 @@ void LibvmiInterface::stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId)
 {
     if (vmi_stop_single_step_vcpu(vmiInstance, event, vcpuId) != VMI_SUCCESS)
     {
-        throw VmiException("Failed to stop single stepping for vcpu " + Convenience::intToDec(vcpuId));
+        throw VmiException(fmt::format("Failed to stop single stepping for vcpu {}", vcpuId));
     }
 }
 
@@ -446,4 +439,41 @@ uint64_t LibvmiInterface::getSystemCr3()
 
     systemCr3 = convertPidToDtb(systemPid);
     return systemCr3;
+}
+
+addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, const std::string& member)
+{
+    addr_t memberAddress = 0;
+    if (vmi_get_kernel_struct_offset(vmiInstance, structName.c_str(), member.c_str(), &memberAddress) != VMI_SUCCESS)
+    {
+        throw VmiException(fmt::format("Failed to get offset of kernel struct {} with member {}", structName, member));
+    }
+    return memberAddress;
+}
+
+bool LibvmiInterface::isInitialized()
+{
+    return vmiInstance != nullptr;
+}
+
+std::tuple<addr_t, size_t, size_t> LibvmiInterface::getBitfieldOffsetAndSizeFromJson(const std::string& structName,
+                                                                                     const std::string& structMember)
+{
+    addr_t offset{};
+    size_t startBit{};
+    size_t endBit{};
+
+    auto ret = vmi_get_bitfield_offset_and_size_from_json(vmiInstance,
+                                                          vmi_get_kernel_json(vmiInstance),
+                                                          structName.c_str(),
+                                                          structMember.c_str(),
+                                                          &offset,
+                                                          &startBit,
+                                                          &endBit);
+    if (ret != VMI_SUCCESS)
+    {
+        throw VmiException(fmt::format(
+            "{}: Unable extract offset and size from struct {} with member {}", __func__, structName, structMember));
+    }
+    return std::make_tuple(offset, startBit, endBit);
 }

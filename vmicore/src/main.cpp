@@ -75,7 +75,7 @@ int main(int argc, const char* argv[])
             boost::di::bind<ISingleStepSupervisor>().to<SingleStepSupervisor>(),
             boost::di::bind<IPluginSystem>().to<PluginSystem>(),
             boost::di::bind<IActiveProcessesSupervisor>().to<ActiveProcessesSupervisor>(),
-            boost::di::bind<IKernelObjectExtractorWin10>().to<KernelObjectExtractorWin10>(),
+            boost::di::bind<IKernelAccess>().to<KernelAccess>(),
             boost::di::bind<IInterruptFactory>().to<InterruptFactory>(),
             boost::di::bind<ILogging>().to(
                 [&enableGRPCServer](const auto& injector) -> std::shared_ptr<ILogging>

@@ -1,32 +1,17 @@
 #ifndef VMICORE_PLUGININTERFACE_H
 #define VMICORE_PLUGININTERFACE_H
 
-#include "../os/windows/KernelObjectDefinitionsWin10.h"
+#include "../os/windows/ProtectionValues.h"
+#include "IPluginConfig.h"
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
-#define VMI_PLUGIN_API_VERSION 10
+constexpr uint8_t VMI_PLUGIN_API_VERSION = 10;
 
 namespace Plugin
 {
-    class IPluginConfig
-    {
-      public:
-        virtual ~IPluginConfig() = default;
-
-        [[nodiscard]] virtual std::optional<std::string> getString(const std::string& element) const = 0;
-
-        virtual void overrideString(const std::string& element, const std::string& value) = 0;
-
-        [[nodiscard]] virtual std::optional<std::vector<std::string>>
-        getStringSequence(const std::string& element) const = 0;
-
-      protected:
-        IPluginConfig() = default;
-    };
-
     using virtual_address_t = uint64_t;
 
     using processTerminationCallback_f = void (*)(pid_t processPid, const char* processName);
@@ -47,7 +32,7 @@ namespace Plugin
         virtual_address_t baseAddress{};
         size_t size{};
         std::string moduleName{};
-        KernelObjectDefinitionsWin10::ProtectionValues protection{};
+        ProtectionValues protection{};
         bool isSharedMemory = false;
         bool isBeingDeleted = false;
         bool isProcessBaseImage = false;
@@ -57,7 +42,7 @@ namespace Plugin
         MemoryRegion(virtual_address_t baseAddress,
                      size_t size,
                      std::string moduleName,
-                     KernelObjectDefinitionsWin10::ProtectionValues protection,
+                     ProtectionValues protection,
                      bool isSharedMemory,
                      bool isBeingDeleted,
                      bool isProcessBaseImage)

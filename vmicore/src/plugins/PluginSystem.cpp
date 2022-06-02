@@ -14,8 +14,6 @@
 namespace
 {
     bool isInstanciated = false;
-
-    constexpr uint32_t statusPending = 0x103;
     constexpr char const* paddingLogFile = "memoryExtractionPaddingLog.txt";
 }
 

@@ -10,8 +10,6 @@
 #include <utility>
 #include <vector>
 
-using ProtectionValues = KernelObjectDefinitionsWin10::ProtectionValues;
-
 class MemoryRegionInformation
 {
   public:
