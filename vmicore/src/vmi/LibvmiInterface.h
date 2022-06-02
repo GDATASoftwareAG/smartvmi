@@ -15,6 +15,11 @@
 #include <string>
 #include <vector>
 
+#define LIBVMI_EXTRA_JSON
+
+#include "libvmi/libvmi_extra.h"
+#include <json-c/json.h>
+
 class ILibvmiInterface
 {
   public:
@@ -27,6 +32,8 @@ class ILibvmiInterface
     virtual void clearEvent(vmi_event_t& event, bool deallocate) = 0;
 
     virtual uint8_t read8PA(uint64_t pyhsicalAddress) = 0;
+
+    virtual uint8_t read8VA(const uint64_t virtualAddress, const uint64_t cr3) = 0;
 
     virtual uint32_t read32VA(uint64_t virtualAddress, uint64_t cr3) = 0;
 
@@ -60,13 +67,20 @@ class ILibvmiInterface
 
     virtual bool areEventsPending() = 0;
 
-    virtual std::unique_ptr<std::string> extractWStringAtVA(uint64_t wstringVA, size_t sizeInBytes, uint64_t cr3) = 0;
+    virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) = 0;
 
     virtual std::unique_ptr<std::string> extractStringAtVA(uint64_t virtualAddress, uint64_t cr3) = 0;
 
     virtual void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) = 0;
 
     virtual uint64_t getSystemCr3() = 0;
+
+    virtual addr_t getKernelStructOffset(const std::string& structName, const std::string& member) = 0;
+
+    virtual bool isInitialized() = 0;
+
+    virtual std::tuple<addr_t, size_t, size_t> getBitfieldOffsetAndSizeFromJson(const std::string& struct_name,
+                                                                                const std::string& struct_member) = 0;
 
   protected:
     ILibvmiInterface() = default;
@@ -85,9 +99,13 @@ class LibvmiInterface : public ILibvmiInterface
 
     void waitForCR3Event(const std::function<void()>& cr3EventHandler) override;
 
+    static event_response_t _cr3Callback(vmi_instance_t vmi, vmi_event_t* event);
+
     void clearEvent(vmi_event_t& event, bool deallocate) override;
 
     uint8_t read8PA(uint64_t pyhsicalAddress) override;
+
+    uint8_t read8VA(const uint64_t virtualAddress, const uint64_t cr3) override;
 
     uint32_t read32VA(uint64_t virtualAddress, uint64_t cr3) override;
 
@@ -121,11 +139,9 @@ class LibvmiInterface : public ILibvmiInterface
 
     bool areEventsPending() override;
 
-    std::unique_ptr<std::string> extractWStringAtVA(uint64_t wstringVA, size_t sizeInBytes, uint64_t cr3) override;
+    std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) override;
 
     std::unique_ptr<std::string> extractStringAtVA(uint64_t virtualAddress, uint64_t cr3) override;
-
-    static event_response_t _cr3Callback(vmi_instance_t vmi, vmi_event_t* event);
 
     void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) override;
 
@@ -145,6 +161,13 @@ class LibvmiInterface : public ILibvmiInterface
         return exctractedValue;
     }
 
+    addr_t getKernelStructOffset(const std::string& structName, const std::string& member) override;
+
+    bool isInitialized() override;
+
+    std::tuple<addr_t, size_t, size_t> getBitfieldOffsetAndSizeFromJson(const std::string& structName,
+                                                                        const std::string& structMember) override;
+
   private:
     uint numberOfVCPUs{};
     std::shared_ptr<IConfigParser> configInterface;
@@ -153,12 +176,9 @@ class LibvmiInterface : public ILibvmiInterface
     std::shared_ptr<IEventStream> eventStream;
     vmi_instance_t vmiInstance{};
     std::mutex libvmiLock{};
-    /*
-     * TODO: As of C++17 codecvt is deprecated. Wait until a better solution is standardized, then replace codecvt:
-     * http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html
-     */
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> wstringConverter;
     uint64_t systemCr3{};
+
+    static std::unique_ptr<std::string> createConfigString(const std::string& offsetsFile);
 
     static void freeEvent(vmi_event_t* event, status_t rc);
 
@@ -169,8 +189,6 @@ class LibvmiInterface : public ILibvmiInterface
     static access_context_t createPhysicalAddressAccessContext(uint64_t physicalAddress);
 
     static access_context_t createVirtualAddressAccessContext(uint64_t virtualAddress, uint64_t cr3);
-
-    static std::unique_ptr<std::string> createConfigString(const std::string& offsetsFile);
 };
 
 #endif // VMICORE_LIBVMIINTERFACE_H

@@ -11,7 +11,7 @@ option(VMI_SANITIZERS "Build with sanitizers." OFF)
 
 # Variable section
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -100,6 +100,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(gsl)
 
+# Setup fmt library as it is not available yet in gnu stdlib
+
+FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+        GIT_TAG 8.1.1
+)
+FetchContent_MakeAvailable(fmt)
+
 # Rust grpc server
 
 add_subdirectory(rust_src)
@@ -118,7 +127,8 @@ set(source_files
         src/io/grpc/GRPCLogger.cpp
         src/io/grpc/GRPCServer.cpp
         src/os/windows/ActiveProcessesSupervisor.cpp
-        src/os/windows/KernelObjectExtractorWin10.cpp
+        src/os/windows/KernelAccess.cpp
+        src/os/windows/KernelOffsets.cpp
         src/os/windows/SystemEventSupervisor.cpp
         src/os/windows/VadTreeWin10.cpp
         src/plugins/PluginSystem.cpp
@@ -140,7 +150,7 @@ set(test_files
 
 # Link libraries
 
-set(libraries rust_grpc_server vmi_shared dl yaml-cpp GSL)
+set(libraries rust_grpc_server vmi_shared dl yaml-cpp GSL fmt-header-only)
 set(test_libraries pthread gtest gmock gmock_main)
 
 # End variable section

@@ -5,13 +5,10 @@
 #include "OutputXML.h"
 #include "Semaphore.h"
 #include "YaraInterface.h"
-
 #include <PluginInterface.h>
 #include <condition_variable>
 #include <memory>
 #include <yara/limits.h> // NOLINT(modernize-deprecated-headers)
-
-using ProtectionValues = KernelObjectDefinitionsWin10::ProtectionValues;
 
 class Scanner
 {

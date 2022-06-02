@@ -9,19 +9,17 @@ using testing::Unused;
 class PluginSystemFixture : public ProcessesMemoryStateFixture
 {
   protected:
-    Plugin::PluginInterface* pluginInterface = dynamic_cast<Plugin::PluginInterface*>(pluginSystem.get());
+    Plugin::PluginInterface* pluginInterface{};
 
     void SetUp() override
     {
         ProcessesMemoryStateFixture::SetUp();
-
-        ON_CALL(*mockLogging, newNamedLogger(_))
-            .WillByDefault([](const std::string& /*name*/) { return std::make_unique<MockGRPCLogger>(); });
+        ProcessesMemoryStateFixture::setupActiveProcesses();
+        pluginInterface = dynamic_cast<Plugin::PluginInterface*>(pluginSystem.get());
 
         setupActiveProcessList({process0, process4, process248});
 
         process4VadTreeMemoryState();
-        setupReturnsForFullProcess248Name();
 
         activeProcessesSupervisor->initialize();
     }
@@ -187,7 +185,7 @@ class ReadProcessMemoryRegionFixture : public PluginSystemFixture
     uint64_t sevenPagesRegionBaseVA = 6666 * PagingDefinitions::pageSizeInBytes;
 
     memoryRegionTestInformation singlePageMemoryRegion{singlePageRegionBaseVA,
-                                                       systemCr3,
+                                                       systemCR3,
                                                        PagingDefinitions::pageSizeInBytes,
                                                        std::vector<uint8_t>(PagingDefinitions::pageSizeInBytes, 0xCD)};
     std::unique_ptr<std::vector<memoryRegionTestInformation>> threePagesMemoryRegion;
@@ -220,7 +218,7 @@ class ReadProcessMemoryRegionFixture : public PluginSystemFixture
     void setupThreePagesRegionReturns()
     {
         threePagesMemoryRegion =
-            createMultipageRegionInformation(threePagesRegionBaseVA, systemCr3, 3 * PagingDefinitions::pageSizeInBytes);
+            createMultipageRegionInformation(threePagesRegionBaseVA, systemCR3, 3 * PagingDefinitions::pageSizeInBytes);
         threePagesMemoryRegion->at(1).memoryPageContent.clear(); // simulate non mapped page
         for (const auto& element : *threePagesMemoryRegion)
         {

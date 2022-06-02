@@ -1,5 +1,4 @@
 #include "ActiveProcessesSupervisor.h"
-#include "../../Convenience.h"
 
 namespace
 {
@@ -7,11 +6,11 @@ namespace
 }
 
 ActiveProcessesSupervisor::ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                                                     std::shared_ptr<IKernelObjectExtractorWin10> kernelObjectExtractor,
+                                                     std::shared_ptr<IKernelAccess> kernelAccess,
                                                      std::shared_ptr<ILogging> loggingLib,
                                                      std::shared_ptr<IEventStream> eventStream)
     : vmiInterface(std::move(vmiInterface)),
-      kernelObjectExtractor(std::move(kernelObjectExtractor)),
+      kernelAccess(std::move(kernelAccess)),
       logger(NEW_LOGGER(loggingLib)),
       loggingLib(std::move(loggingLib)),
       eventStream(std::move(eventStream))
@@ -21,6 +20,7 @@ ActiveProcessesSupervisor::ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInte
 void ActiveProcessesSupervisor::initialize()
 {
     logger->info("--- Initialization ---");
+    kernelAccess->initWindowsOffsets();
     auto psActiveProcessListHeadVA = vmiInterface->translateKernelSymbolToVA("PsActiveProcessHead");
     auto currentListEntry = psActiveProcessListHeadVA;
     logger->debug("Got VA of PsActiveProcessHead",
@@ -28,8 +28,7 @@ void ActiveProcessesSupervisor::initialize()
 
     do
     {
-        auto currentProcessEprocessBase = currentListEntry - OffsetDefinitionsWin10::_EPROCESS::ActiveProcessLinks;
-        addNewProcess(currentProcessEprocessBase);
+        addNewProcess(kernelAccess->getCurrentProcessEprocessBase(currentListEntry));
         currentListEntry = vmiInterface->read64VA(currentListEntry, vmiInterface->getSystemCr3());
     } while (currentListEntry != psActiveProcessListHeadVA);
     logger->info("--- End of Initialization ---");
@@ -40,13 +39,10 @@ ActiveProcessesSupervisor::extractProcessInformation(uint64_t eprocessBase) cons
 {
     auto processInformation = std::make_unique<ActiveProcessInformation>();
     processInformation->eprocessBase = eprocessBase;
-    processInformation->processCR3 = vmiInterface->read64VA(
-        eprocessBase + OffsetDefinitionsWin10::_KPROCESS::DirectoryTableBase, vmiInterface->getSystemCr3());
-    processInformation->pid = extractPid(eprocessBase);
-    processInformation->parentPid = vmiInterface->read32VA(
-        eprocessBase + OffsetDefinitionsWin10::_EPROCESS::InheritedFromUniqueProcessId, vmiInterface->getSystemCr3());
-    processInformation->name = *vmiInterface->extractStringAtVA(
-        eprocessBase + OffsetDefinitionsWin10::_EPROCESS::ImageFileName, vmiInterface->getSystemCr3());
+    processInformation->processCR3 = kernelAccess->extractDirectoryTableBase(eprocessBase);
+    processInformation->pid = kernelAccess->extractPID(eprocessBase);
+    processInformation->parentPid = kernelAccess->extractParentID(eprocessBase);
+    processInformation->name = kernelAccess->extractImageFileName(eprocessBase);
     try
     {
         processInformation->processPath = extractProcessPath(eprocessBase);
@@ -62,14 +58,8 @@ ActiveProcessesSupervisor::extractProcessInformation(uint64_t eprocessBase) cons
                          logfield::create("Exception", e.what())});
     }
     processInformation->vadTree = std::make_unique<VadTreeWin10>(
-        kernelObjectExtractor, eprocessBase, processInformation->pid, processInformation->name, loggingLib);
+        kernelAccess, eprocessBase, processInformation->pid, processInformation->name, loggingLib);
     return processInformation;
-}
-
-pid_t ActiveProcessesSupervisor::extractPid(uint64_t eprocessBase) const
-{
-    return vmiInterface->read32VA(eprocessBase + OffsetDefinitionsWin10::_EPROCESS::UniqueProcessId,
-                                  vmiInterface->getSystemCr3());
 }
 
 std::shared_ptr<ActiveProcessInformation> ActiveProcessesSupervisor::getProcessInformationByPid(pid_t pid)
@@ -128,15 +118,14 @@ void ActiveProcessesSupervisor::addNewProcess(uint64_t eprocessBase)
 
 bool ActiveProcessesSupervisor::isProcessActive(uint64_t eprocessBase) const
 {
-    auto exitStatus = vmiInterface->read32VA(eprocessBase + OffsetDefinitionsWin10::_EPROCESS::ExitStatus,
-                                             vmiInterface->getSystemCr3());
+    auto exitStatus = kernelAccess->extractExitStatus(eprocessBase);
     if (exitStatus == statusPending)
     {
         return true;
     }
     logger->debug("Encountered a process that has got an exit status other than 'status pending'",
                   {logfield::create("_EPROCESS_base", Convenience::intToHex(eprocessBase)),
-                   logfield::create("ProcessId", static_cast<uint64_t>(extractPid(eprocessBase))),
+                   logfield::create("ProcessId", static_cast<uint64_t>(kernelAccess->extractPID(eprocessBase))),
                    logfield::create("ExitStatus", static_cast<uint64_t>(exitStatus))
 
                   });
@@ -207,54 +196,23 @@ std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> ActivePr
     return runningProcesses;
 }
 
-// is duplicate of same function in VadTreeWin10.cpp, do not see a nice solution to this at the moment
-uint64_t ActiveProcessesSupervisor::removeReferenceCountFromExFastRef(uint64_t exFastRefValue)
-{
-    return exFastRefValue & ~(static_cast<uint64_t>(0xF));
-}
-
 std::unique_ptr<std::string> ActiveProcessesSupervisor::extractProcessPath(uint64_t eprocessBase) const
 {
-    auto processPath = std::make_unique<std::string>();
-    auto sectionAddress = vmiInterface->read64VA(eprocessBase + OffsetDefinitionsWin10::_EPROCESS::SectionObject,
-                                                 vmiInterface->getSystemCr3());
-    if (sectionAddress == 0)
-    {
-        throw VmiException(std::string(__func__) + ": Section base address is null");
-    }
-
-    auto controlAreaAddress =
-        vmiInterface->read64VA(sectionAddress + OffsetDefinitionsWin10::_SECTION::u1, vmiInterface->getSystemCr3());
-    if (controlAreaAddress == 0)
-    {
-        throw VmiException(std::string(__func__) + ": Control area base address is null");
-    }
-
-    auto sectionFlags =
-        kernelObjectExtractor->extractMmSectionFlags(controlAreaAddress + OffsetDefinitionsWin10::_CONTROL_AREA::u);
-    if (sectionFlags->File == 0)
+    auto sectionAddress = kernelAccess->extractSectionAddress(eprocessBase);
+    auto controlAreaAddress = kernelAccess->extractControlAreaAddress(sectionAddress);
+    auto fileFlag = kernelAccess->extractIsFile(controlAreaAddress);
+    if (!fileFlag)
     {
         throw VmiException(std::string(__func__) + ": File flag in mmSectionFlags not set");
     }
+    auto controlAreaFilePointer = kernelAccess->extractControlAreaFilePointer(controlAreaAddress);
+    auto filePointerAddress = KernelAccess::removeReferenceCountFromExFastRef(controlAreaFilePointer);
+    auto processPath = kernelAccess->extractProcessPath(filePointerAddress);
 
-    auto filePointerAddress = removeReferenceCountFromExFastRef(vmiInterface->read64VA(
-        controlAreaAddress + OffsetDefinitionsWin10::_CONTROL_AREA::FilePointer, vmiInterface->getSystemCr3()));
-    if (filePointerAddress == 0)
-    {
-        throw VmiException(std::string(__func__) + ": File pointer base address is null");
-    }
-
-    auto fileName = kernelObjectExtractor->extractUnicodeObject(filePointerAddress +
-                                                                OffsetDefinitionsWin10::_FILE_OBJECT::FileName);
-    if (fileName->Buffer == nullptr || fileName->Length == 0)
-    {
-        throw VmiException(std::string(__func__) + ": Unicode string is not valid");
-    }
-    processPath = kernelObjectExtractor->extractWString(reinterpret_cast<uint64_t>(fileName->Buffer), fileName->Length);
     return processPath;
 }
 
-std::unique_ptr<std::string> ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string& path) const
+std::unique_ptr<std::string> ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string& path)
 {
     auto substringStartIterator =
         std::find_if(path.crbegin(), path.crend(), [](const char c) { return c == '\\'; }).base();

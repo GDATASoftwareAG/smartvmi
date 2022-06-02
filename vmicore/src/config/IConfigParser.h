@@ -1,7 +1,7 @@
 #ifndef VMICORE_CONFIGPARSER_H
 #define VMICORE_CONFIGPARSER_H
 
-#include "../plugins/PluginInterface.h"
+#include "../plugins/IPluginConfig.h"
 #include <filesystem>
 #include <map>
 #include <memory>

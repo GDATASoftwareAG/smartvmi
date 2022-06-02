@@ -15,6 +15,8 @@ class MockLibvmiInterface : public ILibvmiInterface
 
     MOCK_METHOD(uint8_t, read8PA, (const uint64_t pyhsicalAddress), (override));
 
+    MOCK_METHOD(uint8_t, read8VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
+
     MOCK_METHOD(uint32_t, read32VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
 
     MOCK_METHOD(uint64_t, read64VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
@@ -51,8 +53,8 @@ class MockLibvmiInterface : public ILibvmiInterface
     MOCK_METHOD(bool, areEventsPending, (), (override));
 
     MOCK_METHOD(std::unique_ptr<std::string>,
-                extractWStringAtVA,
-                (const uint64_t wstringVA, const size_t sizeInBytes, const uint64_t cr3),
+                extractUnicodeStringAtVA,
+                (const uint64_t stringVA, const uint64_t cr3),
                 (override));
 
     MOCK_METHOD(std::unique_ptr<std::string>,
@@ -63,6 +65,15 @@ class MockLibvmiInterface : public ILibvmiInterface
     MOCK_METHOD(void, stopSingleStepForVcpu, (vmi_event_t * event, uint vcpuId), (override));
 
     MOCK_METHOD(uint64_t, getSystemCr3, (), (override));
+
+    MOCK_METHOD(addr_t, getKernelStructOffset, (const std::string& structName, const std::string& member), (override));
+
+    MOCK_METHOD(bool, isInitialized, (), (override));
+
+    MOCK_METHOD((std::tuple<addr_t, size_t, size_t>),
+                getBitfieldOffsetAndSizeFromJson,
+                (const std::string&, const std::string&),
+                (override));
 };
 
 #endif // VMICORE_MOCK_LIBVMIINTERFACE_H

@@ -30,7 +30,7 @@ void InterruptEvent::clearInterruptEventHandling(ILibvmiInterface& vmiInterface)
                                          {logfield::create("logger", loggerName)});
     }
 
-    for (auto const [_addr, interruptEvent] : interruptsByPA)
+    for (auto const& [_addr, interruptEvent] : interruptsByPA)
     {
         interruptEvent->teardown();
     }

@@ -1,7 +1,7 @@
 #ifndef VMICORE_VADT_H
 #define VMICORE_VADT_H
 
-#include "KernelObjectDefinitionsWin10.h"
+#include "ProtectionValues.h"
 #include <string>
 
 class Vadt
@@ -11,7 +11,7 @@ class Vadt
     uint64_t startingVPN;
     uint64_t endingVPN;
     std::string fileName;
-    KernelObjectDefinitionsWin10::ProtectionValues protection;
+    ProtectionValues protection;
     bool isFileBacked;
     bool isSharedMemory;
     bool isBeingDeleted;
