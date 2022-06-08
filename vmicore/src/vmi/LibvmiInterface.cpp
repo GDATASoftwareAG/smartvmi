@@ -451,6 +451,17 @@ addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, con
     return memberAddress;
 }
 
+size_t LibvmiInterface::getStructSizeFromJson(const std::string& struct_name)
+{
+    size_t size = 0;
+    if (vmi_get_struct_size_from_json(vmiInstance, vmi_get_kernel_json(vmiInstance), struct_name.c_str(), &size) !=
+        VMI_SUCCESS)
+    {
+        throw VmiException(fmt::format("{}: Unable to extract struct size of {}", __func__, struct_name));
+    }
+    return size;
+}
+
 bool LibvmiInterface::isInitialized()
 {
     return vmiInstance != nullptr;

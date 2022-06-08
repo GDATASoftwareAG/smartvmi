@@ -77,6 +77,8 @@ class ILibvmiInterface
 
     virtual addr_t getKernelStructOffset(const std::string& structName, const std::string& member) = 0;
 
+    virtual size_t getStructSizeFromJson(const std::string& struct_name) = 0;
+
     virtual bool isInitialized() = 0;
 
     virtual std::tuple<addr_t, size_t, size_t> getBitfieldOffsetAndSizeFromJson(const std::string& struct_name,
@@ -162,6 +164,8 @@ class LibvmiInterface : public ILibvmiInterface
     }
 
     addr_t getKernelStructOffset(const std::string& structName, const std::string& member) override;
+
+    size_t getStructSizeFromJson(const std::string& struct_name) override;
 
     bool isInitialized() override;
 
