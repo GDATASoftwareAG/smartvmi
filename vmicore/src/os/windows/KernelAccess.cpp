@@ -160,31 +160,30 @@ std::unique_ptr<std::string> KernelAccess::extractProcessPath(addr_t filePointer
                                                   vmiInterface->getSystemCr3());
 }
 
-uint32_t KernelAccess::extractFlagValue32(addr_t flagBaseVA, size_t startBit, size_t endBit) const
-{
-    expectSaneKernelAddress(flagBaseVA, static_cast<const char*>(__func__));
-    auto flagValue = vmiInterface->read32VA(flagBaseVA, vmiInterface->getSystemCr3());
-
-    return getFlagValue(flagValue, startBit, endBit);
-}
-
 addr_t KernelAccess::getMmVadShortFlagsAddr(addr_t vadShortBaseVA) const
 {
     return vadShortBaseVA + kernelOffsets.mmVadShort.Flags;
 }
 
-uint32_t KernelAccess::extractProtectionFlagValue(addr_t vadShortBaseVA) const
+uint8_t KernelAccess::extractProtectionFlagValue(addr_t vadShortBaseVA) const
 {
-    return extractFlagValue32(getMmVadShortFlagsAddr(vadShortBaseVA),
-                              kernelOffsets.mmvadFlags.protection.startBit,
-                              kernelOffsets.mmvadFlags.protection.endBit);
+    auto flagsSize = vmiInterface->getStructSizeFromJson(KernelStructOffsets::mmvad_flags::structName);
+    // As of now, there are 32 Protectionvalues
+    assert((kernelOffsets.mmvadFlags.protection.endBit - kernelOffsets.mmvadFlags.protection.startBit) < 6);
+    return static_cast<uint8_t>(extractFlagValue(getMmVadShortFlagsAddr(vadShortBaseVA),
+                                                 flagsSize,
+                                                 kernelOffsets.mmvadFlags.protection.startBit,
+                                                 kernelOffsets.mmvadFlags.protection.endBit));
 }
 
 bool KernelAccess::extractIsPrivateMemory(addr_t vadShortBaseVA) const
 {
-    return static_cast<bool>(extractFlagValue32(getMmVadShortFlagsAddr(vadShortBaseVA),
-                                                kernelOffsets.mmvadFlags.privateMemory.startBit,
-                                                kernelOffsets.mmvadFlags.privateMemory.endBit));
+    auto flagsSize = vmiInterface->getStructSizeFromJson(KernelStructOffsets::mmvad_flags::structName);
+    assert((kernelOffsets.mmvadFlags.privateMemory.endBit - kernelOffsets.mmvadFlags.privateMemory.startBit) == 1);
+    return static_cast<bool>(extractFlagValue(getMmVadShortFlagsAddr(vadShortBaseVA),
+                                              flagsSize,
+                                              kernelOffsets.mmvadFlags.privateMemory.startBit,
+                                              kernelOffsets.mmvadFlags.privateMemory.endBit));
 }
 
 addr_t KernelAccess::getMmSectionFlagsAddr(addr_t controlAreaBaseVA) const
@@ -194,23 +193,33 @@ addr_t KernelAccess::getMmSectionFlagsAddr(addr_t controlAreaBaseVA) const
 
 bool KernelAccess::extractIsBeingDeleted(addr_t controlAreaBaseVA) const
 {
-    return static_cast<bool>(extractFlagValue32(getMmSectionFlagsAddr(controlAreaBaseVA),
-                                                kernelOffsets.mmsectionFlags.beingDeleted.startBit,
-                                                kernelOffsets.mmsectionFlags.beingDeleted.endBit));
+    auto flagsSize = vmiInterface->getStructSizeFromJson(KernelStructOffsets::mmsection_flags::structName);
+    assert((kernelOffsets.mmsectionFlags.beingDeleted.endBit - kernelOffsets.mmsectionFlags.beingDeleted.startBit) ==
+           1);
+    return static_cast<bool>(extractFlagValue(getMmSectionFlagsAddr(controlAreaBaseVA),
+                                              flagsSize,
+                                              kernelOffsets.mmsectionFlags.beingDeleted.startBit,
+                                              kernelOffsets.mmsectionFlags.beingDeleted.endBit));
 }
 
 bool KernelAccess::extractIsImage(addr_t controlAreaBaseVA) const
 {
-    return static_cast<bool>(extractFlagValue32(getMmSectionFlagsAddr(controlAreaBaseVA),
-                                                kernelOffsets.mmsectionFlags.image.startBit,
-                                                kernelOffsets.mmsectionFlags.image.endBit));
+    auto flagsSize = vmiInterface->getStructSizeFromJson(KernelStructOffsets::mmsection_flags::structName);
+    assert((kernelOffsets.mmsectionFlags.image.endBit - kernelOffsets.mmsectionFlags.image.startBit) == 1);
+    return static_cast<bool>(extractFlagValue(getMmSectionFlagsAddr(controlAreaBaseVA),
+                                              flagsSize,
+                                              kernelOffsets.mmsectionFlags.image.startBit,
+                                              kernelOffsets.mmsectionFlags.image.endBit));
 }
 
 bool KernelAccess::extractIsFile(addr_t controlAreaBaseVA) const
 {
-    return static_cast<bool>(extractFlagValue32(getMmSectionFlagsAddr(controlAreaBaseVA),
-                                                kernelOffsets.mmsectionFlags.file.startBit,
-                                                kernelOffsets.mmsectionFlags.file.endBit));
+    auto flagsSize = vmiInterface->getStructSizeFromJson(KernelStructOffsets::mmsection_flags::structName);
+    assert((kernelOffsets.mmsectionFlags.file.endBit - kernelOffsets.mmsectionFlags.file.startBit) == 1);
+    return static_cast<bool>(extractFlagValue(getMmSectionFlagsAddr(controlAreaBaseVA),
+                                              flagsSize,
+                                              kernelOffsets.mmsectionFlags.file.startBit,
+                                              kernelOffsets.mmsectionFlags.file.endBit));
 }
 
 addr_t KernelAccess::getVadNodeRightChildOffset() const
@@ -223,4 +232,24 @@ addr_t KernelAccess::getVadNodeLeftChildOffset() const
 {
     return kernelOffsets.mmVad.mmVadShortBaseAddress + kernelOffsets.mmVadShort.VadNode +
            kernelOffsets.rtlBalancedNode.Left;
+}
+
+uint64_t KernelAccess::extractFlagValue(addr_t flagBaseVA, size_t size, size_t startBit, size_t endBit) const
+{
+    expectSaneKernelAddress(flagBaseVA, static_cast<const char*>(__func__));
+    uint64_t flagValue = 0;
+    switch (size)
+    {
+        case sizeof(uint32_t):
+            flagValue = vmiInterface->read32VA(flagBaseVA, vmiInterface->getSystemCr3());
+            break;
+        case sizeof(uint64_t):
+            flagValue = vmiInterface->read64VA(flagBaseVA, vmiInterface->getSystemCr3());
+            break;
+        default:
+            throw VmiException(
+                fmt::format("{}: {} is unknown flag struct size", KernelStructOffsets::mmvad_flags::structName, size));
+    }
+
+    return getFlagValue(flagValue, startBit, endBit);
 }

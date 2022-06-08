@@ -142,6 +142,7 @@ set(source_files
 
 set(test_files
         test/os/windows/ActiveProcessesSupervisor_UnitTest.cpp
+        test/os/windows/KernelAccess_UnitTest.cpp
         test/os/windows/SystemEventSupervisor_UnitTest.cpp
         test/plugins/PluginSystem_UnitTest.cpp
         test/vmi/InterruptEvent_UnitTest.cpp

@@ -74,6 +74,8 @@ class MockLibvmiInterface : public ILibvmiInterface
                 getBitfieldOffsetAndSizeFromJson,
                 (const std::string&, const std::string&),
                 (override));
+
+    MOCK_METHOD(size_t, getStructSizeFromJson, (const std::string& struct_name), (override));
 };
 
 #endif // VMICORE_MOCK_LIBVMIINTERFACE_H

@@ -13,14 +13,15 @@ class KernelAccessFixture : public ProcessesMemoryStateFixture
     void SetUp() override
     {
         ProcessesMemoryStateFixture::SetUp();
+        kernelAccess->initWindowsOffsets();
     }
 };
 
 TEST_F(KernelAccessFixture, extractFileName_ValidKernelspaceAddress_NoThrow)
 {
     EXPECT_CALL(*mockVmiInterface,
-                extractUnicodeStringAtVA(
-                    PagingDefinitions::kernelspaceLowerBoundary + kernelOffsets->fileObject.FileName, systemCR3))
+                extractUnicodeStringAtVA(PagingDefinitions::kernelspaceLowerBoundary + _FILE_OBJECT_OFFSETS::FileName,
+                                         systemCR3))
         .Times(1);
 
     EXPECT_NO_THROW(auto filename = kernelAccess->extractFileName(PagingDefinitions::kernelspaceLowerBoundary));

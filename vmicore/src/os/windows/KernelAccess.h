@@ -51,7 +51,7 @@ class IKernelAccess
 
     [[nodiscard]] virtual addr_t getMmVadShortFlagsAddr(addr_t vadShortBaseVA) const = 0;
 
-    [[nodiscard]] virtual uint32_t extractProtectionFlagValue(addr_t vadShortBaseVA) const = 0;
+    [[nodiscard]] virtual uint8_t extractProtectionFlagValue(addr_t vadShortBaseVA) const = 0;
 
     [[nodiscard]] virtual bool extractIsPrivateMemory(addr_t vadShortBaseVA) const = 0;
 
@@ -117,7 +117,7 @@ class KernelAccess : public IKernelAccess
 
     [[nodiscard]] addr_t getMmVadShortFlagsAddr(addr_t vadShortBaseVA) const override;
 
-    [[nodiscard]] uint32_t extractProtectionFlagValue(addr_t vadShortBaseVA) const override;
+    [[nodiscard]] uint8_t extractProtectionFlagValue(addr_t vadShortBaseVA) const override;
 
     [[nodiscard]] bool extractIsPrivateMemory(addr_t vadShortBaseVA) const override;
 
@@ -137,6 +137,8 @@ class KernelAccess : public IKernelAccess
 
     [[nodiscard]] addr_t getVadNodeRightChildOffset() const;
 
+    [[nodiscard]] uint64_t extractFlagValue(addr_t flagBaseVA, size_t size, size_t startBit, size_t endBit) const;
+
     template <typename T> T getFlagValue(T flags, size_t startBit, size_t endBit) const
     {
         size_t flagLength = endBit - startBit;
@@ -149,8 +151,6 @@ class KernelAccess : public IKernelAccess
     }
 
     static void expectSaneKernelAddress(addr_t address, const char* caller);
-
-    [[nodiscard]] uint32_t extractFlagValue32(addr_t flagBaseVA, size_t startBit, size_t endBit) const;
 };
 
 #endif // VMICORE_KERNELACCESS_H

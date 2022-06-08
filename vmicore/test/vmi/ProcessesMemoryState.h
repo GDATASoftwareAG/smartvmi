@@ -3,6 +3,7 @@
 
 #include "../../src/os/PagingDefinitions.h"
 #include "../../src/os/windows/ActiveProcessesSupervisor.h"
+#include "../../src/os/windows/KernelOffsets.h"
 #include "../../src/os/windows/ProtectionValues.h"
 #include "../../src/plugins/PluginSystem.h"
 #include "../config/mock_ConfigInterface.h"
@@ -255,6 +256,10 @@ class ProcessesMemoryStateFixture : public testing::Test
             .WillByDefault(Return(std::make_tuple(0, MMVAD_FLAGS_OFFSETS::protection, 12)));
         ON_CALL(*mockVmiInterface, getBitfieldOffsetAndSizeFromJson("_MMVAD_FLAGS", "PrivateMemory"))
             .WillByDefault(Return(std::make_tuple(0, MMVAD_FLAGS_OFFSETS::privateMemory, 21)));
+        ON_CALL(*mockVmiInterface, getStructSizeFromJson(KernelStructOffsets::mmvad_flags::structName))
+            .WillByDefault(Return(4));
+        ON_CALL(*mockVmiInterface, getStructSizeFromJson(KernelStructOffsets::mmsection_flags::structName))
+            .WillByDefault(Return(4));
     }
 
     void setupProcessWithLink(const processValues& process, uint64_t linkEprocessBase)
