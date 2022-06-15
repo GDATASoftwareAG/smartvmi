@@ -82,7 +82,7 @@ namespace VmiCore::Windows
                                logfield::create("size", static_cast<uint64_t>(size))});
                 regions->emplace_back(startAddress,
                                       size,
-                                      currentVad->fileName,
+                                      std::string(currentVad->fileName),
                                       std::make_unique<PageProtection>(mmProtectToValue.at(currentVad->protection),
                                                                        OperatingSystem::WINDOWS),
                                       currentVad->isSharedMemory,
@@ -135,7 +135,7 @@ namespace VmiCore::Windows
                 try
                 {
                     auto filePointerObjectAddress = kernelAccess->extractFilePointerObjectAddress(controlAreaBaseVA);
-                    vadt->fileName = *extractFileName(filePointerObjectAddress);
+                    vadt->fileName = kernelAccess->extractFileName(filePointerObjectAddress);
 
                     auto imageFilePointerFromEprocess = kernelAccess->extractImageFilePointer(eprocessBase);
                     auto imageFilePointerFromVad = filePointerObjectAddress;
@@ -143,8 +143,7 @@ namespace VmiCore::Windows
                 }
                 catch (const std::exception& e)
                 {
-                    vadt->fileName = "unknownFilename";
-                    logger->warning("Unable to extract file name for VAD",
+                        logger->warning("Unable to extract file name for VAD",
                                     {
                                         logfield::create("ProcessName", processName),
                                         logfield::create("ProcessId", static_cast<int64_t>(pid)),
@@ -158,17 +157,15 @@ namespace VmiCore::Windows
         return vadt;
     }
 
-    std::unique_ptr<std::string> VadTreeWin10::extractFileName(addr_t filePointerObjectAddress) const
+    VmiUnicodeStruct VadTreeWin10::extractFileName(addr_t filePointerObjectAddress) const
     {
-        std::unique_ptr<std::string> fileName;
         try
         {
-            fileName = kernelAccess->extractFileName(filePointerObjectAddress);
+            return kernelAccess->extractFileName(filePointerObjectAddress);
         }
         catch (const VmiException&)
         {
             throw VmiException(fmt::format("Unable to extract Filename @ {:#x}", filePointerObjectAddress));
         }
-        return fileName;
     }
 }

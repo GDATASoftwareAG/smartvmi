@@ -12,7 +12,7 @@ namespace VmiCore::Windows
         uint64_t vadEntryBaseVA;
         uint64_t startingVPN;
         uint64_t endingVPN;
-        std::string fileName;
+        VmiUnicodeStruct fileName;
         uint8_t protection;
         bool isFileBacked;
         bool isSharedMemory;

@@ -27,7 +27,7 @@ namespace VmiCore::Windows
             auto eprocessBasesMatch = expectedProcess.eprocessBase == arg->base;
             auto cr3sMatch = expectedProcess.directoryTableBase == arg->processCR3;
             auto namesMatch = expectedProcess.imageFileName == arg->name;
-            auto fullNamesMatch = expectedProcess.fullName == *arg->fullName;
+            auto fullNamesMatch = expectedProcess.fullName == arg->fullName;
             auto pidsMatch = expectedProcess.processId == arg->pid;
 
             if (eprocessBasesMatch && cr3sMatch && namesMatch && fullNamesMatch && pidsMatch)

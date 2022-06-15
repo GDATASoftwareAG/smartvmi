@@ -51,7 +51,7 @@ namespace VmiCore
 
         MOCK_METHOD(bool, areEventsPending, (), (override));
 
-        MOCK_METHOD(std::unique_ptr<std::string>, extractUnicodeStringAtVA, (const addr_t, const addr_t), (override));
+        MOCK_METHOD(VmiUnicodeStruct, extractUnicodeStringAtVA, (const addr_t, const addr_t), (override));
 
         MOCK_METHOD(std::unique_ptr<std::string>, extractStringAtVA, (const addr_t, const addr_t), (override));
 

@@ -32,7 +32,7 @@ namespace VmiCore::Windows
 
         [[nodiscard]] std::unique_ptr<Vadt> createVadt(uint64_t vadEntryBaseVA) const;
 
-        [[nodiscard]] std::unique_ptr<std::string> extractFileName(addr_t filePointerObjectAddress) const;
+        [[nodiscard]] VmiUnicodeStruct extractFileName(addr_t filePointerObjectAddress) const;
     };
 }
 

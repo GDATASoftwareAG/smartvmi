@@ -34,7 +34,7 @@ namespace VmiCore::Windows
         return imageFilePointer;
     }
 
-    std::unique_ptr<std::string> KernelAccess::extractFileName(addr_t fileObjectBaseAddress) const
+    VmiUnicodeStruct KernelAccess::extractFileName(addr_t fileObjectBaseAddress) const
     {
         expectSaneKernelAddress(fileObjectBaseAddress, static_cast<const char*>(__func__));
         return vmiInterface->extractUnicodeStringAtVA(fileObjectBaseAddress + kernelOffsets.fileObject.FileName,
@@ -165,7 +165,7 @@ namespace VmiCore::Windows
                                       vmiInterface->convertPidToDtb(systemPid));
     }
 
-    std::unique_ptr<std::string> KernelAccess::extractProcessPath(addr_t filePointerAddress) const
+    VmiUnicodeStruct KernelAccess::extractProcessPath(addr_t filePointerAddress) const
     {
         expectSaneKernelAddress(filePointerAddress, static_cast<const char*>(__func__));
         return vmiInterface->extractUnicodeStringAtVA(filePointerAddress + kernelOffsets.fileObject.FileName,

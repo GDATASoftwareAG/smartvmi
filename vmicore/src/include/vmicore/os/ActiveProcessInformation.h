@@ -1,10 +1,13 @@
 #ifndef VMICORE_ACTIVEPROCESSINFORMATION_H
 #define VMICORE_ACTIVEPROCESSINFORMATION_H
 
+#include "../vmi/VmiUnicodeStruct.h"
 #include "IMemoryRegionExtractor.h"
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
+#include <variant>
 #include <vector>
 
 namespace VmiCore
@@ -16,8 +19,9 @@ namespace VmiCore
         pid_t pid;
         pid_t parentPid;
         std::string name;
-        std::unique_ptr<std::string> fullName;
-        std::unique_ptr<std::string> processPath;
+        std::string_view fullName;
+        std::string_view processPath;
+        std::variant<std::string, VmiUnicodeStruct> processPathData;
         std::unique_ptr<IMemoryRegionExtractor> memoryRegionExtractor;
         bool is32BitProcess;
     };

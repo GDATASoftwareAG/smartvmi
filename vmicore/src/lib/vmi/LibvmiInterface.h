@@ -13,6 +13,7 @@
 #include <vmicore/os/OperatingSystem.h>
 #include <vmicore/types.h>
 #include <vmicore/vmi/IIntrospectionAPI.h>
+#include <vmicore/vmi/VmiUnicodeStruct.h>
 
 #define LIBVMI_EXTRA_JSON
 
@@ -103,7 +104,7 @@ namespace VmiCore
 
         [[nodiscard]] bool areEventsPending() override;
 
-        [[nodiscard]] std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
+        [[nodiscard]] VmiUnicodeStruct extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
 
         [[nodiscard]] std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) override;
 

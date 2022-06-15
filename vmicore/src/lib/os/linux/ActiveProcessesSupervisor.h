@@ -46,7 +46,7 @@ namespace VmiCore::Linux
 
         [[nodiscard]] pid_t extractPid(uint64_t taskStruct) const;
 
-        [[nodiscard]] std::unique_ptr<std::string> splitProcessFileNameFromPath(const std::string& path) const;
+        [[nodiscard]] std::string_view splitProcessFileNameFromPath(const std::string_view& path) const;
     };
 }
 

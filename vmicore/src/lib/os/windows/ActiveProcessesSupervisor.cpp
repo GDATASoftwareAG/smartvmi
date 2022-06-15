@@ -53,13 +53,12 @@ namespace VmiCore::Windows
         processInformation->is32BitProcess = kernelAccess->extractIsWow64Process(eprocessBase);
         try
         {
-            processInformation->processPath = extractProcessPath(eprocessBase);
-            processInformation->fullName = splitProcessFileNameFromPath(*processInformation->processPath);
+            processInformation->processPathData = extractProcessPath(eprocessBase);
+            processInformation->processPath = get<VmiUnicodeStruct>(processInformation->processPathData);
+            processInformation->fullName = splitProcessFileNameFromPath(processInformation->processPath);
         }
         catch (const std::exception& e)
         {
-            processInformation->processPath = std::make_unique<std::string>();
-            processInformation->fullName = std::make_unique<std::string>();
             logger->warning("Process",
                             {logfield::create("ProcessName", processInformation->name),
                              logfield::create("ProcessId", static_cast<uint64_t>(processInformation->pid)),
@@ -208,7 +207,7 @@ namespace VmiCore::Windows
         return runningProcesses;
     }
 
-    std::unique_ptr<std::string> ActiveProcessesSupervisor::extractProcessPath(uint64_t eprocessBase) const
+    VmiUnicodeStruct  ActiveProcessesSupervisor::extractProcessPath(uint64_t eprocessBase) const
     {
         auto sectionAddress = kernelAccess->extractSectionAddress(eprocessBase);
         auto controlAreaAddress = kernelAccess->extractControlAreaAddress(sectionAddress);
@@ -219,19 +218,17 @@ namespace VmiCore::Windows
         }
         auto controlAreaFilePointer = kernelAccess->extractControlAreaFilePointer(controlAreaAddress);
         auto filePointerAddress = KernelAccess::removeReferenceCountFromExFastRef(controlAreaFilePointer);
-        auto processPath = kernelAccess->extractProcessPath(filePointerAddress);
-
-        return processPath;
+        return kernelAccess->extractProcessPath(filePointerAddress);
     }
 
-    std::unique_ptr<std::string> ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string& path)
+    std::string_view ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string_view& path)
     {
-        auto substringStartIterator =
+        const auto *substringStartIterator =
             std::find_if(path.crbegin(), path.crend(), [](const char c) { return c == '\\'; }).base();
         if (substringStartIterator == path.cbegin())
         {
             throw VmiException(fmt::format("{}: Unable to find any path separators at all", __func__));
         }
-        return std::make_unique<std::string>(substringStartIterator, path.cend());
+        return {substringStartIterator, path.cend()};
     }
 }

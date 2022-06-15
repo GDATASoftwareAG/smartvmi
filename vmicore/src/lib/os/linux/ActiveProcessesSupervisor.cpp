@@ -50,13 +50,13 @@ namespace VmiCore::Linux
                 vmiInterface->convertVAToPA(vmiInterface->read64VA(mm + vmiInterface->getOffset("linux_pgd"),
                                                                    vmiInterface->convertPidToDtb(SYSTEM_PID)),
                                             vmiInterface->convertPidToDtb(SYSTEM_PID));
-            processInformation->processPath = std::make_unique<std::string>(pathExtractor.extractDPath(
+            processInformation->processPathData = pathExtractor.extractDPath(
                 vmiInterface->read64VA(mm + vmiInterface->getKernelStructOffset("mm_struct", "exe_file"),
                                        vmiInterface->convertPidToDtb(SYSTEM_PID)) +
-                vmiInterface->getKernelStructOffset("file", "f_path")));
-            processInformation->fullName = processInformation->processPath
-                                               ? splitProcessFileNameFromPath(*processInformation->processPath)
-                                               : nullptr;
+                vmiInterface->getKernelStructOffset("file", "f_path"));
+            processInformation->processPath = get<std::string>(processInformation->processPathData);
+            processInformation->fullName =
+                splitProcessFileNameFromPath(processInformation->processPath);
             processInformation->memoryRegionExtractor = std::make_unique<MMExtractor>(vmiInterface, logging, mm);
         }
 
@@ -194,14 +194,14 @@ namespace VmiCore::Linux
         return runningProcesses;
     }
 
-    std::unique_ptr<std::string> ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string& path) const
+    std::string_view ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string_view& path) const
     {
-        auto substringStartIterator =
+        const auto* substringStartIterator =
             std::find_if(path.crbegin(), path.crend(), [](const char c) { return c == '/'; }).base();
         if (substringStartIterator == path.cbegin())
         {
             throw VmiException(fmt::format("{}: Unable to find any path separators at all", __func__));
         }
-        return std::make_unique<std::string>(substringStartIterator, path.cend());
+        return {substringStartIterator, path.cend()};
     }
 }

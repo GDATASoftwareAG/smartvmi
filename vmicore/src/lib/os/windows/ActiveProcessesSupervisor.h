@@ -48,9 +48,9 @@ namespace VmiCore::Windows
 
         [[nodiscard]] std::unique_ptr<ActiveProcessInformation> extractProcessInformation(uint64_t eprocessBase) const;
 
-        [[nodiscard]] std::unique_ptr<std::string> extractProcessPath(uint64_t eprocessBase) const;
+        [[nodiscard]] VmiUnicodeStruct extractProcessPath(uint64_t eprocessBase) const;
 
-        [[nodiscard]] static std::unique_ptr<std::string> splitProcessFileNameFromPath(const std::string& path);
+        [[nodiscard]] static std::string_view splitProcessFileNameFromPath(const std::string_view& path);
     };
 }
 

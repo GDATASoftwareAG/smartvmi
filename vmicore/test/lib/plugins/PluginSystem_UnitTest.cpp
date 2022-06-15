@@ -83,7 +83,7 @@ namespace VmiCore
         {
             isEqual = false;
         }
-        if ((*arg->fullName) != expectedProcess.fullName)
+        if ((arg->fullName) != expectedProcess.fullName)
         {
             isEqual = false;
         }
