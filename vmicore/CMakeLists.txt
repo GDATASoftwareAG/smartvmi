@@ -138,7 +138,8 @@ set(source_files
         src/vmi/LibvmiInterface.cpp
         src/vmi/SingleStepSupervisor.cpp
         src/vmi/VmiInitData.cpp
-        src/vmi/VmiInitError.cpp)
+        src/vmi/VmiInitError.cpp
+        src/vmi/VmiUnicodeStruct.cpp)
 
 set(test_files
         test/os/windows/ActiveProcessesSupervisor_UnitTest.cpp

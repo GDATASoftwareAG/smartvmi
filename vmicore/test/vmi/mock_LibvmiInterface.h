@@ -52,10 +52,7 @@ class MockLibvmiInterface : public ILibvmiInterface
 
     MOCK_METHOD(bool, areEventsPending, (), (override));
 
-    MOCK_METHOD(std::unique_ptr<std::string>,
-                extractUnicodeStringAtVA,
-                (const uint64_t stringVA, const uint64_t cr3),
-                (override));
+    MOCK_METHOD(VmiUnicodeStruct, extractUnicodeStringAtVA, (const uint64_t stringVA, const uint64_t cr3), (override));
 
     MOCK_METHOD(std::unique_ptr<std::string>,
                 extractStringAtVA,

@@ -7,6 +7,7 @@
 #include "../io/ILogging.h"
 #include "VmiException.h"
 #include "VmiInitError.h"
+#include "VmiUnicodeStruct.h"
 #include <codecvt>
 #include <functional>
 #include <libvmi/events.h>
@@ -67,7 +68,7 @@ class ILibvmiInterface
 
     virtual bool areEventsPending() = 0;
 
-    virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) = 0;
+    virtual VmiUnicodeStruct extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) = 0;
 
     virtual std::unique_ptr<std::string> extractStringAtVA(uint64_t virtualAddress, uint64_t cr3) = 0;
 
@@ -139,7 +140,7 @@ class LibvmiInterface : public ILibvmiInterface
 
     bool areEventsPending() override;
 
-    std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) override;
+    VmiUnicodeStruct extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) override;
 
     std::unique_ptr<std::string> extractStringAtVA(uint64_t virtualAddress, uint64_t cr3) override;
 

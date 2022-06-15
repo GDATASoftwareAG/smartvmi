@@ -62,7 +62,7 @@ std::unique_ptr<std::list<Vadt>> VadTreeWin10::getAllVadts()
         try
         {
             auto currentVad = createVadt(currentVadEntryBaseVA);
-            vadtList->push_back(*currentVad);
+            vadtList->push_back(std::move(*currentVad));
         }
         catch (const std::exception& e)
         {
@@ -109,7 +109,7 @@ std::unique_ptr<Vadt> VadTreeWin10::createVadt(uint64_t vadEntryBaseVA) const
             try
             {
                 auto filePointerObjectAddress = kernelAccess->extractFilePointerObjectAddress(controlAreaBaseVA);
-                vadt->fileName = *extractFileName(filePointerObjectAddress);
+                vadt->fileName = kernelAccess->extractFileName(filePointerObjectAddress);
 
                 auto imageFilePointerFromEprocess = kernelAccess->extractImageFilePointer(eprocessBase);
                 auto imageFilePointerFromVad = filePointerObjectAddress;
@@ -117,7 +117,6 @@ std::unique_ptr<Vadt> VadTreeWin10::createVadt(uint64_t vadEntryBaseVA) const
             }
             catch (const std::exception& e)
             {
-                vadt->fileName = "unknownFilename";
                 logger->warning("Unable to extract file name for VAD",
                                 {
                                     logfield::create("ProcessName", processName),
@@ -130,18 +129,4 @@ std::unique_ptr<Vadt> VadTreeWin10::createVadt(uint64_t vadEntryBaseVA) const
         vadt->isBeingDeleted = kernelAccess->extractIsBeingDeleted(controlAreaBaseVA);
     }
     return vadt;
-}
-
-std::unique_ptr<std::string> VadTreeWin10::extractFileName(addr_t filePointerObjectAddress) const
-{
-    std::unique_ptr<std::string> fileName;
-    try
-    {
-        fileName = kernelAccess->extractFileName(filePointerObjectAddress);
-    }
-    catch (const VmiException&)
-    {
-        throw VmiException("Unable to extract Filename @ " + Convenience::intToHex(filePointerObjectAddress));
-    }
-    return fileName;
 }

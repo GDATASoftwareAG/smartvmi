@@ -27,7 +27,7 @@ uint64_t KernelAccess::extractImageFilePointer(uint64_t eprocessBase) const
     return imageFilePointer;
 }
 
-std::unique_ptr<std::string> KernelAccess::extractFileName(uint64_t fileObjectBaseAddress) const
+VmiUnicodeStruct KernelAccess::extractFileName(uint64_t fileObjectBaseAddress) const
 {
     expectSaneKernelAddress(fileObjectBaseAddress, static_cast<const char*>(__func__));
     return vmiInterface->extractUnicodeStringAtVA(fileObjectBaseAddress + kernelOffsets.fileObject.FileName,
@@ -153,7 +153,7 @@ addr_t KernelAccess::extractControlAreaFilePointer(addr_t controlAreaAddress) co
                                   vmiInterface->getSystemCr3());
 }
 
-std::unique_ptr<std::string> KernelAccess::extractProcessPath(addr_t filePointerAddress) const
+VmiUnicodeStruct KernelAccess::extractProcessPath(addr_t filePointerAddress) const
 {
     expectSaneKernelAddress(filePointerAddress, static_cast<const char*>(__func__));
     return vmiInterface->extractUnicodeStringAtVA(filePointerAddress + kernelOffsets.fileObject.FileName,

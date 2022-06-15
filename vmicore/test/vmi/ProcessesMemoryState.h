@@ -305,7 +305,7 @@ class ProcessesMemoryStateFixture : public testing::Test
         ON_CALL(*mockVmiInterface,
                 extractUnicodeStringAtVA(process.filePointerAddress + _FILE_OBJECT_OFFSETS::FileName, systemCR3))
             .WillByDefault([processFilePath = process.filePath](uint64_t, uint64_t)
-                           { return std::make_unique<std::string>(processFilePath); });
+                           { return createVmiUnicodeStruct(processFilePath); });
     }
 
     void setupExtractProcessInformationReturns(const processValues& process)
@@ -466,7 +466,7 @@ class ProcessesMemoryStateFixture : public testing::Test
         ON_CALL(*mockVmiInterface,
                 extractUnicodeStringAtVA((filePointerObjectAddress) + _FILE_OBJECT_OFFSETS::FileName, systemCR3))
             .WillByDefault([fileNameString = fileNameString](uint64_t, uint64_t)
-                           { return std::make_unique<std::string>(fileNameString); });
+                           { return createVmiUnicodeStruct(fileNameString); });
         ON_CALL(*mockVmiInterface, read64VA(process4.eprocessBase + _EPROCESS_OFFSETS::ImageFilePointer, systemCR3))
             .WillByDefault(Return(filePointerObjectAddress));
     }
@@ -547,6 +547,14 @@ class ProcessesMemoryStateFixture : public testing::Test
                                                       mockLogging,
                                                       std::make_shared<NiceMock<MockEventStream>>());
     };
+
+    static VmiUnicodeStruct createVmiUnicodeStruct(const std::string& content)
+    {
+        VmiUnicodeStruct unicodeStruct;
+        unicodeStruct.data()->length = content.length();
+        unicodeStruct.data()->contents = reinterpret_cast<uint8_t*>(strdup(content.c_str()));
+        return unicodeStruct;
+    }
 };
 
 #endif // VMICORE_PROCESSESMEMORYSTATEFIXTURE_H

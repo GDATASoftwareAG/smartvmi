@@ -26,8 +26,6 @@ class VadTreeWin10
     std::unique_ptr<ILogger> logger;
 
     [[nodiscard]] std::unique_ptr<Vadt> createVadt(uint64_t vadEntryBaseVA) const;
-
-    [[nodiscard]] std::unique_ptr<std::string> extractFileName(addr_t filePointerObjectAddress) const;
 };
 
 #endif // VMICORE_VADTREEWIN10_H

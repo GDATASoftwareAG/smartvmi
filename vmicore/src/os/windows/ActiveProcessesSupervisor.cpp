@@ -46,11 +46,10 @@ ActiveProcessesSupervisor::extractProcessInformation(uint64_t eprocessBase) cons
     try
     {
         processInformation->processPath = extractProcessPath(eprocessBase);
-        processInformation->fullName = splitProcessFileNameFromPath(*processInformation->processPath);
+        processInformation->fullName = splitProcessFileNameFromPath(processInformation->processPath.asStringView());
     }
     catch (const std::exception& e)
     {
-        processInformation->processPath = std::make_unique<std::string>();
         processInformation->fullName = std::make_unique<std::string>();
         logger->warning("Process",
                         {logfield::create("ProcessName", processInformation->name),
@@ -196,7 +195,7 @@ std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> ActivePr
     return runningProcesses;
 }
 
-std::unique_ptr<std::string> ActiveProcessesSupervisor::extractProcessPath(uint64_t eprocessBase) const
+VmiUnicodeStruct ActiveProcessesSupervisor::extractProcessPath(uint64_t eprocessBase) const
 {
     auto sectionAddress = kernelAccess->extractSectionAddress(eprocessBase);
     auto controlAreaAddress = kernelAccess->extractControlAreaAddress(sectionAddress);
@@ -207,12 +206,10 @@ std::unique_ptr<std::string> ActiveProcessesSupervisor::extractProcessPath(uint6
     }
     auto controlAreaFilePointer = kernelAccess->extractControlAreaFilePointer(controlAreaAddress);
     auto filePointerAddress = KernelAccess::removeReferenceCountFromExFastRef(controlAreaFilePointer);
-    auto processPath = kernelAccess->extractProcessPath(filePointerAddress);
-
-    return processPath;
+    return kernelAccess->extractProcessPath(filePointerAddress);
 }
 
-std::unique_ptr<std::string> ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string& path)
+std::unique_ptr<std::string> ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string_view& path)
 {
     auto substringStartIterator =
         std::find_if(path.crbegin(), path.crend(), [](const char c) { return c == '\\'; }).base();
