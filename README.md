@@ -30,6 +30,11 @@ The tools as well as the generated and validated training data will be released 
 
 In the German economy alone, computer crime causes damage of more than 10 billion euros every year. Securing IT systems against cyber attacks and cyber espionage is therefore crucial for the economy and society to be able to take advantage of the progress and opportunities offered by digitization. In the funded project, procedures are being researched that, on the one hand, use innovative forensic reconnaissance methods to investigate and understand attack scenarios. On the other hand, these findings will be used to create new possibilities for detecting and preventing such attacks in advance and in real time.
 
+### Accepted Publications
+
+* Sentanoe, S., Dangl, T. and Reiser, H.P., 2022. KVMIveggur: Flexible, secure, and efficient support for self-service virtual machine introspection. Forensic Science International: Digital Investigation
+* Dangl, T., Sentanoe, S. and Reiser, H.P., 2022, August. VMIFresh: Efficient and Fresh Caches for Virtual Machine Introspection. In The 17th International Conference on Availability, Reliability and Security
+
 
 ___
 
