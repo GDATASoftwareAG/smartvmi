@@ -8,7 +8,7 @@
 #include <string>
 
 // Struct is externally verified during plugin initialization
-[[maybe_unused]] constexpr Plugin::PluginDetails pluginInformation = {
+[[maybe_unused]] extern constexpr Plugin::PluginDetails pluginInformation = {
     VMI_PLUGIN_API_VERSION, PLUGIN_NAME, PLUGIN_VERSION};
 
 Plugin::PluginInterface* pluginInterface;
