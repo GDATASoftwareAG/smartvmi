@@ -128,7 +128,7 @@ std::unique_ptr<std::vector<Plugin::MemoryRegion>> PluginSystem::getProcessMemor
                            logfield::create("size", static_cast<uint64_t>(size))});
             memoryRegionsVector->emplace_back(startAddress,
                                               size,
-                                              vadtListElement.fileName,
+                                              std::string(vadtListElement.fileName.asStringViewOrDefault()),
                                               vadtListElement.protection,
                                               vadtListElement.isSharedMemory,
                                               vadtListElement.isBeingDeleted,

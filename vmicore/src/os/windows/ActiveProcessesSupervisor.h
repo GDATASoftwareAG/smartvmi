@@ -17,7 +17,7 @@ struct ActiveProcessInformation
     pid_t parentPid;
     std::string name;
     std::unique_ptr<std::string> fullName;
-    std::unique_ptr<std::string> processPath;
+    VmiUnicodeStruct processPath;
     std::unique_ptr<VadTreeWin10> vadTree;
 };
 
@@ -75,9 +75,9 @@ class ActiveProcessesSupervisor : public IActiveProcessesSupervisor
 
     [[nodiscard]] std::unique_ptr<ActiveProcessInformation> extractProcessInformation(uint64_t eprocessBase) const;
 
-    [[nodiscard]] std::unique_ptr<std::string> extractProcessPath(uint64_t eprocessBase) const;
+    [[nodiscard]] VmiUnicodeStruct extractProcessPath(uint64_t eprocessBase) const;
 
-    [[nodiscard]] static std::unique_ptr<std::string> splitProcessFileNameFromPath(const std::string& path);
+    [[nodiscard]] static std::unique_ptr<std::string> splitProcessFileNameFromPath(const std::string_view& path);
 };
 
 #endif // VMICORE_ACTIVEPROCESSESSUPERVISOR_H

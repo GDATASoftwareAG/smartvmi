@@ -10,7 +10,7 @@ class Vadt
     uint64_t vadEntryBaseVA;
     uint64_t startingVPN;
     uint64_t endingVPN;
-    std::string fileName;
+    VmiUnicodeStruct fileName;
     ProtectionValues protection;
     bool isFileBacked;
     bool isSharedMemory;

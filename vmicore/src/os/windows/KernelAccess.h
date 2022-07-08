@@ -16,7 +16,7 @@ class IKernelAccess
 
     [[nodiscard]] virtual uint64_t extractImageFilePointer(uint64_t imageFilePointerAddressLocation) const = 0;
 
-    [[nodiscard]] virtual std::unique_ptr<std::string> extractFileName(uint64_t fileObjectBaseAddress) const = 0;
+    [[nodiscard]] virtual VmiUnicodeStruct extractFileName(uint64_t fileObjectBaseAddress) const = 0;
 
     [[nodiscard]] virtual addr_t extractControlAreaBasePointer(addr_t vadEntryBaseVA) const = 0;
 
@@ -47,7 +47,7 @@ class IKernelAccess
 
     [[nodiscard]] virtual addr_t extractControlAreaFilePointer(addr_t controlAreaAddress) const = 0;
 
-    [[nodiscard]] virtual std::unique_ptr<std::string> extractProcessPath(addr_t filePointerAddress) const = 0;
+    [[nodiscard]] virtual VmiUnicodeStruct extractProcessPath(addr_t filePointerAddress) const = 0;
 
     [[nodiscard]] virtual addr_t getMmVadShortFlagsAddr(addr_t vadShortBaseVA) const = 0;
 
@@ -80,7 +80,7 @@ class KernelAccess : public IKernelAccess
 
     [[nodiscard]] uint64_t extractImageFilePointer(uint64_t eprocessBase) const override;
 
-    [[nodiscard]] std::unique_ptr<std::string> extractFileName(uint64_t fileObjectBaseAddress) const override;
+    [[nodiscard]] VmiUnicodeStruct extractFileName(uint64_t fileObjectBaseAddress) const override;
 
     [[nodiscard]] addr_t extractControlAreaBasePointer(addr_t vadEntryBaseVA) const override;
 
@@ -113,7 +113,7 @@ class KernelAccess : public IKernelAccess
 
     [[nodiscard]] addr_t extractControlAreaFilePointer(addr_t controlAreaAddress) const override;
 
-    [[nodiscard]] std::unique_ptr<std::string> extractProcessPath(addr_t filePointerAddress) const override;
+    [[nodiscard]] VmiUnicodeStruct extractProcessPath(addr_t filePointerAddress) const override;
 
     [[nodiscard]] addr_t getMmVadShortFlagsAddr(addr_t vadShortBaseVA) const override;
 
