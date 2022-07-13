@@ -3,9 +3,9 @@
 #include "../io/grpc/GRPCLogger.h"
 #include "../os/PagingDefinitions.h"
 #include "VmiException.h"
+#include <fmt/core.h>
 #include <memory>
 #include <utility>
-#include <fmt/core.h>
 
 namespace
 {
@@ -56,7 +56,7 @@ InterruptEvent::InterruptEvent(std::shared_ptr<ILibvmiInterface> vmiInterface,
 
 void InterruptEvent::initialize()
 {
-    targetPAString = fmt::format("{}", targetPA);
+    targetPAString = fmt::format("{:#x}", targetPA);
     singleStepCallbackFunction =
         SingleStepSupervisor::createSingleStepCallback(shared_from_this(), &InterruptEvent::singleStepCallback);
     storeOriginalValue();
@@ -111,7 +111,7 @@ void InterruptEvent::storeOriginalValue()
     originalValue = vmiInterface->read8PA(targetPA);
     logger->debug("Save original value",
                   {logfield::create("targetPA", targetPAString),
-                   logfield::create("originalValue", fmt::format("{:x}", originalValue))});
+                   logfield::create("originalValue", fmt::format("{:#x}", originalValue))});
     if (originalValue == INT3_BREAKPOINT)
     {
         throw VmiException(std::string(__func__) + "InterruptEvent originalValue @ " + targetPAString +
@@ -137,7 +137,7 @@ event_response_t InterruptEvent::_defaultInterruptCallback(__attribute__((unused
         {
             GlobalControl::logger()->debug(
                 "Reinject interrupt into guest OS",
-                {logfield::create("logger", loggerName), logfield::create("eventPA", fmt::format("{:x}", eventPA))});
+                {logfield::create("logger", loggerName), logfield::create("eventPA", fmt::format("{:#x}", eventPA))});
             event->interrupt_event.reinject = REINJECT_INTERRUPT;
         }
         event->interrupt_event.insn_length = 1;

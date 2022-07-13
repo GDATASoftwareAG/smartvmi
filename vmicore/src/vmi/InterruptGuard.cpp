@@ -1,8 +1,8 @@
 #include "InterruptGuard.h"
 #include "../GlobalControl.h"
 #include "../os/PagingDefinitions.h"
-#include <memory>
 #include <fmt/core.h>
+#include <memory>
 
 namespace
 {
@@ -42,12 +42,13 @@ void InterruptGuard::initialize()
     // we need a small buffer of data from the subsequent page because memory reads may be overlapping
     if (!vmiInterface->readXVA(pageBaseVA, systemCr3, shadowPage))
     {
-        throw VmiException(fmt::format("{}: Unable to create Interrupt @ {} in system with cr3 {:x}", __func__, pageBaseVA, systemCr3));
+        throw VmiException(fmt::format(
+            "{}: Unable to create Interrupt @ {} in system with cr3 {:x}", __func__, pageBaseVA, systemCr3));
     }
     enableEvent();
     logger->debug(
         "Interrupt guard: Register RW event on gfn",
-        {logfield::create("targetGFN", fmt::format("{:x}", targetPA >> PagingDefinitions::numberOfPageIndexBits))});
+        {logfield::create("targetGFN", fmt::format("{:#x}", targetPA >> PagingDefinitions::numberOfPageIndexBits))});
 }
 
 void InterruptGuard::teardown()
@@ -90,7 +91,7 @@ event_response_t InterruptGuard::guardCallback(vmi_event_t* event)
         logger->warning("Interrupt guard hit, check if patch guard is active");
         interruptGuardHit = true;
     }
-    logger->debug("Interrupt guard hit", {logfield::create("eventPA", fmt::format("{:x}", eventPA))});
+    logger->debug("Interrupt guard hit", {logfield::create("eventPA", fmt::format("{:#x}", eventPA))});
     event->emul_read = &emulateReadData;
     // we are allowed to provide more data than actually needed but empirically no more than 16 bytes are read at a time
     for (int i = 0; i < 16; ++i)

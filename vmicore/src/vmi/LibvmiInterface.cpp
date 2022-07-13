@@ -65,9 +65,10 @@ void LibvmiInterface::freeEvent(vmi_event_t* event, status_t rc)
 {
     if (rc != VMI_SUCCESS)
     {
-        libvmiInterfaceInstance->logger->warning("Failed to clear event",
-                                                 {logfield::create("eventAddress", fmt::format("{:x}", (uint64_t)event)),
-                                                  logfield::create("type", static_cast<uint64_t>(event->type))});
+        libvmiInterfaceInstance->logger->warning(
+            "Failed to clear event",
+            {logfield::create("eventAddress", fmt::format("{:#x}", (uint64_t)event)),
+             logfield::create("type", static_cast<uint64_t>(event->type))});
     }
     free(event);
 }
@@ -327,7 +328,7 @@ pid_t LibvmiInterface::convertDtbToPid(uint64_t dtb)
     pid_t pid = 0;
     if (vmi_dtb_to_pid(vmiInstance, dtb, &pid) != VMI_SUCCESS)
     {
-        throw VmiException(fmt::format("Unable obtain the pid for dtb {}", dtb));
+        throw VmiException(fmt::format("Unable obtain the pid for dtb {:#x}", dtb));
     }
     return pid;
 }

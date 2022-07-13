@@ -2,8 +2,8 @@
 #include "../../GlobalControl.h"
 #include "../../io/grpc/GRPCLogger.h"
 #include "../../vmi/VmiException.h"
-#include <utility>
 #include <fmt/core.h>
+#include <utility>
 
 SystemEventSupervisor::SystemEventSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                              std::shared_ptr<IPluginSystem> pluginSystem,
@@ -36,7 +36,7 @@ void SystemEventSupervisor::startPspCallProcessNotifyRoutinesMonitoring()
 {
     auto processNotifyFunctionVA = vmiInterface->translateKernelSymbolToVA("PspCallProcessNotifyRoutines");
     logger->debug("Obtained starting address of PspCallProcessNotifyRoutines",
-                  {logfield::create("VA", fmt::format("{:x}", processNotifyFunctionVA))});
+                  {logfield::create("VA", fmt::format("{:#x}", processNotifyFunctionVA))});
     auto notifyProcessCallbackFunction = InterruptEvent::createInterruptCallback(
         weak_from_this(), &SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback);
 
@@ -50,7 +50,7 @@ void SystemEventSupervisor::startKeBugCheckExMonitoring()
 {
     auto bugCheckFunctionVA = vmiInterface->translateKernelSymbolToVA("KeBugCheckEx");
     logger->debug("Obtained starting address of KeBugCheckEx",
-                  {logfield::create("VA", fmt::format("{:x}", bugCheckFunctionVA))});
+                  {logfield::create("VA", fmt::format("{:#x}", bugCheckFunctionVA))});
     auto bugCheckCallbackFunction =
         InterruptEvent::createInterruptCallback(weak_from_this(), &SystemEventSupervisor::keBugCheckExCallback);
 
@@ -66,7 +66,7 @@ SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback(InterruptEvent& inte
     logger->debug("Called",
                   {
                       logfield::create("Function", static_cast<std::string>(__func__)),
-                      logfield::create("_EPROCESS_base ", fmt::format("{:x}", eprocessBase)),
+                      logfield::create("_EPROCESS_base ", fmt::format("{:#x}", eprocessBase)),
                       logfield::create("terminationFlag ", isTerminationEvent),
                   });
     if (isTerminationEvent)
@@ -94,7 +94,7 @@ InterruptEvent::InterruptResponse SystemEventSupervisor::keBugCheckExCallback(In
 {
     auto bugCheckCode = interruptEvent.getRcx();
     eventStream->sendBSODEvent(static_cast<int64_t>(bugCheckCode));
-    logger->warning("BSOD detected!", {logfield::create("BugCheckCode", fmt::format("{:x}", bugCheckCode))});
+    logger->warning("BSOD detected!", {logfield::create("BugCheckCode", fmt::format("{:#x}", bugCheckCode))});
     GlobalControl::endVmi = true;
     GlobalControl::postRunPluginAction = false;
     pluginSystem->passShutdownEventToRegisteredPlugins();

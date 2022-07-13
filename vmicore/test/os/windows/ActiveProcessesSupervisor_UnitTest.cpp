@@ -42,19 +42,19 @@ TEST_F(ActiveProcessesSupervisorFixture, initialize_preexistingProcesses_process
                 sendProcessEvent(::grpc::ProcessState::Started,
                                  StrEq(emptyFileName),
                                  process0.processId,
-                                 StrEq(fmt::format("{:x}", process0.cr3))))
+                                 StrEq(fmt::format("{:#x}", process0.cr3))))
         .Times(1);
     EXPECT_CALL(*mockEventStream,
                 sendProcessEvent(::grpc::ProcessState::Started,
                                  StrEq(process4.imageFileName),
                                  process4.processId,
-                                 StrEq(fmt::format("{:x}", systemCR3))))
+                                 StrEq(fmt::format("{:#x}", systemCR3))))
         .Times(1);
     EXPECT_CALL(*mockEventStream,
                 sendProcessEvent(::grpc::ProcessState::Started,
                                  StrEq(process248.imageFileName),
                                  process248.processId,
-                                 StrEq(fmt::format("{:x}", process248.cr3))))
+                                 StrEq(fmt::format("{:#x}", process248.cr3))))
         .Times(1);
 
     EXPECT_NO_THROW(activeProcessesSupervisor->initialize());
@@ -81,7 +81,7 @@ TEST_F(ActiveProcessesSupervisorFixture, addNewProcess_process332_processStartEv
                 sendProcessEvent(::grpc::ProcessState::Started,
                                  StrEq(process332.imageFileName),
                                  process332.processId,
-                                 StrEq(fmt::format("{:x}", process332.cr3))))
+                                 StrEq(fmt::format("{:#x}", process332.cr3))))
         .Times(1);
     EXPECT_NO_THROW(activeProcessesSupervisor->addNewProcess(process332.eprocessBase));
 }
@@ -105,7 +105,7 @@ TEST_F(ActiveProcessesSupervisorFixture, removeActiveProcess_presentProcess_proc
                 sendProcessEvent(::grpc::ProcessState::Terminated,
                                  StrEq(process248.imageFileName),
                                  process248.processId,
-                                 StrEq(fmt::format("{:x}", process248.cr3))))
+                                 StrEq(fmt::format("{:#x}", process248.cr3))))
         .Times(1);
     EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process248.eprocessBase));
 }

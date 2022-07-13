@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <dlfcn.h>
 #include <exception>
-#include <utility>
 #include <fmt/core.h>
+#include <utility>
 
 #define PLUGIN_NAME "Main"
 #define PLUGIN_VERSION "2.0"
@@ -48,9 +48,13 @@ PluginSystem::readPagesWithUnmappedRegionPadding(uint64_t pageAlignedVA, uint64_
 {
     if (pageAlignedVA % PagingDefinitions::pageSizeInBytes != 0)
     {
-        throw std::invalid_argument(fmt::format("Starting address {:#x} is not aligned to page boundary", pageAlignedVA));
+        throw std::invalid_argument(
+            fmt::format("Starting address {:#x} is not aligned to page boundary", pageAlignedVA));
     }
-    auto vadIdentifier(fmt::format("CR3 {:x} VAD @ {:x}-{:x}", cr3,pageAlignedVA, (pageAlignedVA + numberOfPages * PagingDefinitions::pageSizeInBytes)));
+    auto vadIdentifier(fmt::format("CR3 {:#x} VAD @ {:#x}-{:#x}",
+                                   cr3,
+                                   pageAlignedVA,
+                                   (pageAlignedVA + numberOfPages * PagingDefinitions::pageSizeInBytes)));
     auto memoryRegion = std::make_unique<std::vector<uint8_t>>();
     auto needsPadding = true;
     for (uint64_t currentPageIndex = 0; currentPageIndex < numberOfPages; currentPageIndex++)
@@ -64,7 +68,7 @@ PluginSystem::readPagesWithUnmappedRegionPadding(uint64_t pageAlignedVA, uint64_
                 logger->info("First successful page extraction after padding",
                              {logfield::create(WRITE_TO_FILE_TAG, paddingLogFile),
                               logfield::create("vadIdentifier", vadIdentifier),
-                              logfield::create("pageAlignedVA", fmt::format("{:x}", pageAlignedVA))});
+                              logfield::create("pageAlignedVA", fmt::format("{:#x}", pageAlignedVA))});
             }
             memoryRegion->insert(memoryRegion->cend(), memoryPage.cbegin(), memoryPage.cend());
         }
@@ -77,7 +81,7 @@ PluginSystem::readPagesWithUnmappedRegionPadding(uint64_t pageAlignedVA, uint64_
                 logger->info("Start of padding",
                              {logfield::create(WRITE_TO_FILE_TAG, paddingLogFile),
                               logfield::create("vadIdentifier", vadIdentifier),
-                              logfield::create("pageAlignedVA", fmt::format("{:x}", pageAlignedVA))});
+                              logfield::create("pageAlignedVA", fmt::format("{:#x}", pageAlignedVA))});
             }
         }
         pageAlignedVA += PagingDefinitions::pageSizeInBytes;
@@ -118,10 +122,10 @@ std::unique_ptr<std::vector<Plugin::MemoryRegion>> PluginSystem::getProcessMemor
             auto endAddress = ((vadtListElement.endingVPN + 1) << PagingDefinitions::numberOfPageIndexBits) - 1;
             auto size = endAddress - startAddress + 1;
             logger->debug("Vadt element",
-                          {logfield::create("startingVPN", fmt::format("{:x}", vadtListElement.startingVPN)),
-                           logfield::create("endingVPN", fmt::format("{:x}", vadtListElement.endingVPN)),
-                           logfield::create("startAddress", fmt::format("{:x}", startAddress)),
-                           logfield::create("endAddress", fmt::format("{:x}", endAddress)),
+                          {logfield::create("startingVPN", fmt::format("{:#x}", vadtListElement.startingVPN)),
+                           logfield::create("endingVPN", fmt::format("{:#x}", vadtListElement.endingVPN)),
+                           logfield::create("startAddress", fmt::format("{:#x}", startAddress)),
+                           logfield::create("endAddress", fmt::format("{:#x}", endAddress)),
                            logfield::create("size", static_cast<uint64_t>(size))});
             memoryRegionsVector->emplace_back(startAddress,
                                               size,
