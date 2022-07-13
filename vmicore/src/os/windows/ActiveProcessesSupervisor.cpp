@@ -1,4 +1,5 @@
 #include "ActiveProcessesSupervisor.h"
+#include <fmt/core.h>
 
 namespace
 {
@@ -24,7 +25,7 @@ void ActiveProcessesSupervisor::initialize()
     auto psActiveProcessListHeadVA = vmiInterface->translateKernelSymbolToVA("PsActiveProcessHead");
     auto currentListEntry = psActiveProcessListHeadVA;
     logger->debug("Got VA of PsActiveProcessHead",
-                  {logfield::create("PsActiveProcessHeadVA", Convenience::intToHex(currentListEntry))});
+                  {logfield::create("PsActiveProcessHeadVA", fmt::format("{:x}", currentListEntry))});
 
     do
     {
@@ -82,8 +83,7 @@ ActiveProcessesSupervisor::getProcessInformationByEprocessBase(uint64_t eprocess
     const auto pidIterator = pidsByEprocessBase.find(eprocessBase);
     if (pidIterator == pidsByEprocessBase.cend())
     {
-        throw std::invalid_argument(std::string(__func__) + ": Process with _EPROCESS base " +
-                                    Convenience::intToHex(eprocessBase) + " not in process cache.");
+        throw std::invalid_argument(fmt::format("{}: Process with _EPROCESS base {:x} not in process cache.", __func__, eprocessBase));
     }
     return getProcessInformationByPid(pidIterator->second);
 }
@@ -99,16 +99,16 @@ void ActiveProcessesSupervisor::addNewProcess(uint64_t eprocessBase)
     {
         parentPid = std::to_string(parentProcessInformation->second->pid);
         parentName = parentProcessInformation->second->name;
-        parentCr3 = Convenience::intToHex(parentProcessInformation->second->processCR3);
+        parentCr3 = fmt::format("{:x}", parentProcessInformation->second->processCR3);
     }
     eventStream->sendProcessEvent(::grpc::ProcessState::Started,
                                   processInformation->name,
                                   static_cast<uint32_t>(processInformation->pid),
-                                  Convenience::intToHex(processInformation->processCR3));
+                                  fmt::format("{:x}", processInformation->processCR3));
     logger->info("Discovered active process",
                  {logfield::create("ProcessName", processInformation->name),
                   logfield::create("ProcessId", static_cast<uint64_t>(processInformation->pid)),
-                  logfield::create("ProcessCr3", Convenience::intToHex(processInformation->processCR3)),
+                  logfield::create("ProcessCr3", fmt::format("{:x}", processInformation->processCR3)),
                   logfield::create("ParentProcessName", parentName),
                   logfield::create("ParentProcessId", parentPid),
                   logfield::create("ParentProcessCr3", parentCr3)});
@@ -124,7 +124,7 @@ bool ActiveProcessesSupervisor::isProcessActive(uint64_t eprocessBase) const
         return true;
     }
     logger->debug("Encountered a process that has got an exit status other than 'status pending'",
-                  {logfield::create("_EPROCESS_base", Convenience::intToHex(eprocessBase)),
+                  {logfield::create("_EPROCESS_base", fmt::format("{:x}", eprocessBase)),
                    logfield::create("ProcessId", static_cast<uint64_t>(kernelAccess->extractPID(eprocessBase))),
                    logfield::create("ExitStatus", static_cast<uint64_t>(exitStatus))
 
@@ -141,7 +141,7 @@ void ActiveProcessesSupervisor::removeActiveProcess(uint64_t eprocessBase)
         if (processInformationIterator == processInformationByPid.end())
         {
             logger->warning("Process information not found for process",
-                            {logfield::create("_EPROCESS_base", Convenience::intToHex(eprocessBase)),
+                            {logfield::create("_EPROCESS_base", fmt::format("{:x}", eprocessBase)),
                              logfield::create("ProcessId", static_cast<uint64_t>(eprocessBaseIterator->second))
 
                             });
@@ -156,18 +156,18 @@ void ActiveProcessesSupervisor::removeActiveProcess(uint64_t eprocessBase)
             {
                 parentPid = std::to_string(parentProcessInformation->second->pid);
                 parentName = parentProcessInformation->second->name;
-                parentCr3 = Convenience::intToHex(parentProcessInformation->second->processCR3);
+                parentCr3 = fmt::format("{:x}", parentProcessInformation->second->processCR3);
             }
 
             eventStream->sendProcessEvent(::grpc::ProcessState::Terminated,
                                           processInformationIterator->second->name,
                                           static_cast<uint32_t>(processInformationIterator->second->pid),
-                                          Convenience::intToHex(processInformationIterator->second->processCR3));
+                                          fmt::format("{:x}", processInformationIterator->second->processCR3));
             logger->info(
                 "Remove process from actives processes",
                 {logfield::create("ProcessName", processInformationIterator->second->name),
                  logfield::create("ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)),
-                 logfield::create("ProcessCr3", Convenience::intToHex(processInformationIterator->second->processCR3)),
+                 logfield::create("ProcessCr3", fmt::format("{:x}", processInformationIterator->second->processCR3)),
                  logfield::create("ParentProcessName", parentName),
                  logfield::create("ParentProcessId", parentPid),
                  logfield::create("ParentProcessCr3", parentCr3)});
@@ -179,7 +179,7 @@ void ActiveProcessesSupervisor::removeActiveProcess(uint64_t eprocessBase)
     else
     {
         logger->warning("Process does not seem to be stored as an active process",
-                        {logfield::create("_EPROCESS_base", Convenience::intToHex(eprocessBase))});
+                        {logfield::create("_EPROCESS_base", fmt::format("{:x}", eprocessBase))});
     }
 }
 
