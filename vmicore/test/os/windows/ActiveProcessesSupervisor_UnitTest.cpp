@@ -1,7 +1,7 @@
 #include "../../vmi/ProcessesMemoryState.h"
+#include <fmt/core.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <fmt/core.h>
 
 using testing::Contains;
 using testing::Not;
