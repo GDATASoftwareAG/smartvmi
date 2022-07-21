@@ -67,7 +67,7 @@ void LibvmiInterface::freeEvent(vmi_event_t* event, status_t rc)
     {
         libvmiInterfaceInstance->logger->warning(
             "Failed to clear event",
-            {logfield::create("eventAddress", fmt::format("{:#x}", (uint64_t)event)),
+            {logfield::create("eventAddress", fmt::format("{:#x}", static_cast<uint64_t>(event->type))),
              logfield::create("type", static_cast<uint64_t>(event->type))});
     }
     free(event);

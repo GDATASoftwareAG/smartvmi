@@ -43,7 +43,7 @@ void InterruptGuard::initialize()
     if (!vmiInterface->readXVA(pageBaseVA, systemCr3, shadowPage))
     {
         throw VmiException(fmt::format(
-            "{}: Unable to create Interrupt @ {} in system with cr3 {:x}", __func__, pageBaseVA, systemCr3));
+            "{}: Unable to create Interrupt @ {:#x} in system with cr3 {:#x}", __func__, pageBaseVA, systemCr3));
     }
     enableEvent();
     logger->debug(

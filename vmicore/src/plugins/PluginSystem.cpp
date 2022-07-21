@@ -49,7 +49,7 @@ PluginSystem::readPagesWithUnmappedRegionPadding(uint64_t pageAlignedVA, uint64_
     if (pageAlignedVA % PagingDefinitions::pageSizeInBytes != 0)
     {
         throw std::invalid_argument(
-            fmt::format("Starting address {:#x} is not aligned to page boundary", pageAlignedVA));
+            fmt::format("{}: Starting address {:#x} is not aligned to page boundary", __func__, pageAlignedVA));
     }
     auto vadIdentifier(fmt::format("CR3 {:#x} VAD @ {:#x}-{:#x}",
                                    cr3,
