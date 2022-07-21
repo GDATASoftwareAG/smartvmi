@@ -204,7 +204,7 @@ std::unique_ptr<std::string> ActiveProcessesSupervisor::extractProcessPath(uint6
     auto fileFlag = kernelAccess->extractIsFile(controlAreaAddress);
     if (!fileFlag)
     {
-        throw VmiException(std::string(__func__) + ": File flag in mmSectionFlags not set");
+        throw VmiException(fmt::format("{}: File flag in mmSectionFlags not set", __func__));
     }
     auto controlAreaFilePointer = kernelAccess->extractControlAreaFilePointer(controlAreaAddress);
     auto filePointerAddress = KernelAccess::removeReferenceCountFromExFastRef(controlAreaFilePointer);
@@ -219,7 +219,7 @@ std::unique_ptr<std::string> ActiveProcessesSupervisor::splitProcessFileNameFrom
         std::find_if(path.crbegin(), path.crend(), [](const char c) { return c == '\\'; }).base();
     if (substringStartIterator == path.cbegin())
     {
-        throw VmiException(std::string(__func__) + ": Unable to find any path separators at all");
+        throw VmiException(fmt::format("{}: Unable to find any path separators at all", __func__));
     }
     return std::make_unique<std::string>(substringStartIterator, path.cend());
 }
