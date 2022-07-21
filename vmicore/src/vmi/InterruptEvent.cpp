@@ -79,7 +79,8 @@ void InterruptEvent::setupVmiInterruptEvent()
 {
     if (interruptsByPA.find(targetPA) != interruptsByPA.end())
     {
-        throw VmiException(fmt::format("{}: Interrupt already registered at this address: {}", __func__, targetPAString));
+        throw VmiException(
+            fmt::format("{}: Interrupt already registered at this address: {}", __func__, targetPAString));
     }
     interruptsByPA[targetPA] = this;
 }
@@ -114,7 +115,8 @@ void InterruptEvent::storeOriginalValue()
                    logfield::create("originalValue", fmt::format("{:#x}", originalValue))});
     if (originalValue == INT3_BREAKPOINT)
     {
-        throw VmiException(fmt::format("{}: InterruptEvent originalValue @ {} is already an INT3 breakpoint.", __func__, targetPAString));
+        throw VmiException(fmt::format(
+            "{}: InterruptEvent originalValue @ {} is already an INT3 breakpoint.", __func__, targetPAString));
     }
 }
 
@@ -160,7 +162,8 @@ event_response_t InterruptEvent::interruptCallback(uint32_t vcpuId)
     }
     catch (const std::runtime_error& e)
     {
-        throw std::runtime_error(fmt::format("{}: {} Target physical address = {}", __func__, e.what(), targetPAString));
+        throw std::runtime_error(
+            fmt::format("{}: {} Target physical address = {}", __func__, e.what(), targetPAString));
     }
     disableEvent();
     if (response == InterruptResponse::Continue)
