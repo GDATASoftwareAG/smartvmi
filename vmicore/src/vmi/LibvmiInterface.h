@@ -1,13 +1,13 @@
 #ifndef VMICORE_LIBVMIINTERFACE_H
 #define VMICORE_LIBVMIINTERFACE_H
 
-#include "../Convenience.h"
 #include "../config/IConfigParser.h"
 #include "../io/IEventStream.h"
 #include "../io/ILogging.h"
 #include "VmiException.h"
 #include "VmiInitError.h"
 #include <codecvt>
+#include <fmt/core.h>
 #include <functional>
 #include <libvmi/events.h>
 #include <memory>
@@ -156,9 +156,11 @@ class LibvmiInterface : public ILibvmiInterface
         std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_read(vmiInstance, &accessContext, sizeof(T), exctractedValue.get(), nullptr) != VMI_SUCCESS)
         {
-            throw VmiException(std::string(__func__) + ": Unable to read " + std::to_string(sizeof(T)) +
-                               " bytes from VA " + Convenience::intToHex(accessContext.addr) + " with cr3 " +
-                               Convenience::intToHex(accessContext.pt));
+            throw VmiException(fmt::format("{}: Unable to read {} bytes from VA {:#x} with cr3 {:#x}",
+                                           __func__,
+                                           sizeof(T),
+                                           accessContext.addr,
+                                           accessContext.pt));
         }
         return exctractedValue;
     }
