@@ -1,4 +1,5 @@
 #include "VadTreeWin10.h"
+#include <fmt/core.h>
 #include <unordered_set>
 
 VadTreeWin10::VadTreeWin10(std::shared_ptr<IKernelAccess> kernelAccess,
@@ -30,7 +31,7 @@ std::unique_ptr<std::list<Vadt>> VadTreeWin10::getAllVadts()
         if (!insertionResult.second)
         {
             logger->warning("Cycle detected! Vad entry already visited",
-                            {logfield::create("VadEntryBaseVA", Convenience::intToHex(currentVadEntryBaseVA))});
+                            {logfield::create("VadEntryBaseVA", fmt::format("{:#x}", currentVadEntryBaseVA))});
             continue;
         }
 
@@ -46,7 +47,7 @@ std::unique_ptr<std::list<Vadt>> VadTreeWin10::getAllVadts()
             logger->warning("Unable to extract process",
                             {logfield::create("ProcessName", processName),
                              logfield::create("ProcessId", static_cast<int64_t>(pid)),
-                             logfield::create("_MMVAD_SHORT", Convenience::intToHex(currentVadEntryBaseVA)),
+                             logfield::create("_MMVAD_SHORT", fmt::format("{:#x}", currentVadEntryBaseVA)),
                              logfield::create("exception", e.what())});
             continue;
         }
@@ -102,8 +103,8 @@ std::unique_ptr<Vadt> VadTreeWin10::createVadt(uint64_t vadEntryBaseVA) const
         {
             logger->debug("Is file backed",
                           {
-                              logfield::create("mmSectionFlags.Image", Convenience::intToHex(imageFlag)),
-                              logfield::create("mmSectionFlags.File", Convenience::intToHex(fileFlag)),
+                              logfield::create("mmSectionFlags.Image", fmt::format("{:#x}", imageFlag)),
+                              logfield::create("mmSectionFlags.File", fmt::format("{:#x}", fileFlag)),
                           });
             vadt->isFileBacked = true;
             try
@@ -141,7 +142,7 @@ std::unique_ptr<std::string> VadTreeWin10::extractFileName(addr_t filePointerObj
     }
     catch (const VmiException&)
     {
-        throw VmiException("Unable to extract Filename @ " + Convenience::intToHex(filePointerObjectAddress));
+        throw VmiException(fmt::format("Unable to extract Filename @ {:#x}", filePointerObjectAddress));
     }
     return fileName;
 }

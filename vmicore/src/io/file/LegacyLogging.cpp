@@ -1,5 +1,4 @@
 #include "LegacyLogging.h"
-#include "../../Convenience.h"
 #include <cstdint>
 #include <exception>
 #include <filesystem>
