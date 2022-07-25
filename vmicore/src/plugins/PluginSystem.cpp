@@ -250,8 +250,8 @@ void PluginSystem::initializePlugin(const std::string& pluginName, std::shared_p
     }
     dlerror(); // clear possible remnants of error messages
 
-    auto pluginInformation = reinterpret_cast<Plugin::PluginDetails*>(dlsym(libraryHandle, "pluginInformation"));
-    auto dlErrorMessage = dlerror();
+    auto* pluginInformation = reinterpret_cast<Plugin::PluginDetails*>(dlsym(libraryHandle, "pluginInformation"));
+    auto* dlErrorMessage = dlerror();
     if (dlErrorMessage != nullptr)
     {
         throw std::runtime_error("Unable to retrieve extern symbol 'pluginInformation': " +

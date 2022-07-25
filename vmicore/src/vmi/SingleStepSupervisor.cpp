@@ -69,9 +69,10 @@ event_response_t SingleStepSupervisor::singleStepCallback(vmi_event_t* event)
     }
     catch (const std::runtime_error& e)
     {
-        throw VmiException(std::string(__func__) +
-                           ": Callback target for the current single step event does not exist anymore. VCPU_ID = " +
-                           std::to_string(event->vcpu_id));
+        throw VmiException(
+            fmt::format("{}: Callback target for the current single step event does not exist anymore. VCPU_ID = {}",
+                        __func__,
+                        event->vcpu_id));
     }
     callbacks[event->vcpu_id] = nullptr;
     event->callback = nullptr;
@@ -84,8 +85,8 @@ void SingleStepSupervisor::setSingleStepCallback(uint vcpuId, const std::functio
 {
     if (callbacks[vcpuId])
     {
-        throw VmiException(std::string(__func__) +
-                           ": Registering a second callback to the current VCPU is not allowed.");
+        throw VmiException(
+            fmt::format("{}: Registering a second callback to the current VCPU is not allowed.", __func__));
     }
     callbacks[vcpuId] = eventCallback;
     SETUP_SINGLESTEP_EVENT(&singleStepEvents[vcpuId], 0, _defaultSingleStepCallback, true);

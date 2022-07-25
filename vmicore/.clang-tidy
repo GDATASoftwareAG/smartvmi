@@ -8,6 +8,7 @@ Checks: '
   -cppcoreguidelines-special-member-functions,
   -cppcoreguidelines-pro-type-union-access,
   google-*,
+  -google-readability-namespace-comments,
   llvm-*,
   -llvm-header-guard,
   -llvm-namespace-comment,
