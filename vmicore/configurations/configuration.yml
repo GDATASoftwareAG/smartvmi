@@ -16,3 +16,4 @@ plugin_system:
       ignored_processes:
         - SearchUI.exe
         - system
+    libapitracing.so:
