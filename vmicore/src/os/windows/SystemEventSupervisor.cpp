@@ -69,24 +69,28 @@ SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback(InterruptEvent& inte
                       logfield::create("_EPROCESS_base ", fmt::format("{:#x}", eprocessBase)),
                       logfield::create("terminationFlag ", isTerminationEvent),
                   });
-    if (isTerminationEvent)
+    try
     {
-        try
+        auto processInformation = activeProcessesSupervisor->getProcessInformationByEprocessBase(eprocessBase);
+
+        if (isTerminationEvent)
         {
-            auto processInformation = activeProcessesSupervisor->getProcessInformationByEprocessBase(eprocessBase);
             pluginSystem->passProcessTerminationEventToRegisteredPlugins(processInformation->pid,
                                                                          *processInformation->fullName);
             activeProcessesSupervisor->removeActiveProcess(eprocessBase);
         }
-        catch (const std::invalid_argument& e)
+        else
         {
-            logger->warning("InvalidArgumentException", {logfield::create("exception", e.what())});
+            pluginSystem->passProcessStartEventToRegisteredPlugins(processInformation->pid,
+                                                                         *processInformation->fullName);
+            activeProcessesSupervisor->addNewProcess(eprocessBase);
         }
     }
-    else
+    catch (const std::invalid_argument& e)
     {
-        activeProcessesSupervisor->addNewProcess(eprocessBase);
+        logger->warning("InvalidArgumentException", {logfield::create("exception", e.what())});
     }
+
     return InterruptEvent::InterruptResponse::Continue;
 }
 

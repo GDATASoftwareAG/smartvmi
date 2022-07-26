@@ -148,6 +148,11 @@ void PluginSystem::registerProcessTerminationEvent(Plugin::processTerminationCal
     registeredProcessTerminationCallbacks.push_back(terminationCallback);
 }
 
+void PluginSystem::registerProcessStartEvent(Plugin::processStartCallback_f startCallback)
+{
+    registeredProcessStartCallbacks.push_back(startCallback);
+}
+
 void PluginSystem::registerShutdownEvent(Plugin::shutdownCallback_f shutdownCallback)
 {
     registeredShutdownCallbacks.push_back(shutdownCallback);
@@ -288,6 +293,14 @@ void PluginSystem::passProcessTerminationEventToRegisteredPlugins(pid_t pid, con
     for (auto& processTerminationCallback : registeredProcessTerminationCallbacks)
     {
         processTerminationCallback(pid, processName.c_str());
+    }
+}
+
+void PluginSystem::passProcessStartEventToRegisteredPlugins(pid_t pid, const std::string& processName)
+{
+    for (auto& processStartCallback : registeredProcessStartCallbacks)
+    {
+        processStartCallback(pid, processName.c_str());
     }
 }
 

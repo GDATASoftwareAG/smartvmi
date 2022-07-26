@@ -15,6 +15,8 @@ class MockPluginSystem : public IPluginSystem
 
     MOCK_METHOD(void, registerProcessTerminationEvent, (Plugin::processTerminationCallback_f), (override));
 
+    MOCK_METHOD(void, registerProcessStartEvent, (Plugin::processStartCallback_f), (override));
+
     MOCK_METHOD(void, registerShutdownEvent, (Plugin::shutdownCallback_f), (override));
 
     MOCK_METHOD(std::unique_ptr<std::string>, getResultsDir, (), (const override));
@@ -32,6 +34,8 @@ class MockPluginSystem : public IPluginSystem
     MOCK_METHOD(void, initializePlugin, (const std::string&, std::shared_ptr<Plugin::IPluginConfig>), (override));
 
     MOCK_METHOD(void, passProcessTerminationEventToRegisteredPlugins, (pid_t, const std::string&), (override));
+
+    MOCK_METHOD(void, passProcessStartEventToRegisteredPlugins, (pid_t, const std::string&), (override));
 
     MOCK_METHOD(void, passShutdownEventToRegisteredPlugins, (), (override));
 };

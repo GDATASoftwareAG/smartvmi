@@ -16,6 +16,8 @@ namespace Plugin
 
     using processTerminationCallback_f = void (*)(pid_t processPid, const char* processName);
 
+    using processStartCallback_f = void (*)(pid_t processPid, const char* processName);
+
     using cr3ChangeCallback_f = void (*)(uint64_t newCR3);
 
     using shutdownCallback_f = void (*)();
@@ -86,6 +88,8 @@ namespace Plugin
         [[nodiscard]] virtual std::unique_ptr<std::vector<ProcessInformation>> getRunningProcesses() const = 0;
 
         virtual void registerProcessTerminationEvent(processTerminationCallback_f terminationCallback) = 0;
+
+        virtual void registerProcessStartEvent(processStartCallback_f startCallback) = 0;
 
         virtual void registerShutdownEvent(shutdownCallback_f shutdownCallback) = 0;
 

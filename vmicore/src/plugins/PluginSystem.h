@@ -20,6 +20,8 @@ class IPluginSystem : public Plugin::PluginInterface
 
     virtual void passProcessTerminationEventToRegisteredPlugins(pid_t pid, const std::string& processName) = 0;
 
+    virtual void passProcessStartEventToRegisteredPlugins(pid_t pid, const std::string& processName) = 0;
+
     virtual void passShutdownEventToRegisteredPlugins() = 0;
 
   protected:
@@ -42,6 +44,8 @@ class PluginSystem : public IPluginSystem
 
     void passProcessTerminationEventToRegisteredPlugins(pid_t pid, const std::string& processName) override;
 
+    void passProcessStartEventToRegisteredPlugins(pid_t pid, const std::string& processName) override;
+
     void passShutdownEventToRegisteredPlugins() override;
 
   private:
@@ -50,6 +54,7 @@ class PluginSystem : public IPluginSystem
     std::shared_ptr<ActiveProcessesSupervisor> activeProcessesSupervisor;
     std::shared_ptr<IFileTransport> legacyLogging;
     std::vector<Plugin::processTerminationCallback_f> registeredProcessTerminationCallbacks;
+    std::vector<Plugin::processStartCallback_f> registeredProcessStartCallbacks;
     std::vector<Plugin::shutdownCallback_f> registeredShutdownCallbacks;
     std::shared_ptr<ILogging> loggingLib;
     std::unique_ptr<ILogger> logger;
@@ -68,6 +73,8 @@ class PluginSystem : public IPluginSystem
     [[nodiscard]] std::unique_ptr<std::vector<Plugin::ProcessInformation>> getRunningProcesses() const override;
 
     void registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback) override;
+
+    void registerProcessStartEvent(Plugin::processStartCallback_f startCallback) override;
 
     void registerShutdownEvent(Plugin::shutdownCallback_f shutdownCallback) override;
 
