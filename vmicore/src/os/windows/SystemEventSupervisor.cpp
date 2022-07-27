@@ -71,19 +71,22 @@ SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback(InterruptEvent& inte
                   });
     try
     {
-        auto processInformation = activeProcessesSupervisor->getProcessInformationByEprocessBase(eprocessBase);
 
         if (isTerminationEvent)
         {
+            logger->info("### Termination event");
+            auto processInformation = activeProcessesSupervisor->getProcessInformationByEprocessBase(eprocessBase);
             pluginSystem->passProcessTerminationEventToRegisteredPlugins(processInformation->pid,
                                                                          *processInformation->fullName);
             activeProcessesSupervisor->removeActiveProcess(eprocessBase);
         }
         else
         {
+            logger->info("### Starting event");
+            activeProcessesSupervisor->addNewProcess(eprocessBase);
+            auto processInformation = activeProcessesSupervisor->getProcessInformationByEprocessBase(eprocessBase);
             pluginSystem->passProcessStartEventToRegisteredPlugins(processInformation->pid,
                                                                          *processInformation->fullName);
-            activeProcessesSupervisor->addNewProcess(eprocessBase);
         }
     }
     catch (const std::invalid_argument& e)

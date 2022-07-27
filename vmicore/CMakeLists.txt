@@ -60,8 +60,8 @@ FetchContent_MakeAvailable(googletest)
 
 FetchContent_Declare(
         libvmi
-        GIT_REPOSITORY https://github.com/libvmi/libvmi
-        GIT_TAG b34cb61
+        GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
+        GIT_TAG test
 )
 set(libvmi_ENABLE_STATIC OFF)
 set(libvmi_BUILD_EXAMPLES OFF)
