@@ -1,22 +1,23 @@
 #include "Config.h"
-#include <fmt/core.h>
+#include "Filenames.h"
+#include "Tracer.h"
 #include <PluginInterface.h>
-
-namespace
-{
-    constexpr const char* LOG_FILENAME = "apiTracing.txt";
-}
+#include <fmt/core.h>
 
 // Struct is externally verified during plugin initialization
 [[maybe_unused]] extern constexpr Plugin::PluginDetails pluginInformation = {
     VMI_PLUGIN_API_VERSION, PLUGIN_NAME, PLUGIN_VERSION};
 
 Plugin::PluginInterface* pluginInterface;
+std::unique_ptr<Tracer> tracer;
 
-void processStartCallback(pid_t pid, const char* processName)
+void processStartCallback(pid_t processID, std::shared_ptr<std::string> processName)
 {
-    pluginInterface->logMessage(
-        Plugin::LogLevel::info, LOG_FILENAME, fmt::format("Starting process: {} with pid: {}", processName, pid));
+    pluginInterface->logMessage(Plugin::LogLevel::info,
+                                LOG_FILENAME,
+                                fmt::format("Starting process: {} with pid: {}", processName->c_str(), processID));
+    // TODO
+    // Create Process Object here
 }
 
 extern "C" bool init(Plugin::PluginInterface* communicator, std::shared_ptr<Plugin::IPluginConfig> config)
@@ -27,18 +28,18 @@ extern "C" bool init(Plugin::PluginInterface* communicator, std::shared_ptr<Plug
     pluginInterface->logMessage(
         Plugin::LogLevel::info, LOG_FILENAME, "Starting apiTracing plugin build version " + std::string(BUILD_VERSION));
 
-    //TODO
-    //try
-    //{
-    //    std::shared_ptr<IConfig> configuration = std::make_shared<Config>(pluginInterface);
-    //    configuration->parseConfiguration(*config);
-    //}
-    //catch (const ConfigException& exc)
-    //{
-    //    pluginInterface->logMessage(
-    //        Plugin::LogLevel::error, LOG_FILENAME, "Error loading configuration: " + std::string(exc.what()));
-    //    success = false;
-    //}
+    try
+    {
+        std::shared_ptr<IConfig> configuration = std::make_shared<Config>(pluginInterface);
+        configuration->parseConfiguration(*config);
+        tracer = std::make_unique<Tracer>(pluginInterface, configuration);
+    }
+    catch (const ConfigException& exc)
+    {
+        pluginInterface->logMessage(
+            Plugin::LogLevel::error, LOG_FILENAME, "Error loading configuration: " + std::string(exc.what()));
+        success = false;
+    }
 
     if (success)
     {
@@ -48,8 +49,7 @@ extern "C" bool init(Plugin::PluginInterface* communicator, std::shared_ptr<Plug
         }
         catch (const std::exception&)
         {
-            pluginInterface->logMessage(
-                Plugin::LogLevel::error, LOG_FILENAME, "Could not register ProcessStart Event");
+            pluginInterface->logMessage(Plugin::LogLevel::error, LOG_FILENAME, "Could not register ProcessStart Event");
             success = false;
         }
 

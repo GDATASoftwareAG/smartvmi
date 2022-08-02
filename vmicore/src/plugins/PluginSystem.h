@@ -18,9 +18,9 @@ class IPluginSystem : public Plugin::PluginInterface
 
     virtual void initializePlugin(const std::string& pluginName, std::shared_ptr<Plugin::IPluginConfig> config) = 0;
 
-    virtual void passProcessTerminationEventToRegisteredPlugins(pid_t pid, const std::string& processName) = 0;
+    virtual void passProcessTerminationEventToRegisteredPlugins(pid_t pid, std::shared_ptr<std::string> processName) = 0;
 
-    virtual void passProcessStartEventToRegisteredPlugins(pid_t pid, const std::string& processName) = 0;
+    virtual void passProcessStartEventToRegisteredPlugins(pid_t pid, std::shared_ptr<std::string> processName) = 0;
 
     virtual void passShutdownEventToRegisteredPlugins() = 0;
 
@@ -42,9 +42,9 @@ class PluginSystem : public IPluginSystem
 
     void initializePlugin(const std::string& pluginName, std::shared_ptr<Plugin::IPluginConfig> config) override;
 
-    void passProcessTerminationEventToRegisteredPlugins(pid_t pid, const std::string& processName) override;
+    void passProcessTerminationEventToRegisteredPlugins(pid_t pid, std::shared_ptr<std::string> processName) override;
 
-    void passProcessStartEventToRegisteredPlugins(pid_t pid, const std::string& processName) override;
+    void passProcessStartEventToRegisteredPlugins(pid_t pid, std::shared_ptr<std::string> processName) override;
 
     void passShutdownEventToRegisteredPlugins() override;
 
@@ -71,6 +71,8 @@ class PluginSystem : public IPluginSystem
     [[nodiscard]] std::unique_ptr<std::vector<Plugin::MemoryRegion>> getProcessMemoryRegions(pid_t pid) const override;
 
     [[nodiscard]] std::unique_ptr<std::vector<Plugin::ProcessInformation>> getRunningProcesses() const override;
+
+    [[nodiscard]] std::unique_ptr<std::vector<std::string>> getLoadedModules(pid_t processID) const override;
 
     void registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback) override;
 

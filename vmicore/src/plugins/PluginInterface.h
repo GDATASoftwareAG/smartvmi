@@ -8,15 +8,15 @@
 #include <string>
 #include <vector>
 
-constexpr uint8_t VMI_PLUGIN_API_VERSION = 10;
+constexpr uint8_t VMI_PLUGIN_API_VERSION = 11;
 
 namespace Plugin
 {
     using virtual_address_t = uint64_t;
 
-    using processTerminationCallback_f = void (*)(pid_t processPid, const char* processName);
+    using processTerminationCallback_f = void (*)(pid_t processID, std::shared_ptr<std::string> processName);
 
-    using processStartCallback_f = void (*)(pid_t processPid, const char* processName);
+    using processStartCallback_f = void (*)(pid_t processID, std::shared_ptr<std::string> processName);
 
     using cr3ChangeCallback_f = void (*)(uint64_t newCR3);
 
@@ -86,6 +86,8 @@ namespace Plugin
         [[nodiscard]] virtual std::unique_ptr<std::vector<MemoryRegion>> getProcessMemoryRegions(pid_t pid) const = 0;
 
         [[nodiscard]] virtual std::unique_ptr<std::vector<ProcessInformation>> getRunningProcesses() const = 0;
+
+        [[nodiscard]] virtual std::unique_ptr<std::vector<std::string>> getLoadedModules(pid_t processID) const = 0;
 
         virtual void registerProcessTerminationEvent(processTerminationCallback_f terminationCallback) = 0;
 

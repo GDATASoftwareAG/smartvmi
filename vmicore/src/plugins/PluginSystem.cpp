@@ -235,6 +235,11 @@ std::unique_ptr<std::vector<Plugin::ProcessInformation>> PluginSystem::getRunnin
     return activeProcessesForPlugin;
 }
 
+std::unique_ptr<std::vector<std::string>> PluginSystem::getLoadedModules(pid_t processID) const
+{
+    vmiInterface->
+}
+
 void PluginSystem::initializePlugin(const std::string& pluginName, std::shared_ptr<Plugin::IPluginConfig> config)
 {
     auto pluginDirectory = configInterface->getPluginDirectory();
@@ -288,19 +293,19 @@ void PluginSystem::initializePlugin(const std::string& pluginName, std::shared_p
     }
 }
 
-void PluginSystem::passProcessTerminationEventToRegisteredPlugins(pid_t pid, const std::string& processName)
+void PluginSystem::passProcessTerminationEventToRegisteredPlugins(pid_t pid, std::shared_ptr<std::string> processName)
 {
     for (auto& processTerminationCallback : registeredProcessTerminationCallbacks)
     {
-        processTerminationCallback(pid, processName.c_str());
+        processTerminationCallback(pid, processName);
     }
 }
 
-void PluginSystem::passProcessStartEventToRegisteredPlugins(pid_t pid, const std::string& processName)
+void PluginSystem::passProcessStartEventToRegisteredPlugins(pid_t pid, std::shared_ptr<std::string> processName)
 {
     for (auto& processStartCallback : registeredProcessStartCallbacks)
     {
-        processStartCallback(pid, processName.c_str());
+        processStartCallback(pid, processName);
     }
 }
 

@@ -52,9 +52,11 @@ add_definitions(-DBUILD_VERSION="${PROGRAM_BUILD_NUMBER}" -DPLUGIN_NAME="${PROJE
 
 set(source_files
         src/Config.cpp
-        src/ApiTracing.cpp)
+        src/ApiTracing.cpp
+        src/Tracer.cpp)
 
-set(test_files)
+set(test_files
+        test/Tracer_unittest.cpp)
 
 set(libraries fmt-header-only)
 

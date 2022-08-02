@@ -16,7 +16,7 @@ struct ActiveProcessInformation
     pid_t pid;
     pid_t parentPid;
     std::string name;
-    std::unique_ptr<std::string> fullName;
+    std::shared_ptr<std::string> fullName;
     std::unique_ptr<std::string> processPath;
     std::unique_ptr<VadTreeWin10> vadTree;
 };

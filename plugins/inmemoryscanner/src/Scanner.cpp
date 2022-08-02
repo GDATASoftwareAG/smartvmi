@@ -63,7 +63,6 @@ void Scanner::scanMemoryRegion(pid_t pid,
                                         "Memory region is too big, reduce to " + intToHex(maximumScanSize));
             scanSize = maximumScanSize;
         }
-
         pluginInterface->logMessage(
             Plugin::LogLevel::debug, LOG_FILENAME, "Start getProcessMemoryRegion with size: " + intToHex(scanSize));
 

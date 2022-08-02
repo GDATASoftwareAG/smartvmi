@@ -33,9 +33,9 @@ class MockPluginSystem : public IPluginSystem
 
     MOCK_METHOD(void, initializePlugin, (const std::string&, std::shared_ptr<Plugin::IPluginConfig>), (override));
 
-    MOCK_METHOD(void, passProcessTerminationEventToRegisteredPlugins, (pid_t, const std::string&), (override));
+    MOCK_METHOD(void, passProcessTerminationEventToRegisteredPlugins, (pid_t pid, std::shared_ptr<std::string> processName), (override));
 
-    MOCK_METHOD(void, passProcessStartEventToRegisteredPlugins, (pid_t, const std::string&), (override));
+    MOCK_METHOD(void, passProcessStartEventToRegisteredPlugins, (pid_t pid, std::shared_ptr<std::string> processName), (override));
 
     MOCK_METHOD(void, passShutdownEventToRegisteredPlugins, (), (override));
 };

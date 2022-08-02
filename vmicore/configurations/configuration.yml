@@ -9,3 +9,7 @@ plugin_system:
   directory: ../../plugins/apitracing/build/
   plugins:
     libapitracing.so:
+        ntdll:
+          - CreateProcessA
+        output_path: ../../plugins/apitracing/results/
+
