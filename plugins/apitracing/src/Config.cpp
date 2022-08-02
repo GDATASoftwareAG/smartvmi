@@ -8,8 +8,9 @@ void Config::parseConfiguration(const Plugin::IPluginConfig& config)
 {
     outputPath = config.getString("output_path").value();
 
-    auto hookedFunctions = config.getStringSequence("ntdll").value_or(std::vector<std::string>());
-    std::copy(hookedFunctions.begin(), hookedFunctions.end(), std::inserter(hookList, hookList.end()));
+    //TODO Fix this init... oO
+    auto hookedFunctions = config.getStringSequence("traced_processes").value_or(std::vector<std::string>());
+//    std::copy(hookedFunctions.begin(), hookedFunctions.end(), std::inserter(hookList, hookList.end()));
 
     for (auto& element : hookedFunctions)
     {
@@ -18,12 +19,17 @@ void Config::parseConfiguration(const Plugin::IPluginConfig& config)
     }
 }
 
-std::vector<std::string> Config::getHookTargets() const
+std::map<std::string, std::vector<std::string>> Config::getHookTargets(const std::string& processName) const
 {
-    return hookList;
+    return hookList.at(processName);
 }
 
 std::filesystem::path Config::getOutputPath() const
 {
     return outputPath;
+}
+
+std::string Config::getInitialProcessName() const
+{
+    return initialProcessName;
 }

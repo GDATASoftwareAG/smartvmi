@@ -35,6 +35,8 @@ class TracerTestFixture : public testing::Test
     std::vector<Plugin::MemoryRegion> memoryRegions = {
         memoryRegionDescriptor, memoryRegionDescriptorForSharedMemory, nonDllMemoryRegionDescriptorForSharedMemory};
 
+    std::shared_ptr<std::string> tracedProcess = std::make_shared<std::string>("traceMeNow");
+
     std::string kernelDllName = "KernelBase.dll";
     std::string ntdllDllName = "ntdll.dll";
     std::string nonDllName = "KernelBase";
@@ -69,10 +71,19 @@ MATCHER_P(IsEqualModule, expectedModule, "")
     return isEqual;
 }
 
-TEST_F(TracerTestFixture, initSingleModule_WindowsPaths)
+TEST_F(TracerTestFixture, initLoadedModules_validPid_correctModuleNamesStored)
 {
     ASSERT_NO_THROW(tracer->initLoadedModules(testPid));
+
     EXPECT_THAT(tracer->getLoadedModules(), Contains(IsEqualModule(expectedFirstModule)));
     EXPECT_THAT(tracer->getLoadedModules(), Contains(IsEqualModule(expectedSecondModule)));
     EXPECT_THAT(tracer->getLoadedModules(), Not(Contains(IsEqualModule(unExpectedModule))));
+}
+
+TEST_F(TracerTestFixture, addHooks_tracedProcess_registerInterruptForAllHookTargets)
+{
+//    EXPECT_CALL(*pluginInterface,
+//               requestFunctionCallHook()); //TODO Create function with fitting parameters (process-cr3, address, callback)
+
+    ASSERT_NO_THROW(tracer->addHooks(testPid, tracedProcess));
 }

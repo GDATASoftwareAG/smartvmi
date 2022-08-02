@@ -16,8 +16,7 @@ void processStartCallback(pid_t processID, std::shared_ptr<std::string> processN
     pluginInterface->logMessage(Plugin::LogLevel::info,
                                 LOG_FILENAME,
                                 fmt::format("Starting process: {} with pid: {}", processName->c_str(), processID));
-    // TODO
-    // Create Process Object here
+    tracer->addHooks(processID, processName);
 }
 
 extern "C" bool init(Plugin::PluginInterface* communicator, std::shared_ptr<Plugin::IPluginConfig> config)

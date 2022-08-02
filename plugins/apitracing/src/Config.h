@@ -20,9 +20,11 @@ class IConfig
 
     virtual void parseConfiguration(const Plugin::IPluginConfig& config) = 0;
 
-    [[nodiscard]] virtual std::vector<std::string> getHookTargets() const = 0;
+    [[nodiscard]] virtual std::map<std::string, std::vector<std::string>> getHookTargets(const std::string& processName) const = 0;
 
     [[nodiscard]] virtual std::filesystem::path getOutputPath() const = 0;
+
+    [[nodiscard]] virtual std::string getInitialProcessName() const = 0;
 
   protected:
     IConfig() = default;
@@ -37,12 +39,15 @@ class Config : public IConfig
 
     void parseConfiguration(const Plugin::IPluginConfig& config) override;
 
-    [[nodiscard]] std::vector<std::string> getHookTargets() const override;
+    [[nodiscard]] std::map<std::string, std::vector<std::string>> getHookTargets(const std::string& processName) const override;
 
     [[nodiscard]] std::filesystem::path getOutputPath() const override;
 
+    [[nodiscard]] std::string getInitialProcessName() const override;
+
   private:
     const Plugin::PluginInterface* pluginInterface;
-    std::vector<std::string> hookList;
+    std::map<std::string, std::map<std::string, std::vector<std::string>>> hookList;
     std::filesystem::path outputPath;
+    std::string initialProcessName;
 };
