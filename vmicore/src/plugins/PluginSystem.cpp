@@ -293,6 +293,9 @@ void PluginSystem::passProcessTerminationEventToRegisteredPlugins(pid_t pid, con
 
 void PluginSystem::passShutdownEventToRegisteredPlugins()
 {
+    vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
+    vmiInterface->flushPageCache();
+
     for (auto& shutdownCallback : registeredShutdownCallbacks)
     {
         shutdownCallback();
