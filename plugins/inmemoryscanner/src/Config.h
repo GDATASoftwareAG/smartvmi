@@ -31,6 +31,8 @@ class IConfig
 
     [[nodiscard]] virtual uint64_t getMaximumScanSize() const = 0;
 
+    virtual void overrideDumpMemoryFlag(bool value) = 0;
+
   protected:
     IConfig() = default;
 };
@@ -55,6 +57,8 @@ class Config : public IConfig
     [[nodiscard]] bool isDumpingMemoryActivated() const override;
 
     [[nodiscard]] uint64_t getMaximumScanSize() const override;
+
+    void overrideDumpMemoryFlag(bool value) override;
 
   private:
     const Plugin::PluginInterface* pluginInterface;

@@ -16,7 +16,9 @@ class IPluginSystem : public Plugin::PluginInterface
   public:
     ~IPluginSystem() override = default;
 
-    virtual void initializePlugin(const std::string& pluginName, std::shared_ptr<Plugin::IPluginConfig> config) = 0;
+    virtual void initializePlugin(const std::string& pluginName,
+                                  std::shared_ptr<Plugin::IPluginConfig> config,
+                                  const std::vector<std::string>& args) = 0;
 
     virtual void passProcessTerminationEventToRegisteredPlugins(pid_t pid, const std::string& processName) = 0;
 
@@ -38,7 +40,9 @@ class PluginSystem : public IPluginSystem
 
     ~PluginSystem() override;
 
-    void initializePlugin(const std::string& pluginName, std::shared_ptr<Plugin::IPluginConfig> config) override;
+    void initializePlugin(const std::string& pluginName,
+                          std::shared_ptr<Plugin::IPluginConfig> config,
+                          const std::vector<std::string>& args) override;
 
     void passProcessTerminationEventToRegisteredPlugins(pid_t pid, const std::string& processName) override;
 

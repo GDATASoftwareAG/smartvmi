@@ -8,7 +8,7 @@ vm:
 plugin_system:
   directory: /usr/local/lib/
   plugins:
-    libinmemory.so:
+    libinmemoryscanner.so:
       signature_file: /usr/local/share/inmemsigs/sigs.sig
       dump_memory: false
       scan_all_regions: false

@@ -29,7 +29,10 @@ class MockPluginSystem : public IPluginSystem
 
     MOCK_METHOD(void, sendInMemDetectionEvent, (const std::string&), (const override));
 
-    MOCK_METHOD(void, initializePlugin, (const std::string&, std::shared_ptr<Plugin::IPluginConfig>), (override));
+    MOCK_METHOD(void,
+                initializePlugin,
+                (const std::string&, std::shared_ptr<Plugin::IPluginConfig>, const std::vector<std::string>& args),
+                (override));
 
     MOCK_METHOD(void, passProcessTerminationEventToRegisteredPlugins, (pid_t, const std::string&), (override));
 

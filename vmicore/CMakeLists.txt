@@ -40,6 +40,12 @@ if (TRACE_MODE)
     add_definitions(-DTRACE_MODE)
 endif ()
 
+# Check if tclap is present
+
+include(FindPkgConfig)
+
+pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
+
 include(FetchContent)
 
 # Setup bundled google test framework
@@ -156,7 +162,7 @@ set(test_libraries pthread gtest gmock gmock_main)
 
 # End variable section
 
-add_executable(vmicore "src/main.cpp" ${source_files})
+add_executable(vmicore "src/main.cpp" "src/Cmdline.cpp" ${source_files})
 set_property(TARGET vmicore PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 target_compile_options(vmicore PRIVATE ${core_compile_flags} ${extra_compile_flags})
 target_compile_definitions(vmicore PRIVATE "INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
