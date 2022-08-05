@@ -1,5 +1,5 @@
-#ifndef VMICORE_KERNELOFFSETS_H
-#define VMICORE_KERNELOFFSETS_H
+#ifndef VMICORE_WINDOWS_KERNELOFFSETS_H
+#define VMICORE_WINDOWS_KERNELOFFSETS_H
 
 #include "../../vmi/LibvmiInterface.h"
 #include <memory>
@@ -120,4 +120,4 @@ class KernelOffsets
     KernelStructOffsets::mmsection_flags mmsectionFlags{};
 };
 
-#endif // VMICORE_KERNELOFFSETS_H
+#endif // VMICORE_WINDOWS_KERNELOFFSETS_H

@@ -20,7 +20,7 @@ using init_f = bool (*)(Plugin::PluginInterface* pluginInterface,
 
 PluginSystem::PluginSystem(std::shared_ptr<IConfigParser> configInterface,
                            std::shared_ptr<ILibvmiInterface> vmiInterface,
-                           std::shared_ptr<ActiveProcessesSupervisor> activeProcessesSupervisor,
+                           std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
                            std::shared_ptr<IFileTransport> pluginLogging,
                            std::shared_ptr<ILogging> loggingLib,
                            std::shared_ptr<IEventStream> eventStream)
@@ -102,46 +102,10 @@ PluginSystem::readProcessMemoryRegion(pid_t pid, Plugin::virtual_address_t addre
     return readPagesWithUnmappedRegionPadding(address, process->processCR3, numberOfPages);
 }
 
-std::unique_ptr<std::vector<Plugin::MemoryRegion>> PluginSystem::getProcessMemoryRegions(pid_t pid) const
+std::unique_ptr<std::vector<MemoryRegion>> PluginSystem::getProcessMemoryRegions(pid_t pid) const
 {
-    logger->debug("Called for process",
-                  {logfield::create("ProcessId", static_cast<int64_t>(pid)),
-                   logfield::create("Function", static_cast<std::string>(__func__))});
-
-    auto processInformation = activeProcessesSupervisor->getProcessInformationByPid(pid);
-    auto vadtList = processInformation->vadTree->getAllVadts();
-    logger->debug("Vadt", {logfield::create("count", static_cast<uint64_t>(vadtList->size()))});
-
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> memoryRegionsVector;
-    if (!vadtList->empty())
-    {
-        memoryRegionsVector = std::make_unique<std::vector<Plugin::MemoryRegion>>();
-
-        for (const auto& vadtListElement : *vadtList)
-        {
-            auto startAddress = vadtListElement.startingVPN << PagingDefinitions::numberOfPageIndexBits;
-            auto endAddress = ((vadtListElement.endingVPN + 1) << PagingDefinitions::numberOfPageIndexBits) - 1;
-            auto size = endAddress - startAddress + 1;
-            logger->debug("Vadt element",
-                          {logfield::create("startingVPN", fmt::format("{:#x}", vadtListElement.startingVPN)),
-                           logfield::create("endingVPN", fmt::format("{:#x}", vadtListElement.endingVPN)),
-                           logfield::create("startAddress", fmt::format("{:#x}", startAddress)),
-                           logfield::create("endAddress", fmt::format("{:#x}", endAddress)),
-                           logfield::create("size", static_cast<uint64_t>(size))});
-            memoryRegionsVector->emplace_back(startAddress,
-                                              size,
-                                              vadtListElement.fileName,
-                                              vadtListElement.protection,
-                                              vadtListElement.isSharedMemory,
-                                              vadtListElement.isBeingDeleted,
-                                              vadtListElement.isProcessBaseImage);
-        }
-    }
-    else
-    {
-        memoryRegionsVector = std::make_unique<std::vector<Plugin::MemoryRegion>>();
-    }
-    return memoryRegionsVector;
+    const auto processInformation = activeProcessesSupervisor->getProcessInformationByPid(pid);
+    return std::make_unique<std::vector<MemoryRegion>>(*processInformation->memoryRegions);
 }
 
 void PluginSystem::registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback)
@@ -220,15 +184,9 @@ std::unique_ptr<std::string> PluginSystem::getResultsDir() const
     return std::make_unique<std::string>(configInterface->getResultsDirectory());
 }
 
-std::unique_ptr<std::vector<Plugin::ProcessInformation>> PluginSystem::getRunningProcesses() const
+std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>> PluginSystem::getRunningProcesses() const
 {
-    auto activeProcesses = activeProcessesSupervisor->getActiveProcesses();
-    auto activeProcessesForPlugin = std::make_unique<std::vector<Plugin::ProcessInformation>>();
-    for (const auto& activeProcess : *activeProcesses)
-    {
-        activeProcessesForPlugin->emplace_back(activeProcess->pid, *activeProcess->fullName);
-    }
-    return activeProcessesForPlugin;
+    return activeProcessesSupervisor->getActiveProcesses();
 }
 
 void PluginSystem::initializePlugin(const std::string& pluginName,

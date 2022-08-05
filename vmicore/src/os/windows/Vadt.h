@@ -1,39 +1,42 @@
-#ifndef VMICORE_VADT_H
-#define VMICORE_VADT_H
+#ifndef VMICORE_WINDOWS_VADT_H
+#define VMICORE_WINDOWS_VADT_H
 
 #include "ProtectionValues.h"
 #include <string>
 
-class Vadt
+namespace Windows
 {
-  public:
-    uint64_t vadEntryBaseVA;
-    uint64_t startingVPN;
-    uint64_t endingVPN;
-    std::string fileName;
-    ProtectionValues protection;
-    bool isFileBacked;
-    bool isSharedMemory;
-    bool isBeingDeleted;
-    bool isProcessBaseImage;
-
-    bool operator==(const Vadt& rhs) const
+    class Vadt
     {
-        return (vadEntryBaseVA != rhs.vadEntryBaseVA)           ? false
-               : (startingVPN != rhs.startingVPN)               ? false
-               : (endingVPN != rhs.endingVPN)                   ? false
-               : (fileName != rhs.fileName)                     ? false
-               : (protection != rhs.protection)                 ? false
-               : (isFileBacked != rhs.isFileBacked)             ? false
-               : (isSharedMemory != rhs.isSharedMemory)         ? false
-               : (isProcessBaseImage != rhs.isProcessBaseImage) ? false
-                                                                : true;
-    }
+      public:
+        uint64_t vadEntryBaseVA;
+        uint64_t startingVPN;
+        uint64_t endingVPN;
+        std::string fileName;
+        ProtectionValues protection;
+        bool isFileBacked;
+        bool isSharedMemory;
+        bool isBeingDeleted;
+        bool isProcessBaseImage;
 
-    bool operator!=(const Vadt& rhs) const
-    {
-        return !operator==(rhs);
-    }
-};
+        bool operator==(const Vadt& rhs) const
+        {
+            return (vadEntryBaseVA != rhs.vadEntryBaseVA)           ? false
+                   : (startingVPN != rhs.startingVPN)               ? false
+                   : (endingVPN != rhs.endingVPN)                   ? false
+                   : (fileName != rhs.fileName)                     ? false
+                   : (protection != rhs.protection)                 ? false
+                   : (isFileBacked != rhs.isFileBacked)             ? false
+                   : (isSharedMemory != rhs.isSharedMemory)         ? false
+                   : (isProcessBaseImage != rhs.isProcessBaseImage) ? false
+                                                                    : true;
+        }
 
-#endif // VMICORE_VADT_H
+        bool operator!=(const Vadt& rhs) const
+        {
+            return !operator==(rhs);
+        }
+    };
+}
+
+#endif // VMICORE_WINDOWS_VADT_H

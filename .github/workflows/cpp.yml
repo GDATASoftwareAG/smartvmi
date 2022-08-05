@@ -168,6 +168,7 @@ jobs:
   test_coverage_upload:
     needs: [test_core, test_inmemoryscanner]
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
       - name: Download vmicore coverage artifact

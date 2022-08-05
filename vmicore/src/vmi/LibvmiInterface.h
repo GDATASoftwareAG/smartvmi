@@ -27,9 +27,7 @@ class ILibvmiInterface
 
     virtual ~ILibvmiInterface() = default;
 
-    virtual void initializeVmi(const std::function<void()>& postInitializationFunction) = 0;
-
-    virtual void waitForCR3Event(const std::function<void()>& cr3EventHandler) = 0;
+    virtual void initializeVmi() = 0;
 
     virtual void clearEvent(vmi_event_t& event, bool deallocate) = 0;
 
@@ -65,8 +63,6 @@ class ILibvmiInterface
 
     virtual void resumeVm() = 0;
 
-    virtual bool isVmAlive() = 0;
-
     virtual bool areEventsPending() = 0;
 
     virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) = 0;
@@ -75,7 +71,9 @@ class ILibvmiInterface
 
     virtual void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) = 0;
 
-    virtual uint64_t getSystemCr3() = 0;
+    virtual os_t getOsType() = 0;
+
+    virtual uint64_t getOffset(const std::string& name) = 0;
 
     virtual addr_t getKernelStructOffset(const std::string& structName, const std::string& member) = 0;
 
@@ -103,11 +101,7 @@ class LibvmiInterface : public ILibvmiInterface
 
     ~LibvmiInterface() override;
 
-    void initializeVmi(const std::function<void()>& postInitializationFunction) override;
-
-    void waitForCR3Event(const std::function<void()>& cr3EventHandler) override;
-
-    static event_response_t _cr3Callback(vmi_instance_t vmi, vmi_event_t* event);
+    void initializeVmi() override;
 
     void clearEvent(vmi_event_t& event, bool deallocate) override;
 
@@ -143,8 +137,6 @@ class LibvmiInterface : public ILibvmiInterface
 
     void resumeVm() override;
 
-    bool isVmAlive() override;
-
     bool areEventsPending() override;
 
     std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) override;
@@ -153,7 +145,7 @@ class LibvmiInterface : public ILibvmiInterface
 
     void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) override;
 
-    uint64_t getSystemCr3() override;
+    os_t getOsType() override;
 
     template <typename T> std::unique_ptr<T> readVa(const uint64_t virtualAddress, const uint64_t cr3)
     {
@@ -171,6 +163,8 @@ class LibvmiInterface : public ILibvmiInterface
         return exctractedValue;
     }
 
+    uint64_t getOffset(const std::string& name) override;
+
     addr_t getKernelStructOffset(const std::string& structName, const std::string& member) override;
 
     size_t getStructSizeFromJson(const std::string& struct_name) override;
@@ -183,20 +177,14 @@ class LibvmiInterface : public ILibvmiInterface
   private:
     uint numberOfVCPUs{};
     std::shared_ptr<IConfigParser> configInterface;
-    std::function<void()> cr3EventHandler;
     std::unique_ptr<ILogger> logger;
     std::shared_ptr<IEventStream> eventStream;
     vmi_instance_t vmiInstance{};
     std::mutex libvmiLock{};
-    uint64_t systemCr3{};
 
     static std::unique_ptr<std::string> createConfigString(const std::string& offsetsFile);
 
     static void freeEvent(vmi_event_t* event, status_t rc);
-
-    void waitForCR3Event();
-
-    void cr3Callback(vmi_event_t* event);
 
     static access_context_t createPhysicalAddressAccessContext(uint64_t physicalAddress);
 

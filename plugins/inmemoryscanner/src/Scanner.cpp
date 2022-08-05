@@ -26,7 +26,7 @@ std::unique_ptr<std::string> Scanner::getFilenameFromPath(const std::string& pat
     return filename;
 }
 
-bool Scanner::shouldRegionBeScanned(const Plugin::MemoryRegion& memoryRegionDescriptor)
+bool Scanner::shouldRegionBeScanned(const MemoryRegion& memoryRegionDescriptor)
 {
     bool verdict = true;
     if (configuration->isScanAllRegionsActivated())
@@ -42,14 +42,12 @@ bool Scanner::shouldRegionBeScanned(const Plugin::MemoryRegion& memoryRegionDesc
     return verdict;
 }
 
-void Scanner::scanMemoryRegion(pid_t pid,
-                               const std::string& processName,
-                               const Plugin::MemoryRegion& memoryRegionDescriptor)
+void Scanner::scanMemoryRegion(pid_t pid, const std::string& processName, const MemoryRegion& memoryRegionDescriptor)
 {
     pluginInterface->logMessage(Plugin::LogLevel::info,
                                 LOG_FILENAME,
-                                "Scanning Memory region from " + intToHex(memoryRegionDescriptor.baseAddress) +
-                                    " with size " + intToHex(memoryRegionDescriptor.size) + " name " +
+                                "Scanning Memory region from " + intToHex(memoryRegionDescriptor.base) + " with size " +
+                                    intToHex(memoryRegionDescriptor.size) + " name " +
                                     memoryRegionDescriptor.moduleName);
 
     if (shouldRegionBeScanned(memoryRegionDescriptor))
@@ -67,7 +65,7 @@ void Scanner::scanMemoryRegion(pid_t pid,
         pluginInterface->logMessage(
             Plugin::LogLevel::debug, LOG_FILENAME, "Start getProcessMemoryRegion with size: " + intToHex(scanSize));
 
-        auto memoryRegion = pluginInterface->readProcessMemoryRegion(pid, memoryRegionDescriptor.baseAddress, scanSize);
+        auto memoryRegion = pluginInterface->readProcessMemoryRegion(pid, memoryRegionDescriptor.base, scanSize);
 
         pluginInterface->logMessage(Plugin::LogLevel::debug,
                                     LOG_FILENAME,
@@ -105,8 +103,8 @@ void Scanner::scanMemoryRegion(pid_t pid,
                 {
                     pluginInterface->sendInMemDetectionEvent(result.ruleName);
                 }
-                outputXml.addResult(processName, pid, memoryRegionDescriptor.baseAddress, *results);
-                logInMemoryResultToTextFile(processName, pid, memoryRegionDescriptor.baseAddress, *results);
+                outputXml.addResult(processName, pid, memoryRegionDescriptor.base, *results);
+                logInMemoryResultToTextFile(processName, pid, memoryRegionDescriptor.base, *results);
             }
         }
     }
@@ -167,9 +165,10 @@ void Scanner::scanAllProcesses()
     std::vector<std::future<void>> scanProcessAsyncTasks;
     for (const auto& process : *processes)
     {
-        if (process.pid != 0)
+        if (process->pid != 0)
         {
-            scanProcessAsyncTasks.push_back(std::async(&Scanner::scanProcess, this, process.pid, process.name));
+            scanProcessAsyncTasks.push_back(
+                std::async(&Scanner::scanProcess, this, process->pid, (*process->fullName)));
         }
     }
     for (auto& currentTask : scanProcessAsyncTasks)
@@ -198,13 +197,13 @@ void Scanner::saveOutput()
 
 void Scanner::logInMemoryResultToTextFile(const std::string& processName,
                                           pid_t pid,
-                                          Plugin::virtual_address_t baseAddress,
+                                          Plugin::virtual_address_t base,
                                           const std::vector<Rule>& results)
 {
     for (const auto& rule : results)
     {
         std::string matchesAsString(rule.ruleNamespace + " : " + rule.ruleName + " in " + processName + " (" +
-                                    std::to_string(pid) + ") at " + intToHex(baseAddress) + " matches (");
+                                    std::to_string(pid) + ") at " + intToHex(base) + " matches (");
         for (const auto& match : rule.matches)
         {
             matchesAsString += match.matchName + ", ";

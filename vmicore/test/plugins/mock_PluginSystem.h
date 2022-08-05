@@ -9,9 +9,12 @@ class MockPluginSystem : public IPluginSystem
                 (pid_t, Plugin::virtual_address_t, size_t),
                 (const override));
 
-    MOCK_METHOD(std::unique_ptr<std::vector<Plugin::MemoryRegion>>, getProcessMemoryRegions, (pid_t), (const override));
+    MOCK_METHOD(std::unique_ptr<std::vector<MemoryRegion>>, getProcessMemoryRegions, (pid_t), (const override));
 
-    MOCK_METHOD(std::unique_ptr<std::vector<Plugin::ProcessInformation>>, getRunningProcesses, (), (const override));
+    MOCK_METHOD(std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>,
+                getRunningProcesses,
+                (),
+                (const override));
 
     MOCK_METHOD(void, registerProcessTerminationEvent, (Plugin::processTerminationCallback_f), (override));
 

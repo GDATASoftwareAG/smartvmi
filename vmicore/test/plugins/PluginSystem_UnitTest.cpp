@@ -28,11 +28,11 @@ class PluginSystemFixture : public ProcessesMemoryStateFixture
 MATCHER_P(IsEqualMemoryRegion, expectedRegion, "")
 {
     bool isEqual = true;
-    if (expectedRegion.baseAddress != arg.baseAddress)
+    if (expectedRegion.base != arg.base)
     {
         *result_listener << "\nBase Addresses not equal:";
-        *result_listener << "\nExpected: " << expectedRegion.baseAddress;
-        *result_listener << "\nActual: " << arg.baseAddress;
+        *result_listener << "\nExpected: " << expectedRegion.base;
+        *result_listener << "\nActual: " << arg.base;
         isEqual = false;
     }
     if (expectedRegion.size != arg.size)
@@ -76,11 +76,11 @@ MATCHER_P(IsEqualMemoryRegion, expectedRegion, "")
 MATCHER_P(IsEqualProcessInformation, expectedProcess, "")
 {
     bool isEqual = true;
-    if (expectedProcess.processId != arg.pid)
+    if (expectedProcess.processId != arg->pid)
     {
         isEqual = false;
     }
-    if (arg.name != expectedProcess.fullName)
+    if ((*arg->fullName) != expectedProcess.fullName)
     {
         isEqual = false;
     }
@@ -89,7 +89,7 @@ MATCHER_P(IsEqualProcessInformation, expectedProcess, "")
 
 TEST_F(PluginSystemFixture, getProcessMemoryRegions_queryMemoryRegionsOfValidProcessWithVadTreeCycle_validMemoryRegions)
 {
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> memoryRegions;
+    std::unique_ptr<std::vector<MemoryRegion>> memoryRegions;
 
     ASSERT_NO_THROW(memoryRegions = pluginInterface->getProcessMemoryRegions(process4.processId));
 
@@ -106,7 +106,7 @@ TEST_F(PluginSystemFixture, getProcessMemoryRegions_invalidPidParameter_invalidA
 
 TEST_F(PluginSystemFixture, getRunningProcesses_validInternalState_CorrectProcesses)
 {
-    std::unique_ptr<std::vector<Plugin::ProcessInformation>> runningProcesses;
+    std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>> runningProcesses;
 
     ASSERT_NO_THROW(runningProcesses = pluginInterface->getRunningProcesses());
 
@@ -116,7 +116,7 @@ TEST_F(PluginSystemFixture, getRunningProcesses_validInternalState_CorrectProces
 
 TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region2IsSharedMemory)
 {
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> process4MemoryRegions;
+    std::unique_ptr<std::vector<MemoryRegion>> process4MemoryRegions;
 
     ASSERT_NO_THROW(process4MemoryRegions = pluginInterface->getProcessMemoryRegions(process4.processId));
 
@@ -125,7 +125,7 @@ TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region2IsSharedMemo
 
 TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region3IsPrivateMemory)
 {
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> process4MemoryRegions;
+    std::unique_ptr<std::vector<MemoryRegion>> process4MemoryRegions;
 
     ASSERT_NO_THROW(process4MemoryRegions = pluginInterface->getProcessMemoryRegions(process4.processId));
 
@@ -134,7 +134,7 @@ TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region3IsPrivateMem
 
 TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region2IsProcessBaseImage)
 {
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> process4MemoryRegions;
+    std::unique_ptr<std::vector<MemoryRegion>> process4MemoryRegions;
 
     ASSERT_NO_THROW(process4MemoryRegions = pluginInterface->getProcessMemoryRegions(process4.processId));
 
@@ -143,7 +143,7 @@ TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region2IsProcessBas
 
 TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region3IsNotProcessBaseImage)
 {
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> process4MemoryRegions;
+    std::unique_ptr<std::vector<MemoryRegion>> process4MemoryRegions;
 
     ASSERT_NO_THROW(process4MemoryRegions = pluginInterface->getProcessMemoryRegions(process4.processId));
 
@@ -152,16 +152,16 @@ TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4_region3IsNotProcess
 
 TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4WithHighVPNRegion_hasCorrectBaseAddress)
 {
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> process4MemoryRegions;
+    std::unique_ptr<std::vector<MemoryRegion>> process4MemoryRegions;
 
     ASSERT_NO_THROW(process4MemoryRegions = pluginInterface->getProcessMemoryRegions(process4.processId));
 
-    EXPECT_EQ(process4MemoryRegions->at(2).baseAddress, vadRootNodeLeftChildStartingAddress);
+    EXPECT_EQ(process4MemoryRegions->at(2).base, vadRootNodeLeftChildStartingAddress);
 }
 
 TEST_F(PluginSystemFixture, getProcessMemoryRegions_process4WithHighVPNRegion_hasCorrectSize)
 {
-    std::unique_ptr<std::vector<Plugin::MemoryRegion>> process4MemoryRegions;
+    std::unique_ptr<std::vector<MemoryRegion>> process4MemoryRegions;
 
     ASSERT_NO_THROW(process4MemoryRegions = pluginInterface->getProcessMemoryRegions(process4.processId));
 

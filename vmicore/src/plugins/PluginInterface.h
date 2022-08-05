@@ -1,14 +1,14 @@
 #ifndef VMICORE_PLUGININTERFACE_H
 #define VMICORE_PLUGININTERFACE_H
 
-#include "../os/windows/ProtectionValues.h"
+#include "../os/ActiveProcessInformation.h"
 #include "IPluginConfig.h"
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
-constexpr uint8_t VMI_PLUGIN_API_VERSION = 11;
+constexpr uint8_t VMI_PLUGIN_API_VERSION = 12;
 
 namespace Plugin
 {
@@ -26,44 +26,6 @@ namespace Plugin
         const char* pluginName;
         const char* pluginVersion;
     } __attribute__((aligned(128)));
-
-    struct MemoryRegion
-    {
-        virtual_address_t baseAddress{};
-        size_t size{};
-        std::string moduleName{};
-        ProtectionValues protection{};
-        bool isSharedMemory = false;
-        bool isBeingDeleted = false;
-        bool isProcessBaseImage = false;
-
-        MemoryRegion() = default;
-
-        MemoryRegion(virtual_address_t baseAddress,
-                     size_t size,
-                     std::string moduleName,
-                     ProtectionValues protection,
-                     bool isSharedMemory,
-                     bool isBeingDeleted,
-                     bool isProcessBaseImage)
-            : baseAddress(baseAddress),
-              size(size),
-              moduleName(std::move(moduleName)),
-              protection(protection),
-              isSharedMemory(isSharedMemory),
-              isBeingDeleted(isBeingDeleted),
-              isProcessBaseImage(isProcessBaseImage){};
-    } __attribute__((aligned(64)));
-
-    struct ProcessInformation
-    {
-        pid_t pid{};
-        std::string name{};
-
-        ProcessInformation() = default;
-
-        ProcessInformation(pid_t pid, std::string name) : pid(pid), name(std::move(name)){};
-    } __attribute__((aligned(64)));
 
     enum class LogLevel
     {
@@ -83,7 +45,8 @@ namespace Plugin
 
         [[nodiscard]] virtual std::unique_ptr<std::vector<MemoryRegion>> getProcessMemoryRegions(pid_t pid) const = 0;
 
-        [[nodiscard]] virtual std::unique_ptr<std::vector<ProcessInformation>> getRunningProcesses() const = 0;
+        [[nodiscard]] virtual std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
+        getRunningProcesses() const = 0;
 
         virtual void registerProcessTerminationEvent(processTerminationCallback_f terminationCallback) = 0;
 

@@ -1,5 +1,5 @@
-#ifndef VMICORE_WINDOWS_SYSTEMEVENTSUPERVISOR_H
-#define VMICORE_WINDOWS_SYSTEMEVENTSUPERVISOR_H
+#ifndef VMICORE_LINUX_SYSTEMEVENTSUPERVISOR_H
+#define VMICORE_LINUX_SYSTEMEVENTSUPERVISOR_H
 
 #include "../../io/IEventStream.h"
 #include "../../plugins/PluginSystem.h"
@@ -11,7 +11,7 @@
 #include "ActiveProcessesSupervisor.h"
 #include <memory>
 
-namespace Windows
+namespace Linux
 {
     class SystemEventSupervisor : public std::enable_shared_from_this<SystemEventSupervisor>,
                                   public ISystemEventSupervisor
@@ -29,9 +29,9 @@ namespace Windows
 
         void initialize() override;
 
-        InterruptEvent::InterruptResponse pspCallProcessNotifyRoutinesCallback(InterruptEvent& interruptEvent);
-
-        InterruptEvent::InterruptResponse keBugCheckExCallback(InterruptEvent& interruptEvent);
+        InterruptEvent::InterruptResponse procForkConnectorCallback(InterruptEvent& interruptEvent);
+        InterruptEvent::InterruptResponse procExecConnectorCallback(InterruptEvent& interruptEvent);
+        InterruptEvent::InterruptResponse procExitConnectorCallback(InterruptEvent& interruptEvent);
 
         void teardown() override;
 
@@ -40,17 +40,18 @@ namespace Windows
         std::shared_ptr<IPluginSystem> pluginSystem;
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
         std::shared_ptr<IConfigParser> configInterface;
-        [[maybe_unused]] std::shared_ptr<InterruptEvent> notifyProcessInterruptEvent;
-        [[maybe_unused]] std::shared_ptr<InterruptEvent> bugCheckInterruptEvent;
+        [[maybe_unused]] std::shared_ptr<InterruptEvent> procForkConnectorEvent;
+        [[maybe_unused]] std::shared_ptr<InterruptEvent> procExecConnectorEvent;
+        [[maybe_unused]] std::shared_ptr<InterruptEvent> procExitConnectorEvent;
         std::shared_ptr<IInterruptFactory> interruptFactory;
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;
 
-        void startPspCallProcessNotifyRoutinesMonitoring();
-
-        void startKeBugCheckExMonitoring();
+        void startProcForkConnectorMonitoring();
+        void startProcExecConnectorMonitoring();
+        void startProcExitConnectorMonitoring();
     };
 }
 
-#endif // VMICORE_WINDOWS_SYSTEMEVENTSUPERVISOR_H
+#endif // VMICORE_LINUX_SYSTEMEVENTSUPERVISOR_H

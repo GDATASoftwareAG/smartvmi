@@ -66,8 +66,8 @@ FetchContent_MakeAvailable(googletest)
 
 FetchContent_Declare(
         libvmi
-        GIT_REPOSITORY https://github.com/libvmi/libvmi
-        GIT_TAG b34cb61
+        GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
+        GIT_TAG test
 )
 set(libvmi_ENABLE_STATIC OFF)
 set(libvmi_BUILD_EXAMPLES OFF)
@@ -132,11 +132,14 @@ set(source_files
         src/io/file/LegacyLogging.cpp
         src/io/grpc/GRPCLogger.cpp
         src/io/grpc/GRPCServer.cpp
+        src/os/PageProtection.cpp
         src/os/windows/ActiveProcessesSupervisor.cpp
         src/os/windows/KernelAccess.cpp
         src/os/windows/KernelOffsets.cpp
         src/os/windows/SystemEventSupervisor.cpp
         src/os/windows/VadTreeWin10.cpp
+        src/os/linux/ActiveProcessesSupervisor.cpp
+        src/os/linux/SystemEventSupervisor.cpp
         src/plugins/PluginSystem.cpp
         src/vmi/InterruptEvent.cpp
         src/vmi/InterruptFactory.cpp

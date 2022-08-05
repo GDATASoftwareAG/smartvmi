@@ -36,10 +36,9 @@ class Scanner
     Semaphore<std::mutex, std::condition_variable> semaphore =
         Semaphore<std::mutex, std::condition_variable>(YR_MAX_THREADS);
 
-    bool shouldRegionBeScanned(const Plugin::MemoryRegion& memoryRegionDescriptor);
+    bool shouldRegionBeScanned(const MemoryRegion& memoryRegionDescriptor);
 
-    void
-    scanMemoryRegion(pid_t pid, const std::string& processName, const Plugin::MemoryRegion& memoryRegionDescriptor);
+    void scanMemoryRegion(pid_t pid, const std::string& processName, const MemoryRegion& memoryRegionDescriptor);
 
     void logInMemoryResultToTextFile(const std::string& processName,
                                      pid_t pid,

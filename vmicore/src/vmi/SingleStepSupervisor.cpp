@@ -39,7 +39,6 @@ void SingleStepSupervisor::initializeSingleStepEvents()
 
 void SingleStepSupervisor::teardown()
 {
-
     for (auto& event : singleStepEvents)
     {
         if (event.ss_event.enable)

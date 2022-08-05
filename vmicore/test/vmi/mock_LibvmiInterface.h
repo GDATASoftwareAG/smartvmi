@@ -7,9 +7,7 @@
 class MockLibvmiInterface : public ILibvmiInterface
 {
   public:
-    MOCK_METHOD(void, initializeVmi, (const std::function<void()>& postInitializationFunction), (override));
-
-    MOCK_METHOD(void, waitForCR3Event, (const std::function<void()>& cr3EventHandler), (override));
+    MOCK_METHOD(void, initializeVmi, (), (override));
 
     MOCK_METHOD(void, clearEvent, (vmi_event_t & event, bool deallocate), (override));
 
@@ -48,8 +46,6 @@ class MockLibvmiInterface : public ILibvmiInterface
 
     MOCK_METHOD(void, resumeVm, (), (override));
 
-    MOCK_METHOD(bool, isVmAlive, (), (override));
-
     MOCK_METHOD(bool, areEventsPending, (), (override));
 
     MOCK_METHOD(std::unique_ptr<std::string>,
@@ -64,7 +60,9 @@ class MockLibvmiInterface : public ILibvmiInterface
 
     MOCK_METHOD(void, stopSingleStepForVcpu, (vmi_event_t * event, uint vcpuId), (override));
 
-    MOCK_METHOD(uint64_t, getSystemCr3, (), (override));
+    MOCK_METHOD(os_t, getOsType, (), (override));
+
+    MOCK_METHOD(uint64_t, getOffset, (const std::string& name), (override));
 
     MOCK_METHOD(addr_t, getKernelStructOffset, (const std::string& structName, const std::string& member), (override));
 

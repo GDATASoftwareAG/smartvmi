@@ -5,8 +5,7 @@
 #include "../io/IEventStream.h"
 #include "../io/ILogging.h"
 #include "../io/file/LegacyLogging.h"
-#include "../os/windows/ActiveProcessesSupervisor.h"
-#include "../os/windows/KernelAccess.h"
+#include "../os/IActiveProcessesSupervisor.h"
 #include "../vmi/LibvmiInterface.h"
 #include "PluginInterface.h"
 #include <vector>
@@ -33,7 +32,7 @@ class PluginSystem : public IPluginSystem
   public:
     PluginSystem(std::shared_ptr<IConfigParser> configInterface,
                  std::shared_ptr<ILibvmiInterface> vmiInterface,
-                 std::shared_ptr<ActiveProcessesSupervisor> activeProcessesSupervisor,
+                 std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
                  std::shared_ptr<IFileTransport> pluginLogging,
                  std::shared_ptr<ILogging> loggingLib,
                  std::shared_ptr<IEventStream> eventStream);
@@ -51,7 +50,7 @@ class PluginSystem : public IPluginSystem
   private:
     std::shared_ptr<IConfigParser> configInterface;
     std::shared_ptr<ILibvmiInterface> vmiInterface;
-    std::shared_ptr<ActiveProcessesSupervisor> activeProcessesSupervisor;
+    std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
     std::shared_ptr<IFileTransport> legacyLogging;
     std::vector<Plugin::processTerminationCallback_f> registeredProcessTerminationCallbacks;
     std::vector<Plugin::shutdownCallback_f> registeredShutdownCallbacks;
@@ -67,9 +66,10 @@ class PluginSystem : public IPluginSystem
     [[nodiscard]] std::unique_ptr<std::vector<uint8_t>>
     readProcessMemoryRegion(pid_t pid, Plugin::virtual_address_t address, size_t numberOfBytes) const override;
 
-    [[nodiscard]] std::unique_ptr<std::vector<Plugin::MemoryRegion>> getProcessMemoryRegions(pid_t pid) const override;
+    [[nodiscard]] std::unique_ptr<std::vector<MemoryRegion>> getProcessMemoryRegions(pid_t pid) const override;
 
-    [[nodiscard]] std::unique_ptr<std::vector<Plugin::ProcessInformation>> getRunningProcesses() const override;
+    [[nodiscard]] std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
+    getRunningProcesses() const override;
 
     void registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback) override;
 

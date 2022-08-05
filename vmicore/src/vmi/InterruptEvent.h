@@ -33,6 +33,8 @@ class InterruptEvent final : public Event, public std::enable_shared_from_this<I
 
     void teardown() override;
 
+    static uint64_t getRdi();
+
     static uint64_t getRcx();
 
     static uint64_t getR8();
