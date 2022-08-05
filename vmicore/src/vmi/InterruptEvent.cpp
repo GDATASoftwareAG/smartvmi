@@ -59,6 +59,8 @@ void InterruptEvent::initialize()
     targetPAString = fmt::format("{:#x}", targetPA);
     singleStepCallbackFunction =
         SingleStepSupervisor::createSingleStepCallback(shared_from_this(), &InterruptEvent::singleStepCallback);
+    vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
+    vmiInterface->flushPageCache();
     storeOriginalValue();
     setupVmiInterruptEvent();
     enableEvent();
@@ -155,6 +157,9 @@ event_response_t InterruptEvent::_defaultInterruptCallback(__attribute__((unused
 
 event_response_t InterruptEvent::interruptCallback(uint32_t vcpuId)
 {
+    vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
+    vmiInterface->flushPageCache();
+
     InterruptResponse response;
     try
     {

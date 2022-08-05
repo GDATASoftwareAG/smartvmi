@@ -489,3 +489,13 @@ std::tuple<addr_t, size_t, size_t> LibvmiInterface::getBitfieldOffsetAndSizeFrom
     }
     return std::make_tuple(offset, startBit, endBit);
 }
+
+void LibvmiInterface::flushV2PCache(addr_t pt)
+{
+    vmi_v2pcache_flush(vmiInstance, pt);
+}
+
+void LibvmiInterface::flushPageCache()
+{
+    vmi_pagecache_flush(vmiInstance);
+}

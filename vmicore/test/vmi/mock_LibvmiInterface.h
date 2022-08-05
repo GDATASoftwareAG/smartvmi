@@ -76,6 +76,10 @@ class MockLibvmiInterface : public ILibvmiInterface
                 (override));
 
     MOCK_METHOD(size_t, getStructSizeFromJson, (const std::string& struct_name), (override));
+
+    MOCK_METHOD(void, flushV2PCache, (addr_t), (override));
+
+    MOCK_METHOD(void, flushPageCache, (), (override));
 };
 
 #endif // VMICORE_MOCK_LIBVMIINTERFACE_H

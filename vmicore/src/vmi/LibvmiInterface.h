@@ -23,6 +23,8 @@
 class ILibvmiInterface
 {
   public:
+    constexpr static addr_t flushAllPTs = ~0ull;
+
     virtual ~ILibvmiInterface() = default;
 
     virtual void initializeVmi(const std::function<void()>& postInitializationFunction) = 0;
@@ -83,6 +85,10 @@ class ILibvmiInterface
 
     virtual std::tuple<addr_t, size_t, size_t> getBitfieldOffsetAndSizeFromJson(const std::string& struct_name,
                                                                                 const std::string& struct_member) = 0;
+
+    virtual void flushV2PCache(addr_t pt) = 0;
+
+    virtual void flushPageCache() = 0;
 
   protected:
     ILibvmiInterface() = default;
@@ -195,6 +201,10 @@ class LibvmiInterface : public ILibvmiInterface
     static access_context_t createPhysicalAddressAccessContext(uint64_t physicalAddress);
 
     static access_context_t createVirtualAddressAccessContext(uint64_t virtualAddress, uint64_t cr3);
+
+    void flushV2PCache(addr_t pt) override;
+
+    void flushPageCache() override;
 };
 
 #endif // VMICORE_LIBVMIINTERFACE_H
