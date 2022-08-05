@@ -8,6 +8,7 @@
 #include "plugins/PluginSystem.h"
 #include "vmi/LibvmiInterface.h"
 #include <memory>
+#include <unordered_map>
 
 class VmiHub
 {
@@ -19,7 +20,7 @@ class VmiHub
            std::shared_ptr<ILogging> loggingLib,
            std::shared_ptr<IEventStream> eventStream);
 
-    uint run();
+    uint run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs);
 
   private:
     std::shared_ptr<IConfigParser> configInterface;

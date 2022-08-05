@@ -85,3 +85,8 @@ uint64_t Config::getMaximumScanSize() const
 {
     return maximumScanSize;
 }
+
+void Config::overrideDumpMemoryFlag(bool value)
+{
+    dumpMemory = value;
+}

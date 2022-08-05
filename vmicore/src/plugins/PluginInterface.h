@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-constexpr uint8_t VMI_PLUGIN_API_VERSION = 10;
+constexpr uint8_t VMI_PLUGIN_API_VERSION = 11;
 
 namespace Plugin
 {
@@ -104,8 +104,6 @@ namespace Plugin
       protected:
         PluginInterface() = default;
     };
-
-    using init_f = bool (*)(PluginInterface* pluginInterface, std::shared_ptr<IPluginConfig> config);
 }
 
 #endif // VMICORE_PLUGININTERFACE_H

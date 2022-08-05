@@ -1,21 +1,22 @@
 #include "PluginSystem.h"
 #include "../io/ILogger.h"
 #include "../os/PagingDefinitions.h"
-#include "../vmi/VmiException.h"
 #include <cstdint>
 #include <dlfcn.h>
 #include <exception>
 #include <fmt/core.h>
 #include <utility>
 
-#define PLUGIN_NAME "Main"
-#define PLUGIN_VERSION "2.0"
-
 namespace
 {
     bool isInstanciated = false;
     constexpr char const* paddingLogFile = "memoryExtractionPaddingLog.txt";
 }
+
+// Must match init function declared in PluginInit.h
+using init_f = bool (*)(Plugin::PluginInterface* pluginInterface,
+                        std::shared_ptr<Plugin::IPluginConfig> config,
+                        std::vector<std::string> args);
 
 PluginSystem::PluginSystem(std::shared_ptr<IConfigParser> configInterface,
                            std::shared_ptr<ILibvmiInterface> vmiInterface,
@@ -230,7 +231,9 @@ std::unique_ptr<std::vector<Plugin::ProcessInformation>> PluginSystem::getRunnin
     return activeProcessesForPlugin;
 }
 
-void PluginSystem::initializePlugin(const std::string& pluginName, std::shared_ptr<Plugin::IPluginConfig> config)
+void PluginSystem::initializePlugin(const std::string& pluginName,
+                                    std::shared_ptr<Plugin::IPluginConfig> config,
+                                    const std::vector<std::string>& args)
 {
     auto pluginDirectory = configInterface->getPluginDirectory();
     logger->debug("Plugin directory",
@@ -270,14 +273,14 @@ void PluginSystem::initializePlugin(const std::string& pluginName, std::shared_p
                                  " is incompatible with VmiCore API Version " + std::to_string(VMI_PLUGIN_API_VERSION));
     }
 
-    auto pluginInitFunction = reinterpret_cast<Plugin::init_f>(dlsym(libraryHandle, "init"));
+    auto pluginInitFunction = reinterpret_cast<init_f>(dlsym(libraryHandle, "init"));
     dlErrorMessage = dlerror();
     if (dlErrorMessage != nullptr)
     {
         throw std::runtime_error("Unable to retrieve function 'init': " + std::string(dlErrorMessage));
     }
 
-    if (!pluginInitFunction(dynamic_cast<Plugin::PluginInterface*>(this), std::move(config)))
+    if (!pluginInitFunction(dynamic_cast<Plugin::PluginInterface*>(this), std::move(config), args))
     {
         throw std::runtime_error("Unable to initialize plugin " + pluginName);
     }

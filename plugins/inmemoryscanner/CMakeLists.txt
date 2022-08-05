@@ -11,6 +11,8 @@ include(FindPkgConfig)
 
 pkg_check_modules(YARA REQUIRED yara>=4)
 
+pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
+
 include(FetchContent)
 
 # Setup bundled google test framework
@@ -33,7 +35,7 @@ include_directories("${VMICORE_DIRECTORY_ROOT}/src/plugins")
 
 # Variable section
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

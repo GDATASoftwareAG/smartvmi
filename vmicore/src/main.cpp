@@ -1,3 +1,12 @@
+#ifndef BUILD_VERSION
+#define BUILD_VERSION "TestBuild"
+#endif
+
+#ifndef PROGRAM_VERSION
+#define PROGRAM_VERSION "0.0.0"
+#endif
+
+#include "Cmdline.h"
 #include "GlobalControl.h"
 #include "VmiHub.h"
 #include "config/ConfigYAMLParser.h"
@@ -18,46 +27,11 @@
 #include <memory>
 #include <optional>
 #include <ostream>
-#include <tclap/CmdLine.h>
 #include <thread>
-
-#ifndef BUILD_VERSION
-#define BUILD_VERSION "TestBuild"
-#endif
-
-#ifndef PROGRAM_VERSION
-#define PROGRAM_VERSION "0.0.0"
-#endif
 
 int main(int argc, const char* argv[])
 {
     int exitCode = 0;
-
-    TCLAP::CmdLine cmd("VMI tool for automated malware behaviour extraction.", ' ', PROGRAM_VERSION);
-    TCLAP::ValueArg<std::string> configFileArgument("c",
-                                                    "config",
-                                                    "YAML file containing the config for the VMI analysis.",
-                                                    false,
-                                                    INSTALL_PREFIX "/etc/vmicore.conf",
-                                                    "config_file.yml",
-                                                    cmd);
-    TCLAP::ValueArg<std::string> domainNameArgument(
-        "n", "name", "Name of the domain to introspect.", false, "", "domain_name", cmd);
-    TCLAP::ValueArg<std::filesystem::path> kvmiSocketArgument(
-        "s", "socket", "KVMi socket path (required for introspecting on kvm).", false, "", "/path/to/socket", cmd);
-    TCLAP::ValueArg<std::string> resultsDirectoryArgument(
-        "r", "results", "Path to top level directory for results.", false, "./results", "results_directory", cmd);
-    TCLAP::ValueArg<std::string> gRPCListenAddressArgument(
-        "g", "grpc-listen-addr", "Listen address for grpc server.", false, "", "listen_address", cmd);
-    TCLAP::ValueArg<std::string> logLevelArgument("l",
-                                                  "log-level",
-                                                  "Log level to use - [debug, info (default), warning, error].",
-                                                  false,
-                                                  "info",
-                                                  "Log level",
-                                                  cmd);
-    TCLAP::SwitchArg dumpMemoryArgument("d", "dump", "Dump memory if the inmemory scanner plugin is loaded.", cmd);
-    TCLAP::SwitchArg enableDebugArgument("", "grpc-debug", "Enable additional console logs for gRPC mode.", cmd);
 
     std::shared_ptr<ILogging> logging;
     std::shared_ptr<IEventStream> eventStream;
@@ -65,9 +39,11 @@ int main(int argc, const char* argv[])
 
     try
     {
+        Cmdline cmd{};
         cmd.parse(argc, argv);
-        auto enableGRPCServer = gRPCListenAddressArgument.isSet();
-        auto configFilePath = configFileArgument.getValue();
+
+        auto enableGRPCServer = cmd.gRPCListenAddressArgument.isSet();
+        auto configFilePath = cmd.configFileArgument.getValue();
 
         const auto injector = boost::di::make_injector(
             boost::di::bind<IConfigParser>().to<ConfigYAMLParser>(),
@@ -105,7 +81,7 @@ int main(int argc, const char* argv[])
                     return injector.template create<std::shared_ptr<LegacyLogging>>();
                 }),
             boost::di::bind<::rust::Box<::grpc::GRPCServer>>().to(std::make_shared<::rust::Box<::grpc::GRPCServer>>(
-                ::grpc::new_server(gRPCListenAddressArgument.getValue(), enableDebugArgument.isSet()))),
+                ::grpc::new_server(cmd.gRPCListenAddressArgument.getValue(), cmd.enableDebugArgument.isSet()))),
             boost::di::bind<::rust::Box<::logging::console::ConsoleLoggerBuilder>>().to(
                 std::make_shared<::rust::Box<::logging::console::ConsoleLoggerBuilder>>(
                     ::logging::console::new_console_logger_builder())));
@@ -113,30 +89,21 @@ int main(int argc, const char* argv[])
         // We need to init the configuration before anything else so that our loggers will be setup correctly.
         auto configInterface = injector.create<std::shared_ptr<IConfigParser>>();
         configInterface->extractConfiguration(configFilePath);
-        if (domainNameArgument.isSet())
+        if (cmd.domainNameArgument.isSet())
         {
-            configInterface->setVmName(domainNameArgument.getValue());
+            configInterface->setVmName(cmd.domainNameArgument.getValue());
         }
-        if (kvmiSocketArgument.isSet())
+        if (cmd.kvmiSocketArgument.isSet())
         {
-            configInterface->setSocketPath(kvmiSocketArgument.getValue());
+            configInterface->setSocketPath(cmd.kvmiSocketArgument.getValue());
         }
-        if (resultsDirectoryArgument.isSet())
+        if (cmd.resultsDirectoryArgument.isSet())
         {
-            configInterface->setResultsDirectory(resultsDirectoryArgument.getValue());
+            configInterface->setResultsDirectory(cmd.resultsDirectoryArgument.getValue());
         }
-        if (dumpMemoryArgument.isSet())
+        if (cmd.logLevelArgument.isSet())
         {
-            auto pluginMap = configInterface->getPlugins();
-            auto inMemoryPluginConfig = pluginMap.find("libinmemory.so");
-            if (inMemoryPluginConfig != pluginMap.end())
-            {
-                inMemoryPluginConfig->second->overrideString("dump_memory", "true");
-            }
-        }
-        if (logLevelArgument.isSet())
-        {
-            configInterface->setLogLevel(logLevelArgument.getValue());
+            configInterface->setLogLevel(cmd.logLevelArgument.getValue());
         }
 
         auto logLevel = ::logging::convert_to_log_level(configInterface->getLogLevel());
@@ -151,7 +118,7 @@ int main(int argc, const char* argv[])
         auto vmiHub = injector.create<std::shared_ptr<VmiHub>>();
 
         GlobalControl::init(logging->newLogger(), eventStream);
-        vmiHub->run();
+        vmiHub->run(cmd.pluginArgs);
     }
     catch (const ::rust::Error&)
     {

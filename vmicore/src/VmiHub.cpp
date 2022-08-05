@@ -157,11 +157,14 @@ void setupSignalHandling()
     }
 }
 
-uint VmiHub::run()
+uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs)
 {
     for (auto& plugin : configInterface->getPlugins())
     {
-        pluginSystem->initializePlugin(plugin.first, plugin.second);
+        pluginSystem->initializePlugin(plugin.first,
+                                       plugin.second,
+                                       pluginArgs.contains(plugin.first) ? pluginArgs.at(plugin.first)
+                                                                         : std::vector<std::string>{plugin.first});
     }
 
     // Initialize SystemEventSupervisor as first callback for CR3Event to avoid initialization on an undefined memory

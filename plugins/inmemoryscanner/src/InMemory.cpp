@@ -3,9 +3,10 @@
 #include "Filenames.h"
 #include "Scanner.h"
 #include "Yara.h"
-#include <PluginInterface.h>
+#include <PluginInit.h>
 #include <memory>
 #include <string>
+#include <tclap/CmdLine.h>
 
 // Struct is externally verified during plugin initialization
 [[maybe_unused]] extern constexpr Plugin::PluginDetails pluginInformation = {
@@ -36,10 +37,16 @@ void processTerminationCallback(pid_t pid, const char* processName)
     scanner->scanProcess(pid, processName);
 }
 
-extern "C" bool init(Plugin::PluginInterface* communicator, std::shared_ptr<Plugin::IPluginConfig> config)
+extern "C" bool init(Plugin::PluginInterface* communicator,
+                     std::shared_ptr<Plugin::IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
+                     std::vector<std::string> args)
 {
     auto success = true;
     pluginInterface = communicator;
+    TCLAP::CmdLine cmd("InMemory scanner plugin for VMICore.", ' ', PLUGIN_VERSION);
+    TCLAP::SwitchArg dumpMemoryArgument("d", "dump", "Dump memory.", cmd);
+
+    cmd.parse(args);
 
     pluginInterface->logMessage(
         Plugin::LogLevel::info, LOG_FILENAME, "Starting inMemory plugin build version " + std::string(BUILD_VERSION));
@@ -48,6 +55,10 @@ extern "C" bool init(Plugin::PluginInterface* communicator, std::shared_ptr<Plug
     {
         std::shared_ptr<IConfig> configuration = std::make_shared<Config>(pluginInterface);
         configuration->parseConfiguration(*config);
+        if (dumpMemoryArgument.isSet())
+        {
+            configuration->overrideDumpMemoryFlag(dumpMemoryArgument.getValue());
+        }
         auto yara = std::make_unique<Yara>(configuration->getSignatureFile());
         auto dumping = std::make_unique<Dumping>(pluginInterface, configuration);
         scanner = std::make_unique<Scanner>(pluginInterface, configuration, std::move(yara), std::move(dumping));
