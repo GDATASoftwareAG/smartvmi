@@ -3,6 +3,7 @@
 
 #include "../IEventStream.h"
 #include "../IFileTransport.h"
+#include "../ILogger.h"
 #include "../ILogging.h"
 #include <memory>
 #include <optional>

@@ -1,6 +1,4 @@
 #include "GRPCServer.h"
-#include "../ILogger.h"
-#include "../ILogging.h"
 #include "GRPCLogger.h"
 #include <cstdint>
 #include <exception>

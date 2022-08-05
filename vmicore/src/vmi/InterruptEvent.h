@@ -35,6 +35,8 @@ class InterruptEvent final : public Event, public std::enable_shared_from_this<I
 
     static uint64_t getRcx();
 
+    static uint64_t getRdi();
+
     static uint64_t getR8();
 
     static void initializeInterruptEventHandling(ILibvmiInterface& vmiInterface);

@@ -143,7 +143,7 @@ class ProcessesMemoryStateFixture : public testing::Test
                                                  4,
                                                  statusPending,
                                                  "System",
-                                                 emptyFileName,
+                                                 emptyFullName,
                                                  0,
                                                  systemCR3,
                                                  0,
@@ -176,7 +176,7 @@ class ProcessesMemoryStateFixture : public testing::Test
                                                    R"(\Windows\System32\csrss.exe)"};
 
     std::shared_ptr<NiceMock<MockLibvmiInterface>> mockVmiInterface = std::make_shared<NiceMock<MockLibvmiInterface>>();
-    std::shared_ptr<KernelAccess> kernelAccess;
+    std::shared_ptr<Windows::KernelAccess> kernelAccess;
 
     std::shared_ptr<NiceMock<MockLogging>> mockLogging = []()
     {
@@ -190,11 +190,11 @@ class ProcessesMemoryStateFixture : public testing::Test
 
     std::shared_ptr<NiceMock<MockEventStream>> mockEventStream = std::make_shared<NiceMock<MockEventStream>>();
 
-    std::shared_ptr<ActiveProcessesSupervisor> activeProcessesSupervisor;
+    std::shared_ptr<Windows::ActiveProcessesSupervisor> activeProcessesSupervisor;
 
     void setupReturnsForVmiInterface()
     {
-        ON_CALL(*mockVmiInterface, getSystemCr3()).WillByDefault(Return(systemCR3));
+        ON_CALL(*mockVmiInterface, convertPidToDtb(Windows::systemPid)).WillByDefault(Return(systemCR3));
         ON_CALL(*mockVmiInterface, getKernelStructOffset("_KPROCESS", "DirectoryTableBase"))
             .WillByDefault(Return(_KPROCESS_OFFSETS::DirectoryTableBase));
         ON_CALL(*mockVmiInterface, getKernelStructOffset("_EPROCESS", "InheritedFromUniqueProcessId"))
@@ -353,15 +353,16 @@ class ProcessesMemoryStateFixture : public testing::Test
     uint32_t vadRootNodeEndingVpnHigh = 0;
     uint64_t vadRootNodeStartingAddress = vadRootNodeStartingVpn << PagingDefinitions::numberOfPageIndexBits;
     uint64_t vadRootNodeEndingAddress = ((vadRootNodeEndingVpn + 1) << PagingDefinitions::numberOfPageIndexBits) - 1;
-    uint64_t vadRootNodeMemoryRegionSize = vadRootNodeEndingAddress - vadRootNodeStartingAddress + 1;
-    ProtectionValues vadRootNodeMemoryRegionProtection = ProtectionValues::PAGE_READWRITE;
-    Plugin::MemoryRegion expectedMemoryRegion1{vadRootNodeStartingAddress,
-                                               vadRootNodeMemoryRegionSize,
-                                               std::string{},
-                                               vadRootNodeMemoryRegionProtection,
-                                               false,
-                                               false,
-                                               false};
+    size_t vadRootNodeMemoryRegionSize = vadRootNodeEndingAddress - vadRootNodeStartingAddress + 1;
+    PageProtection vadRootNodeMemoryRegionProtection{static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE),
+                                                     OperatingSystem::WINDOWS};
+    MemoryRegion expectedMemoryRegion1{vadRootNodeStartingAddress,
+                                       vadRootNodeMemoryRegionSize,
+                                       std::string{},
+                                       vadRootNodeMemoryRegionProtection,
+                                       false,
+                                       false,
+                                       false};
 
     uint32_t vadRootNodeRightChildStartingVpn = 444;
     uint32_t vadRootNodeRightChildEndingVpn = 445;
@@ -372,14 +373,15 @@ class ProcessesMemoryStateFixture : public testing::Test
     uint64_t vadRootNodeChildMemoryRegionSize =
         vadRootNodeChildEndingAddress - vadRootNodeRightChildStartingAddress + 1;
     std::string fileNameString = std::string(R"(\Windows\IAMSYSTEM.exe)");
-    ProtectionValues vadRootNodeChildMemoryRegionProtection = ProtectionValues::PAGE_EXECUTE_WRITECOPY;
-    Plugin::MemoryRegion expectedMemoryRegion2{vadRootNodeRightChildStartingAddress,
-                                               vadRootNodeChildMemoryRegionSize,
-                                               fileNameString,
-                                               vadRootNodeChildMemoryRegionProtection,
-                                               true,
-                                               true,
-                                               true};
+    PageProtection vadRootNodeChildMemoryRegionProtection{
+        static_cast<uint32_t>(Windows::ProtectionValues::MM_EXECUTE_WRITECOPY), OperatingSystem::WINDOWS};
+    MemoryRegion expectedMemoryRegion2{vadRootNodeRightChildStartingAddress,
+                                       vadRootNodeChildMemoryRegionSize,
+                                       fileNameString,
+                                       vadRootNodeChildMemoryRegionProtection,
+                                       true,
+                                       true,
+                                       true};
 
     uint64_t vadRootNodeLeftChildStartingVpn = 0x100010666;
     uint64_t vadRootNodeLeftChildEndingVpn = 0x100010667;
@@ -389,13 +391,14 @@ class ProcessesMemoryStateFixture : public testing::Test
         ((vadRootNodeLeftChildEndingVpn + 1) << PagingDefinitions::numberOfPageIndexBits) - 1;
     uint64_t vadRootNodeLeftChildMemoryRegionSize =
         vadRootNodeLeftChildEndingAddress - vadRootNodeLeftChildStartingAddress + 1;
-    Plugin::MemoryRegion expectedMemoryRegion3{vadRootNodeLeftChildStartingAddress,
-                                               vadRootNodeLeftChildMemoryRegionSize,
-                                               std::string{},
-                                               ProtectionValues::PAGE_READWRITE,
-                                               false,
-                                               false,
-                                               false};
+    MemoryRegion expectedMemoryRegion3{
+        vadRootNodeLeftChildStartingAddress,
+        vadRootNodeLeftChildMemoryRegionSize,
+        std::string{},
+        PageProtection{static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), OperatingSystem::WINDOWS},
+        false,
+        false,
+        false};
 
     void systemVadTreeRootNodeMemoryState()
     {
@@ -420,9 +423,11 @@ class ProcessesMemoryStateFixture : public testing::Test
         ON_CALL(*mockVmiInterface, read32VA(vadRootNodeBase + __MMVAD_SHORT_OFFSETS::EndingVpn, systemCR3))
             .WillByDefault(Return(vadRootNodeEndingVpn));
         ON_CALL(*mockVmiInterface, read64VA(vadRootNodeBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
-            .WillByDefault(Return(createMmvadFlags(static_cast<uint32_t>(ProtectionValues::PAGE_READWRITE), true)));
+            .WillByDefault(
+                Return(createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
         ON_CALL(*mockVmiInterface, read32VA(vadRootNodeBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
-            .WillByDefault(Return(createMmvadFlags(static_cast<uint32_t>(ProtectionValues::PAGE_READWRITE), true)));
+            .WillByDefault(
+                Return(createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
     }
 
     void systemVadTreeRightChildOfRootNodeMemoryState()
@@ -450,12 +455,9 @@ class ProcessesMemoryStateFixture : public testing::Test
             .WillByDefault(Return(vadRootNodeRightChildStartingVpn));
         ON_CALL(*mockVmiInterface, read32VA(vadRootNodeRightChildBase + __MMVAD_SHORT_OFFSETS::EndingVpn, systemCR3))
             .WillByDefault(Return(vadRootNodeRightChildEndingVpn));
-        ON_CALL(*mockVmiInterface, read64VA(vadRootNodeRightChildBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
-            .WillByDefault(
-                Return(createMmvadFlags(static_cast<uint32_t>(ProtectionValues::PAGE_EXECUTE_WRITECOPY), false)));
         ON_CALL(*mockVmiInterface, read32VA(vadRootNodeRightChildBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
-            .WillByDefault(
-                Return(createMmvadFlags(static_cast<uint32_t>(ProtectionValues::PAGE_EXECUTE_WRITECOPY), false)));
+            .WillByDefault(Return(
+                createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_EXECUTE_WRITECOPY), false)));
         ON_CALL(*mockVmiInterface, read64VA(vadRootNodeRightChildBase + _MMVAD_OFFSETS::Subsection, systemCR3))
             .WillByDefault(Return(subsectionAddress));
         ON_CALL(*mockVmiInterface, read64VA(subsectionAddress + _SUBSECTION_OFFSETS::ControlArea, systemCR3))
@@ -500,9 +502,11 @@ class ProcessesMemoryStateFixture : public testing::Test
         ON_CALL(*mockVmiInterface, read32VA(vadRootNodeLeftChildBase + __MMVAD_SHORT_OFFSETS::EndingVpn, systemCR3))
             .WillByDefault(Return(vadRootNodeLeftChildEndingVpn));
         ON_CALL(*mockVmiInterface, read64VA(vadRootNodeLeftChildBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
-            .WillByDefault(Return(createMmvadFlags(static_cast<uint32_t>(ProtectionValues::PAGE_READWRITE), true)));
+            .WillByDefault(
+                Return(createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
         ON_CALL(*mockVmiInterface, read32VA(vadRootNodeLeftChildBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
-            .WillByDefault(Return(createMmvadFlags(static_cast<uint32_t>(ProtectionValues::PAGE_READWRITE), true)));
+            .WillByDefault(
+                Return(createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
     }
 
     static uint32_t createMmvadFlags(uint32_t protection, bool privateMemory)
@@ -542,9 +546,9 @@ class ProcessesMemoryStateFixture : public testing::Test
         setupReturnsForVmiInterface();
         setupReturnsForConfigInterface();
 
-        kernelAccess = std::make_shared<KernelAccess>(mockVmiInterface);
-        activeProcessesSupervisor =
-            std::make_shared<ActiveProcessesSupervisor>(mockVmiInterface, kernelAccess, mockLogging, mockEventStream);
+        kernelAccess = std::make_shared<Windows::KernelAccess>(mockVmiInterface);
+        activeProcessesSupervisor = std::make_shared<Windows::ActiveProcessesSupervisor>(
+            mockVmiInterface, kernelAccess, mockLogging, mockEventStream);
         pluginSystem = std::make_shared<PluginSystem>(mockConfigInterface,
                                                       mockVmiInterface,
                                                       activeProcessesSupervisor,

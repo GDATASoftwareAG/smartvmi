@@ -1,0 +1,11 @@
+#ifndef VMICORE_OPERATINGSYSTEM_H
+#define VMICORE_OPERATINGSYSTEM_H
+
+enum class OperatingSystem
+{
+    INVALID,
+    WINDOWS,
+    LINUX,
+};
+
+#endif // VMICORE_OPERATINGSYSTEM_H

@@ -22,7 +22,7 @@ MATCHER_P(IsEqualProcess, expectedProcess, "")
     bool isEqual = false;
     if (arg)
     {
-        auto eprocessBasesMatch = expectedProcess.eprocessBase == arg->eprocessBase;
+        auto eprocessBasesMatch = expectedProcess.eprocessBase == arg->base;
         auto cr3sMatch = expectedProcess.directoryTableBase == arg->processCR3;
         auto namesMatch = expectedProcess.imageFileName == arg->name;
         auto fullNamesMatch = expectedProcess.fullName == *arg->fullName;
@@ -67,7 +67,7 @@ TEST_F(ActiveProcessesSupervisorFixture, addNewProcess_process332_processAdded)
 
     EXPECT_NO_THROW(activeProcessesSupervisor->addNewProcess(process332.eprocessBase));
 
-    std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> activeProcesses;
+    std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>> activeProcesses;
     EXPECT_NO_THROW(activeProcesses = activeProcessesSupervisor->getActiveProcesses());
     EXPECT_THAT(*activeProcesses, Contains(IsEqualProcess(process332)));
 }
@@ -92,7 +92,7 @@ TEST_F(ActiveProcessesSupervisorFixture, removeActiveProcess_presentProcess_proc
 
     EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process248.eprocessBase));
 
-    std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> activeProcesses;
+    std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>> activeProcesses;
     EXPECT_NO_THROW(activeProcesses = activeProcessesSupervisor->getActiveProcesses());
     EXPECT_THAT(*activeProcesses, Not(Contains(IsEqualProcess(process248))));
 }
@@ -116,7 +116,7 @@ TEST_F(ActiveProcessesSupervisorFixture, removeNotActiveProcess_inactiveProcess_
 
     EXPECT_NO_THROW(activeProcessesSupervisor->removeActiveProcess(process332.eprocessBase));
 
-    std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> activeProcesses;
+    std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>> activeProcesses;
     EXPECT_NO_THROW(activeProcesses = activeProcessesSupervisor->getActiveProcesses());
     EXPECT_THAT(*activeProcesses, UnorderedElementsAre(IsEqualProcess(process4), IsEqualProcess(process248)));
 }

@@ -23,8 +23,8 @@ class MemoryRegionInformation
     const std::string moduleName;
     const std::string processName;
     const std::string uid;
-    const std::string startAdress;
-    const std::string endAdress;
+    const std::string startAddress;
+    const std::string endAddress;
     // NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes)
 
     MemoryRegionInformation(std::string pid,
@@ -36,8 +36,8 @@ class MemoryRegionInformation
                             std::string moduleName,
                             std::string processName,
                             std::string uid,
-                            std::string startAdress,
-                            std::string endAdress)
+                            std::string startAddress,
+                            std::string endAddress)
         : pid(std::move(pid)),
           scanSize(scanSize),
           flags(std::move(flags)),
@@ -47,8 +47,8 @@ class MemoryRegionInformation
           moduleName(std::move(moduleName)),
           processName(std::move(processName)),
           uid(std::move(uid)),
-          startAdress(std::move(startAdress)),
-          endAdress(std::move(endAdress))
+          startAddress(std::move(startAddress)),
+          endAddress(std::move(endAddress))
     {
     }
 
@@ -60,9 +60,9 @@ class MemoryRegionInformation
             .append("-")
             .append(flags)
             .append("-")
-            .append(startAdress)
+            .append(startAddress)
             .append("-")
-            .append(endAdress)
+            .append(endAddress)
             .append("-")
             .append(uid);
     }
@@ -83,10 +83,10 @@ class MemoryRegionInformation
             .append(flags)
             .append(R"(", )")
             .append(R"("StartAddress": ")")
-            .append(startAdress)
+            .append(startAddress)
             .append(R"(", )")
             .append(R"("EndAddress": ")")
-            .append(endAdress)
+            .append(endAddress)
             .append(R"(", )")
             .append(R"("BeingDeleted": )")
             .append(boolToString(isBeingDeleted))
@@ -118,7 +118,7 @@ class IDumping
 
     virtual void dumpMemoryRegion(const std::string& processName,
                                   pid_t pid,
-                                  const Plugin::MemoryRegion& memoryRegionDescriptor,
+                                  const MemoryRegion& memoryRegionDescriptor,
                                   const std::vector<uint8_t>& data) = 0;
 
     virtual std::vector<std::string> getAllMemoryRegionInformation() = 0;
@@ -137,7 +137,7 @@ class Dumping : public IDumping
 
     void dumpMemoryRegion(const std::string& processName,
                           pid_t pid,
-                          const Plugin::MemoryRegion& memoryRegionDescriptor,
+                          const MemoryRegion& memoryRegionDescriptor,
                           const std::vector<uint8_t>& data) override;
 
     std::vector<std::string> getAllMemoryRegionInformation() override;
@@ -153,10 +153,8 @@ class Dumping : public IDumping
     int memoryRegionCounter{};
     std::mutex counterLock{};
 
-    static std::unique_ptr<std::string> protectionToString(ProtectionValues protection);
-
     static std::unique_ptr<MemoryRegionInformation> createMemoryRegionInformation(
-        const std::string& processName, pid_t pid, const Plugin::MemoryRegion& memoryRegionDescriptor, int regionId);
+        const std::string& processName, pid_t pid, const MemoryRegion& memoryRegionDescriptor, int regionId);
 
     int getNextRegionId();
 

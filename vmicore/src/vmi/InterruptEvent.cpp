@@ -104,6 +104,11 @@ uint64_t InterruptEvent::getRcx()
     return event.x86_regs->rcx;
 }
 
+uint64_t InterruptEvent::getRdi()
+{
+    return event.x86_regs->rdi;
+}
+
 uint64_t InterruptEvent::getR8()
 {
     return event.x86_regs->r8;

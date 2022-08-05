@@ -1,83 +1,57 @@
-#ifndef VMICORE_ACTIVEPROCESSESSUPERVISOR_H
-#define VMICORE_ACTIVEPROCESSESSUPERVISOR_H
+#ifndef VMICORE_WINDOWS_ACTIVEPROCESSESSUPERVISOR_H
+#define VMICORE_WINDOWS_ACTIVEPROCESSESSUPERVISOR_H
 
 #include "../../io/IEventStream.h"
+#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
-#include "../../io/grpc/GRPCLogger.h"
 #include "../../vmi/LibvmiInterface.h"
+#include "../IActiveProcessesSupervisor.h"
+#include "Constants.h"
 #include "VadTreeWin10.h"
 #include <map>
 #include <memory>
 
-struct ActiveProcessInformation
+namespace Windows
 {
-    uint64_t eprocessBase;
-    uint64_t processCR3;
-    pid_t pid;
-    pid_t parentPid;
-    std::string name;
-    std::unique_ptr<std::string> fullName;
-    std::unique_ptr<std::string> processPath;
-    std::unique_ptr<VadTreeWin10> vadTree;
-};
+    class ActiveProcessesSupervisor : public IActiveProcessesSupervisor
+    {
+      public:
+        ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
+                                  std::shared_ptr<IKernelAccess> kernelAccess,
+                                  std::shared_ptr<ILogging> loggingLib,
+                                  std::shared_ptr<IEventStream> eventStream);
 
-class IActiveProcessesSupervisor
-{
-  public:
-    virtual ~IActiveProcessesSupervisor() = default;
+        void initialize() override;
 
-    virtual void initialize() = 0;
+        [[nodiscard]] std::shared_ptr<ActiveProcessInformation> getProcessInformationByPid(pid_t pid) const override;
 
-    virtual std::shared_ptr<ActiveProcessInformation> getProcessInformationByPid(pid_t pid) = 0;
+        [[nodiscard]] std::shared_ptr<ActiveProcessInformation>
+        getProcessInformationByBase(uint64_t eprocessBase) const override;
 
-    virtual std::shared_ptr<ActiveProcessInformation> getProcessInformationByEprocessBase(uint64_t eprocessBase) = 0;
+        void addNewProcess(uint64_t eprocessBase) override;
 
-    virtual void addNewProcess(uint64_t eprocessBase) = 0;
+        void removeActiveProcess(uint64_t eprocessBase) override;
 
-    virtual void removeActiveProcess(uint64_t eprocessBase) = 0;
+        [[nodiscard]] std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
+        getActiveProcesses() const override;
 
-    virtual std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> getActiveProcesses() = 0;
+      private:
+        std::shared_ptr<ILibvmiInterface> vmiInterface;
+        std::shared_ptr<IKernelAccess> kernelAccess;
+        std::map<pid_t, std::shared_ptr<ActiveProcessInformation>> processInformationByPid;
+        std::map<uint64_t, pid_t> pidsByEprocessBase;
+        std::unique_ptr<ILogger> logger;
+        std::shared_ptr<ILogging> loggingLib;
+        std::shared_ptr<IEventStream> eventStream;
 
-  protected:
-    IActiveProcessesSupervisor() = default;
-};
+        [[nodiscard]] bool isProcessActive(uint64_t eprocessBase) const;
 
-class ActiveProcessesSupervisor : public IActiveProcessesSupervisor
-{
-  public:
-    ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                              std::shared_ptr<IKernelAccess> kernelAccess,
-                              std::shared_ptr<ILogging> loggingLib,
-                              std::shared_ptr<IEventStream> eventStream);
+        [[nodiscard]] std::unique_ptr<ActiveProcessInformation> extractProcessInformation(uint64_t eprocessBase) const;
 
-    void initialize() override;
+        [[nodiscard]] std::unique_ptr<std::string> extractProcessPath(uint64_t eprocessBase) const;
 
-    std::shared_ptr<ActiveProcessInformation> getProcessInformationByPid(pid_t pid) override;
+        [[nodiscard]] static std::unique_ptr<std::string> splitProcessFileNameFromPath(const std::string& path);
+    };
+}
 
-    std::shared_ptr<ActiveProcessInformation> getProcessInformationByEprocessBase(uint64_t eprocessBase) override;
-
-    void addNewProcess(uint64_t eprocessBase) override;
-
-    void removeActiveProcess(uint64_t eprocessBase) override;
-
-    std::unique_ptr<std::vector<std::shared_ptr<ActiveProcessInformation>>> getActiveProcesses() override;
-
-  private:
-    std::shared_ptr<ILibvmiInterface> vmiInterface;
-    std::shared_ptr<IKernelAccess> kernelAccess;
-    std::map<pid_t, std::shared_ptr<ActiveProcessInformation>> processInformationByPid;
-    std::map<uint64_t, pid_t> pidsByEprocessBase;
-    std::unique_ptr<ILogger> logger;
-    std::shared_ptr<ILogging> loggingLib;
-    std::shared_ptr<IEventStream> eventStream;
-
-    [[nodiscard]] bool isProcessActive(uint64_t eprocessBase) const;
-
-    [[nodiscard]] std::unique_ptr<ActiveProcessInformation> extractProcessInformation(uint64_t eprocessBase) const;
-
-    [[nodiscard]] std::unique_ptr<std::string> extractProcessPath(uint64_t eprocessBase) const;
-
-    [[nodiscard]] static std::unique_ptr<std::string> splitProcessFileNameFromPath(const std::string& path);
-};
-
-#endif // VMICORE_ACTIVEPROCESSESSUPERVISOR_H
+#endif // VMICORE_WINDOWS_ACTIVEPROCESSESSUPERVISOR_H

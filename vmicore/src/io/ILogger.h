@@ -5,10 +5,10 @@
 #include "cxxbridge/rust_grpc_server/src/bridge.rs.h"
 #include <memory>
 
-#define NEW_LOGGER(log_server) (log_server->newNamedLogger(std::filesystem::path(__FILE__).filename().stem()))
+#define NEW_LOGGER(log_server) ((log_server)->newNamedLogger(std::filesystem::path(__FILE__).filename().stem()))
 // Has to be the same as in the HiveOperations project to indicate in which file the log should be written.
 // pkg->script->vmi->vmi_connector.go
-#define WRITE_TO_FILE_TAG "writeToFileTag"
+constexpr auto WRITE_TO_FILE_TAG = "writeToFileTag";
 
 namespace logfield
 {
