@@ -1,5 +1,9 @@
 #include "VmiHub.h"
 #include "GlobalControl.h"
+#include "os/linux/ActiveProcessesSupervisor.h"
+#include "os/linux/SystemEventSupervisor.h"
+#include "os/windows/ActiveProcessesSupervisor.h"
+#include "os/windows/SystemEventSupervisor.h"
 
 #include <csignal>
 #include <memory>
@@ -13,17 +17,15 @@ namespace
 
 VmiHub::VmiHub(std::shared_ptr<IConfigParser> configInterface,
                std::shared_ptr<ILibvmiInterface> vmiInterface,
-               std::shared_ptr<PluginSystem> pluginSystem,
-               std::shared_ptr<SystemEventSupervisor> systemEventSupervisor,
                std::shared_ptr<ILogging> loggingLib,
-               std::shared_ptr<IEventStream> eventStream)
+               std::shared_ptr<IEventStream> eventStream,
+               std::shared_ptr<IInterruptFactory> interruptFactory)
     : configInterface(std::move(configInterface)),
       vmiInterface(std::move(vmiInterface)),
-      pluginSystem(std::move(pluginSystem)),
-      systemEventSupervisor(std::move(systemEventSupervisor)),
       loggingLib(std::move(loggingLib)),
       logger(NEW_LOGGER(this->loggingLib)),
-      eventStream(std::move(eventStream))
+      eventStream(std::move(eventStream)),
+      interruptFactory(std::move(interruptFactory))
 {
 }
 
@@ -57,52 +59,17 @@ void VmiHub::waitForEvents() const
             eventStream->sendErrorEvent(e.what());
             logger->info("Trying to get the VM state");
 
-            if (vmiInterface->isVmAlive())
-            {
-                logger->info("VM is alive");
-            }
-            else
-            {
-                logger->info("VM is not alive");
-                GlobalControl::postRunPluginAction = false;
-            }
             exitCode = 1;
             GlobalControl::endVmi = true;
-        }
-        if (!vmiInterface->areEventsPending() && !GlobalControl::endVmi)
-        {
-            if (!vmiInterface->isVmAlive())
-            {
-                logger->error("VM is unresponsive");
-                eventStream->sendErrorEvent("VM is unresponsive");
-                exitCode = 1;
-                GlobalControl::endVmi = true;
-                GlobalControl::postRunPluginAction = false;
-            }
         }
     }
 }
 
 void VmiHub::performShutdownPluginAction() const
 {
-    bool success = true;
-    try
-    {
-        vmiInterface->waitForCR3Event([&pluginSystem = pluginSystem]()
-                                      { pluginSystem->passShutdownEventToRegisteredPlugins(); });
-    }
-    catch (const VmiException& e)
-    {
-        success = false;
-        logger->warning("VmiException", {logfield::create("exception", e.what())});
-    }
-    if (!success)
-    {
-        logger->info("Trying alternative approach");
-        vmiInterface->pauseVm();
-        pluginSystem->passShutdownEventToRegisteredPlugins();
-        vmiInterface->resumeVm();
-    }
+    vmiInterface->pauseVm();
+    pluginSystem->passShutdownEventToRegisteredPlugins();
+    vmiInterface->resumeVm();
 }
 
 void logReceivedSignal(int signal)
@@ -159,6 +126,49 @@ void setupSignalHandling()
 
 uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs)
 {
+    vmiInterface->initializeVmi();
+    std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
+    switch (vmiInterface->getOsType())
+    {
+        case VMI_OS_LINUX:
+        {
+            activeProcessesSupervisor =
+                std::make_shared<Linux::ActiveProcessesSupervisor>(vmiInterface, loggingLib, eventStream);
+            systemEventSupervisor = std::make_shared<Linux::SystemEventSupervisor>(vmiInterface,
+                                                                                   pluginSystem,
+                                                                                   activeProcessesSupervisor,
+                                                                                   configInterface,
+                                                                                   interruptFactory,
+                                                                                   loggingLib,
+                                                                                   eventStream);
+            break;
+        }
+        case VMI_OS_WINDOWS:
+        {
+            auto kernelObjectExtractor = std::make_shared<Windows::KernelAccess>(vmiInterface);
+            activeProcessesSupervisor = std::make_shared<Windows::ActiveProcessesSupervisor>(
+                vmiInterface, kernelObjectExtractor, loggingLib, eventStream);
+            systemEventSupervisor = std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
+                                                                                     pluginSystem,
+                                                                                     activeProcessesSupervisor,
+                                                                                     configInterface,
+                                                                                     interruptFactory,
+                                                                                     loggingLib,
+                                                                                     eventStream);
+            break;
+        }
+        default:
+        {
+            throw std::runtime_error("Unknown operating system.");
+        }
+    }
+
+    pluginSystem = std::make_shared<PluginSystem>(configInterface,
+                                                  vmiInterface,
+                                                  activeProcessesSupervisor,
+                                                  std::make_shared<LegacyLogging>(configInterface),
+                                                  loggingLib,
+                                                  eventStream);
     for (auto& plugin : configInterface->getPlugins())
     {
         pluginSystem->initializePlugin(plugin.first,
@@ -167,10 +177,9 @@ uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>
                                                                          : std::vector<std::string>{plugin.first});
     }
 
-    // Initialize SystemEventSupervisor as first callback for CR3Event to avoid initialization on an undefined memory
-    // state
-    vmiInterface->initializeVmi([&systemEventSupervisor = systemEventSupervisor]()
-                                { systemEventSupervisor->initialize(); });
+    vmiInterface->pauseVm();
+    systemEventSupervisor->initialize();
+    vmiInterface->resumeVm();
 
     eventStream->sendReadyEvent();
 

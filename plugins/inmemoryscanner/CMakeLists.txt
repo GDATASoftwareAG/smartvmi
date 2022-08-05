@@ -29,6 +29,14 @@ set(googletest_INSTALL_GTEST OFF)
 set(googletest_INSTALL_GMOCK OFF)
 FetchContent_MakeAvailable(googletest)
 
+# Add page protection object library required for testing
+
+add_subdirectory("${VMICORE_DIRECTORY_ROOT}/src/os/" "${CMAKE_CURRENT_BINARY_DIR}/page_protection")
+
+# Add public vmicore mocks
+
+add_subdirectory("${VMICORE_DIRECTORY_ROOT}/test/public" "${CMAKE_CURRENT_BINARY_DIR}/vmicore_mocks")
+
 # Configure include directory for required VMICore plugin header files
 
 include_directories("${VMICORE_DIRECTORY_ROOT}/src/plugins")
@@ -67,7 +75,7 @@ add_executable(inmemoryscanner-test ${source_files} ${test_files})
 
 target_compile_options(inmemoryscanner-test PRIVATE ${compile_flags} -g -O0 --coverage)
 target_link_options(inmemoryscanner-test PRIVATE --coverage)
-target_link_libraries(inmemoryscanner-test ${libraries} pthread gtest gmock gmock_main)
+target_link_libraries(inmemoryscanner-test ${libraries} page_protection vmicore_mocks pthread gtest gmock gmock_main)
 
 # Setup test discovery
 

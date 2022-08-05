@@ -9,8 +9,6 @@
 namespace
 {
     LibvmiInterface* libvmiInterfaceInstance = nullptr;
-    bool cr3Trigger = false;
-    constexpr pid_t systemPid = 4;
 }
 
 LibvmiInterface::LibvmiInterface(std::shared_ptr<IConfigParser> configInterface,
@@ -32,7 +30,7 @@ LibvmiInterface::~LibvmiInterface()
     libvmiInterfaceInstance = nullptr;
 }
 
-void LibvmiInterface::initializeVmi(const std::function<void()>& postInitializationFunction)
+void LibvmiInterface::initializeVmi()
 {
     logger->info("Initialize libvmi", {logfield::create("domain", configInterface->getVmName())});
     logger->info("Initialize successfully initialized", {logfield::create("domain", configInterface->getVmName())});
@@ -40,6 +38,7 @@ void LibvmiInterface::initializeVmi(const std::function<void()>& postInitializat
     auto configString = createConfigString(configInterface->getOffsetsFile());
     auto initData = VmiInitData(configInterface->getSocketPath());
     vmi_init_error initError;
+
     if (vmi_init_complete(&vmiInstance,
                           reinterpret_cast<const void*>(configInterface->getVmName().c_str()),
                           VMI_INIT_DOMAINNAME | VMI_INIT_EVENTS,
@@ -52,8 +51,6 @@ void LibvmiInterface::initializeVmi(const std::function<void()>& postInitializat
     }
 
     numberOfVCPUs = vmi_get_num_vcpus(vmiInstance);
-    cr3EventHandler = postInitializationFunction;
-    waitForCR3Event();
 }
 
 std::unique_ptr<std::string> LibvmiInterface::createConfigString(const std::string& offsetsFile)
@@ -71,77 +68,6 @@ void LibvmiInterface::freeEvent(vmi_event_t* event, status_t rc)
              logfield::create("type", static_cast<uint64_t>(event->type))});
     }
     free(event);
-}
-
-void LibvmiInterface::waitForCR3Event()
-{
-    vmi_event_t cr3Event{};
-    SETUP_REG_EVENT(&cr3Event, CR3, VMI_REGACCESS_W, 0, LibvmiInterface::_cr3Callback);
-    cr3Event.reg_event.onchange = true;
-    if (vmi_register_event(vmiInstance, &cr3Event) != VMI_SUCCESS)
-    {
-        throw VmiException(fmt::format("{}: Unable to register cr3 event.", __func__));
-    }
-    if (cr3Trigger)
-    {
-        throw std::runtime_error(
-            fmt::format("{}: Initial value of cr3Trigger is 'true'. This should not occur", __func__));
-    }
-    for (auto i = 5; i > 0; --i)
-    {
-        if (cr3Trigger)
-        {
-            break;
-        }
-        waitForEvent();
-    }
-    if (!cr3Trigger)
-    {
-        try
-        {
-            clearEvent(cr3Event, false);
-        }
-        catch (const VmiException& e)
-        {
-            logger->warning(e.what());
-        }
-        throw VmiException(fmt::format("{}: No cr3 event caught after 5 tries.", __func__));
-    }
-    else
-    {
-        cr3Trigger = false;
-    }
-}
-
-void LibvmiInterface::waitForCR3Event(const std::function<void()>& cr3EventHandler)
-{
-    this->cr3EventHandler = cr3EventHandler;
-    waitForCR3Event();
-}
-
-event_response_t LibvmiInterface::_cr3Callback(__attribute__((unused)) vmi_instance_t vmi, vmi_event_t* event)
-{
-    try
-    {
-        libvmiInterfaceInstance->cr3Callback(event);
-    }
-    catch (const std::exception& e)
-    {
-        GlobalControl::endVmi = true;
-        libvmiInterfaceInstance->logger->error("Unexpected exception", {logfield::create("exception", e.what())});
-        libvmiInterfaceInstance->eventStream->sendErrorEvent(e.what());
-    }
-    cr3Trigger = true;
-    return VMI_EVENT_RESPONSE_NONE;
-}
-
-void LibvmiInterface::cr3Callback(vmi_event_t* event)
-{
-    if (vmi_clear_event(vmiInstance, event, nullptr) != VMI_SUCCESS)
-    {
-        throw VmiException(fmt::format("{}: Unable to clear cr3 event.", __func__));
-    }
-    cr3EventHandler();
 }
 
 void LibvmiInterface::clearEvent(vmi_event_t& event, bool deallocate)
@@ -351,30 +277,6 @@ void LibvmiInterface::resumeVm()
     }
 }
 
-bool LibvmiInterface::isVmAlive()
-{
-    bool isAlive = false;
-    try
-    {
-        auto systemDtb = getSystemCr3();
-
-        if (systemDtb != 0 && systemDtb != VMI_FAILURE)
-        {
-            // vmiDtbToPid does not use cached values, therefore the conversion fails if the VM is not active anymore
-            if (convertDtbToPid(systemDtb) == 4)
-            {
-                isAlive = true;
-            }
-        }
-    }
-    catch (const VmiException& e)
-    {
-        logger->warning("Exception when checking if VM is alive", {logfield::create("exception", e.what())});
-    }
-
-    return isAlive;
-}
-
 bool LibvmiInterface::areEventsPending()
 {
     bool pending = false;
@@ -431,15 +333,19 @@ void LibvmiInterface::stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId)
     }
 }
 
-uint64_t LibvmiInterface::getSystemCr3()
+os_t LibvmiInterface::getOsType()
 {
-    if (systemCr3 != 0)
-    {
-        return systemCr3;
-    }
+    return vmi_get_ostype(vmiInstance);
+}
 
-    systemCr3 = convertPidToDtb(systemPid);
-    return systemCr3;
+uint64_t LibvmiInterface::getOffset(const std::string& name)
+{
+    uint64_t offset = 0;
+    if (vmi_get_offset(vmiInstance, name.c_str(), &offset) != VMI_SUCCESS)
+    {
+        throw VmiException(fmt::format("{}: Unable to find offset {}", __func__, name));
+    }
+    return offset;
 }
 
 addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, const std::string& member)

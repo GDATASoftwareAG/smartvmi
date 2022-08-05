@@ -15,7 +15,7 @@ Dumping::Dumping(const Plugin::PluginInterface* pluginInterface, std::shared_ptr
 
 void Dumping::dumpMemoryRegion(const std::string& processName,
                                pid_t pid,
-                               const Plugin::MemoryRegion& memoryRegionDescriptor,
+                               const MemoryRegion& memoryRegionDescriptor,
                                const std::vector<uint8_t>& data)
 {
     auto memoryRegionInformation =
@@ -24,7 +24,7 @@ void Dumping::dumpMemoryRegion(const std::string& processName,
 
     pluginInterface->logMessage(Plugin::LogLevel::info,
                                 LOG_FILENAME,
-                                "Dumping Memory region from " + memoryRegionInformation->startAdress + " with size " +
+                                "Dumping Memory region from " + memoryRegionInformation->startAddress + " with size " +
                                     std::to_string(memoryRegionInformation->scanSize) +
                                     " from Process: " + processName + " : " + std::to_string(pid) +
                                     " Module: " + memoryRegionInformation->moduleName + " to " + inMemDumpFileName);
@@ -36,65 +36,8 @@ void Dumping::dumpMemoryRegion(const std::string& processName,
     appendRegionInfo(inMemRegionInfo);
 }
 
-std::unique_ptr<std::string> Dumping::protectionToString(ProtectionValues protection)
-{
-    auto protectionAsString = std::make_unique<std::string>();
-    switch (protection)
-    {
-        case ProtectionValues::PAGE_NOACCESS:
-        case ProtectionValues::PAGE_NOACCESS_2:
-        case ProtectionValues::PAGE_NOACCESS_3:
-        case ProtectionValues::PAGE_NOACCESS_4:
-            protectionAsString->append("N");
-            break;
-        case ProtectionValues::PAGE_READONLY:
-        case ProtectionValues::PAGE_NOCACHE_PAGE_READONLY:
-        case ProtectionValues::PAGE_GUARD_PAGE_READONLY:
-        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_READONLY:
-            protectionAsString->append("R");
-            break;
-        case ProtectionValues::PAGE_READWRITE:
-        case ProtectionValues::PAGE_NOCACHE_PAGE_READWRITE:
-        case ProtectionValues::PAGE_GUARD_PAGE_READWRITE:
-        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_READWRITE:
-            protectionAsString->append("RW");
-            break;
-        case ProtectionValues::PAGE_EXECUTE:
-        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE:
-        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE:
-        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE:
-            protectionAsString->append("X");
-            break;
-        case ProtectionValues::PAGE_EXECUTE_READ:
-        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_READ:
-        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_READ:
-        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_READ:
-            protectionAsString->append("RX");
-            break;
-        case ProtectionValues::PAGE_EXECUTE_READWRITE:
-        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_READWRITE:
-        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_READWRITE:
-        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_READWRITE:
-            protectionAsString->append("RWX");
-            break;
-        case ProtectionValues::PAGE_WRITECOPY:
-        case ProtectionValues::PAGE_NOCACHE_PAGE_WRITECOPY:
-        case ProtectionValues::PAGE_GUARD_PAGE_WRITECOPY:
-        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_WRITECOPY:
-            protectionAsString->append("WC");
-            break;
-        case ProtectionValues::PAGE_EXECUTE_WRITECOPY:
-        case ProtectionValues::PAGE_NOCACHE_PAGE_EXECUTE_WRITECOPY:
-        case ProtectionValues::PAGE_GUARD_PAGE_EXECUTE_WRITECOPY:
-        case ProtectionValues::PAGE_WRITECOMBINE_PAGE_EXECUTE_WRITECOPY:
-            protectionAsString->append("WCX");
-            break;
-    }
-    return protectionAsString;
-}
-
 std::unique_ptr<MemoryRegionInformation> Dumping::createMemoryRegionInformation(
-    const std::string& processName, pid_t pid, const Plugin::MemoryRegion& memoryRegionDescriptor, int regionId)
+    const std::string& processName, pid_t pid, const MemoryRegion& memoryRegionDescriptor, int regionId)
 {
     auto moduleName = Scanner::getFilenameFromPath(memoryRegionDescriptor.moduleName);
     if (moduleName->empty())
@@ -102,21 +45,21 @@ std::unique_ptr<MemoryRegionInformation> Dumping::createMemoryRegionInformation(
         *moduleName = "private";
     }
 
-    auto flags = protectionToString(memoryRegionDescriptor.protection);
-    auto startAdress = intToHex(memoryRegionDescriptor.baseAddress);
-    auto endAdress = intToHex(memoryRegionDescriptor.baseAddress + memoryRegionDescriptor.size);
+    auto flags = memoryRegionDescriptor.protection.toString();
+    auto startAddress = intToHex(memoryRegionDescriptor.base);
+    auto endAddress = intToHex(memoryRegionDescriptor.base + memoryRegionDescriptor.size);
 
     auto memRegionInformation = MemoryRegionInformation{std::to_string(pid),
                                                         memoryRegionDescriptor.size,
-                                                        *flags,
+                                                        flags,
                                                         memoryRegionDescriptor.isBeingDeleted,
                                                         memoryRegionDescriptor.isProcessBaseImage,
                                                         memoryRegionDescriptor.isSharedMemory,
                                                         *moduleName,
                                                         processName,
                                                         std::to_string(regionId),
-                                                        startAdress,
-                                                        endAdress};
+                                                        startAddress,
+                                                        endAddress};
     auto memRegionInformationUniquePointer = std::make_unique<MemoryRegionInformation>(memRegionInformation);
 
     return memRegionInformationUniquePointer;

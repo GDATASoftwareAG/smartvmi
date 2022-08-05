@@ -13,11 +13,10 @@ namespace Plugin
                     readProcessMemoryRegion,
                     (pid_t pid, virtual_address_t address, size_t numberOfBytes),
                     (const, override));
-        MOCK_METHOD(std::unique_ptr<std::vector<MemoryRegion>>,
-                    getProcessMemoryRegions,
-                    (pid_t pid),
+        MOCK_METHOD(std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>,
+                    getRunningProcesses,
+                    (),
                     (const, override));
-        MOCK_METHOD(std::unique_ptr<std::vector<ProcessInformation>>, getRunningProcesses, (), (const, override));
         MOCK_METHOD(void,
                     registerProcessTerminationEvent,
                     (processTerminationCallback_f terminationCallback),

@@ -22,8 +22,14 @@ class SystemEventSupervisorFixture : public testing::Test
     std::shared_ptr<MockInterruptFactory> interruptFactory = std::make_shared<MockInterruptFactory>();
     std::shared_ptr<MockLogging> logging = std::make_shared<NiceMock<MockLogging>>();
     std::shared_ptr<MockEventStream> eventStream = std::make_shared<MockEventStream>();
-    std::shared_ptr<SystemEventSupervisor> systemEventSupervisor = std::make_shared<SystemEventSupervisor>(
-        vmiInterface, pluginSystem, activeProcessSupervisor, configInterface, interruptFactory, logging, eventStream);
+    std::shared_ptr<Windows::SystemEventSupervisor> systemEventSupervisor =
+        std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
+                                                         pluginSystem,
+                                                         activeProcessSupervisor,
+                                                         configInterface,
+                                                         interruptFactory,
+                                                         logging,
+                                                         eventStream);
 };
 
 TEST_F(SystemEventSupervisorFixture, teardown_validState_interruptFactoryTeardownCalled)

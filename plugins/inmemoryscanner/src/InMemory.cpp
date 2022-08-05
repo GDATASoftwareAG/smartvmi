@@ -32,9 +32,9 @@ void shutdownCallback()
     pluginInterface->logMessage(Plugin::LogLevel::info, LOG_FILENAME, "Done scanning all processes");
 }
 
-void processTerminationCallback(pid_t pid, const char* processName)
+void processTerminationCallback(std::shared_ptr<const ActiveProcessInformation> processInformation)
 {
-    scanner->scanProcess(pid, processName);
+    scanner->scanProcess(std::move(processInformation));
 }
 
 extern "C" bool init(Plugin::PluginInterface* communicator,
