@@ -2,13 +2,13 @@
 
 #include "Config.h"
 
-#include <PluginInterface.h>
 #include <filesystem>
 #include <mutex>
 #include <random>
 #include <string>
 #include <utility>
 #include <vector>
+#include <vmicore/plugins/PluginInterface.h>
 
 class MemoryRegionInformation
 {

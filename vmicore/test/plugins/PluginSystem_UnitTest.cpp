@@ -28,45 +28,45 @@ class PluginSystemFixture : public ProcessesMemoryStateFixture
 MATCHER_P(IsEqualMemoryRegion, expectedRegion, "")
 {
     bool isEqual = true;
-    if (expectedRegion.base != arg.base)
+    if (expectedRegion->base != arg.base)
     {
         *result_listener << "\nBase Addresses not equal:";
-        *result_listener << "\nExpected: " << expectedRegion.base;
+        *result_listener << "\nExpected: " << expectedRegion->base;
         *result_listener << "\nActual: " << arg.base;
         isEqual = false;
     }
-    if (expectedRegion.size != arg.size)
+    if (expectedRegion->size != arg.size)
     {
         *result_listener << "\nSize not equal:";
-        *result_listener << "\nExpected: " << expectedRegion.size;
+        *result_listener << "\nExpected: " << expectedRegion->size;
         *result_listener << "\nActual: " << arg.size;
         isEqual = false;
     }
-    if (expectedRegion.moduleName != arg.moduleName)
+    if (expectedRegion->moduleName != arg.moduleName)
     {
         *result_listener << "\nModule name not equal: ";
-        *result_listener << "\nExpected: " << expectedRegion.moduleName;
+        *result_listener << "\nExpected: " << expectedRegion->moduleName;
         *result_listener << "\nActual: " << arg.moduleName;
         isEqual = false;
     }
-    if (expectedRegion.isSharedMemory != arg.isSharedMemory)
+    if (expectedRegion->isSharedMemory != arg.isSharedMemory)
     {
         *result_listener << "\nisSharedMemory boolean not equal: ";
-        *result_listener << "\nExpected: " << expectedRegion.isSharedMemory;
+        *result_listener << "\nExpected: " << expectedRegion->isSharedMemory;
         *result_listener << "\nActual: " << arg.isSharedMemory;
         isEqual = false;
     }
-    if (expectedRegion.isBeingDeleted != arg.isBeingDeleted)
+    if (expectedRegion->isBeingDeleted != arg.isBeingDeleted)
     {
         *result_listener << "\nisBeingDeleted boolean not equal: ";
-        *result_listener << "\nExpected: " << expectedRegion.isBeingDeleted;
+        *result_listener << "\nExpected: " << expectedRegion->isBeingDeleted;
         *result_listener << "\nActual: " << arg.isBeingDeleted;
         isEqual = false;
     }
-    if (expectedRegion.isProcessBaseImage != arg.isProcessBaseImage)
+    if (expectedRegion->isProcessBaseImage != arg.isProcessBaseImage)
     {
         *result_listener << "\nisProcessBaseImage boolean not equal: ";
-        *result_listener << "\nExpected: " << expectedRegion.isProcessBaseImage;
+        *result_listener << "\nExpected: " << expectedRegion->isProcessBaseImage;
         *result_listener << "\nActual: " << arg.isProcessBaseImage;
         isEqual = false;
     }
@@ -98,9 +98,9 @@ TEST_F(PluginSystemFixture, getRunningProcesses_queryMemoryRegionsOfValidProcess
                                       { return a->pid == process4.processId; });
 
     EXPECT_THAT(*process4Info->memoryRegionExtractor->extractAllMemoryRegions(),
-                UnorderedElementsAre(IsEqualMemoryRegion(expectedMemoryRegion1),
-                                     IsEqualMemoryRegion(expectedMemoryRegion2),
-                                     IsEqualMemoryRegion(expectedMemoryRegion3)));
+                UnorderedElementsAre(IsEqualMemoryRegion(&expectedMemoryRegion1),
+                                     IsEqualMemoryRegion(&expectedMemoryRegion2),
+                                     IsEqualMemoryRegion(&expectedMemoryRegion3)));
 }
 
 TEST_F(PluginSystemFixture, getRunningProcesses_validInternalState_CorrectProcesses)

@@ -3,10 +3,10 @@
 #include "Filenames.h"
 #include "Scanner.h"
 #include "Yara.h"
-#include <PluginInit.h>
 #include <memory>
 #include <string>
 #include <tclap/CmdLine.h>
+#include <vmicore/plugins/PluginInit.h>
 
 // Struct is externally verified during plugin initialization
 [[maybe_unused]] extern constexpr Plugin::PluginDetails pluginInformation = {

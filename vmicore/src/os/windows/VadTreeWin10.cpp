@@ -1,4 +1,5 @@
 #include "VadTreeWin10.h"
+#include "../PageProtection.h"
 #include "../PagingDefinitions.h"
 #include <fmt/core.h>
 #include <unordered_set>
@@ -76,14 +77,14 @@ namespace Windows
                                logfield::create("startAddress", fmt::format("{:#x}", startAddress)),
                                logfield::create("endAddress", fmt::format("{:#x}", endAddress)),
                                logfield::create("size", static_cast<uint64_t>(size))});
-                regions->emplace_back(
-                    startAddress,
-                    size,
-                    currentVad->fileName,
-                    ::PageProtection(static_cast<uint32_t>(currentVad->protection), OperatingSystem::WINDOWS),
-                    currentVad->isSharedMemory,
-                    currentVad->isBeingDeleted,
-                    currentVad->isProcessBaseImage);
+                regions->emplace_back(startAddress,
+                                      size,
+                                      currentVad->fileName,
+                                      std::make_unique<PageProtection>(static_cast<uint32_t>(currentVad->protection),
+                                                                       OperatingSystem::WINDOWS),
+                                      currentVad->isSharedMemory,
+                                      currentVad->isBeingDeleted,
+                                      currentVad->isProcessBaseImage);
             }
             catch (const std::exception& e)
             {

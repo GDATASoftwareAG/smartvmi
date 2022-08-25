@@ -1,10 +1,10 @@
 #pragma once
 
-#include <PluginInterface.h>
 #include <filesystem>
 #include <memory>
 #include <set>
 #include <stdexcept>
+#include <vmicore/plugins/PluginInterface.h>
 
 class ConfigException : public std::runtime_error
 {

@@ -1,8 +1,8 @@
 #ifndef VMICORE_PLUGINCONFIG_H
 #define VMICORE_PLUGINCONFIG_H
 
-#include "../plugins/PluginInterface.h"
 #include <string>
+#include <vmicore/plugins/IPluginConfig.h>
 #include <yaml-cpp/yaml.h>
 
 class PluginConfig : public Plugin::IPluginConfig

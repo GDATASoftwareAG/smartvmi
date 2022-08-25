@@ -1,5 +1,4 @@
-#include "../../../src/os/ActiveProcessInformation.h"
-#include "../../../src/os/windows/ActiveProcessesSupervisor.h"
+#include "../../../src/os/IActiveProcessesSupervisor.h"
 #include <gmock/gmock.h>
 
 class MockActiveProcessesSupervisor : public IActiveProcessesSupervisor

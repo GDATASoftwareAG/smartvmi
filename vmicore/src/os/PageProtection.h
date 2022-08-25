@@ -4,28 +4,20 @@
 #include "OperatingSystem.h"
 #include <cstdint>
 #include <string>
-#include <variant>
+#include <vmicore/os/IPageProtection.h>
 
-struct ProtectionValues
-{
-    uint32_t readable : 1 = 0;
-    uint32_t writeable : 1 = 0;
-    uint32_t executable : 1 = 0;
-    uint32_t copyOnWrite : 1 = 0;
-};
-
-class PageProtection
+class PageProtection : public IPageProtection
 {
   public:
     PageProtection() = default;
 
     PageProtection(uint32_t value, OperatingSystem os);
 
-    [[nodiscard]] ProtectionValues get() const;
+    [[nodiscard]] ProtectionValues get() const override;
 
-    [[nodiscard]] uint64_t getRaw() const;
+    [[nodiscard]] uint64_t getRaw() const override;
 
-    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] std::string toString() const override;
 
   private:
     ProtectionValues protection{};

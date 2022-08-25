@@ -1,13 +1,13 @@
 #include "../src/Scanner.h"
 #include "FakeYara.h"
-#include "ProtectionValues.h"
 #include "mock_Config.h"
 #include "mock_Dumping.h"
 #include "mock_Yara.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <vmicore/os/mock_MemoryRegionExtractor.h>
-#include <vmicore/plugins/mock_PluginInterface.h>
+#include <vmicore/test/os/mock_MemoryRegionExtractor.h>
+#include <vmicore/test/os/mock_PageProtection.h>
+#include <vmicore/test/plugins/mock_PluginInterface.h>
 
 using testing::_;
 using testing::An;
@@ -37,8 +37,6 @@ class ScannerTestBaseFixture : public testing::Test
     std::string dumpedRegionsDir = "dumpedRegions";
 
     std::string protectionAsString = "RWX";
-    PageProtection protection{static_cast<uint32_t>(Windows::ProtectionValues::MM_EXECUTE_READWRITE),
-                              OperatingSystem::WINDOWS};
 
     std::filesystem::path inMemoryDumpsPath = std::filesystem::path(vmiResultsOutputDir) / inMemOutputDir;
     std::filesystem::path dumpedRegionsPath = inMemoryDumpsPath / dumpedRegionsDir;
@@ -115,8 +113,10 @@ class ScannerTestFixtureDumpingDisabled : public ScannerTestBaseFixture
 class ScannerTestFixtureDumpingEnabled : public ScannerTestBaseFixture
 {
   protected:
-    MemoryRegion memoryRegionDescriptor{startAddress, size, "", protection, false, false, false};
-    MemoryRegion memoryRegionDescriptorForSharedMemory{startAddress, size, "", protection, true, false, true};
+    MemoryRegion memoryRegionDescriptor{
+        startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false};
+    MemoryRegion memoryRegionDescriptorForSharedMemory{
+        startAddress, size, "", std::make_unique<MockPageProtection>(), true, false, true};
     const std::string uidFirstRegion = "0";
 
     void SetUp() override
@@ -124,12 +124,14 @@ class ScannerTestFixtureDumpingEnabled : public ScannerTestBaseFixture
         ScannerTestBaseFixture::SetUp();
 
         ON_CALL(*configuration, isDumpingMemoryActivated()).WillByDefault(Return(true));
+        ON_CALL(*dynamic_cast<MockPageProtection*>(memoryRegionDescriptor.protection.get()), toString())
+            .WillByDefault(Return(protectionAsString));
         ON_CALL(*systemMemoryRegionExtractorRaw, extractAllMemoryRegions())
             .WillByDefault(
                 [&memoryRegionDescriptor = memoryRegionDescriptor]()
                 {
                     auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                    memoryRegions->push_back(memoryRegionDescriptor);
+                    memoryRegions->push_back(std::move(memoryRegionDescriptor));
                     return memoryRegions;
                 });
         ON_CALL(*sharedBaseImageMemoryRegionExtractorRaw, extractAllMemoryRegions())
@@ -137,7 +139,7 @@ class ScannerTestFixtureDumpingEnabled : public ScannerTestBaseFixture
                 [&memoryRegionDescriptorForSharedMemory = memoryRegionDescriptorForSharedMemory]()
                 {
                     auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                    memoryRegions->push_back(memoryRegionDescriptorForSharedMemory);
+                    memoryRegions->push_back(std::move(memoryRegionDescriptorForSharedMemory));
                     return memoryRegions;
                 });
         auto dumping = std::make_unique<Dumping>(pluginInterface.get(), configuration);
@@ -157,10 +159,11 @@ TEST_F(ScannerTestFixtureDumpingDisabled, scanProcess_largeMemoryRegion_trimToMa
 {
     ON_CALL(*systemMemoryRegionExtractorRaw, extractAllMemoryRegions())
         .WillByDefault(
-            [startAddress = startAddress, maxScanSize = maxScanSize, protectionFlags = protection]()
+            [startAddress = startAddress, maxScanSize = maxScanSize]()
             {
                 auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                memoryRegions->emplace_back(startAddress, maxScanSize + 1, "", protectionFlags, false, false, false);
+                memoryRegions->emplace_back(
+                    startAddress, maxScanSize + 1, "", std::make_unique<MockPageProtection>(), false, false, false);
                 return memoryRegions;
             });
 
@@ -173,10 +176,11 @@ TEST_F(ScannerTestFixtureDumpingDisabled, scanProcess_smallMemoryRegion_original
 {
     ON_CALL(*systemMemoryRegionExtractorRaw, extractAllMemoryRegions())
         .WillByDefault(
-            [startAddress = startAddress, size = size, protectionFlags = protection]()
+            [startAddress = startAddress, size = size]()
             {
                 auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                memoryRegions->emplace_back(startAddress, size, "", protectionFlags, false, false, false);
+                memoryRegions->emplace_back(
+                    startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
                 return memoryRegions;
             });
 
@@ -189,10 +193,11 @@ TEST_F(ScannerTestFixtureDumpingDisabled, scanProcess_disabledDumping_dumpingNot
 {
     ON_CALL(*systemMemoryRegionExtractorRaw, extractAllMemoryRegions())
         .WillByDefault(
-            [startAddress = startAddress, size = size, protectionFlags = protection]()
+            [startAddress = startAddress, size = size]()
             {
                 auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                memoryRegions->emplace_back(startAddress, size, "", protectionFlags, false, false, false);
+                memoryRegions->emplace_back(
+                    startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
                 return memoryRegions;
             });
     EXPECT_CALL(*pluginInterface, readProcessMemoryRegion(testPid, startAddress, size))
@@ -224,7 +229,7 @@ TEST_F(ScannerTestFixtureDumpingEnabled, scanProcess_processWithLongName_memoryD
             [&memoryRegionDescriptor = memoryRegionDescriptor]()
             {
                 auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                memoryRegions->push_back(memoryRegionDescriptor);
+                memoryRegions->push_back(std::move(memoryRegionDescriptor));
                 return memoryRegions;
             });
     auto expectedFileNameRegEx = trimmedProcessName + "-" + std::to_string(pid) + "-" + protectionAsString + "-" +
@@ -275,10 +280,11 @@ TEST_F(ScannerTestFixtureDumpingDisabled, scanAllProcesses_MoreScanningThreadTha
             });
     ON_CALL(*memoryRegionExtractorRaw, extractAllMemoryRegions())
         .WillByDefault(
-            [startAddress = startAddress, size = size, protectionFlags = protection]()
+            [startAddress = startAddress, size = size]()
             {
                 auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                memoryRegions->emplace_back(startAddress, size, "", protectionFlags, false, false, false);
+                memoryRegions->emplace_back(
+                    startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
 
                 return memoryRegions;
             });
@@ -322,10 +328,10 @@ TEST_F(ScannerTestFixtureDumpingEnabled, scanAllProcesses_ProcessWithLongNameSca
     // Redefine default mock return because a new MemoryRegionExtractor mock has been created
     ON_CALL(*memoryRegionExtractorRaw, extractAllMemoryRegions())
         .WillByDefault(
-            [memoryRegionDescriptor = memoryRegionDescriptor]()
+            [&memoryRegionDescriptor = memoryRegionDescriptor]()
             {
                 auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                memoryRegions->push_back(memoryRegionDescriptor);
+                memoryRegions->push_back(std::move(memoryRegionDescriptor));
 
                 return memoryRegions;
             });

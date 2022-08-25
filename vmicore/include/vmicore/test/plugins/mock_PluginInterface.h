@@ -1,7 +1,7 @@
 #pragma once
 
-#include <PluginInterface.h>
 #include <gmock/gmock.h>
+#include <vmicore/plugins/PluginInterface.h>
 
 namespace Plugin
 {

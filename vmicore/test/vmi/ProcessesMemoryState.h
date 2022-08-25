@@ -1,6 +1,7 @@
 #ifndef VMICORE_PROCESSESMEMORYSTATEFIXTURE_H
 #define VMICORE_PROCESSESMEMORYSTATEFIXTURE_H
 
+#include "../../src/os/PageProtection.h"
 #include "../../src/os/PagingDefinitions.h"
 #include "../../src/os/windows/ActiveProcessesSupervisor.h"
 #include "../../src/os/windows/KernelOffsets.h"
@@ -354,12 +355,12 @@ class ProcessesMemoryStateFixture : public testing::Test
     uint64_t vadRootNodeStartingAddress = vadRootNodeStartingVpn << PagingDefinitions::numberOfPageIndexBits;
     uint64_t vadRootNodeEndingAddress = ((vadRootNodeEndingVpn + 1) << PagingDefinitions::numberOfPageIndexBits) - 1;
     size_t vadRootNodeMemoryRegionSize = vadRootNodeEndingAddress - vadRootNodeStartingAddress + 1;
-    PageProtection vadRootNodeMemoryRegionProtection{static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE),
-                                                     OperatingSystem::WINDOWS};
+    std::unique_ptr<IPageProtection> vadRootNodeMemoryRegionProtection = std::make_unique<PageProtection>(
+        static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), OperatingSystem::WINDOWS);
     MemoryRegion expectedMemoryRegion1{vadRootNodeStartingAddress,
                                        vadRootNodeMemoryRegionSize,
                                        std::string{},
-                                       vadRootNodeMemoryRegionProtection,
+                                       std::move(vadRootNodeMemoryRegionProtection),
                                        false,
                                        false,
                                        false};
@@ -373,12 +374,12 @@ class ProcessesMemoryStateFixture : public testing::Test
     uint64_t vadRootNodeChildMemoryRegionSize =
         vadRootNodeChildEndingAddress - vadRootNodeRightChildStartingAddress + 1;
     std::string fileNameString = std::string(R"(\Windows\IAMSYSTEM.exe)");
-    PageProtection vadRootNodeChildMemoryRegionProtection{
-        static_cast<uint32_t>(Windows::ProtectionValues::MM_EXECUTE_WRITECOPY), OperatingSystem::WINDOWS};
+    std::unique_ptr<IPageProtection> vadRootNodeChildMemoryRegionProtection = std::make_unique<PageProtection>(
+        static_cast<uint32_t>(Windows::ProtectionValues::MM_EXECUTE_WRITECOPY), OperatingSystem::WINDOWS);
     MemoryRegion expectedMemoryRegion2{vadRootNodeRightChildStartingAddress,
                                        vadRootNodeChildMemoryRegionSize,
                                        fileNameString,
-                                       vadRootNodeChildMemoryRegionProtection,
+                                       std::move(vadRootNodeChildMemoryRegionProtection),
                                        true,
                                        true,
                                        true};
@@ -395,7 +396,8 @@ class ProcessesMemoryStateFixture : public testing::Test
         vadRootNodeLeftChildStartingAddress,
         vadRootNodeLeftChildMemoryRegionSize,
         std::string{},
-        PageProtection{static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), OperatingSystem::WINDOWS},
+        std::make_unique<PageProtection>(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE),
+                                         OperatingSystem::WINDOWS),
         false,
         false,
         false};
