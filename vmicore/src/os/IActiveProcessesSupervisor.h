@@ -1,10 +1,10 @@
 #ifndef VMICORE_IACTIVEPROCESSESSUPERVISOR_H
 #define VMICORE_IACTIVEPROCESSESSUPERVISOR_H
 
-#include "ActiveProcessInformation.h"
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <vmicore/os/ActiveProcessInformation.h>
 
 class IActiveProcessesSupervisor
 {

@@ -55,12 +55,18 @@ PageProtection::PageProtection(uint32_t value, OperatingSystem os) : raw(value),
         }
         case OperatingSystem::LINUX:
         {
-            protection = {.readable = value & static_cast<uint8_t>(Linux::ProtectionValues::VM_READ),
-                          .writeable = value & static_cast<uint8_t>(Linux::ProtectionValues::VM_WRITE),
-                          .executable = value & static_cast<uint8_t>(Linux::ProtectionValues::VM_EXEC),
-                          .copyOnWrite = value & (static_cast<uint8_t>(Linux::ProtectionValues::VM_SHARED) |
-                                                  static_cast<uint8_t>(Linux::ProtectionValues::VM_MAYWRITE)) ==
-                                                     static_cast<uint8_t>(Linux::ProtectionValues::VM_MAYWRITE)};
+            if (value > UINT8_MAX)
+            {
+                throw std::runtime_error("Value must not be larger than a byte.");
+            }
+            protection = {
+                .readable = static_cast<uint8_t>(value & static_cast<uint8_t>(Linux::ProtectionValues::VM_READ)),
+                .writeable = static_cast<uint8_t>(value & static_cast<uint8_t>(Linux::ProtectionValues::VM_WRITE)),
+                .executable = static_cast<uint8_t>(value & static_cast<uint8_t>(Linux::ProtectionValues::VM_EXEC)),
+                .copyOnWrite =
+                    static_cast<uint8_t>((value & (static_cast<uint8_t>(Linux::ProtectionValues::VM_SHARED) |
+                                                   static_cast<uint8_t>(Linux::ProtectionValues::VM_MAYWRITE))) ==
+                                         static_cast<uint8_t>(Linux::ProtectionValues::VM_MAYWRITE))};
             break;
         }
         default:

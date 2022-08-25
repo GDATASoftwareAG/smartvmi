@@ -120,6 +120,10 @@ FetchContent_MakeAvailable(fmt)
 add_subdirectory(rust_src)
 include_directories(${CMAKE_BINARY_DIR}/rust_src)
 
+# Public header files
+
+add_subdirectory(include)
+
 # Project source files
 
 set(source_files
@@ -162,7 +166,7 @@ set(test_files
 
 # Link libraries
 
-set(libraries rust_grpc_server vmi_shared dl yaml-cpp GSL fmt-header-only)
+set(libraries rust_grpc_server vmicore_public_headers vmi_shared dl yaml-cpp GSL fmt-header-only)
 set(test_libraries pthread gtest gmock gmock_main)
 
 # End variable section

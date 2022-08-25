@@ -1,8 +1,8 @@
 #ifndef VMICORE_MOCK_MEMORYREGIONEXTRACTOR_H
 #define VMICORE_MOCK_MEMORYREGIONEXTRACTOR_H
 
-#include "../../../src/os/IMemoryRegionExtractor.h"
 #include <gmock/gmock.h>
+#include <vmicore/os/IMemoryRegionExtractor.h>
 
 class MockMemoryRegionExtractor : public IMemoryRegionExtractor
 {

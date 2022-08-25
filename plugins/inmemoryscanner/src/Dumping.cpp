@@ -45,7 +45,7 @@ std::unique_ptr<MemoryRegionInformation> Dumping::createMemoryRegionInformation(
         *moduleName = "private";
     }
 
-    auto flags = memoryRegionDescriptor.protection.toString();
+    auto flags = memoryRegionDescriptor.protection->toString();
     auto startAddress = intToHex(memoryRegionDescriptor.base);
     auto endAddress = intToHex(memoryRegionDescriptor.base + memoryRegionDescriptor.size);
 

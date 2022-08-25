@@ -8,8 +8,8 @@
 #include "../io/file/LegacyLogging.h"
 #include "../os/IActiveProcessesSupervisor.h"
 #include "../vmi/LibvmiInterface.h"
-#include "PluginInterface.h"
 #include <vector>
+#include <vmicore/plugins/PluginInterface.h>
 
 class IPluginSystem : public Plugin::PluginInterface
 {

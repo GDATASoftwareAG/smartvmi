@@ -1,11 +1,11 @@
 #ifndef VMICORE_CONFIGPARSER_H
 #define VMICORE_CONFIGPARSER_H
 
-#include "../plugins/IPluginConfig.h"
 #include <filesystem>
 #include <map>
 #include <memory>
 #include <string>
+#include <vmicore/plugins/IPluginConfig.h>
 
 class IConfigParser
 {

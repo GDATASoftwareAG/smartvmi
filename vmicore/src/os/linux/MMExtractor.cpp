@@ -1,4 +1,5 @@
 #include "MMExtractor.h"
+#include "../PageProtection.h"
 #include "Constants.h"
 #include "ProtectionValues.h"
 
@@ -38,18 +39,18 @@ namespace Linux
                 fileName = pathExtractor.extractDPath(file + vmiInterface->getKernelStructOffset("file", "f_path"));
             }
 
-            auto permissions = PageProtection(flags, OperatingSystem::LINUX);
+            auto permissions = std::make_unique<PageProtection>(flags, OperatingSystem::LINUX);
 
             logger->debug("Memory Region",
                           {logfield::create("start", fmt::format("{:#x}", start)),
                            logfield::create("end", fmt::format("{:#x}", end)),
                            logfield::create("size", size),
-                           logfield::create("permissions", permissions.toString()),
+                           logfield::create("permissions", permissions->toString()),
                            logfield::create("filename", fileName)});
             regions->emplace_back(start,
                                   size,
                                   fileName,
-                                  permissions,
+                                  std::move(permissions),
                                   !!(flags & static_cast<uint8_t>(ProtectionValues::VM_SHARED)),
                                   false,
                                   false);

@@ -5,9 +5,9 @@
 #include "OutputXML.h"
 #include "Semaphore.h"
 #include "YaraInterface.h"
-#include <PluginInterface.h>
 #include <condition_variable>
 #include <memory>
+#include <vmicore/plugins/PluginInterface.h>
 #include <yara/limits.h> // NOLINT(modernize-deprecated-headers)
 
 class Scanner

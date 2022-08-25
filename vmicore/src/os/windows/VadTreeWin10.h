@@ -2,11 +2,11 @@
 #define VMICORE_WINDOWS_VADTREEWIN10_H
 
 #include "../../io/ILogging.h"
-#include "../IMemoryRegionExtractor.h"
 #include "KernelAccess.h"
 #include "Vadt.h"
 #include <list>
 #include <memory>
+#include <vmicore/os/IMemoryRegionExtractor.h>
 
 namespace Windows
 {
