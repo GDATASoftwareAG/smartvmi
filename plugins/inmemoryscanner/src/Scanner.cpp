@@ -3,7 +3,14 @@
 #include <future>
 #include <iterator>
 
-Scanner::Scanner(const Plugin::PluginInterface* pluginInterface,
+using VmiCore::ActiveProcessInformation;
+using VmiCore::addr_t;
+using VmiCore::MemoryRegion;
+using VmiCore::pid_t;
+using VmiCore::Plugin::LogLevel;
+using VmiCore::Plugin::PluginInterface;
+
+Scanner::Scanner(const PluginInterface* pluginInterface,
                  std::shared_ptr<IConfig> configuration,
                  std::unique_ptr<YaraInterface> yaraEngine,
                  std::unique_ptr<IDumping> dumping)
@@ -37,14 +44,14 @@ bool Scanner::shouldRegionBeScanned(const MemoryRegion& memoryRegionDescriptor)
     {
         verdict = false;
         pluginInterface->logMessage(
-            Plugin::LogLevel::info, LOG_FILENAME, "Skipping: Is shared memory and not the process base image.");
+            LogLevel::info, LOG_FILENAME, "Skipping: Is shared memory and not the process base image.");
     }
     return verdict;
 }
 
 void Scanner::scanMemoryRegion(pid_t pid, const std::string& processName, const MemoryRegion& memoryRegionDescriptor)
 {
-    pluginInterface->logMessage(Plugin::LogLevel::info,
+    pluginInterface->logMessage(LogLevel::info,
                                 LOG_FILENAME,
                                 "Scanning Memory region from " + intToHex(memoryRegionDescriptor.base) + " with size " +
                                     intToHex(memoryRegionDescriptor.size) + " name " +
@@ -56,38 +63,35 @@ void Scanner::scanMemoryRegion(pid_t pid, const std::string& processName, const 
         auto maximumScanSize = configuration->getMaximumScanSize();
         if (scanSize > maximumScanSize)
         {
-            pluginInterface->logMessage(Plugin::LogLevel::info,
-                                        LOG_FILENAME,
-                                        "Memory region is too big, reduce to " + intToHex(maximumScanSize));
+            pluginInterface->logMessage(
+                LogLevel::info, LOG_FILENAME, "Memory region is too big, reduce to " + intToHex(maximumScanSize));
             scanSize = maximumScanSize;
         }
 
         pluginInterface->logMessage(
-            Plugin::LogLevel::debug, LOG_FILENAME, "Start getProcessMemoryRegion with size: " + intToHex(scanSize));
+            LogLevel::debug, LOG_FILENAME, "Start getProcessMemoryRegion with size: " + intToHex(scanSize));
 
         auto memoryRegion = pluginInterface->readProcessMemoryRegion(pid, memoryRegionDescriptor.base, scanSize);
 
-        pluginInterface->logMessage(Plugin::LogLevel::debug,
-                                    LOG_FILENAME,
-                                    "End getProcessMemoryRegion with size: " + intToHex(memoryRegion->size()));
+        pluginInterface->logMessage(
+            LogLevel::debug, LOG_FILENAME, "End getProcessMemoryRegion with size: " + intToHex(memoryRegion->size()));
         if (memoryRegion->empty())
         {
-            pluginInterface->logMessage(
-                Plugin::LogLevel::debug, LOG_FILENAME, "Extracted memory region has size 0, skipping");
+            pluginInterface->logMessage(LogLevel::debug, LOG_FILENAME, "Extracted memory region has size 0, skipping");
         }
         else
         {
             if (configuration->isDumpingMemoryActivated())
             {
-                pluginInterface->logMessage(Plugin::LogLevel::debug,
+                pluginInterface->logMessage(LogLevel::debug,
                                             LOG_FILENAME,
                                             "Start dumpVadRegionToFile with size: " + intToHex(memoryRegion->size()));
                 dumping->dumpMemoryRegion(processName, pid, memoryRegionDescriptor, *memoryRegion);
-                pluginInterface->logMessage(Plugin::LogLevel::debug, LOG_FILENAME, "End dumpVadRegionToFile");
+                pluginInterface->logMessage(LogLevel::debug, LOG_FILENAME, "End dumpVadRegionToFile");
             }
 
             pluginInterface->logMessage(
-                Plugin::LogLevel::debug, LOG_FILENAME, "Start scanMemory with size: " + intToHex(memoryRegion->size()));
+                LogLevel::debug, LOG_FILENAME, "Start scanMemory with size: " + intToHex(memoryRegion->size()));
 
             // The semaphore protects the yara rules from being accessed more than YR_MAX_THREADS (32 atm.) times in
             // parallel.
@@ -95,7 +99,7 @@ void Scanner::scanMemoryRegion(pid_t pid, const std::string& processName, const 
             auto results = yaraEngine->scanMemory(*memoryRegion);
             semaphore.notify();
 
-            pluginInterface->logMessage(Plugin::LogLevel::debug, LOG_FILENAME, "End scanMemory");
+            pluginInterface->logMessage(LogLevel::debug, LOG_FILENAME, "End scanMemory");
 
             if (!results->empty())
             {
@@ -118,14 +122,14 @@ void Scanner::scanProcess(std::shared_ptr<const ActiveProcessInformation> proces
     }
     if (configuration->isProcessIgnored(*processInformation->fullName))
     {
-        pluginInterface->logMessage(Plugin::LogLevel::info,
+        pluginInterface->logMessage(LogLevel::info,
                                     LOG_FILENAME,
                                     "Process " + std::to_string(processInformation->pid) + " \"" +
                                         *processInformation->fullName + "\" is ignored due to process name");
     }
     else
     {
-        pluginInterface->logMessage(Plugin::LogLevel::info,
+        pluginInterface->logMessage(LogLevel::info,
                                     LOG_FILENAME,
                                     "Scanning process " + std::to_string(processInformation->pid) + " \"" +
                                         *processInformation->fullName + "\"");
@@ -143,7 +147,7 @@ void Scanner::scanProcess(std::shared_ptr<const ActiveProcessInformation> proces
                 {
                     auto errorMsg = "Error scanning memory region of process " + *processInformation->fullName + ": " +
                                     std::string(exc.what());
-                    pluginInterface->logMessage(Plugin::LogLevel::error, LOG_FILENAME, errorMsg);
+                    pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, errorMsg);
                     pluginInterface->sendErrorEvent(errorMsg);
                 }
             }
@@ -151,10 +155,10 @@ void Scanner::scanProcess(std::shared_ptr<const ActiveProcessInformation> proces
         catch (const std::exception& exc)
         {
             auto errorMsg = "Error scanning process " + *processInformation->fullName + ": " + std::string(exc.what());
-            pluginInterface->logMessage(Plugin::LogLevel::error, LOG_FILENAME, errorMsg);
+            pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, errorMsg);
             pluginInterface->sendErrorEvent(errorMsg);
         }
-        pluginInterface->logMessage(Plugin::LogLevel::info,
+        pluginInterface->logMessage(LogLevel::info,
                                     LOG_FILENAME,
                                     "Done scanning process " + std::to_string(processInformation->pid) + " \"" +
                                         *processInformation->fullName + "\"");
@@ -198,7 +202,7 @@ void Scanner::saveOutput()
 
 void Scanner::logInMemoryResultToTextFile(const std::string& processName,
                                           pid_t pid,
-                                          Plugin::virtual_address_t base,
+                                          addr_t base,
                                           const std::vector<Rule>& results)
 {
     for (const auto& rule : results)
@@ -210,6 +214,6 @@ void Scanner::logInMemoryResultToTextFile(const std::string& processName,
             matchesAsString += match.matchName + ", ";
         }
         matchesAsString += ")\n";
-        pluginInterface->logMessage(Plugin::LogLevel::info, inMemoryResultsTextFile, matchesAsString);
+        pluginInterface->logMessage(LogLevel::info, inMemoryResultsTextFile, matchesAsString);
     }
 }

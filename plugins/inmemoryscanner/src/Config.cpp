@@ -2,9 +2,13 @@
 #include "Filenames.h"
 #include <algorithm>
 
-Config::Config(const Plugin::PluginInterface* pluginInterface) : pluginInterface(pluginInterface) {}
+using VmiCore::Plugin::IPluginConfig;
+using VmiCore::Plugin::LogLevel;
+using VmiCore::Plugin::PluginInterface;
 
-void Config::parseConfiguration(const Plugin::IPluginConfig& config)
+Config::Config(const PluginInterface* pluginInterface) : pluginInterface(pluginInterface) {}
+
+void Config::parseConfiguration(const IPluginConfig& config)
 {
     signatureFile = config.getString("signature_file").value();
     outputPath = config.getString("output_path").value();
@@ -29,7 +33,7 @@ void Config::parseConfiguration(const Plugin::IPluginConfig& config)
     for (auto& element : ignoredProcesses)
     {
         pluginInterface->logMessage(
-            Plugin::LogLevel::info, LOG_FILENAME, std::string("Got ignored process \"").append(element).append("\""));
+            LogLevel::info, LOG_FILENAME, std::string("Got ignored process \"").append(element).append("\""));
     }
 }
 

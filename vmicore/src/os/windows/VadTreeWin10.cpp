@@ -1,10 +1,11 @@
 #include "VadTreeWin10.h"
+#include "../../vmi/VmiException.h"
 #include "../PageProtection.h"
 #include "../PagingDefinitions.h"
 #include <fmt/core.h>
 #include <unordered_set>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     VadTreeWin10::VadTreeWin10(std::shared_ptr<IKernelAccess> kernelAccess,
                                uint64_t eprocessBase,

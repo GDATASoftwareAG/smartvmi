@@ -8,16 +8,22 @@
 #include <tclap/CmdLine.h>
 #include <vmicore/plugins/PluginInit.h>
 
+using VmiCore::ActiveProcessInformation;
+using VmiCore::Plugin::IPluginConfig;
+using VmiCore::Plugin::LogLevel;
+using VmiCore::Plugin::PluginDetails;
+using VmiCore::Plugin::PluginInterface;
+
 // Struct is externally verified during plugin initialization
-[[maybe_unused]] extern constexpr Plugin::PluginDetails pluginInformation = {
+[[maybe_unused]] extern constexpr PluginDetails pluginInformation = {
     VMI_PLUGIN_API_VERSION, PLUGIN_NAME, PLUGIN_VERSION};
 
-Plugin::PluginInterface* pluginInterface;
+PluginInterface* pluginInterface;
 std::unique_ptr<Scanner> scanner;
 
 void shutdownCallback()
 {
-    pluginInterface->logMessage(Plugin::LogLevel::info, LOG_FILENAME, "Shutdown initiated");
+    pluginInterface->logMessage(LogLevel::info, LOG_FILENAME, "Shutdown initiated");
     try
     {
         scanner->scanAllProcesses();
@@ -25,11 +31,11 @@ void shutdownCallback()
     catch (const std::exception& exc)
     {
         auto errorMsg = "Error occurred during shutdown scan. Reason: " + std::string(exc.what());
-        pluginInterface->logMessage(Plugin::LogLevel::error, LOG_FILENAME, errorMsg);
+        pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, errorMsg);
         pluginInterface->sendErrorEvent(errorMsg);
     }
     scanner->saveOutput();
-    pluginInterface->logMessage(Plugin::LogLevel::info, LOG_FILENAME, "Done scanning all processes");
+    pluginInterface->logMessage(LogLevel::info, LOG_FILENAME, "Done scanning all processes");
 }
 
 void processTerminationCallback(std::shared_ptr<const ActiveProcessInformation> processInformation)
@@ -37,8 +43,8 @@ void processTerminationCallback(std::shared_ptr<const ActiveProcessInformation> 
     scanner->scanProcess(std::move(processInformation));
 }
 
-extern "C" bool init(Plugin::PluginInterface* communicator,
-                     std::shared_ptr<Plugin::IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
+extern "C" bool init(PluginInterface* communicator,
+                     std::shared_ptr<IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
                      std::vector<std::string> args)
 {
     auto success = true;
@@ -49,7 +55,7 @@ extern "C" bool init(Plugin::PluginInterface* communicator,
     cmd.parse(args);
 
     pluginInterface->logMessage(
-        Plugin::LogLevel::info, LOG_FILENAME, "Starting inMemory plugin build version " + std::string(BUILD_VERSION));
+        LogLevel::info, LOG_FILENAME, "Starting inMemory plugin build version " + std::string(BUILD_VERSION));
 
     try
     {
@@ -66,13 +72,12 @@ extern "C" bool init(Plugin::PluginInterface* communicator,
     catch (const ConfigException& exc)
     {
         pluginInterface->logMessage(
-            Plugin::LogLevel::error, LOG_FILENAME, "Error loading configuration: " + std::string(exc.what()));
+            LogLevel::error, LOG_FILENAME, "Error loading configuration: " + std::string(exc.what()));
         success = false;
     }
     catch (const YaraException& exc)
     {
-        pluginInterface->logMessage(
-            Plugin::LogLevel::error, LOG_FILENAME, "Error loading yara: " + std::string(exc.what()));
+        pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, "Error loading yara: " + std::string(exc.what()));
         success = false;
     }
 
@@ -84,8 +89,7 @@ extern "C" bool init(Plugin::PluginInterface* communicator,
         }
         catch (const std::exception&)
         {
-            pluginInterface->logMessage(
-                Plugin::LogLevel::error, LOG_FILENAME, "Could not register ProcessTermination Event");
+            pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, "Could not register ProcessTermination Event");
             success = false;
         }
         try
@@ -94,10 +98,10 @@ extern "C" bool init(Plugin::PluginInterface* communicator,
         }
         catch (const std::exception&)
         {
-            pluginInterface->logMessage(Plugin::LogLevel::error, LOG_FILENAME, "Could not register Shutdown Event");
+            pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, "Could not register Shutdown Event");
             success = false;
         }
-        pluginInterface->logMessage(Plugin::LogLevel::info, LOG_FILENAME, "inMemory Plugin: init end");
+        pluginInterface->logMessage(LogLevel::info, LOG_FILENAME, "inMemory Plugin: init end");
     }
 
     return success;

@@ -4,10 +4,13 @@
 #include <gmock/gmock.h>
 #include <vmicore/os/IMemoryRegionExtractor.h>
 
-class MockMemoryRegionExtractor : public IMemoryRegionExtractor
+namespace VmiCore
 {
-  public:
-    MOCK_METHOD(std::unique_ptr<std::list<MemoryRegion>>, extractAllMemoryRegions, (), (const override));
-};
+    class MockMemoryRegionExtractor : public IMemoryRegionExtractor
+    {
+      public:
+        MOCK_METHOD(std::unique_ptr<std::list<MemoryRegion>>, extractAllMemoryRegions, (), (const override));
+    };
+}
 
 #endif // VMICORE_MOCK_MEMORYREGIONEXTRACTOR_H

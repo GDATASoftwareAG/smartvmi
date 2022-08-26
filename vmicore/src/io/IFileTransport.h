@@ -4,15 +4,18 @@
 #include <memory>
 #include <vector>
 
-class IFileTransport
+namespace VmiCore
 {
-  public:
-    virtual ~IFileTransport() = default;
+    class IFileTransport
+    {
+      public:
+        virtual ~IFileTransport() = default;
 
-    virtual void saveBinaryToFile(const std::string& logFileName, const std::vector<uint8_t>& data) = 0;
+        virtual void saveBinaryToFile(const std::string& logFileName, const std::vector<uint8_t>& data) = 0;
 
-  protected:
-    IFileTransport() = default;
-};
+      protected:
+        IFileTransport() = default;
+    };
+}
 
 #endif // VMICORE_IFILETRANSPORT_H

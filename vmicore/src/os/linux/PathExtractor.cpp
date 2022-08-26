@@ -1,7 +1,7 @@
 #include "PathExtractor.h"
 #include "Constants.h"
 
-namespace Linux
+namespace VmiCore::Linux
 {
     PathExtractor::PathExtractor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                  const std::shared_ptr<ILogging>& logging)

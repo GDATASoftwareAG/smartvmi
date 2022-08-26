@@ -5,21 +5,24 @@
 #include <vmicore/plugins/IPluginConfig.h>
 #include <yaml-cpp/yaml.h>
 
-class PluginConfig : public Plugin::IPluginConfig
+namespace VmiCore
 {
-  public:
-    explicit PluginConfig(const YAML::Node& pluginNode);
+    class PluginConfig : public Plugin::IPluginConfig
+    {
+      public:
+        explicit PluginConfig(const YAML::Node& pluginNode);
 
-    ~PluginConfig() override = default;
+        ~PluginConfig() override = default;
 
-    std::optional<std::string> getString(const std::string& element) const override;
+        std::optional<std::string> getString(const std::string& element) const override;
 
-    void overrideString(const std::string& element, const std::string& value) override;
+        void overrideString(const std::string& element, const std::string& value) override;
 
-    std::optional<std::vector<std::string>> getStringSequence(const std::string& element) const override;
+        std::optional<std::vector<std::string>> getStringSequence(const std::string& element) const override;
 
-  private:
-    YAML::Node pluginRootNode;
-};
+      private:
+        YAML::Node pluginRootNode;
+    };
+}
 
 #endif // VMICORE_PLUGINCONFIG_H

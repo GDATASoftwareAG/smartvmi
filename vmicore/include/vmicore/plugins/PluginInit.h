@@ -3,7 +3,7 @@
 
 #include "PluginInterface.h"
 
-namespace Plugin
+namespace VmiCore::Plugin
 {
     extern "C" bool
     init(PluginInterface* pluginInterface, std::shared_ptr<IPluginConfig> config, std::vector<std::string> args);

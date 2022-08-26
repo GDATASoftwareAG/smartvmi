@@ -1,4 +1,5 @@
 #include "KernelAccess.h"
+#include "../../vmi/VmiException.h"
 #include "../PagingDefinitions.h"
 #include "Constants.h"
 #include <fmt/core.h>
@@ -8,7 +9,7 @@ namespace
     constexpr uint64_t exFastRefBits = 0xF;
 }
 
-namespace Windows
+namespace VmiCore::Windows
 {
     KernelAccess::KernelAccess(std::shared_ptr<ILibvmiInterface> vmiInterface) : vmiInterface(std::move(vmiInterface))
     {

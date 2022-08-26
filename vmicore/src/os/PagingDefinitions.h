@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace PagingDefinitions
+namespace VmiCore::PagingDefinitions
 {
     constexpr uint64_t numberOfPageIndexBits = 12;
     constexpr uint64_t pageSizeInBytes = 4096;

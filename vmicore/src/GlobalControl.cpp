@@ -1,42 +1,45 @@
 #include "GlobalControl.h"
 
-namespace
+namespace VmiCore
 {
-    std::unique_ptr<ILogger> staticLogger;
-    std::shared_ptr<IEventStream> staticEventStream;
-}
-
-namespace GlobalControl
-{
-    volatile bool endVmi = false;
-    volatile bool postRunPluginAction = false;
-
-    const std::unique_ptr<ILogger>& logger()
+    namespace
     {
-        if (staticLogger)
+        std::unique_ptr<ILogger> staticLogger;
+        std::shared_ptr<IEventStream> staticEventStream;
+    }
+
+    namespace GlobalControl
+    {
+        volatile bool endVmi = false;
+        volatile bool postRunPluginAction = false;
+
+        const std::unique_ptr<ILogger>& logger()
         {
-            return staticLogger;
+            if (staticLogger)
+            {
+                return staticLogger;
+            }
+            throw std::runtime_error("No Logger present");
         }
-        throw std::runtime_error("No Logger present");
-    }
 
-    const std::shared_ptr<IEventStream>& eventStream()
-    {
-        if (staticEventStream)
+        const std::shared_ptr<IEventStream>& eventStream()
         {
-            return staticEventStream;
+            if (staticEventStream)
+            {
+                return staticEventStream;
+            }
+            throw std::runtime_error("No Eventstream present");
         }
-        throw std::runtime_error("No Eventstream present");
-    }
 
-    void init(std::unique_ptr<ILogger> logger, std::shared_ptr<IEventStream> eventStream)
-    {
-        staticLogger = std::move(logger);
-        staticEventStream = std::move(eventStream);
-    }
+        void init(std::unique_ptr<ILogger> logger, std::shared_ptr<IEventStream> eventStream)
+        {
+            staticLogger = std::move(logger);
+            staticEventStream = std::move(eventStream);
+        }
 
-    void uninit()
-    {
-        staticLogger.reset();
+        void uninit()
+        {
+            staticLogger.reset();
+        }
     }
 }

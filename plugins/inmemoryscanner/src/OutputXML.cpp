@@ -1,6 +1,6 @@
 #include "OutputXML.h"
 #include "rapidxml/rapidxml_print.hpp"
-#include <fstream>
+#include <sstream>
 
 OutputXML::OutputXML()
 {

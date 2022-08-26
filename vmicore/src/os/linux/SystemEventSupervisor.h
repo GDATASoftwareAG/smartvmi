@@ -12,7 +12,7 @@
 #include "../ISystemEventSupervisor.h"
 #include <memory>
 
-namespace Linux
+namespace VmiCore::Linux
 {
     class SystemEventSupervisor : public std::enable_shared_from_this<SystemEventSupervisor>,
                                   public ISystemEventSupervisor

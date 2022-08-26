@@ -11,7 +11,7 @@
 #include <map>
 #include <memory>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     class ActiveProcessesSupervisor : public IActiveProcessesSupervisor
     {

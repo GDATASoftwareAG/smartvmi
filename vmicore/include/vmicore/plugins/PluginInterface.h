@@ -2,6 +2,7 @@
 #define VMICORE_PLUGININTERFACE_H
 
 #include "../os/ActiveProcessInformation.h"
+#include "../types.h"
 #include "IPluginConfig.h"
 #include <memory>
 #include <optional>
@@ -10,10 +11,8 @@
 
 constexpr uint8_t VMI_PLUGIN_API_VERSION = 12;
 
-namespace Plugin
+namespace VmiCore::Plugin
 {
-    using virtual_address_t = uint64_t;
-
     using processTerminationCallback_f = void (*)(std::shared_ptr<const ActiveProcessInformation>);
 
     using shutdownCallback_f = void (*)();
@@ -39,7 +38,7 @@ namespace Plugin
         virtual ~PluginInterface() = default;
 
         [[nodiscard]] virtual std::unique_ptr<std::vector<uint8_t>>
-        readProcessMemoryRegion(pid_t pid, virtual_address_t address, size_t numberOfBytes) const = 0;
+        readProcessMemoryRegion(pid_t pid, addr_t address, size_t numberOfBytes) const = 0;
 
         [[nodiscard]] virtual std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
         getRunningProcesses() const = 0;

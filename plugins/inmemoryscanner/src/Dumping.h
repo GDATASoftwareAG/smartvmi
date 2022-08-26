@@ -118,7 +118,7 @@ class IDumping
 
     virtual void dumpMemoryRegion(const std::string& processName,
                                   pid_t pid,
-                                  const MemoryRegion& memoryRegionDescriptor,
+                                  const VmiCore::MemoryRegion& memoryRegionDescriptor,
                                   const std::vector<uint8_t>& data) = 0;
 
     virtual std::vector<std::string> getAllMemoryRegionInformation() = 0;
@@ -131,19 +131,19 @@ class Dumping : public IDumping
 {
 
   public:
-    Dumping(const Plugin::PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration);
+    Dumping(const VmiCore::Plugin::PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration);
 
     ~Dumping() override = default;
 
     void dumpMemoryRegion(const std::string& processName,
                           pid_t pid,
-                          const MemoryRegion& memoryRegionDescriptor,
+                          const VmiCore::MemoryRegion& memoryRegionDescriptor,
                           const std::vector<uint8_t>& data) override;
 
     std::vector<std::string> getAllMemoryRegionInformation() override;
 
   private:
-    const Plugin::PluginInterface* pluginInterface;
+    const VmiCore::Plugin::PluginInterface* pluginInterface;
     std::shared_ptr<IConfig> configuration;
 
     std::filesystem::path dumpingPath;
@@ -154,7 +154,7 @@ class Dumping : public IDumping
     std::mutex counterLock{};
 
     static std::unique_ptr<MemoryRegionInformation> createMemoryRegionInformation(
-        const std::string& processName, pid_t pid, const MemoryRegion& memoryRegionDescriptor, int regionId);
+        const std::string& processName, pid_t pid, const VmiCore::MemoryRegion& memoryRegionDescriptor, int regionId);
 
     int getNextRegionId();
 

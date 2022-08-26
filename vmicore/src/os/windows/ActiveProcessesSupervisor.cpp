@@ -1,9 +1,10 @@
 #include "ActiveProcessesSupervisor.h"
+#include "../../vmi/VmiException.h"
 #include "../PagingDefinitions.h"
 #include <fmt/core.h>
 #include <string>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     namespace
     {

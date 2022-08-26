@@ -7,65 +7,68 @@
 #include <memory>
 #include <utility>
 
-GRPCLogger::GRPCLogger(::rust::Box<::logging::grpc::GrpcLogger> logger) : logger(std::move(logger)) {}
-
-void GRPCLogger::bind(std::initializer_list<::rust::Box<::logging::LogField>> fields)
+namespace VmiCore
 {
-    logger->bind(::rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
-}
+    GRPCLogger::GRPCLogger(::rust::Box<::logging::grpc::GrpcLogger> logger) : logger(std::move(logger)) {}
 
-void GRPCLogger::debug(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
-{
-    try
+    void GRPCLogger::bind(std::initializer_list<::rust::Box<::logging::LogField>> fields)
     {
-        logger->log(::logging::Level::DEBUG,
-                    message,
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        logger->bind(::rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
-    catch (const ::rust::Error& e)
-    {
-        std::cerr << "could not write log: " << e.what() << std::endl;
-    }
-}
 
-void GRPCLogger::info(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
-{
-    try
+    void GRPCLogger::debug(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
     {
-        logger->log(::logging::Level::INFO,
-                    message,
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        try
+        {
+            logger->log(::logging::Level::DEBUG,
+                        message,
+                        rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        }
+        catch (const ::rust::Error& e)
+        {
+            std::cerr << "could not write log: " << e.what() << std::endl;
+        }
     }
-    catch (const ::rust::Error& e)
-    {
-        std::cerr << "could not write log: " << e.what() << std::endl;
-    }
-}
 
-void GRPCLogger::warning(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
-{
-    try
+    void GRPCLogger::info(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
     {
-        logger->log(::logging::Level::WARN,
-                    message,
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        try
+        {
+            logger->log(::logging::Level::INFO,
+                        message,
+                        rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        }
+        catch (const ::rust::Error& e)
+        {
+            std::cerr << "could not write log: " << e.what() << std::endl;
+        }
     }
-    catch (const ::rust::Error& e)
-    {
-        std::cerr << "could not write log: " << e.what() << std::endl;
-    }
-}
 
-void GRPCLogger::error(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
-{
-    try
+    void GRPCLogger::warning(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
     {
-        logger->log(::logging::Level::ERROR,
-                    message,
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        try
+        {
+            logger->log(::logging::Level::WARN,
+                        message,
+                        rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        }
+        catch (const ::rust::Error& e)
+        {
+            std::cerr << "could not write log: " << e.what() << std::endl;
+        }
     }
-    catch (const ::rust::Error& e)
+
+    void GRPCLogger::error(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
     {
-        std::cerr << "could not write log: " << e.what() << std::endl;
+        try
+        {
+            logger->log(::logging::Level::ERROR,
+                        message,
+                        rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        }
+        catch (const ::rust::Error& e)
+        {
+            std::cerr << "could not write log: " << e.what() << std::endl;
+        }
     }
 }

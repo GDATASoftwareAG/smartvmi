@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace Plugin
+namespace VmiCore::Plugin
 {
     class IPluginConfig
     {

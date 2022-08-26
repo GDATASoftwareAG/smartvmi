@@ -11,30 +11,33 @@
 
 using testing::NiceMock;
 
-class SystemEventSupervisorFixture : public testing::Test
+namespace VmiCore
 {
-  protected:
-    std::shared_ptr<MockLibvmiInterface> vmiInterface = std::make_shared<NiceMock<MockLibvmiInterface>>();
-    std::shared_ptr<MockPluginSystem> pluginSystem = std::make_shared<NiceMock<MockPluginSystem>>();
-    std::shared_ptr<MockActiveProcessesSupervisor> activeProcessSupervisor =
-        std::make_shared<NiceMock<MockActiveProcessesSupervisor>>();
-    std::shared_ptr<MockConfigInterface> configInterface = std::make_shared<NiceMock<MockConfigInterface>>();
-    std::shared_ptr<MockInterruptFactory> interruptFactory = std::make_shared<MockInterruptFactory>();
-    std::shared_ptr<MockLogging> logging = std::make_shared<NiceMock<MockLogging>>();
-    std::shared_ptr<MockEventStream> eventStream = std::make_shared<MockEventStream>();
-    std::shared_ptr<Windows::SystemEventSupervisor> systemEventSupervisor =
-        std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
-                                                         pluginSystem,
-                                                         activeProcessSupervisor,
-                                                         configInterface,
-                                                         interruptFactory,
-                                                         logging,
-                                                         eventStream);
-};
+    class SystemEventSupervisorFixture : public testing::Test
+    {
+      protected:
+        std::shared_ptr<MockLibvmiInterface> vmiInterface = std::make_shared<NiceMock<MockLibvmiInterface>>();
+        std::shared_ptr<MockPluginSystem> pluginSystem = std::make_shared<NiceMock<MockPluginSystem>>();
+        std::shared_ptr<MockActiveProcessesSupervisor> activeProcessSupervisor =
+            std::make_shared<NiceMock<MockActiveProcessesSupervisor>>();
+        std::shared_ptr<MockConfigInterface> configInterface = std::make_shared<NiceMock<MockConfigInterface>>();
+        std::shared_ptr<MockInterruptFactory> interruptFactory = std::make_shared<MockInterruptFactory>();
+        std::shared_ptr<MockLogging> logging = std::make_shared<NiceMock<MockLogging>>();
+        std::shared_ptr<MockEventStream> eventStream = std::make_shared<MockEventStream>();
+        std::shared_ptr<Windows::SystemEventSupervisor> systemEventSupervisor =
+            std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
+                                                             pluginSystem,
+                                                             activeProcessSupervisor,
+                                                             configInterface,
+                                                             interruptFactory,
+                                                             logging,
+                                                             eventStream);
+    };
 
-TEST_F(SystemEventSupervisorFixture, teardown_validState_interruptFactoryTeardownCalled)
-{
-    EXPECT_CALL(*interruptFactory, teardown()).Times(1);
+    TEST_F(SystemEventSupervisorFixture, teardown_validState_interruptFactoryTeardownCalled)
+    {
+        EXPECT_CALL(*interruptFactory, teardown()).Times(1);
 
-    EXPECT_NO_THROW(systemEventSupervisor->teardown());
+        EXPECT_NO_THROW(systemEventSupervisor->teardown());
+    }
 }
