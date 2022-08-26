@@ -57,7 +57,10 @@ PageProtection::PageProtection(uint32_t value, OperatingSystem os) : raw(value),
         {
             protection = {.readable = value & static_cast<uint8_t>(Linux::ProtectionValues::VM_READ),
                           .writeable = value & static_cast<uint8_t>(Linux::ProtectionValues::VM_WRITE),
-                          .executable = value & static_cast<uint8_t>(Linux::ProtectionValues::VM_EXEC)};
+                          .executable = value & static_cast<uint8_t>(Linux::ProtectionValues::VM_EXEC),
+                          .copyOnWrite = value & (static_cast<uint8_t>(Linux::ProtectionValues::VM_SHARED) |
+                                                  static_cast<uint8_t>(Linux::ProtectionValues::VM_MAYWRITE)) ==
+                                                     static_cast<uint8_t>(Linux::ProtectionValues::VM_MAYWRITE)};
             break;
         }
         default:

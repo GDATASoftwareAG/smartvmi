@@ -9,6 +9,11 @@ namespace Linux
         VM_WRITE = 2,
         VM_EXEC = 4,
         VM_SHARED = 8,
+
+        VM_MAYREAD = 0x10,
+        VM_MAYWRITE = 0x20,
+        VM_MAYEXEC = 0x40,
+        VM_MAYSHARE = 0x80
     };
 }
 
