@@ -5,20 +5,23 @@
 #include <gsl/pointers>
 #include <libvmi/libvmi.h>
 
-class VmiInitData
+namespace VmiCore
 {
-  public:
-    gsl::owner<vmi_init_data_t*> data{};
+    class VmiInitData
+    {
+      public:
+        gsl::owner<vmi_init_data_t*> data{};
 
-    explicit VmiInitData(const std::filesystem::path& socketPath);
+        explicit VmiInitData(const std::filesystem::path& socketPath);
 
-    // do not allow copy construction therefore avoiding multiple free() calls to the same memory location during object
-    // destruction
-    VmiInitData(const VmiInitData&) = delete;
+        // do not allow copy construction therefore avoiding multiple free() calls to the same memory location during
+        // object destruction
+        VmiInitData(const VmiInitData&) = delete;
 
-    VmiInitData(VmiInitData&& vmiInitData) noexcept;
+        VmiInitData(VmiInitData&& vmiInitData) noexcept;
 
-    ~VmiInitData();
-};
+        ~VmiInitData();
+    };
+}
 
 #endif // VMICORE_VMIINITDATA_H

@@ -5,7 +5,11 @@
 #include <algorithm>
 #include <iostream>
 
-Dumping::Dumping(const Plugin::PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration)
+using VmiCore::MemoryRegion;
+using VmiCore::Plugin::LogLevel;
+using VmiCore::Plugin::PluginInterface;
+
+Dumping::Dumping(const PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration)
     : pluginInterface(pluginInterface), configuration(std::move(configuration))
 {
     inMemoryDumpingFolder = *this->pluginInterface->getResultsDir();
@@ -22,7 +26,7 @@ void Dumping::dumpMemoryRegion(const std::string& processName,
         createMemoryRegionInformation(processName, pid, memoryRegionDescriptor, getNextRegionId());
     auto inMemDumpFileName = memoryRegionInformation->getMemFileName();
 
-    pluginInterface->logMessage(Plugin::LogLevel::info,
+    pluginInterface->logMessage(LogLevel::info,
                                 LOG_FILENAME,
                                 "Dumping Memory region from " + memoryRegionInformation->startAddress + " with size " +
                                     std::to_string(memoryRegionInformation->scanSize) +

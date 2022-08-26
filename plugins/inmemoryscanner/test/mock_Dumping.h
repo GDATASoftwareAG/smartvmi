@@ -10,7 +10,7 @@ class MockDumping : public IDumping
                 dumpMemoryRegion,
                 (const std::string& processName,
                  pid_t pid,
-                 const MemoryRegion& memoryRegionDescriptor,
+                 const VmiCore::MemoryRegion& memoryRegionDescriptor,
                  const std::vector<uint8_t>& data),
                 (override));
 

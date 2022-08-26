@@ -11,7 +11,7 @@
 #include "ActiveProcessesSupervisor.h"
 #include <memory>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     class SystemEventSupervisor : public std::enable_shared_from_this<SystemEventSupervisor>,
                                   public ISystemEventSupervisor

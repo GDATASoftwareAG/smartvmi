@@ -10,7 +10,7 @@
 #include <map>
 #include <memory>
 
-namespace Linux
+namespace VmiCore::Linux
 {
     class ActiveProcessesSupervisor : public IActiveProcessesSupervisor
     {

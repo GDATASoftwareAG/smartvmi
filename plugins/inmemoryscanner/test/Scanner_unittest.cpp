@@ -17,6 +17,11 @@ using testing::ContainsRegex;
 using testing::NiceMock;
 using testing::Return;
 using testing::Unused;
+using VmiCore::ActiveProcessInformation;
+using VmiCore::MemoryRegion;
+using VmiCore::MockMemoryRegionExtractor;
+using VmiCore::MockPageProtection;
+using VmiCore::Plugin::MockPluginInterface;
 
 class ScannerTestBaseFixture : public testing::Test
 {
@@ -25,7 +30,7 @@ class ScannerTestBaseFixture : public testing::Test
     const pid_t testPid = 4;
     const pid_t processIdWithSharedBaseImageRegion = 5;
 
-    std::unique_ptr<Plugin::MockPluginInterface> pluginInterface = std::make_unique<Plugin::MockPluginInterface>();
+    std::unique_ptr<MockPluginInterface> pluginInterface = std::make_unique<MockPluginInterface>();
     std::shared_ptr<MockConfig> configuration = std::make_shared<MockConfig>();
     std::optional<Scanner> scanner;
     MockMemoryRegionExtractor* systemMemoryRegionExtractorRaw = nullptr;
@@ -40,7 +45,7 @@ class ScannerTestBaseFixture : public testing::Test
 
     std::filesystem::path inMemoryDumpsPath = std::filesystem::path(vmiResultsOutputDir) / inMemOutputDir;
     std::filesystem::path dumpedRegionsPath = inMemoryDumpsPath / dumpedRegionsDir;
-    Plugin::virtual_address_t startAddress = 0x1234000;
+    VmiCore::addr_t startAddress = 0x1234000;
     size_t size = 0x666;
 
     std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>> runningProcesses;

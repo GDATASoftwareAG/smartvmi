@@ -3,7 +3,7 @@
 #include "Constants.h"
 #include "ProtectionValues.h"
 
-namespace Linux
+namespace VmiCore::Linux
 {
     MMExtractor::MMExtractor(const std::shared_ptr<ILibvmiInterface>& vmiInterface,
                              const std::shared_ptr<ILogging>& logging,

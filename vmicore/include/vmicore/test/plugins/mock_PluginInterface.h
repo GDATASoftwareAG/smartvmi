@@ -3,15 +3,14 @@
 #include <gmock/gmock.h>
 #include <vmicore/plugins/PluginInterface.h>
 
-namespace Plugin
+namespace VmiCore::Plugin
 {
-
     class MockPluginInterface : public PluginInterface
     {
       public:
         MOCK_METHOD(std::unique_ptr<std::vector<uint8_t>>,
                     readProcessMemoryRegion,
-                    (pid_t pid, virtual_address_t address, size_t numberOfBytes),
+                    (pid_t pid, addr_t address, size_t numberOfBytes),
                     (const, override));
         MOCK_METHOD(std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>,
                     getRunningProcesses,

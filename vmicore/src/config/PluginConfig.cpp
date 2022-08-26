@@ -1,32 +1,35 @@
 #include "PluginConfig.h"
 
-PluginConfig::PluginConfig(const YAML::Node& pluginNode) : pluginRootNode(pluginNode) {}
-
-std::optional<std::string> PluginConfig::getString(const std::string& element) const
+namespace VmiCore
 {
-    try
-    {
-        return pluginRootNode[element].as<std::string>();
-    }
-    catch (const YAML::Exception&)
-    {
-        return std::nullopt;
-    }
-}
+    PluginConfig::PluginConfig(const YAML::Node& pluginNode) : pluginRootNode(pluginNode) {}
 
-void PluginConfig::overrideString(const std::string& element, const std::string& value)
-{
-    pluginRootNode[element] = value;
-}
-
-std::optional<std::vector<std::string>> PluginConfig::getStringSequence(const std::string& element) const
-{
-    try
+    std::optional<std::string> PluginConfig::getString(const std::string& element) const
     {
-        return pluginRootNode[element].as<std::vector<std::string>>();
+        try
+        {
+            return pluginRootNode[element].as<std::string>();
+        }
+        catch (const YAML::Exception&)
+        {
+            return std::nullopt;
+        }
     }
-    catch (const YAML::Exception&)
+
+    void PluginConfig::overrideString(const std::string& element, const std::string& value)
     {
-        return std::nullopt;
+        pluginRootNode[element] = value;
+    }
+
+    std::optional<std::vector<std::string>> PluginConfig::getStringSequence(const std::string& element) const
+    {
+        try
+        {
+            return pluginRootNode[element].as<std::vector<std::string>>();
+        }
+        catch (const YAML::Exception&)
+        {
+            return std::nullopt;
+        }
     }
 }

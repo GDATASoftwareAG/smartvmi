@@ -8,27 +8,30 @@ using testing::Not;
 using testing::StrEq;
 using testing::UnorderedElementsAre;
 
-class KernelAccessFixture : public ProcessesMemoryStateFixture
+namespace VmiCore
 {
-    void SetUp() override
+    class KernelAccessFixture : public ProcessesMemoryStateFixture
     {
-        ProcessesMemoryStateFixture::SetUp();
-        kernelAccess->initWindowsOffsets();
+        void SetUp() override
+        {
+            ProcessesMemoryStateFixture::SetUp();
+            kernelAccess->initWindowsOffsets();
+        }
+    };
+
+    TEST_F(KernelAccessFixture, extractFileName_ValidKernelspaceAddress_NoThrow)
+    {
+        EXPECT_CALL(*mockVmiInterface,
+                    extractUnicodeStringAtVA(
+                        PagingDefinitions::kernelspaceLowerBoundary + _FILE_OBJECT_OFFSETS::FileName, systemCR3))
+            .Times(1);
+
+        EXPECT_NO_THROW(auto filename = kernelAccess->extractFileName(PagingDefinitions::kernelspaceLowerBoundary));
     }
-};
 
-TEST_F(KernelAccessFixture, extractFileName_ValidKernelspaceAddress_NoThrow)
-{
-    EXPECT_CALL(*mockVmiInterface,
-                extractUnicodeStringAtVA(PagingDefinitions::kernelspaceLowerBoundary + _FILE_OBJECT_OFFSETS::FileName,
-                                         systemCR3))
-        .Times(1);
-
-    EXPECT_NO_THROW(auto filename = kernelAccess->extractFileName(PagingDefinitions::kernelspaceLowerBoundary));
-}
-
-TEST_F(KernelAccessFixture, extractFileName_MalformedKernelspaceAddress_Throws)
-{
-    EXPECT_THROW(auto filename = kernelAccess->extractFileName(~PagingDefinitions::kernelspaceLowerBoundary),
-                 std::invalid_argument);
+    TEST_F(KernelAccessFixture, extractFileName_MalformedKernelspaceAddress_Throws)
+    {
+        EXPECT_THROW(auto filename = kernelAccess->extractFileName(~PagingDefinitions::kernelspaceLowerBoundary),
+                     std::invalid_argument);
+    }
 }

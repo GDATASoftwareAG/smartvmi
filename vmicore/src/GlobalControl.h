@@ -5,7 +5,7 @@
 #include "io/ILogger.h"
 #include <memory>
 
-namespace GlobalControl
+namespace VmiCore::GlobalControl
 {
     extern volatile bool endVmi;
     extern volatile bool postRunPluginAction;

@@ -4,10 +4,13 @@
 #include "VmiException.h"
 #include <libvmi/events.h>
 
-class VmiInitError : public VmiException
+namespace VmiCore
 {
-  public:
-    explicit VmiInitError(vmi_init_error initError);
-};
+    class VmiInitError : public VmiException
+    {
+      public:
+        explicit VmiInitError(vmi_init_error initError);
+    };
+}
 
 #endif // VMICORE_VMIINITERROR_H

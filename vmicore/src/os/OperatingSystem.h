@@ -1,11 +1,14 @@
 #ifndef VMICORE_OPERATINGSYSTEM_H
 #define VMICORE_OPERATINGSYSTEM_H
 
-enum class OperatingSystem
+namespace VmiCore
 {
-    INVALID,
-    WINDOWS,
-    LINUX,
-};
+    enum class OperatingSystem
+    {
+        INVALID,
+        WINDOWS,
+        LINUX,
+    };
+}
 
 #endif // VMICORE_OPERATINGSYSTEM_H

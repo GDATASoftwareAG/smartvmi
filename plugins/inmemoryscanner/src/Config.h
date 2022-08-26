@@ -17,7 +17,7 @@ class IConfig
   public:
     virtual ~IConfig() = default;
 
-    virtual void parseConfiguration(const Plugin::IPluginConfig& config) = 0;
+    virtual void parseConfiguration(const VmiCore::Plugin::IPluginConfig& config) = 0;
 
     [[nodiscard]] virtual std::filesystem::path getSignatureFile() const = 0;
 
@@ -40,11 +40,11 @@ class IConfig
 class Config : public IConfig
 {
   public:
-    explicit Config(const Plugin::PluginInterface* pluginInterface);
+    explicit Config(const VmiCore::Plugin::PluginInterface* pluginInterface);
 
     ~Config() override = default;
 
-    void parseConfiguration(const Plugin::IPluginConfig& config) override;
+    void parseConfiguration(const VmiCore::Plugin::IPluginConfig& config) override;
 
     [[nodiscard]] std::filesystem::path getSignatureFile() const override;
 
@@ -61,7 +61,7 @@ class Config : public IConfig
     void overrideDumpMemoryFlag(bool value) override;
 
   private:
-    const Plugin::PluginInterface* pluginInterface;
+    const VmiCore::Plugin::PluginInterface* pluginInterface;
     std::filesystem::path outputPath;
     std::filesystem::path signatureFile;
     std::set<std::string> ignoredProcesses;

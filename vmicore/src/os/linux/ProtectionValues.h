@@ -1,7 +1,7 @@
 #ifndef VMICORE_LINUX_PROTECTIONVALUES_H
 #define VMICORE_LINUX_PROTECTIONVALUES_H
 
-namespace Linux
+namespace VmiCore::Linux
 {
     enum class ProtectionValues
     {

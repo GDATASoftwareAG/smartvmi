@@ -8,7 +8,7 @@
 #include <memory>
 #include <vmicore/os/IMemoryRegionExtractor.h>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     class VadTreeWin10 : public IMemoryRegionExtractor
     {

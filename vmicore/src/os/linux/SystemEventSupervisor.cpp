@@ -4,7 +4,7 @@
 #include <fmt/core.h>
 #include <utility>
 
-namespace Linux
+namespace VmiCore::Linux
 {
     SystemEventSupervisor::SystemEventSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                                  std::shared_ptr<IPluginSystem> pluginSystem,

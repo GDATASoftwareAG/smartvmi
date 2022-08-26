@@ -1,10 +1,11 @@
 #include "ActiveProcessesSupervisor.h"
+#include "../../vmi/VmiException.h"
 #include "Constants.h"
 #include "MMExtractor.h"
 #include <fmt/core.h>
 #include <string>
 
-namespace Linux
+namespace VmiCore::Linux
 {
     ActiveProcessesSupervisor::ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                                          const std::shared_ptr<ILogging>& loggingLib,
@@ -71,8 +72,8 @@ namespace Linux
 
     pid_t ActiveProcessesSupervisor::extractPid(uint64_t taskStruct) const
     {
-        return vmiInterface->read32VA(taskStruct + vmiInterface->getOffset("linux_pid"),
-                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
+        return static_cast<pid_t>(vmiInterface->read32VA(taskStruct + vmiInterface->getOffset("linux_pid"),
+                                                         vmiInterface->convertPidToDtb(SYSTEM_PID)));
     }
 
     std::shared_ptr<ActiveProcessInformation> ActiveProcessesSupervisor::getProcessInformationByPid(pid_t pid) const

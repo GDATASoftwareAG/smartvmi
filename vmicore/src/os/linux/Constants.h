@@ -1,7 +1,7 @@
 #ifndef VMICORE_LINUX_CONSTANTS_H
 #define VMICORE_LINUX_CONSTANTS_H
 
-namespace Linux
+namespace VmiCore::Linux
 {
     constexpr auto SYSTEM_PID = 0;
 }

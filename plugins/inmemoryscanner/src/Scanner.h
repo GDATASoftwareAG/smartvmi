@@ -13,21 +13,21 @@
 class Scanner
 {
   public:
-    Scanner(const Plugin::PluginInterface* pluginInterface,
+    Scanner(const VmiCore::Plugin::PluginInterface* pluginInterface,
             std::shared_ptr<IConfig> configuration,
             std::unique_ptr<YaraInterface> yaraEngine,
             std::unique_ptr<IDumping> dumping);
 
     static std::unique_ptr<std::string> getFilenameFromPath(const std::string& path);
 
-    void scanProcess(std::shared_ptr<const ActiveProcessInformation> processInformation);
+    void scanProcess(std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
 
     void scanAllProcesses();
 
     void saveOutput();
 
   private:
-    const Plugin::PluginInterface* pluginInterface;
+    const VmiCore::Plugin::PluginInterface* pluginInterface;
     std::shared_ptr<IConfig> configuration;
     std::unique_ptr<YaraInterface> yaraEngine;
     OutputXML outputXml{};
@@ -36,12 +36,13 @@ class Scanner
     Semaphore<std::mutex, std::condition_variable> semaphore =
         Semaphore<std::mutex, std::condition_variable>(YR_MAX_THREADS);
 
-    bool shouldRegionBeScanned(const MemoryRegion& memoryRegionDescriptor);
+    bool shouldRegionBeScanned(const VmiCore::MemoryRegion& memoryRegionDescriptor);
 
-    void scanMemoryRegion(pid_t pid, const std::string& processName, const MemoryRegion& memoryRegionDescriptor);
+    void
+    scanMemoryRegion(pid_t pid, const std::string& processName, const VmiCore::MemoryRegion& memoryRegionDescriptor);
 
     void logInMemoryResultToTextFile(const std::string& processName,
-                                     pid_t pid,
-                                     Plugin::virtual_address_t baseAddress,
+                                     VmiCore::pid_t pid,
+                                     VmiCore::addr_t baseAddress,
                                      const std::vector<Rule>& results);
 };

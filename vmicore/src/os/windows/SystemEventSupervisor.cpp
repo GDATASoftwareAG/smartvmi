@@ -5,7 +5,7 @@
 #include <fmt/core.h>
 #include <utility>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     SystemEventSupervisor::SystemEventSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                                  std::shared_ptr<IPluginSystem> pluginSystem,

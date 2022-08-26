@@ -7,7 +7,7 @@
 #include "PathExtractor.h"
 #include <vmicore/os/IMemoryRegionExtractor.h>
 
-namespace Linux
+namespace VmiCore::Linux
 {
     class MMExtractor : public IMemoryRegionExtractor
     {

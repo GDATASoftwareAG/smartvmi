@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-namespace Linux
+namespace VmiCore::Linux
 {
     class PathExtractor
     {

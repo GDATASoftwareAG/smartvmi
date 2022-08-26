@@ -4,40 +4,43 @@
 
 // NOLINTBEGIN(cppcoreguidelines-no-malloc)
 
-VmiInitData::VmiInitData(const std::filesystem::path& socketPath)
+namespace VmiCore
 {
-    if (!socketPath.empty())
+    VmiInitData::VmiInitData(const std::filesystem::path& socketPath)
     {
-        data = reinterpret_cast<vmi_init_data_t*>(malloc(sizeof(vmi_init_data_t) + sizeof(vmi_init_data_entry_t)));
-
-        if (data == nullptr)
+        if (!socketPath.empty())
         {
-            throw VmiException("Unable to allocate memory");
-        }
+            data = reinterpret_cast<vmi_init_data_t*>(malloc(sizeof(vmi_init_data_t) + sizeof(vmi_init_data_entry_t)));
 
-        data->count = 1;
-        data->entry[0].type = VMI_INIT_DATA_KVMI_SOCKET;
-        data->entry[0].data = strdup(socketPath.c_str());
+            if (data == nullptr)
+            {
+                throw VmiException("Unable to allocate memory");
+            }
 
-        if (data->entry[0].data == nullptr)
-        {
-            free(data);
-            throw VmiException("Unable to duplicate string");
+            data->count = 1;
+            data->entry[0].type = VMI_INIT_DATA_KVMI_SOCKET;
+            data->entry[0].data = strdup(socketPath.c_str());
+
+            if (data->entry[0].data == nullptr)
+            {
+                free(data);
+                throw VmiException("Unable to duplicate string");
+            }
         }
     }
-}
 
-VmiInitData::VmiInitData(VmiInitData&& vmiInitData) noexcept : data(vmiInitData.data)
-{
-    vmiInitData.data = nullptr;
-}
-
-VmiInitData::~VmiInitData()
-{
-    if (data != nullptr)
+    VmiInitData::VmiInitData(VmiInitData&& vmiInitData) noexcept : data(vmiInitData.data)
     {
-        free(data->entry[0].data); // NOLINT(cppcoreguidelines-owning-memory)
-        free(data);
+        vmiInitData.data = nullptr;
+    }
+
+    VmiInitData::~VmiInitData()
+    {
+        if (data != nullptr)
+        {
+            free(data->entry[0].data); // NOLINT(cppcoreguidelines-owning-memory)
+            free(data);
+        }
     }
 }
 

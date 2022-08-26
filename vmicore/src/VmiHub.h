@@ -11,30 +11,33 @@
 #include <memory>
 #include <unordered_map>
 
-class VmiHub
+namespace VmiCore
 {
-  public:
-    VmiHub(std::shared_ptr<IConfigParser> configInterface,
-           std::shared_ptr<ILibvmiInterface> vmiInterface,
-           std::shared_ptr<ILogging> loggingLib,
-           std::shared_ptr<IEventStream> eventStream,
-           std::shared_ptr<IInterruptFactory> interruptFactory);
+    class VmiHub
+    {
+      public:
+        VmiHub(std::shared_ptr<IConfigParser> configInterface,
+               std::shared_ptr<ILibvmiInterface> vmiInterface,
+               std::shared_ptr<ILogging> loggingLib,
+               std::shared_ptr<IEventStream> eventStream,
+               std::shared_ptr<IInterruptFactory> interruptFactory);
 
-    uint run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs);
+        uint run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs);
 
-  private:
-    std::shared_ptr<IConfigParser> configInterface;
-    std::shared_ptr<ILibvmiInterface> vmiInterface;
-    std::shared_ptr<PluginSystem> pluginSystem;
-    std::shared_ptr<ISystemEventSupervisor> systemEventSupervisor;
-    std::shared_ptr<ILogging> loggingLib;
-    std::unique_ptr<ILogger> logger;
-    std::shared_ptr<IEventStream> eventStream;
-    std::shared_ptr<IInterruptFactory> interruptFactory;
+      private:
+        std::shared_ptr<IConfigParser> configInterface;
+        std::shared_ptr<ILibvmiInterface> vmiInterface;
+        std::shared_ptr<PluginSystem> pluginSystem;
+        std::shared_ptr<ISystemEventSupervisor> systemEventSupervisor;
+        std::shared_ptr<ILogging> loggingLib;
+        std::unique_ptr<ILogger> logger;
+        std::shared_ptr<IEventStream> eventStream;
+        std::shared_ptr<IInterruptFactory> interruptFactory;
 
-    void waitForEvents() const;
+        void waitForEvents() const;
 
-    void performShutdownPluginAction() const;
-};
+        void performShutdownPluginAction() const;
+    };
+}
 
 #endif // VMICORE_VMIHUB_H

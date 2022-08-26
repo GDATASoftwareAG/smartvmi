@@ -1,7 +1,7 @@
 #ifndef VMICORE_WINDOWS_PROTECTIONVALUES_H
 #define VMICORE_WINDOWS_PROTECTIONVALUES_H
 
-namespace Windows
+namespace VmiCore::Windows
 {
     enum class ProtectionValues
     {

@@ -7,16 +7,19 @@
 #include <map>
 #include <memory>
 
-class LegacyLogging : public IFileTransport
+namespace VmiCore
 {
-  public:
-    explicit LegacyLogging(std::shared_ptr<IConfigParser> configInterface);
-    ~LegacyLogging() override = default;
+    class LegacyLogging : public IFileTransport
+    {
+      public:
+        explicit LegacyLogging(std::shared_ptr<IConfigParser> configInterface);
+        ~LegacyLogging() override = default;
 
-    void saveBinaryToFile(const std::string& logFileName, const std::vector<uint8_t>& data) override;
+        void saveBinaryToFile(const std::string& logFileName, const std::vector<uint8_t>& data) override;
 
-  private:
-    std::shared_ptr<IConfigParser> configInterface;
-};
+      private:
+        std::shared_ptr<IConfigParser> configInterface;
+    };
+}
 
 #endif // VMICORE_LEGACYLOGGING_H

@@ -6,23 +6,26 @@
 #include <string>
 #include <vmicore/os/IPageProtection.h>
 
-class PageProtection : public IPageProtection
+namespace VmiCore
 {
-  public:
-    PageProtection() = default;
+    class PageProtection : public IPageProtection
+    {
+      public:
+        PageProtection() = default;
 
-    PageProtection(uint32_t value, OperatingSystem os);
+        PageProtection(uint32_t value, OperatingSystem os);
 
-    [[nodiscard]] ProtectionValues get() const override;
+        [[nodiscard]] ProtectionValues get() const override;
 
-    [[nodiscard]] uint64_t getRaw() const override;
+        [[nodiscard]] uint64_t getRaw() const override;
 
-    [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
-  private:
-    ProtectionValues protection{};
-    uint32_t raw = 0;
-    OperatingSystem os = OperatingSystem::INVALID;
-};
+      private:
+        ProtectionValues protection{};
+        uint32_t raw = 0;
+        OperatingSystem os = OperatingSystem::INVALID;
+    };
+}
 
 #endif // VMICORE_PAGEPROTECTION_H

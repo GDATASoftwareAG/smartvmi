@@ -4,8 +4,9 @@
 #include "../../vmi/LibvmiInterface.h"
 #include "KernelOffsets.h"
 #include "ProtectionValues.h"
+#include <vmicore/types.h>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     class IKernelAccess
     {

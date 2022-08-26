@@ -5,15 +5,18 @@
 #include <list>
 #include <memory>
 
-class IMemoryRegionExtractor
+namespace VmiCore
 {
-  public:
-    virtual ~IMemoryRegionExtractor() = default;
+    class IMemoryRegionExtractor
+    {
+      public:
+        virtual ~IMemoryRegionExtractor() = default;
 
-    [[nodiscard]] virtual std::unique_ptr<std::list<MemoryRegion>> extractAllMemoryRegions() const = 0;
+        [[nodiscard]] virtual std::unique_ptr<std::list<MemoryRegion>> extractAllMemoryRegions() const = 0;
 
-  protected:
-    IMemoryRegionExtractor() = default;
-};
+      protected:
+        IMemoryRegionExtractor() = default;
+    };
+}
 
 #endif // VMICORE_IMEMORYREGIONEXTRACTOR_H

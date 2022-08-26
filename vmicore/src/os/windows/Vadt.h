@@ -4,7 +4,7 @@
 #include "ProtectionValues.h"
 #include <string>
 
-namespace Windows
+namespace VmiCore::Windows
 {
     class Vadt
     {
