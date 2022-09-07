@@ -134,6 +134,12 @@ uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>
         {
             activeProcessesSupervisor =
                 std::make_shared<Linux::ActiveProcessesSupervisor>(vmiInterface, loggingLib, eventStream);
+            pluginSystem = std::make_shared<PluginSystem>(configInterface,
+                                                          vmiInterface,
+                                                          activeProcessesSupervisor,
+                                                          std::make_shared<LegacyLogging>(configInterface),
+                                                          loggingLib,
+                                                          eventStream);
             systemEventSupervisor = std::make_shared<Linux::SystemEventSupervisor>(vmiInterface,
                                                                                    pluginSystem,
                                                                                    activeProcessesSupervisor,
@@ -148,6 +154,12 @@ uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>
             auto kernelObjectExtractor = std::make_shared<Windows::KernelAccess>(vmiInterface);
             activeProcessesSupervisor = std::make_shared<Windows::ActiveProcessesSupervisor>(
                 vmiInterface, kernelObjectExtractor, loggingLib, eventStream);
+            pluginSystem = std::make_shared<PluginSystem>(configInterface,
+                                                          vmiInterface,
+                                                          activeProcessesSupervisor,
+                                                          std::make_shared<LegacyLogging>(configInterface),
+                                                          loggingLib,
+                                                          eventStream);
             systemEventSupervisor = std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
                                                                                      pluginSystem,
                                                                                      activeProcessesSupervisor,
@@ -163,12 +175,6 @@ uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>
         }
     }
 
-    pluginSystem = std::make_shared<PluginSystem>(configInterface,
-                                                  vmiInterface,
-                                                  activeProcessesSupervisor,
-                                                  std::make_shared<LegacyLogging>(configInterface),
-                                                  loggingLib,
-                                                  eventStream);
     for (auto& plugin : configInterface->getPlugins())
     {
         pluginSystem->initializePlugin(plugin.first,
