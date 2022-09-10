@@ -65,8 +65,9 @@ namespace Windows
     InterruptEvent::InterruptResponse
     SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback(InterruptEvent& interruptEvent)
     {
-        auto eprocessBase = interruptEvent.getRcx();
-        bool isTerminationEvent = interruptEvent.getR8() == 0;
+        auto& regs = interruptEvent.getRegisters()->x86;
+        auto eprocessBase = regs.rcx;
+        bool isTerminationEvent = regs.r8 == 0;
         logger->debug(fmt::format("{} called", __func__),
                       {
                           logfield::create("_EPROCESS_base ", fmt::format("{:#x}", eprocessBase)),
@@ -94,7 +95,7 @@ namespace Windows
 
     InterruptEvent::InterruptResponse SystemEventSupervisor::keBugCheckExCallback(InterruptEvent& interruptEvent)
     {
-        auto bugCheckCode = interruptEvent.getRcx();
+        auto bugCheckCode = interruptEvent.getRegisters()->x86.rcx;
         eventStream->sendBSODEvent(static_cast<int64_t>(bugCheckCode));
         logger->warning("BSOD detected!", {logfield::create("BugCheckCode", fmt::format("{:#x}", bugCheckCode))});
         GlobalControl::endVmi = true;

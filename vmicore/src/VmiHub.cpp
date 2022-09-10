@@ -151,6 +151,9 @@ uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>
         }
         case VMI_OS_WINDOWS:
         {
+#if defined(ARM64)
+            throw new std::runtime_error("No support for Windows on ARM yet.");
+#endif
             auto kernelObjectExtractor = std::make_shared<Windows::KernelAccess>(vmiInterface);
             activeProcessesSupervisor = std::make_shared<Windows::ActiveProcessesSupervisor>(
                 vmiInterface, kernelObjectExtractor, loggingLib, eventStream);

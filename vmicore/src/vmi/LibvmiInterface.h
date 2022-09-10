@@ -9,7 +9,6 @@
 #include <codecvt>
 #include <fmt/core.h>
 #include <functional>
-#include <libvmi/events.h>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -33,6 +32,8 @@ class ILibvmiInterface
 
     virtual uint8_t read8PA(uint64_t pyhsicalAddress) = 0;
 
+    virtual uint32_t read32PA(uint64_t pyhsicalAddress) = 0;
+
     virtual uint8_t read8VA(const uint64_t virtualAddress, const uint64_t cr3) = 0;
 
     virtual uint32_t read32VA(uint64_t virtualAddress, uint64_t cr3) = 0;
@@ -42,6 +43,8 @@ class ILibvmiInterface
     virtual bool readXVA(uint64_t virtualAddress, uint64_t cr3, std::vector<uint8_t>& content) = 0;
 
     virtual void write8PA(uint64_t physicalAddress, uint8_t value) = 0;
+
+    virtual void write32PA(uint64_t physicalAddress, uint32_t value) = 0;
 
     virtual void waitForEvent() = 0;
 
@@ -107,6 +110,8 @@ class LibvmiInterface : public ILibvmiInterface
 
     uint8_t read8PA(uint64_t pyhsicalAddress) override;
 
+    uint32_t read32PA(uint64_t pyhsicalAddress) override;
+
     uint8_t read8VA(const uint64_t virtualAddress, const uint64_t cr3) override;
 
     uint32_t read32VA(uint64_t virtualAddress, uint64_t cr3) override;
@@ -116,6 +121,8 @@ class LibvmiInterface : public ILibvmiInterface
     bool readXVA(uint64_t virtualAddress, uint64_t cr3, std::vector<uint8_t>& content) override;
 
     void write8PA(uint64_t physicalAddress, uint8_t value) override;
+
+    void write32PA(uint64_t physicalAddress, uint32_t value) override;
 
     void waitForEvent() override;
 

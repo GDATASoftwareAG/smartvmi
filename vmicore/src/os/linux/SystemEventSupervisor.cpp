@@ -1,6 +1,7 @@
 #include "SystemEventSupervisor.h"
 #include "../../GlobalControl.h"
 #include "Constants.h"
+#include <config.h>
 #include <fmt/core.h>
 #include <utility>
 
@@ -74,20 +75,33 @@ namespace Linux
 
     InterruptEvent::InterruptResponse SystemEventSupervisor::procForkConnectorCallback(InterruptEvent& interruptEvent)
     {
-        activeProcessesSupervisor->addNewProcess(interruptEvent.getRdi());
+#if defined(X86_64)
+        uint64_t base = interruptEvent.getRegisters()->x86.rdi;
+#elif defined(ARM64)
+        uint64_t base = interruptEvent.getRegisters()->arm.regs[0];
+#endif
+        activeProcessesSupervisor->addNewProcess(base);
         return InterruptEvent::InterruptResponse::Continue;
     }
 
     InterruptEvent::InterruptResponse SystemEventSupervisor::procExecConnectorCallback(InterruptEvent& interruptEvent)
     {
-        activeProcessesSupervisor->removeActiveProcess(interruptEvent.getRdi());
-        activeProcessesSupervisor->addNewProcess(interruptEvent.getRdi());
+#if defined(X86_64)
+        uint64_t base = interruptEvent.getRegisters()->x86.rdi;
+#elif defined(ARM64)
+        uint64_t base = interruptEvent.getRegisters()->arm.regs[0];
+#endif
+        activeProcessesSupervisor->addNewProcess(base);
         return InterruptEvent::InterruptResponse::Continue;
     }
 
     InterruptEvent::InterruptResponse SystemEventSupervisor::procExitConnectorCallback(InterruptEvent& interruptEvent)
     {
-        auto taskStructBase = interruptEvent.getRdi();
+#if defined(X86_64)
+        uint64_t taskStructBase = interruptEvent.getRegisters()->x86.rdi;
+#elif defined(ARM64)
+        uint64_t taskStructBase = interruptEvent.getRegisters()->arm.regs[0];
+#endif
 
         pluginSystem->passProcessTerminationEventToRegisteredPlugins(
             activeProcessesSupervisor->getProcessInformationByBase(taskStructBase));

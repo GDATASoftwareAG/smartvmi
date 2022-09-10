@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 project(vmicore)
 
+set(X86_64 OFF)
+set(ARM64 OFF)
+
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
+	set(X86_64 ON)
+elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+	set(ARM64 ON)
+else ()
+	message(FATAL_ERROR "Unknown architecture ${CMAKE_SYSTEM_PROCESSOR}")
+endif ()
 
 # Options
 
@@ -15,7 +25,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(core_compile_flags -m64 -Wall)
+if (${X86_64})
+	set(core_compile_flags -m64 -Wall)
+elseif (${ARM64})
+	set(core_compile_flags -march=armv8-a -Wall)
+endif ()
 set(extra_compile_flags -Wunused -Wunreachable-code -Wextra -Wpedantic -Wno-dollar-in-identifier-extension)
 
 # Toolchain checks
@@ -64,26 +78,40 @@ FetchContent_MakeAvailable(googletest)
 
 # Setup libvmi
 
-FetchContent_Declare(
-        libvmi
-        GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
-        GIT_TAG test
-)
-set(libvmi_ENABLE_STATIC OFF)
-set(libvmi_BUILD_EXAMPLES OFF)
+set(ENABLE_STATIC OFF CACHE INTERNAL "")
+set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
+set(ENABLE_VMIFS OFF CACHE INTERNAL "")
+set(ENABLE_FILE OFF CACHE INTERNAL "")
+set(ENABLE_BAREFLANK OFF CACHE INTERNAL "")
+set(ENABLE_PROFILES OFF CACHE INTERNAL "")
+set(ENABLE_TESTING OFF CACHE INTERNAL "")
+
+if (${X86_64})
+	FetchContent_Declare(
+		libvmi
+		GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
+		GIT_TAG test
+	)
+elseif (${ARM64})
+	FetchContent_Declare(
+		libvmi
+		GIT_REPOSITORY https://gitlab.sec.uni-passau.de/sis/vmi-on-arm/libvmi.git
+		GIT_TAG master
+	)
+endif ()
 FetchContent_MakeAvailable(libvmi)
 
 include_directories(BEFORE SYSTEM ${libvmi_SOURCE_DIR})
 
 # Setup yaml-cpp
 
+set(YAML_BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(YAML_CPP_BUILD_TOOLS OFF CACHE INTERNAL "")
 FetchContent_Declare(
         yaml-cpp
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
         GIT_TAG yaml-cpp-0.7.0
 )
-set(yaml-cpp_YAML_BUILD_SHARED_LIBS OFF)
-set(yaml-cpp_YAML_CPP_BUILD_TOOLS OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 
@@ -163,6 +191,9 @@ set(test_files
         test/vmi/InterruptEvent_UnitTest.cpp
         test/vmi/LibvmiInterface_UnitTest.cpp
         test/vmi/SingleStepSupervisor_UnitTest.cpp)
+
+configure_file(src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+include_directories(${PROJECT_BINARY_DIR})
 
 # Link libraries
 

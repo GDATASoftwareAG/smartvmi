@@ -1,6 +1,7 @@
 #include "InterruptFactory.h"
 #include "../io/grpc/GRPCLogger.h"
 #include "InterruptGuard.h"
+#include <config.h>
 #include <memory>
 
 InterruptFactory::InterruptFactory(std::shared_ptr<ILibvmiInterface> vmiInterface,
@@ -33,6 +34,7 @@ std::shared_ptr<InterruptEvent> InterruptFactory::createInterruptEvent(
 
     auto targetPA = vmiInterface->convertVAToPA(targetVA, systemCr3);
 
+#if defined(X86_64)
     auto interruptGuard = std::make_unique<InterruptGuard>(
         vmiInterface, loggingLib->newNamedLogger(interruptName), targetVA, targetPA, systemCr3);
 
@@ -44,6 +46,14 @@ std::shared_ptr<InterruptEvent> InterruptFactory::createInterruptEvent(
                                                            std::move(interruptGuard),
                                                            callbackFunction,
                                                            loggingLib->newNamedLogger(interruptName));
+#elif defined(ARM64)
+    auto interruptEvent = std::make_shared<InterruptEvent>(vmiInterface,
+                                                           targetPA,
+                                                           singleStepSupervisor,
+                                                           nullptr,
+                                                           callbackFunction,
+                                                           loggingLib->newNamedLogger(interruptName));
+#endif
 
     interruptEvent->initialize();
     return interruptEvent;

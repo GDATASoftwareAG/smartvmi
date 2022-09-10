@@ -13,6 +13,8 @@ class MockLibvmiInterface : public ILibvmiInterface
 
     MOCK_METHOD(uint8_t, read8PA, (const uint64_t pyhsicalAddress), (override));
 
+    MOCK_METHOD(uint32_t, read32PA, (const uint64_t pyhsicalAddress), (override));
+
     MOCK_METHOD(uint8_t, read8VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
 
     MOCK_METHOD(uint32_t, read32VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
@@ -25,6 +27,8 @@ class MockLibvmiInterface : public ILibvmiInterface
                 (override));
 
     MOCK_METHOD(void, write8PA, (const uint64_t physicalAddress, const uint8_t value), (override));
+
+    MOCK_METHOD(void, write32PA, (const uint64_t physicalAddress, const uint32_t value), (override));
 
     MOCK_METHOD(void, waitForEvent, (), (override));
 
