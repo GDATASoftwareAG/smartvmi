@@ -20,21 +20,21 @@ namespace VmiCore::Windows
         kernelOffsets = KernelOffsets::init(vmiInterface);
     }
 
-    uint64_t KernelAccess::extractVadTreeRootAddress(uint64_t eprocessBase) const
+    addr_t KernelAccess::extractVadTreeRootAddress(addr_t eprocessBase) const
     {
         auto vadRoot = vmiInterface->read64VA(eprocessBase + kernelOffsets.eprocess.VadRoot,
                                               vmiInterface->convertPidToDtb(systemPid));
         return vadRoot;
     }
 
-    uint64_t KernelAccess::extractImageFilePointer(uint64_t eprocessBase) const
+    addr_t KernelAccess::extractImageFilePointer(addr_t eprocessBase) const
     {
         auto imageFilePointer = vmiInterface->read64VA(eprocessBase + kernelOffsets.eprocess.ImageFilePointer,
                                                        vmiInterface->convertPidToDtb(systemPid));
         return imageFilePointer;
     }
 
-    std::unique_ptr<std::string> KernelAccess::extractFileName(uint64_t fileObjectBaseAddress) const
+    std::unique_ptr<std::string> KernelAccess::extractFileName(addr_t fileObjectBaseAddress) const
     {
         expectSaneKernelAddress(fileObjectBaseAddress, static_cast<const char*>(__func__));
         return vmiInterface->extractUnicodeStringAtVA(fileObjectBaseAddress + kernelOffsets.fileObject.FileName,
