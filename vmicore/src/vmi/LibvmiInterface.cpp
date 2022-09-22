@@ -83,7 +83,7 @@ namespace VmiCore
         }
     }
 
-    uint8_t LibvmiInterface::read8PA(const uint64_t physicalAddress)
+    uint8_t LibvmiInterface::read8PA(const addr_t physicalAddress)
     {
         uint8_t extractedValue = 0;
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
@@ -95,7 +95,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    uint8_t LibvmiInterface::read8VA(const uint64_t virtualAddress, const uint64_t cr3)
+    uint8_t LibvmiInterface::read8VA(const addr_t virtualAddress, const addr_t cr3)
     {
         uint8_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
@@ -107,7 +107,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    uint32_t LibvmiInterface::read32VA(const uint64_t virtualAddress, const uint64_t cr3)
+    uint32_t LibvmiInterface::read32VA(const addr_t virtualAddress, const addr_t cr3)
     {
         uint32_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
@@ -119,7 +119,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    uint64_t LibvmiInterface::read64VA(const uint64_t virtualAddress, const uint64_t cr3)
+    uint64_t LibvmiInterface::read64VA(const addr_t virtualAddress, const addr_t cr3)
     {
         uint64_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
@@ -131,7 +131,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    bool LibvmiInterface::readXVA(const uint64_t virtualAddress, const uint64_t cr3, std::vector<uint8_t>& content)
+    bool LibvmiInterface::readXVA(const addr_t virtualAddress, const addr_t cr3, std::vector<uint8_t>& content)
     {
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
         std::lock_guard<std::mutex> lock(libvmiLock);
@@ -142,7 +142,7 @@ namespace VmiCore
         return true;
     }
 
-    void LibvmiInterface::write8PA(const uint64_t physicalAddress, uint8_t value)
+    void LibvmiInterface::write8PA(const addr_t physicalAddress, uint8_t value)
     {
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
         std::lock_guard<std::mutex> lock(libvmiLock);
@@ -152,7 +152,7 @@ namespace VmiCore
         }
     }
 
-    access_context_t LibvmiInterface::createPhysicalAddressAccessContext(uint64_t physicalAddress)
+    access_context_t LibvmiInterface::createPhysicalAddressAccessContext(addr_t physicalAddress)
     {
         access_context_t accessContext{};
         accessContext.version = ACCESS_CONTEXT_VERSION;
@@ -161,7 +161,7 @@ namespace VmiCore
         return accessContext;
     }
 
-    access_context_t LibvmiInterface::createVirtualAddressAccessContext(uint64_t virtualAddress, uint64_t cr3)
+    access_context_t LibvmiInterface::createVirtualAddressAccessContext(addr_t virtualAddress, addr_t cr3)
     {
         access_context_t accessContext{};
         accessContext.version = ACCESS_CONTEXT_VERSION;
@@ -223,9 +223,9 @@ namespace VmiCore
         return numberOfVCPUs;
     }
 
-    uint64_t LibvmiInterface::translateKernelSymbolToVA(const std::string& kernelSymbolName)
+    addr_t LibvmiInterface::translateKernelSymbolToVA(const std::string& kernelSymbolName)
     {
-        uint64_t kernelSymbolAddress = 0;
+        addr_t kernelSymbolAddress = 0;
         if (vmi_translate_ksym2v(vmiInstance, kernelSymbolName.c_str(), &kernelSymbolAddress) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to find kernel symbol {}", __func__, kernelSymbolName));
@@ -233,9 +233,9 @@ namespace VmiCore
         return kernelSymbolAddress;
     }
 
-    uint64_t LibvmiInterface::convertVAToPA(uint64_t virtualAddress, uint64_t processCr3)
+    addr_t LibvmiInterface::convertVAToPA(addr_t virtualAddress, addr_t processCr3)
     {
-        uint64_t physicalAddress = 0;
+        addr_t physicalAddress = 0;
         if (vmi_pagetable_lookup(vmiInstance, processCr3, virtualAddress, &physicalAddress) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format(
@@ -244,9 +244,9 @@ namespace VmiCore
         return physicalAddress;
     }
 
-    uint64_t LibvmiInterface::convertPidToDtb(pid_t processID)
+    addr_t LibvmiInterface::convertPidToDtb(pid_t processID)
     {
-        uint64_t dtb = 0;
+        addr_t dtb = 0;
         if (vmi_pid_to_dtb(vmiInstance, processID, &dtb) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("Unable to obtain the dtb for pid {}", processID));
@@ -254,7 +254,7 @@ namespace VmiCore
         return dtb;
     }
 
-    pid_t LibvmiInterface::convertDtbToPid(uint64_t dtb)
+    pid_t LibvmiInterface::convertDtbToPid(addr_t dtb)
     {
         vmi_pid_t pid = 0;
         if (vmi_dtb_to_pid(vmiInstance, dtb, &pid) != VMI_SUCCESS)
@@ -298,7 +298,7 @@ namespace VmiCore
         return pending;
     }
 
-    std::unique_ptr<std::string> LibvmiInterface::extractUnicodeStringAtVA(const uint64_t stringVA, const uint64_t cr3)
+    std::unique_ptr<std::string> LibvmiInterface::extractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
         std::lock_guard<std::mutex> lock(libvmiLock);
@@ -316,7 +316,7 @@ namespace VmiCore
         return result;
     }
 
-    std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(const uint64_t virtualAddress, const uint64_t cr3)
+    std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(const addr_t virtualAddress, const addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
         std::lock_guard<std::mutex> lock(libvmiLock);
@@ -343,9 +343,9 @@ namespace VmiCore
         return vmi_get_ostype(vmiInstance);
     }
 
-    uint64_t LibvmiInterface::getOffset(const std::string& name)
+    addr_t LibvmiInterface::getOffset(const std::string& name)
     {
-        uint64_t offset = 0;
+        addr_t offset = 0;
         if (vmi_get_offset(vmiInstance, name.c_str(), &offset) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to find offset {}", __func__, name));

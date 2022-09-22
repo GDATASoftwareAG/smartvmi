@@ -30,17 +30,17 @@ namespace VmiCore
 
         virtual void clearEvent(vmi_event_t& event, bool deallocate) = 0;
 
-        virtual uint8_t read8PA(uint64_t pyhsicalAddress) = 0;
+        virtual uint8_t read8PA(addr_t pyhsicalAddress) = 0;
 
-        virtual uint8_t read8VA(const uint64_t virtualAddress, const uint64_t cr3) = 0;
+        virtual uint8_t read8VA(addr_t virtualAddress, addr_t cr3) = 0;
 
-        virtual uint32_t read32VA(uint64_t virtualAddress, uint64_t cr3) = 0;
+        virtual uint32_t read32VA(addr_t virtualAddress, addr_t cr3) = 0;
 
-        virtual uint64_t read64VA(uint64_t virtualAddress, uint64_t cr3) = 0;
+        virtual uint64_t read64VA(addr_t virtualAddress, addr_t cr3) = 0;
 
-        virtual bool readXVA(uint64_t virtualAddress, uint64_t cr3, std::vector<uint8_t>& content) = 0;
+        virtual bool readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content) = 0;
 
-        virtual void write8PA(uint64_t physicalAddress, uint8_t value) = 0;
+        virtual void write8PA(addr_t physicalAddress, uint8_t value) = 0;
 
         virtual void waitForEvent() = 0;
 
@@ -50,13 +50,13 @@ namespace VmiCore
 
         virtual uint getNumberOfVCPUs() = 0;
 
-        virtual uint64_t translateKernelSymbolToVA(const std::string& kernelSymbolName) = 0;
+        virtual addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) = 0;
 
-        virtual uint64_t convertVAToPA(uint64_t virtualAddress, uint64_t cr3Register) = 0;
+        virtual addr_t convertVAToPA(addr_t virtualAddress, addr_t cr3Register) = 0;
 
-        virtual uint64_t convertPidToDtb(pid_t processID) = 0;
+        virtual addr_t convertPidToDtb(pid_t processID) = 0;
 
-        virtual pid_t convertDtbToPid(uint64_t dtb) = 0;
+        virtual pid_t convertDtbToPid(addr_t dtb) = 0;
 
         virtual void pauseVm() = 0;
 
@@ -64,23 +64,23 @@ namespace VmiCore
 
         virtual bool areEventsPending() = 0;
 
-        virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) = 0;
+        virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
 
-        virtual std::unique_ptr<std::string> extractStringAtVA(uint64_t virtualAddress, uint64_t cr3) = 0;
+        virtual std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) = 0;
 
         virtual void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) = 0;
 
         virtual os_t getOsType() = 0;
 
-        virtual uint64_t getOffset(const std::string& name) = 0;
+        virtual addr_t getOffset(const std::string& name) = 0;
 
         virtual addr_t getKernelStructOffset(const std::string& structName, const std::string& member) = 0;
 
-        virtual size_t getStructSizeFromJson(const std::string& struct_name) = 0;
+        virtual std::size_t getStructSizeFromJson(const std::string& struct_name) = 0;
 
         virtual bool isInitialized() = 0;
 
-        virtual std::tuple<addr_t, size_t, size_t>
+        virtual std::tuple<addr_t, std::size_t, std::size_t>
         getBitfieldOffsetAndSizeFromJson(const std::string& struct_name, const std::string& struct_member) = 0;
 
         virtual void flushV2PCache(addr_t pt) = 0;
@@ -104,17 +104,17 @@ namespace VmiCore
 
         void clearEvent(vmi_event_t& event, bool deallocate) override;
 
-        uint8_t read8PA(uint64_t pyhsicalAddress) override;
+        uint8_t read8PA(addr_t pyhsicalAddress) override;
 
-        uint8_t read8VA(const uint64_t virtualAddress, const uint64_t cr3) override;
+        uint8_t read8VA(addr_t virtualAddress, addr_t cr3) override;
 
-        uint32_t read32VA(uint64_t virtualAddress, uint64_t cr3) override;
+        uint32_t read32VA(addr_t virtualAddress, addr_t cr3) override;
 
-        uint64_t read64VA(uint64_t virtualAddress, uint64_t cr3) override;
+        uint64_t read64VA(addr_t virtualAddress, addr_t cr3) override;
 
-        bool readXVA(uint64_t virtualAddress, uint64_t cr3, std::vector<uint8_t>& content) override;
+        bool readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content) override;
 
-        void write8PA(uint64_t physicalAddress, uint8_t value) override;
+        void write8PA(addr_t physicalAddress, uint8_t value) override;
 
         void waitForEvent() override;
 
@@ -124,13 +124,13 @@ namespace VmiCore
 
         uint getNumberOfVCPUs() override;
 
-        uint64_t translateKernelSymbolToVA(const std::string& kernelSymbolName) override;
+        addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) override;
 
-        uint64_t convertVAToPA(uint64_t virtualAddress, uint64_t processCr3) override;
+        addr_t convertVAToPA(addr_t virtualAddress, addr_t processCr3) override;
 
-        uint64_t convertPidToDtb(pid_t processID) override;
+        addr_t convertPidToDtb(pid_t processID) override;
 
-        pid_t convertDtbToPid(uint64_t dtb) override;
+        pid_t convertDtbToPid(addr_t dtb) override;
 
         void pauseVm() override;
 
@@ -138,15 +138,15 @@ namespace VmiCore
 
         bool areEventsPending() override;
 
-        std::unique_ptr<std::string> extractUnicodeStringAtVA(uint64_t stringVA, uint64_t cr3) override;
+        std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
 
-        std::unique_ptr<std::string> extractStringAtVA(uint64_t virtualAddress, uint64_t cr3) override;
+        std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) override;
 
         void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) override;
 
         os_t getOsType() override;
 
-        template <typename T> std::unique_ptr<T> readVa(const uint64_t virtualAddress, const uint64_t cr3)
+        template <typename T> std::unique_ptr<T> readVa(const addr_t virtualAddress, const addr_t cr3)
         {
             auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
             auto exctractedValue = std::make_unique<T>();
@@ -162,16 +162,16 @@ namespace VmiCore
             return exctractedValue;
         }
 
-        uint64_t getOffset(const std::string& name) override;
+        addr_t getOffset(const std::string& name) override;
 
         addr_t getKernelStructOffset(const std::string& structName, const std::string& member) override;
 
-        size_t getStructSizeFromJson(const std::string& struct_name) override;
+        std::size_t getStructSizeFromJson(const std::string& struct_name) override;
 
         bool isInitialized() override;
 
-        std::tuple<addr_t, size_t, size_t> getBitfieldOffsetAndSizeFromJson(const std::string& structName,
-                                                                            const std::string& structMember) override;
+        std::tuple<addr_t, std::size_t, std::size_t>
+        getBitfieldOffsetAndSizeFromJson(const std::string& structName, const std::string& structMember) override;
 
       private:
         uint numberOfVCPUs{};
@@ -185,9 +185,9 @@ namespace VmiCore
 
         static void freeEvent(vmi_event_t* event, status_t rc);
 
-        static access_context_t createPhysicalAddressAccessContext(uint64_t physicalAddress);
+        static access_context_t createPhysicalAddressAccessContext(addr_t physicalAddress);
 
-        static access_context_t createVirtualAddressAccessContext(uint64_t virtualAddress, uint64_t cr3);
+        static access_context_t createVirtualAddressAccessContext(addr_t virtualAddress, addr_t cr3);
 
         void flushV2PCache(addr_t pt) override;
 

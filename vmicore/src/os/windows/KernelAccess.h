@@ -15,11 +15,11 @@ namespace VmiCore::Windows
 
         virtual void initWindowsOffsets() = 0;
 
-        [[nodiscard]] virtual uint64_t extractVadTreeRootAddress(uint64_t vadTreeRootNodeAddressLocation) const = 0;
+        [[nodiscard]] virtual addr_t extractVadTreeRootAddress(addr_t vadTreeRootNodeAddressLocation) const = 0;
 
-        [[nodiscard]] virtual uint64_t extractImageFilePointer(uint64_t imageFilePointerAddressLocation) const = 0;
+        [[nodiscard]] virtual addr_t extractImageFilePointer(addr_t imageFilePointerAddressLocation) const = 0;
 
-        [[nodiscard]] virtual std::unique_ptr<std::string> extractFileName(uint64_t fileObjectBaseAddress) const = 0;
+        [[nodiscard]] virtual std::unique_ptr<std::string> extractFileName(addr_t fileObjectBaseAddress) const = 0;
 
         [[nodiscard]] virtual addr_t extractControlAreaBasePointer(addr_t vadEntryBaseVA) const = 0;
 
@@ -80,11 +80,11 @@ namespace VmiCore::Windows
 
         void initWindowsOffsets() override;
 
-        [[nodiscard]] uint64_t extractVadTreeRootAddress(uint64_t eprocessBase) const override;
+        [[nodiscard]] addr_t extractVadTreeRootAddress(addr_t eprocessBase) const override;
 
-        [[nodiscard]] uint64_t extractImageFilePointer(uint64_t eprocessBase) const override;
+        [[nodiscard]] addr_t extractImageFilePointer(addr_t eprocessBase) const override;
 
-        [[nodiscard]] std::unique_ptr<std::string> extractFileName(uint64_t fileObjectBaseAddress) const override;
+        [[nodiscard]] std::unique_ptr<std::string> extractFileName(addr_t fileObjectBaseAddress) const override;
 
         [[nodiscard]] addr_t extractControlAreaBasePointer(addr_t vadEntryBaseVA) const override;
 
