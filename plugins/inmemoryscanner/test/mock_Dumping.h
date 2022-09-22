@@ -3,16 +3,19 @@
 #include "../src/Dumping.h"
 #include <gmock/gmock.h>
 
-class MockDumping : public IDumping
+namespace InMemoryScanner
 {
-  public:
-    MOCK_METHOD(void,
-                dumpMemoryRegion,
-                (const std::string& processName,
-                 pid_t pid,
-                 const VmiCore::MemoryRegion& memoryRegionDescriptor,
-                 const std::vector<uint8_t>& data),
-                (override));
+    class MockDumping : public IDumping
+    {
+      public:
+        MOCK_METHOD(void,
+                    dumpMemoryRegion,
+                    (const std::string& processName,
+                     pid_t pid,
+                     const VmiCore::MemoryRegion& memoryRegionDescriptor,
+                     const std::vector<uint8_t>& data),
+                    (override));
 
-    MOCK_METHOD(std::vector<std::string>, getAllMemoryRegionInformation, (), (override));
-};
+        MOCK_METHOD(std::vector<std::string>, getAllMemoryRegionInformation, (), (override));
+    };
+}

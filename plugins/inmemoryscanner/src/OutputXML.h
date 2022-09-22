@@ -5,17 +5,20 @@
 #include <memory>
 #include <mutex>
 
-class OutputXML
+namespace InMemoryScanner
 {
-  public:
-    OutputXML();
+    class OutputXML
+    {
+      public:
+        OutputXML();
 
-    void addResult(const std::string& processName, int pid, uint64_t baseAddress, const std::vector<Rule>& results);
+        void addResult(const std::string& processName, int pid, uint64_t baseAddress, const std::vector<Rule>& results);
 
-    [[nodiscard]] std::unique_ptr<std::string> getString() const;
+        [[nodiscard]] std::unique_ptr<std::string> getString() const;
 
-  private:
-    rapidxml::xml_document<> doc;
-    rapidxml::xml_node<char>* root;
-    std::mutex lock{};
-};
+      private:
+        rapidxml::xml_document<> doc;
+        rapidxml::xml_node<char>* root;
+        std::mutex lock{};
+    };
+}

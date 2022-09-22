@@ -2,14 +2,17 @@
 #include <thread>
 #include <yara/limits.h> // NOLINT(modernize-deprecated-headers)
 
-std::unique_ptr<std::vector<Rule>> FakeYara::scanMemory([[maybe_unused]] std::vector<uint8_t>& buffer)
+namespace InMemoryScanner
 {
-    concurrentThreads++;
-    if (concurrentThreads > YR_MAX_THREADS)
+    std::unique_ptr<std::vector<Rule>> FakeYara::scanMemory([[maybe_unused]] std::vector<uint8_t>& buffer)
     {
-        max_threads_exceeded = true;
+        concurrentThreads++;
+        if (concurrentThreads > YR_MAX_THREADS)
+        {
+            max_threads_exceeded = true;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        concurrentThreads--;
+        return std::make_unique<std::vector<Rule>>();
     }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    concurrentThreads--;
-    return std::make_unique<std::vector<Rule>>();
 }

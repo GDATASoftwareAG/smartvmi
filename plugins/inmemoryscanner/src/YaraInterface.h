@@ -3,19 +3,22 @@
 #include "Common.h"
 #include <memory>
 
-class YaraException : public std::runtime_error
+namespace InMemoryScanner
 {
-  public:
-    explicit YaraException(const std::string& Message) : std::runtime_error(Message.c_str()){};
-};
+    class YaraException : public std::runtime_error
+    {
+      public:
+        explicit YaraException(const std::string& Message) : std::runtime_error(Message.c_str()){};
+    };
 
-class YaraInterface
-{
-  public:
-    virtual ~YaraInterface() = default;
+    class YaraInterface
+    {
+      public:
+        virtual ~YaraInterface() = default;
 
-    virtual std::unique_ptr<std::vector<Rule>> scanMemory(std::vector<uint8_t>& buffer) = 0;
+        virtual std::unique_ptr<std::vector<Rule>> scanMemory(std::vector<uint8_t>& buffer) = 0;
 
-  protected:
-    YaraInterface() = default;
-};
+      protected:
+        YaraInterface() = default;
+    };
+}

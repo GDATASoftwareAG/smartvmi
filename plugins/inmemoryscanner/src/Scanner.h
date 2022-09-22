@@ -10,39 +10,43 @@
 #include <vmicore/plugins/PluginInterface.h>
 #include <yara/limits.h> // NOLINT(modernize-deprecated-headers)
 
-class Scanner
+namespace InMemoryScanner
 {
-  public:
-    Scanner(const VmiCore::Plugin::PluginInterface* pluginInterface,
-            std::shared_ptr<IConfig> configuration,
-            std::unique_ptr<YaraInterface> yaraEngine,
-            std::unique_ptr<IDumping> dumping);
+    class Scanner
+    {
+      public:
+        Scanner(const VmiCore::Plugin::PluginInterface* pluginInterface,
+                std::shared_ptr<IConfig> configuration,
+                std::unique_ptr<YaraInterface> yaraEngine,
+                std::unique_ptr<IDumping> dumping);
 
-    static std::unique_ptr<std::string> getFilenameFromPath(const std::string& path);
+        static std::unique_ptr<std::string> getFilenameFromPath(const std::string& path);
 
-    void scanProcess(std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
+        void scanProcess(std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
 
-    void scanAllProcesses();
+        void scanAllProcesses();
 
-    void saveOutput();
+        void saveOutput();
 
-  private:
-    const VmiCore::Plugin::PluginInterface* pluginInterface;
-    std::shared_ptr<IConfig> configuration;
-    std::unique_ptr<YaraInterface> yaraEngine;
-    OutputXML outputXml{};
-    std::unique_ptr<IDumping> dumping;
-    std::filesystem::path inMemoryResultsTextFile;
-    Semaphore<std::mutex, std::condition_variable> semaphore =
-        Semaphore<std::mutex, std::condition_variable>(YR_MAX_THREADS);
+      private:
+        const VmiCore::Plugin::PluginInterface* pluginInterface;
+        std::shared_ptr<IConfig> configuration;
+        std::unique_ptr<YaraInterface> yaraEngine;
+        OutputXML outputXml{};
+        std::unique_ptr<IDumping> dumping;
+        std::filesystem::path inMemoryResultsTextFile;
+        Semaphore<std::mutex, std::condition_variable> semaphore =
+            Semaphore<std::mutex, std::condition_variable>(YR_MAX_THREADS);
 
-    bool shouldRegionBeScanned(const VmiCore::MemoryRegion& memoryRegionDescriptor);
+        bool shouldRegionBeScanned(const VmiCore::MemoryRegion& memoryRegionDescriptor);
 
-    void
-    scanMemoryRegion(pid_t pid, const std::string& processName, const VmiCore::MemoryRegion& memoryRegionDescriptor);
+        void scanMemoryRegion(pid_t pid,
+                              const std::string& processName,
+                              const VmiCore::MemoryRegion& memoryRegionDescriptor);
 
-    void logInMemoryResultToTextFile(const std::string& processName,
-                                     VmiCore::pid_t pid,
-                                     VmiCore::addr_t baseAddress,
-                                     const std::vector<Rule>& results);
-};
+        void logInMemoryResultToTextFile(const std::string& processName,
+                                         VmiCore::pid_t pid,
+                                         VmiCore::addr_t baseAddress,
+                                         const std::vector<Rule>& results);
+    };
+}
