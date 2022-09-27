@@ -35,7 +35,7 @@ namespace VmiCore
     {
         auto numberOfVCPUs = vmiInterface->getNumberOfVCPUs();
         SingleStepSupervisor::logger->debug("initialize callbacks",
-                                            {logfield::create("vcpus", uint64_t(numberOfVCPUs))});
+                                            {logfield::create("vcpus", static_cast<uint64_t>(numberOfVCPUs))});
         singleStepEvents = std::vector<vmi_event_t>(numberOfVCPUs);
         callbacks = std::vector<std::function<void(vmi_event_t*)>>(numberOfVCPUs);
     }
