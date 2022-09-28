@@ -2,30 +2,23 @@
 
 namespace VmiCore
 {
-    PluginConfig::PluginConfig(const YAML::Node& pluginNode) : pluginRootNode(pluginNode) {}
+    PluginConfig::PluginConfig(const YAML::Node& pluginNode) : pluginRootNode(Clone(pluginNode)) {}
 
-    std::optional<std::string> PluginConfig::getString(const std::string& element) const
+    std::string PluginConfig::asString() const
+    {
+        return Dump(pluginRootNode);
+    }
+
+    const YAML::Node& PluginConfig::rootNode() const
+    {
+        return pluginRootNode;
+    }
+
+    std::optional<std::filesystem::path> PluginConfig::configFilePath() const
     {
         try
         {
-            return pluginRootNode[element].as<std::string>();
-        }
-        catch (const YAML::Exception&)
-        {
-            return std::nullopt;
-        }
-    }
-
-    void PluginConfig::overrideString(const std::string& element, const std::string& value)
-    {
-        pluginRootNode[element] = value;
-    }
-
-    std::optional<std::vector<std::string>> PluginConfig::getStringSequence(const std::string& element) const
-    {
-        try
-        {
-            return pluginRootNode[element].as<std::vector<std::string>>();
+            return pluginRootNode["config_file"].as<std::string>();
         }
         catch (const YAML::Exception&)
         {

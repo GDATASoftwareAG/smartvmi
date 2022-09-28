@@ -25,6 +25,19 @@ FetchContent_Declare(
 option(INSTALL_GTEST "" OFF)
 FetchContent_MakeAvailable(googletest)
 
+# Setup yaml-cpp
+
+FetchContent_Declare(
+        yaml-cpp
+        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+        GIT_TAG yaml-cpp-0.7.0
+)
+option(YAML_BUILD_SHARED_LIBS "" OFF)
+option(YAML_CPP_BUILD_TOOLS "" OFF)
+FetchContent_MakeAvailable(yaml-cpp)
+set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+add_definitions(-DYAML_CPP_SUPPORT)
+
 # Add public vmicore headers
 
 add_subdirectory("${VMICORE_DIRECTORY_ROOT}/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore_public_headers")
@@ -36,7 +49,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(compile_flags -Wunused -Wunreachable-code -Wall -Wextra -Wpedantic)
-set(libraries vmicore_public_headers ${YARA_LINK_LIBRARIES})
+set(libraries vmicore_public_headers ${YARA_LINK_LIBRARIES} yaml-cpp)
 
 add_definitions(-DBUILD_VERSION="${PROGRAM_BUILD_NUMBER}" -DPLUGIN_NAME="${PROJECT_NAME}" -DPLUGIN_VERSION="${PROGRAM_VERSION}")
 

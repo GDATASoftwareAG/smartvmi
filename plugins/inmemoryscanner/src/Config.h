@@ -70,7 +70,5 @@ namespace InMemoryScanner
         bool dumpMemory{};
         bool scanAllRegions{};
         uint64_t maximumScanSize{};
-
-        static bool toBool(std::string str);
     };
 }
