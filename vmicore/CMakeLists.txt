@@ -82,6 +82,8 @@ option(YAML_BUILD_SHARED_LIBS "" OFF)
 option(YAML_CPP_BUILD_TOOLS "" OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+# Enable optional feature from plugin config header in order to be able to implement it
+add_definitions(-DYAML_CPP_SUPPORT)
 
 # Setup Boost DI
 

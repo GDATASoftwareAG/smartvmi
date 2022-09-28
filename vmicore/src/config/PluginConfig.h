@@ -1,9 +1,7 @@
 #ifndef VMICORE_PLUGINCONFIG_H
 #define VMICORE_PLUGINCONFIG_H
 
-#include <string>
 #include <vmicore/plugins/IPluginConfig.h>
-#include <yaml-cpp/yaml.h>
 
 namespace VmiCore
 {
@@ -14,11 +12,11 @@ namespace VmiCore
 
         ~PluginConfig() override = default;
 
-        std::optional<std::string> getString(const std::string& element) const override;
+        [[nodiscard]] std::string asString() const override;
 
-        void overrideString(const std::string& element, const std::string& value) override;
+        [[nodiscard]] const YAML::Node& rootNode() const override;
 
-        std::optional<std::vector<std::string>> getStringSequence(const std::string& element) const override;
+        [[nodiscard]] std::optional<std::filesystem::path> configFilePath() const override;
 
       private:
         YAML::Node pluginRootNode;
