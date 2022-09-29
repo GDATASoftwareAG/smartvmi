@@ -1,0 +1,4 @@
+
+#cmakedefine ARM64
+#cmakedefine X86_64
+

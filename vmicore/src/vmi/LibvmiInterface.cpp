@@ -90,6 +90,18 @@ uint8_t LibvmiInterface::read8PA(const uint64_t physicalAddress)
     return extractedValue;
 }
 
+uint32_t LibvmiInterface::read32PA(const uint64_t physicalAddress)
+{
+    uint32_t extractedValue = 0;
+    auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
+    std::lock_guard<std::mutex> lock(libvmiLock);
+    if (vmi_read_32(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
+    {
+        throw VmiException(fmt::format("{}: Unable to read four byte from PA: {:#x}", __func__, physicalAddress));
+    }
+    return extractedValue;
+}
+
 uint8_t LibvmiInterface::read8VA(const uint64_t virtualAddress, const uint64_t cr3)
 {
     uint8_t extractedValue = 0;
@@ -142,6 +154,16 @@ void LibvmiInterface::write8PA(const uint64_t physicalAddress, uint8_t value)
     auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
     std::lock_guard<std::mutex> lock(libvmiLock);
     if (vmi_write_8(vmiInstance, &accessContext, &value) == VMI_FAILURE)
+    {
+        throw VmiException(fmt::format("{}: Unable to write {:#x} to PA {:#x}", __func__, value, physicalAddress));
+    }
+}
+
+void LibvmiInterface::write32PA(const uint64_t physicalAddress, uint32_t value)
+{
+    auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
+    std::lock_guard<std::mutex> lock(libvmiLock);
+    if (vmi_write_32(vmiInstance, &accessContext, &value) == VMI_FAILURE)
     {
         throw VmiException(fmt::format("{}: Unable to write {:#x} to PA {:#x}", __func__, value, physicalAddress));
     }

@@ -5,11 +5,13 @@
 #include "Event.h"
 #include "InterruptGuard.h"
 #include "SingleStepSupervisor.h"
+#include <config.h>
 #include <map>
 
 #define DONT_REINJECT_INTERRUPT 0
 #define REINJECT_INTERRUPT 1
 #define INT3_BREAKPOINT 0xCC
+#define BRK64_BREAKPOINT 0xD4200000
 
 class InterruptEvent final : public Event, public std::enable_shared_from_this<InterruptEvent>
 {
@@ -33,11 +35,7 @@ class InterruptEvent final : public Event, public std::enable_shared_from_this<I
 
     void teardown() override;
 
-    static uint64_t getRcx();
-
-    static uint64_t getRdi();
-
-    static uint64_t getR8();
+    static registers_t* getRegisters();
 
     static void initializeInterruptEventHandling(ILibvmiInterface& vmiInterface);
 
@@ -68,8 +66,13 @@ class InterruptEvent final : public Event, public std::enable_shared_from_this<I
     std::unique_ptr<InterruptGuard> interruptGuard;
     std::function<InterruptResponse(InterruptEvent&)> callbackFunction;
     std::function<void(vmi_event_t*)> singleStepCallbackFunction;
-    uint8_t originalValue = 0;
     std::string targetPAString;
+
+#if defined(X86_64)
+    uint8_t originalValue = 0;
+#elif defined(ARM64)
+    uint32_t originalValue = 0;
+#endif
 
     void enableEvent() override;
 

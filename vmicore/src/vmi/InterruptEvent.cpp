@@ -69,7 +69,9 @@ void InterruptEvent::initialize()
 void InterruptEvent::teardown()
 {
     disableEvent();
-    interruptGuard->teardown();
+
+    if (interruptGuard)
+        interruptGuard->teardown();
 }
 
 InterruptEvent::~InterruptEvent()
@@ -89,33 +91,32 @@ void InterruptEvent::setupVmiInterruptEvent()
 
 void InterruptEvent::enableEvent()
 {
+#if defined(X86_64)
     vmiInterface->write8PA(targetPA, INT3_BREAKPOINT);
+#elif defined(ARM64)
+    vmiInterface->write32PA(targetPA, BRK64_BREAKPOINT);
+#endif
     logger->debug("Enabled interrupt event", {logfield::create("targetPA", targetPAString)});
 }
 
 void InterruptEvent::disableEvent()
 {
+#if defined(X86_64)
     vmiInterface->write8PA(targetPA, originalValue);
+#elif defined(ARM64)
+    vmiInterface->write32PA(targetPA, originalValue);
+#endif
     logger->debug("Disabled interrupt event", {logfield::create("targetPA", targetPAString)});
 }
 
-uint64_t InterruptEvent::getRcx()
+registers_t* InterruptEvent::getRegisters()
 {
-    return event.x86_regs->rcx;
-}
-
-uint64_t InterruptEvent::getRdi()
-{
-    return event.x86_regs->rdi;
-}
-
-uint64_t InterruptEvent::getR8()
-{
-    return event.x86_regs->r8;
+    return (registers_t*)event.x86_regs;
 }
 
 void InterruptEvent::storeOriginalValue()
 {
+#if defined(X86_64)
     originalValue = vmiInterface->read8PA(targetPA);
     logger->debug("Save original value",
                   {logfield::create("targetPA", targetPAString),
@@ -125,16 +126,34 @@ void InterruptEvent::storeOriginalValue()
         throw VmiException(fmt::format(
             "{}: InterruptEvent originalValue @ {} is already an INT3 breakpoint.", __func__, targetPAString));
     }
+#elif defined(ARM64)
+    originalValue = vmiInterface->read32PA(targetPA);
+    logger->debug("Save original value",
+                  {logfield::create("targetPA", targetPAString),
+                   logfield::create("originalValue", fmt::format("{:#x}", originalValue))});
+    if (originalValue == BRK64_BREAKPOINT)
+    {
+        throw VmiException(fmt::format(
+            "{}: InterruptEvent originalValue @ {} is already an BRK64 breakpoint.", __func__, targetPAString));
+    }
+#endif
 }
 
-event_response_t InterruptEvent::_defaultInterruptCallback(__attribute__((unused)) vmi_instance_t vmi,
-                                                           vmi_event_t* event)
+event_response_t InterruptEvent::_defaultInterruptCallback(vmi_instance_t vmi, vmi_event_t* event)
 {
     auto eventResponse = VMI_EVENT_RESPONSE_NONE;
     try
     {
+#if defined(X86_64)
+        (void)(vmi);
         auto eventPA =
             (event->interrupt_event.gfn << PagingDefinitions::numberOfPageIndexBits) + event->interrupt_event.offset;
+#elif defined(ARM64)
+        addr_t eventPA;
+        if (VMI_SUCCESS !=
+            vmi_pagetable_lookup(vmi, event->arm_regs->ttbr1 & VMI_BIT_MASK(12, 47), event->arm_regs->pc, &eventPA))
+            throw std::runtime_error("Failed address translation of breakpoint hit.");
+#endif
         auto interruptEventIterator = interruptsByPA.find(eventPA);
         if (interruptEventIterator != interruptsByPA.end())
         {
