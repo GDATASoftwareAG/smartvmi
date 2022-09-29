@@ -82,6 +82,7 @@ namespace VmiCore
         void TearDown() override
         {
             interruptFactory.teardown();
+            GlobalControl::uninit();
         }
     };
 
@@ -214,12 +215,16 @@ namespace VmiCore
         EXPECT_NO_THROW(singleStepCallback(&event));
     }
 
-    class InterruptEventFixtureWithoutTeardown : public InterruptEventFixture
+    class InterruptEventFixtureWithoutInterruptFactoryTeardown : public InterruptEventFixture
     {
-        void TearDown() override{};
+        void TearDown() override
+        {
+            GlobalControl::uninit();
+        }
     };
 
-    TEST_F(InterruptEventFixtureWithoutTeardown, clearInterruptEventHandling_activeInterrupt_vmPausedAndResumed)
+    TEST_F(InterruptEventFixtureWithoutInterruptFactoryTeardown,
+           clearInterruptEventHandling_activeInterrupt_vmPausedAndResumed)
     {
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         testing::Sequence s1;
@@ -233,7 +238,8 @@ namespace VmiCore
         InterruptEvent::clearInterruptEventHandling(*vmiInterface);
     }
 
-    TEST_F(InterruptEventFixtureWithoutTeardown, clearInterruptEventHandling_twoActiveInterrupts_interruptsDisabled)
+    TEST_F(InterruptEventFixtureWithoutInterruptFactoryTeardown,
+           clearInterruptEventHandling_twoActiveInterrupts_interruptsDisabled)
     {
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface, write8PA(testPA, testOriginalMemoryContent)).Times(1);
@@ -247,7 +253,7 @@ namespace VmiCore
         InterruptEvent::clearInterruptEventHandling(*vmiInterface);
     }
 
-    TEST_F(InterruptEventFixtureWithoutTeardown,
+    TEST_F(InterruptEventFixtureWithoutInterruptFactoryTeardown,
            clearInterruptEventHandling_twoActiveInterrupts_interruptGuardsDisabled)
     {
         EXPECT_CALL(*vmiInterface, clearEvent(_, _)).Times(AnyNumber());
