@@ -50,16 +50,12 @@ include(FetchContent)
 
 # Setup bundled google test framework
 
-set(BUILD_GMOCK ON CACHE BOOL "Build google mock.")
-set(BUILD_GTEST ON CACHE BOOL "Build google test.")
-set(BUILD_SHARED_LIBS ON CACHE BOOL "Create shared libraries.")
-set(INSTALL_GTEST OFF CACHE BOOL "Do not create installing functionality.")
-set(INSTALL_GMOCK OFF CACHE BOOL "Do not create installing functionality.")
 FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG release-1.11.0
 )
+option(INSTALL_GTEST "" OFF)
 FetchContent_MakeAvailable(googletest)
 
 # Setup libvmi
@@ -69,8 +65,8 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
         GIT_TAG test
 )
-set(libvmi_ENABLE_STATIC OFF)
-set(libvmi_BUILD_EXAMPLES OFF)
+option(ENABLE_STATIC "" OFF)
+option(BUILD_EXAMPLES "" OFF)
 FetchContent_MakeAvailable(libvmi)
 
 include_directories(BEFORE SYSTEM ${libvmi_SOURCE_DIR})
@@ -82,8 +78,8 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
         GIT_TAG yaml-cpp-0.7.0
 )
-set(yaml-cpp_YAML_BUILD_SHARED_LIBS OFF)
-set(yaml-cpp_YAML_CPP_BUILD_TOOLS OFF)
+option(YAML_BUILD_SHARED_LIBS "" OFF)
+option(YAML_CPP_BUILD_TOOLS "" OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 
