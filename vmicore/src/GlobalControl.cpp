@@ -40,6 +40,7 @@ namespace VmiCore
         void uninit()
         {
             staticLogger.reset();
+            staticEventStream.reset();
         }
     }
 }
