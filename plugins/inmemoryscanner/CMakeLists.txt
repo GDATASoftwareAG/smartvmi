@@ -22,11 +22,7 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG release-1.11.0
 )
-set(googletest_BUILD_GMOCK ON)
-set(googletest_BUILD_GTEST ON)
-set(googletest_BUILD_SHARED_LIBS ON)
-set(googletest_INSTALL_GTEST OFF)
-set(googletest_INSTALL_GMOCK OFF)
+option(INSTALL_GTEST "" OFF)
 FetchContent_MakeAvailable(googletest)
 
 # Add public vmicore headers
