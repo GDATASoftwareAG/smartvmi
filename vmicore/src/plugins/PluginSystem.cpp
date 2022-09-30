@@ -208,25 +208,20 @@ namespace VmiCore
         }
         dlerror(); // clear possible remnants of error messages
 
-        auto* pluginInformation = reinterpret_cast<Plugin::PluginDetails*>(dlsym(libraryHandle, "pluginInformation"));
+        auto* pluginApiVersion = reinterpret_cast<uint8_t*>(dlsym(libraryHandle, "_ZN7VmiCore6Plugin11API_VERSIONE"));
         auto* dlErrorMessage = dlerror();
         if (dlErrorMessage != nullptr)
         {
-            throw std::runtime_error("Unable to retrieve extern symbol 'pluginInformation': " +
+            throw std::runtime_error("Unable to retrieve extern symbol '_ZN7VmiCore6Plugin11API_VERSIONE': " +
                                      std::string(dlErrorMessage));
         }
-        logger->debug("Plugin information",
-                      {
-                          logfield::create("API", static_cast<int64_t>(pluginInformation->apiVersion)),
-                          logfield::create("Pluginname", pluginInformation->pluginName),
-                          logfield::create("PluginVersion", pluginInformation->pluginVersion),
-                      });
+        logger->debug("Plugin information", {logfield::create("API_VERSION", static_cast<int64_t>(*pluginApiVersion))});
 
-        if (pluginInformation->apiVersion != VMI_PLUGIN_API_VERSION)
+        if (*pluginApiVersion != Plugin::PluginInterface::API_VERSION)
         {
-            throw std::runtime_error("Plugin API Version " + std::to_string(pluginInformation->apiVersion) +
+            throw std::runtime_error("Plugin API Version " + std::to_string(*pluginApiVersion) +
                                      " is incompatible with VmiCore API Version " +
-                                     std::to_string(VMI_PLUGIN_API_VERSION));
+                                     std::to_string(Plugin::PluginInterface::API_VERSION));
         }
 
         auto pluginInitFunction = reinterpret_cast<init_f>(dlsym(libraryHandle, "init"));

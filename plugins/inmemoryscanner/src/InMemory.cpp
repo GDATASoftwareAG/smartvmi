@@ -8,15 +8,13 @@
 #include <tclap/CmdLine.h>
 #include <vmicore/plugins/PluginInit.h>
 
+VMI_PLUGIN_API_VERSION_INFO
+
 using VmiCore::ActiveProcessInformation;
 using VmiCore::Plugin::IPluginConfig;
 using VmiCore::Plugin::LogLevel;
 using VmiCore::Plugin::PluginDetails;
 using VmiCore::Plugin::PluginInterface;
-
-// Struct is externally verified during plugin initialization
-[[maybe_unused]] extern constexpr PluginDetails pluginInformation = {
-    VMI_PLUGIN_API_VERSION, PLUGIN_NAME, PLUGIN_VERSION};
 
 namespace InMemoryScanner
 {
@@ -56,8 +54,10 @@ namespace InMemoryScanner
 
         cmd.parse(args);
 
-        pluginInterface->logMessage(
-            LogLevel::info, LOG_FILENAME, "Starting inMemory plugin build version " + std::string(BUILD_VERSION));
+        pluginInterface->logMessage(LogLevel::debug,
+                                    LOG_FILENAME,
+                                    "InMemoryScanner plugin version info: " + std::string(PLUGIN_VERSION) + "-" +
+                                        std::string(BUILD_VERSION));
 
         try
         {

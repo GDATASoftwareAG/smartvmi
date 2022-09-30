@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-constexpr uint8_t VMI_PLUGIN_API_VERSION = 12;
-
 namespace VmiCore::Plugin
 {
     using processTerminationCallback_f = void (*)(std::shared_ptr<const ActiveProcessInformation>);
@@ -35,6 +33,8 @@ namespace VmiCore::Plugin
     class PluginInterface
     {
       public:
+        constexpr static uint8_t API_VERSION = 12;
+
         virtual ~PluginInterface() = default;
 
         [[nodiscard]] virtual std::unique_ptr<std::vector<uint8_t>>
