@@ -51,7 +51,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(compile_flags -Wunused -Wunreachable-code -Wall -Wextra -Wpedantic)
 set(libraries vmicore_public_headers ${YARA_LINK_LIBRARIES} yaml-cpp)
 
-add_definitions(-DBUILD_VERSION="${PROGRAM_BUILD_NUMBER}" -DPLUGIN_NAME="${PROJECT_NAME}" -DPLUGIN_VERSION="${PROGRAM_VERSION}")
+add_definitions(-DBUILD_VERSION="${PROGRAM_BUILD_NUMBER}" -DPLUGIN_VERSION="${PROGRAM_VERSION}")
 
 # End variable section
 
