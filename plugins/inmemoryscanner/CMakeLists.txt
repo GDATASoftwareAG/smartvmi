@@ -36,7 +36,7 @@ option(YAML_BUILD_SHARED_LIBS "" OFF)
 option(YAML_CPP_BUILD_TOOLS "" OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
-add_definitions(-DYAML_CPP_SUPPORT)
+add_compile_definitions(YAML_CPP_SUPPORT)
 
 # Add public vmicore headers
 
@@ -51,7 +51,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(compile_flags -Wunused -Wunreachable-code -Wall -Wextra -Wpedantic)
 set(libraries vmicore_public_headers ${YARA_LINK_LIBRARIES} yaml-cpp)
 
-add_definitions(-DBUILD_VERSION="${PROGRAM_BUILD_NUMBER}" -DPLUGIN_VERSION="${PROGRAM_VERSION}")
+add_compile_definitions(BUILD_VERSION="${PROGRAM_BUILD_NUMBER}" PLUGIN_VERSION="${PROGRAM_VERSION}")
 
 # End variable section
 

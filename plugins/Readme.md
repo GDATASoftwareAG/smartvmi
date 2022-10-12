@@ -102,7 +102,7 @@ FetchContent_MakeAvailable(yaml-cpp)
 # Required because libraries have to be relocatable and can therefore only link with relocatable code
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 # Make the function that provides the plugin root node in IPluginConfig available 
-add_definitions(-DYAML_CPP_SUPPORT)
+add_compile_definitions(YAML_CPP_SUPPORT)
 ```
 
 ```c++
