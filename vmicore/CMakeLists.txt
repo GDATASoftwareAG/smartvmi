@@ -35,9 +35,9 @@ if (VMI_SANITIZERS)
     endif ()
 endif ()
 
-add_definitions(-DPROGRAM_VERSION="${PROGRAM_VERSION}" -DBUILD_VERSION="${PROGRAM_BUILD_NUMBER}")
+add_compile_definitions(PROGRAM_VERSION="${PROGRAM_VERSION}" BUILD_VERSION="${PROGRAM_BUILD_NUMBER}")
 if (TRACE_MODE)
-    add_definitions(-DTRACE_MODE)
+    add_compile_definitions(TRACE_MODE)
 endif ()
 
 # Check if tclap is present
@@ -83,7 +83,7 @@ option(YAML_CPP_BUILD_TOOLS "" OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 # Enable optional feature from plugin config header in order to be able to implement it
-add_definitions(-DYAML_CPP_SUPPORT)
+add_compile_definitions(YAML_CPP_SUPPORT)
 
 # Setup Boost DI
 
