@@ -27,6 +27,6 @@ namespace VmiCore::Plugin
       protected:
         IPluginConfig() = default;
     };
-} // namespace Plugin
+}
 
 #endif // VMICORE_IPLUGINCONFIG_H

@@ -18,7 +18,7 @@
 #include "io/console/ConsoleLoggerBuilder.h"
 #include "io/console/DummyEventStream.h"
 #include "io/grpc/GRPCServer.h"
-#include "vmi/InterruptFactory.h"
+#include "vmi/InterruptEventSupervisor.h"
 #include "vmi/LibvmiInterface.h"
 #include "vmi/VmiException.h"
 #include <boost/di.hpp>
@@ -47,7 +47,7 @@ int main(int argc, const char* argv[])
             boost::di::bind<VmiCore::IConfigParser>().to<VmiCore::ConfigYAMLParser>(),
             boost::di::bind<VmiCore::ILibvmiInterface>().to<VmiCore::LibvmiInterface>(),
             boost::di::bind<VmiCore::ISingleStepSupervisor>().to<VmiCore::SingleStepSupervisor>(),
-            boost::di::bind<VmiCore::IInterruptFactory>().to<VmiCore::InterruptFactory>(),
+            boost::di::bind<VmiCore::IInterruptEventSupervisor>().to<VmiCore::InterruptEventSupervisor>(),
             boost::di::bind<VmiCore::ILogging>().to(
                 [&enableGRPCServer](const auto& injector) -> std::shared_ptr<VmiCore::ILogging>
                 {

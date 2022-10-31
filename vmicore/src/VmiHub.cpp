@@ -21,13 +21,13 @@ namespace VmiCore
                    std::shared_ptr<ILibvmiInterface> vmiInterface,
                    std::shared_ptr<ILogging> loggingLib,
                    std::shared_ptr<IEventStream> eventStream,
-                   std::shared_ptr<IInterruptFactory> interruptFactory)
+                   std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor)
         : configInterface(std::move(configInterface)),
           vmiInterface(std::move(vmiInterface)),
           loggingLib(std::move(loggingLib)),
           logger(NEW_LOGGER(this->loggingLib)),
           eventStream(std::move(eventStream)),
-          interruptFactory(std::move(interruptFactory))
+          interruptEventSupervisor(std::move(interruptEventSupervisor))
     {
     }
 
@@ -52,7 +52,7 @@ namespace VmiCore
                               {logfield::create("durationMilliseconds", callDuration.count()),
                                logfield::create("totalElapsedTimeSeconds", elapsedTime.count())});
 #else
-                vmiInterface->waitForEvent();
+                vmiInterface->eventsListen(500);
 #endif
             }
             catch (const std::exception& e)
@@ -65,13 +65,6 @@ namespace VmiCore
                 GlobalControl::endVmi = true;
             }
         }
-    }
-
-    void VmiHub::performShutdownPluginAction() const
-    {
-        vmiInterface->pauseVm();
-        pluginSystem->passShutdownEventToRegisteredPlugins();
-        vmiInterface->resumeVm();
     }
 
     void logReceivedSignal(int signal)
@@ -139,6 +132,7 @@ namespace VmiCore
                 pluginSystem = std::make_shared<PluginSystem>(configInterface,
                                                               vmiInterface,
                                                               activeProcessesSupervisor,
+                                                              interruptEventSupervisor,
                                                               std::make_shared<LegacyLogging>(configInterface),
                                                               loggingLib,
                                                               eventStream);
@@ -146,7 +140,7 @@ namespace VmiCore
                                                                                        pluginSystem,
                                                                                        activeProcessesSupervisor,
                                                                                        configInterface,
-                                                                                       interruptFactory,
+                                                                                       interruptEventSupervisor,
                                                                                        loggingLib,
                                                                                        eventStream);
                 break;
@@ -159,6 +153,7 @@ namespace VmiCore
                 pluginSystem = std::make_shared<PluginSystem>(configInterface,
                                                               vmiInterface,
                                                               activeProcessesSupervisor,
+                                                              interruptEventSupervisor,
                                                               std::make_shared<LegacyLogging>(configInterface),
                                                               loggingLib,
                                                               eventStream);
@@ -166,7 +161,7 @@ namespace VmiCore
                                                                                          pluginSystem,
                                                                                          activeProcessesSupervisor,
                                                                                          configInterface,
-                                                                                         interruptFactory,
+                                                                                         interruptEventSupervisor,
                                                                                          loggingLib,
                                                                                          eventStream);
                 break;
@@ -193,11 +188,15 @@ namespace VmiCore
 
         setupSignalHandling();
         waitForEvents();
+
+        vmiInterface->pauseVm();
         if (GlobalControl::postRunPluginAction)
         {
-            performShutdownPluginAction();
+            pluginSystem->passShutdownEventToRegisteredPlugins();
         }
         systemEventSupervisor->teardown();
+        vmiInterface->resumeVm();
+
         return exitCode;
     }
 }

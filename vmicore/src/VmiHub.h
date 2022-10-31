@@ -6,7 +6,7 @@
 #include "io/ILogging.h"
 #include "os/ISystemEventSupervisor.h"
 #include "plugins/PluginSystem.h"
-#include "vmi/InterruptFactory.h"
+#include "vmi/InterruptEventSupervisor.h"
 #include "vmi/LibvmiInterface.h"
 #include <memory>
 #include <unordered_map>
@@ -20,7 +20,7 @@ namespace VmiCore
                std::shared_ptr<ILibvmiInterface> vmiInterface,
                std::shared_ptr<ILogging> loggingLib,
                std::shared_ptr<IEventStream> eventStream,
-               std::shared_ptr<IInterruptFactory> interruptFactory);
+               std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor);
 
         uint run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs);
 
@@ -32,11 +32,9 @@ namespace VmiCore
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;
-        std::shared_ptr<IInterruptFactory> interruptFactory;
+        std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
 
         void waitForEvents() const;
-
-        void performShutdownPluginAction() const;
     };
 }
 

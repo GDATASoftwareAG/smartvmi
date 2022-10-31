@@ -13,7 +13,6 @@ VMI_PLUGIN_API_VERSION_INFO
 using VmiCore::ActiveProcessInformation;
 using VmiCore::Plugin::IPluginConfig;
 using VmiCore::Plugin::LogLevel;
-using VmiCore::Plugin::PluginDetails;
 using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner

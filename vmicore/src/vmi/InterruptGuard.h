@@ -1,38 +1,43 @@
 #ifndef VMICORE_INTERRUPTGUARD_H
 #define VMICORE_INTERRUPTGUARD_H
 
-#include "Event.h"
+#include "../io/ILogging.h"
+#include "LibvmiInterface.h"
 #include "SingleStepSupervisor.h"
+#include <cstdint>
+#include <libvmi/events.h>
+#include <memory>
+#include <vector>
 
 namespace VmiCore
 {
-    class InterruptGuard final : public Event
+    class InterruptGuard
     {
       public:
         InterruptGuard(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                       std::unique_ptr<ILogger> logger,
+                       const std::shared_ptr<ILogging>& logging,
                        uint64_t targetVA,
-                       uint64_t targetPA,
+                       uint64_t targetGFN,
                        uint64_t systemCr3);
 
-        ~InterruptGuard() override = default;
+        void initialize();
 
-        void initialize() override;
-
-        void teardown() override;
+        void teardown();
 
       private:
+        std::shared_ptr<ILibvmiInterface> vmiInterface;
+        std::unique_ptr<ILogger> logger;
         uint64_t targetVA;
-        uint64_t targetPA;
-        vmi_event* guardEvent{};
+        uint64_t targetGFN;
+        vmi_event_t guardEvent{};
         std::vector<uint8_t> shadowPage;
         uint64_t systemCr3;
         emul_read_t emulateReadData{};
         bool interruptGuardHit = false;
 
-        void enableEvent() override;
+        void enableEvent();
 
-        void disableEvent() override;
+        void disableEvent();
 
         static event_response_t _guardCallback(vmi_instance_t vmiInstance, vmi_event_t* event);
 

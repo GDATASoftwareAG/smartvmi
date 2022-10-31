@@ -1,35 +1,43 @@
 #ifndef VMICORE_EVENT_H
 #define VMICORE_EVENT_H
 
-#include "../io/ILogging.h"
-#include "../io/grpc/GRPCLogger.h"
-#include "LibvmiInterface.h"
 #include <cstdint>
 #include <libvmi/events.h>
-#include <memory>
-#include <utility>
+#include <vmicore/vmi/events/IInterruptEvent.h>
 
 namespace VmiCore
 {
-    class Event
+    class Event : public IInterruptEvent
     {
       public:
-        explicit Event(std::shared_ptr<ILibvmiInterface> vmiInterface, std::unique_ptr<ILogger> logger)
-            : vmiInterface(std::move(vmiInterface)), logger(std::move(logger)){};
+        explicit Event(vmi_event_t* libvmiEvent);
 
-        virtual ~Event() = default;
+        ~Event() override = default;
 
-      protected:
-        std::shared_ptr<ILibvmiInterface> vmiInterface;
-        std::unique_ptr<ILogger> logger;
+        uint64_t getRax() override;
 
-        virtual void initialize() = 0;
+        uint64_t getRbx() override;
 
-        virtual void enableEvent() = 0;
+        uint64_t getRcx() override;
 
-        virtual void disableEvent() = 0;
+        uint64_t getRdx() override;
 
-        virtual void teardown() = 0;
+        uint64_t getRdi() override;
+
+        uint64_t getRip() override;
+
+        uint64_t getCr3() override;
+
+        uint64_t getR8() override;
+
+        addr_t getGla() override;
+
+        addr_t getGfn() override;
+
+        addr_t getOffset() override;
+
+      private:
+        vmi_event_t* libvmiEvent;
     };
 }
 

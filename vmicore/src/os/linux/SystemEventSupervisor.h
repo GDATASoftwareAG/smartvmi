@@ -4,8 +4,7 @@
 #include "../../io/IEventStream.h"
 #include "../../io/ILogger.h"
 #include "../../plugins/PluginSystem.h"
-#include "../../vmi/InterruptEvent.h"
-#include "../../vmi/InterruptFactory.h"
+#include "../../vmi/InterruptEventSupervisor.h"
 #include "../../vmi/LibvmiInterface.h"
 #include "../../vmi/SingleStepSupervisor.h"
 #include "../IActiveProcessesSupervisor.h"
@@ -24,17 +23,17 @@ namespace VmiCore::Linux
                               std::shared_ptr<IPluginSystem> pluginSystem,
                               std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
                               std::shared_ptr<IConfigParser> configInterface,
-                              std::shared_ptr<IInterruptFactory> interruptFactory,
+                              std::shared_ptr<IInterruptEventSupervisor> interruptFactory,
                               std::shared_ptr<ILogging> loggingLib,
                               std::shared_ptr<IEventStream> eventStream);
 
         void initialize() override;
 
-        InterruptEvent::InterruptResponse procForkConnectorCallback(InterruptEvent& interruptEvent);
+        BpResponse procForkConnectorCallback(IInterruptEvent& event);
 
-        InterruptEvent::InterruptResponse procExecConnectorCallback(InterruptEvent& interruptEvent);
+        BpResponse procExecConnectorCallback(IInterruptEvent& event);
 
-        InterruptEvent::InterruptResponse procExitConnectorCallback(InterruptEvent& interruptEvent);
+        BpResponse procExitConnectorCallback(IInterruptEvent& event);
 
         void teardown() override;
 
@@ -43,10 +42,10 @@ namespace VmiCore::Linux
         std::shared_ptr<IPluginSystem> pluginSystem;
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
         std::shared_ptr<IConfigParser> configInterface;
-        [[maybe_unused]] std::shared_ptr<InterruptEvent> procForkConnectorEvent;
-        [[maybe_unused]] std::shared_ptr<InterruptEvent> procExecConnectorEvent;
-        [[maybe_unused]] std::shared_ptr<InterruptEvent> procExitConnectorEvent;
-        std::shared_ptr<IInterruptFactory> interruptFactory;
+        std::shared_ptr<IBreakpoint> procForkConnectorEvent;
+        std::shared_ptr<IBreakpoint> procExecConnectorEvent;
+        std::shared_ptr<IBreakpoint> procExitConnectorEvent;
+        std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;

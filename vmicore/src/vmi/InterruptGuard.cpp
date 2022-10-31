@@ -4,6 +4,7 @@
 #include "VmiException.h"
 #include <fmt/core.h>
 #include <memory>
+#include <utility>
 
 namespace VmiCore
 {
@@ -13,13 +14,14 @@ namespace VmiCore
     }
 
     InterruptGuard::InterruptGuard(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                                   std::unique_ptr<ILogger> logger,
+                                   const std::shared_ptr<ILogging>& logging,
                                    uint64_t targetVA,
-                                   uint64_t targetPA,
+                                   uint64_t targetGFN,
                                    uint64_t systemCr3)
-        : Event(std::move(vmiInterface), std::move(logger)),
+        : vmiInterface(std::move(vmiInterface)),
+          logger(NEW_LOGGER(logging)),
           targetVA(targetVA),
-          targetPA(targetPA),
+          targetGFN(targetGFN),
           shadowPage(PagingDefinitions::pageSizeInBytes + 16),
           systemCr3(systemCr3)
     {
@@ -27,19 +29,13 @@ namespace VmiCore
 
     void InterruptGuard::initialize()
     {
-        // Allocate zeroed memory
-        guardEvent = reinterpret_cast<vmi_event_t*>(calloc(1, sizeof(vmi_event_t)));
         // setting simple read events is unsupported by EPT
-        SETUP_MEM_EVENT(guardEvent,
-                        targetPA >> PagingDefinitions::numberOfPageIndexBits,
-                        VMI_MEMACCESS_RW,
-                        &InterruptGuard::_guardCallback,
-                        false);
-        guardEvent->data = this;
+        SETUP_MEM_EVENT(&guardEvent, targetGFN, VMI_MEMACCESS_RW, &InterruptGuard::_guardCallback, false);
+        guardEvent.data = this;
 
         // This will never change so we initialize this here once
         emulateReadData.dont_free = true;
-        emulateReadData.size = 8;
+        emulateReadData.size = 16;
 
         auto pageBaseVA = targetVA & PagingDefinitions::stripPageOffsetMask;
         // we need a small buffer of data from the subsequent page because memory reads may be overlapping
@@ -51,7 +47,7 @@ namespace VmiCore
         enableEvent();
         logger->debug("Interrupt guard: Register RW event on gfn",
                       {logfield::create("targetGFN",
-                                        fmt::format("{:#x}", targetPA >> PagingDefinitions::numberOfPageIndexBits))});
+                                        fmt::format("{:#x}", targetGFN >> PagingDefinitions::numberOfPageIndexBits))});
     }
 
     void InterruptGuard::teardown()
@@ -61,12 +57,12 @@ namespace VmiCore
 
     void InterruptGuard::enableEvent()
     {
-        vmiInterface->registerEvent(*guardEvent);
+        vmiInterface->registerEvent(guardEvent);
     }
 
     void InterruptGuard::disableEvent()
     {
-        vmiInterface->clearEvent(*guardEvent, true);
+        vmiInterface->clearEvent(guardEvent, true);
     }
 
     event_response_t InterruptGuard::_guardCallback(__attribute__((unused)) vmi_instance_t vmiInstance,

@@ -196,6 +196,7 @@ namespace VmiCore
         std::shared_ptr<NiceMock<MockEventStream>> mockEventStream = std::make_shared<NiceMock<MockEventStream>>();
 
         std::shared_ptr<Windows::ActiveProcessesSupervisor> activeProcessesSupervisor;
+        std::shared_ptr<InterruptEventSupervisor> interruptEventSupervisor;
 
         void setupReturnsForVmiInterface()
         {
@@ -569,6 +570,7 @@ namespace VmiCore
             pluginSystem = std::make_shared<PluginSystem>(mockConfigInterface,
                                                           mockVmiInterface,
                                                           activeProcessesSupervisor,
+                                                          interruptEventSupervisor,
                                                           mockLegacyLogging,
                                                           mockLogging,
                                                           std::make_shared<NiceMock<MockEventStream>>());

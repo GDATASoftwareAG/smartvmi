@@ -1,5 +1,4 @@
 #include "SystemEventSupervisor.h"
-#include "../../GlobalControl.h"
 #include "../../io/grpc/GRPCLogger.h"
 #include "../../vmi/VmiException.h"
 #include <fmt/core.h>
@@ -11,14 +10,14 @@ namespace VmiCore::Windows
                                                  std::shared_ptr<IPluginSystem> pluginSystem,
                                                  std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
                                                  std::shared_ptr<IConfigParser> configInterface,
-                                                 std::shared_ptr<IInterruptFactory> interruptFactory,
+                                                 std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
                                                  std::shared_ptr<ILogging> loggingLib,
                                                  std::shared_ptr<IEventStream> eventStream)
         : vmiInterface(std::move(vmiInterface)),
           pluginSystem(std::move(pluginSystem)),
           activeProcessesSupervisor(std::move(activeProcessesSupervisor)),
           configInterface(std::move(configInterface)),
-          interruptFactory(std::move(interruptFactory)),
+          interruptEventSupervisor(std::move(interruptEventSupervisor)),
           loggingLib(std::move(loggingLib)),
           logger(NEW_LOGGER(this->loggingLib)),
           eventStream(std::move(eventStream))
@@ -28,7 +27,7 @@ namespace VmiCore::Windows
     void SystemEventSupervisor::initialize()
     {
         activeProcessesSupervisor->initialize();
-        interruptFactory->initialize();
+        interruptEventSupervisor->initialize();
         startPspCallProcessNotifyRoutinesMonitoring();
         startKeBugCheckExMonitoring();
     }
@@ -38,14 +37,11 @@ namespace VmiCore::Windows
         auto processNotifyFunctionVA = vmiInterface->translateKernelSymbolToVA("PspCallProcessNotifyRoutines");
         logger->debug("Obtained starting address of PspCallProcessNotifyRoutines",
                       {logfield::create("VA", fmt::format("{:#x}", processNotifyFunctionVA))});
-        auto notifyProcessCallbackFunction = InterruptEvent::createInterruptCallback(
+        auto notifyProcessCallbackFunction = IBreakpoint::createBreakpointCallback(
             weak_from_this(), &SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback);
 
-        notifyProcessInterruptEvent =
-            interruptFactory->createInterruptEvent("PspCallProcessNotifyRoutinesInterruptEvent",
-                                                   processNotifyFunctionVA,
-                                                   vmiInterface->convertPidToDtb(systemPid),
-                                                   notifyProcessCallbackFunction);
+        notifyProcessInterruptEvent = interruptEventSupervisor->createBreakpoint(
+            processNotifyFunctionVA, vmiInterface->convertPidToDtb(systemPid), notifyProcessCallbackFunction);
     }
 
     void SystemEventSupervisor::startKeBugCheckExMonitoring()
@@ -54,19 +50,16 @@ namespace VmiCore::Windows
         logger->debug("Obtained starting address of KeBugCheckEx",
                       {logfield::create("VA", fmt::format("{:#x}", bugCheckFunctionVA))});
         auto bugCheckCallbackFunction =
-            InterruptEvent::createInterruptCallback(weak_from_this(), &SystemEventSupervisor::keBugCheckExCallback);
+            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::keBugCheckExCallback);
 
-        bugCheckInterruptEvent = interruptFactory->createInterruptEvent("KeBugCheckExInterruptEvent",
-                                                                        bugCheckFunctionVA,
-                                                                        vmiInterface->convertPidToDtb(systemPid),
-                                                                        bugCheckCallbackFunction);
+        bugCheckInterruptEvent = interruptEventSupervisor->createBreakpoint(
+            bugCheckFunctionVA, vmiInterface->convertPidToDtb(systemPid), bugCheckCallbackFunction);
     }
 
-    InterruptEvent::InterruptResponse
-    SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback(InterruptEvent& interruptEvent)
+    BpResponse SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback(IInterruptEvent& event)
     {
-        auto eprocessBase = interruptEvent.getRcx();
-        bool isTerminationEvent = interruptEvent.getR8() == 0;
+        auto eprocessBase = event.getRcx();
+        bool isTerminationEvent = event.getR8() == 0;
         logger->debug(fmt::format("{} called", __func__),
                       {
                           logfield::create("_EPROCESS_base ", fmt::format("{:#x}", eprocessBase)),
@@ -89,23 +82,25 @@ namespace VmiCore::Windows
         {
             activeProcessesSupervisor->addNewProcess(eprocessBase);
         }
-        return InterruptEvent::InterruptResponse::Continue;
+        return BpResponse::Continue;
     }
 
-    InterruptEvent::InterruptResponse SystemEventSupervisor::keBugCheckExCallback(InterruptEvent& interruptEvent)
+    BpResponse SystemEventSupervisor::keBugCheckExCallback(IInterruptEvent& event)
     {
-        auto bugCheckCode = interruptEvent.getRcx();
+        auto bugCheckCode = event.getRcx();
         eventStream->sendBSODEvent(static_cast<int64_t>(bugCheckCode));
         logger->warning("BSOD detected!", {logfield::create("BugCheckCode", fmt::format("{:#x}", bugCheckCode))});
         GlobalControl::endVmi = true;
         GlobalControl::postRunPluginAction = false;
         pluginSystem->passShutdownEventToRegisteredPlugins();
         // deactivate the interrupt event because we are terminating immediately (no single stepping)
-        return InterruptEvent::InterruptResponse::Deactivate;
+        return BpResponse::Deactivate;
     }
 
     void SystemEventSupervisor::teardown()
     {
-        interruptFactory->teardown();
+        notifyProcessInterruptEvent->remove();
+        bugCheckInterruptEvent->remove();
+        interruptEventSupervisor->teardown();
     }
 }

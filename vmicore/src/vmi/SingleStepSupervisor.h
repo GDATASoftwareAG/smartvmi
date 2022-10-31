@@ -18,7 +18,8 @@ namespace VmiCore
 
         virtual void teardown() = 0;
 
-        virtual void setSingleStepCallback(uint vcpuId, const std::function<void(vmi_event_t*)>& eventCallback) = 0;
+        virtual void
+        setSingleStepCallback(uint vcpuId, const std::function<void(vmi_event_t*)>& eventCallback, uint64_t data) = 0;
 
       protected:
         ISingleStepSupervisor() = default;
@@ -38,7 +39,9 @@ namespace VmiCore
 
         static event_response_t _defaultSingleStepCallback(vmi_instance_t vmiInstance, vmi_event_t* event);
 
-        void setSingleStepCallback(uint vcpuId, const std::function<void(vmi_event_t*)>& eventCallback) override;
+        void setSingleStepCallback(uint vcpuId,
+                                   const std::function<void(vmi_event_t*)>& eventCallback,
+                                   uint64_t data) override;
 
         template <class T>
         static std::function<void(vmi_event_t*)> createSingleStepCallback(std::shared_ptr<T> callbackObjectShared,

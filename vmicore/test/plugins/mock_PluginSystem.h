@@ -22,6 +22,11 @@ namespace VmiCore
 
         MOCK_METHOD(void, registerShutdownEvent, (Plugin::shutdownCallback_f), (override));
 
+        MOCK_METHOD(std::shared_ptr<IBreakpoint>,
+                    createBreakpoint,
+                    (uint64_t, uint64_t, const std::function<BpResponse(IInterruptEvent&)>&),
+                    (override));
+
         MOCK_METHOD(std::unique_ptr<std::string>, getResultsDir, (), (const override));
 
         MOCK_METHOD(void, writeToFile, (const std::string&, const std::string&), (const override));

@@ -145,8 +145,9 @@ set(source_files
         src/os/linux/PathExtractor.cpp
         src/os/linux/SystemEventSupervisor.cpp
         src/plugins/PluginSystem.cpp
-        src/vmi/InterruptEvent.cpp
-        src/vmi/InterruptFactory.cpp
+        src/vmi/Breakpoint.cpp
+        src/vmi/Event.cpp
+        src/vmi/InterruptEventSupervisor.cpp
         src/vmi/InterruptGuard.cpp
         src/vmi/LibvmiInterface.cpp
         src/vmi/SingleStepSupervisor.cpp
@@ -158,7 +159,7 @@ set(test_files
         test/os/windows/KernelAccess_UnitTest.cpp
         test/os/windows/SystemEventSupervisor_UnitTest.cpp
         test/plugins/PluginSystem_UnitTest.cpp
-        test/vmi/InterruptEvent_UnitTest.cpp
+        test/vmi/InterruptEventSupervisor_UnitTest.cpp
         test/vmi/LibvmiInterface_UnitTest.cpp
         test/vmi/SingleStepSupervisor_UnitTest.cpp)
 
