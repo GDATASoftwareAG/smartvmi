@@ -22,12 +22,14 @@ namespace VmiCore
     PluginSystem::PluginSystem(std::shared_ptr<IConfigParser> configInterface,
                                std::shared_ptr<ILibvmiInterface> vmiInterface,
                                std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
+                               std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
                                std::shared_ptr<IFileTransport> pluginLogging,
                                std::shared_ptr<ILogging> loggingLib,
                                std::shared_ptr<IEventStream> eventStream)
         : configInterface(std::move(configInterface)),
           vmiInterface(std::move(vmiInterface)),
           activeProcessesSupervisor(std::move(activeProcessesSupervisor)),
+          interruptEventSupervisor(std::move(interruptEventSupervisor)),
           legacyLogging(std::move(pluginLogging)),
           loggingLib(std::move(loggingLib)),
           logger(NEW_LOGGER(this->loggingLib)),
@@ -111,6 +113,12 @@ namespace VmiCore
     void PluginSystem::registerShutdownEvent(Plugin::shutdownCallback_f shutdownCallback)
     {
         registeredShutdownCallbacks.push_back(shutdownCallback);
+    }
+
+    std::shared_ptr<IBreakpoint> PluginSystem::createBreakpoint(
+        uint64_t targetVA, uint64_t processDtb, const std::function<BpResponse(IInterruptEvent&)>& callbackFunction)
+    {
+        return interruptEventSupervisor->createBreakpoint(targetVA, processDtb, callbackFunction);
     }
 
     void PluginSystem::writeToFile(const std::string& filename, const std::string& message) const

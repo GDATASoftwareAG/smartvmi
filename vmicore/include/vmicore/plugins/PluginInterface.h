@@ -3,7 +3,9 @@
 
 #include "../os/ActiveProcessInformation.h"
 #include "../types.h"
+#include "../vmi/IBreakpoint.h"
 #include "IPluginConfig.h"
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -14,13 +16,6 @@ namespace VmiCore::Plugin
     using processTerminationCallback_f = void (*)(std::shared_ptr<const ActiveProcessInformation>);
 
     using shutdownCallback_f = void (*)();
-
-    struct PluginDetails
-    {
-        unsigned int apiVersion;
-        const char* pluginName;
-        const char* pluginVersion;
-    };
 
     enum class LogLevel
     {
@@ -33,7 +28,7 @@ namespace VmiCore::Plugin
     class PluginInterface
     {
       public:
-        constexpr static uint8_t API_VERSION = 12;
+        constexpr static uint8_t API_VERSION = 13;
 
         virtual ~PluginInterface() = default;
 
@@ -46,6 +41,11 @@ namespace VmiCore::Plugin
         virtual void registerProcessTerminationEvent(processTerminationCallback_f terminationCallback) = 0;
 
         virtual void registerShutdownEvent(shutdownCallback_f shutdownCallback) = 0;
+
+        [[nodiscard]] virtual std::shared_ptr<IBreakpoint>
+        createBreakpoint(uint64_t targetVA,
+                         uint64_t processDtb,
+                         const std::function<BpResponse(IInterruptEvent&)>& callbackFunction) = 0;
 
         [[nodiscard]] virtual std::unique_ptr<std::string> getResultsDir() const = 0;
 

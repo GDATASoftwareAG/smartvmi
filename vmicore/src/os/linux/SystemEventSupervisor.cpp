@@ -1,5 +1,4 @@
 #include "SystemEventSupervisor.h"
-#include "../../GlobalControl.h"
 #include "Constants.h"
 #include <fmt/core.h>
 #include <utility>
@@ -10,14 +9,14 @@ namespace VmiCore::Linux
                                                  std::shared_ptr<IPluginSystem> pluginSystem,
                                                  std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
                                                  std::shared_ptr<IConfigParser> configInterface,
-                                                 std::shared_ptr<IInterruptFactory> interruptFactory,
+                                                 std::shared_ptr<IInterruptEventSupervisor> interruptFactory,
                                                  std::shared_ptr<ILogging> loggingLib,
                                                  std::shared_ptr<IEventStream> eventStream)
         : vmiInterface(std::move(vmiInterface)),
           pluginSystem(std::move(pluginSystem)),
           activeProcessesSupervisor(std::move(activeProcessesSupervisor)),
           configInterface(std::move(configInterface)),
-          interruptFactory(std::move(interruptFactory)),
+          interruptEventSupervisor(std::move(interruptFactory)),
           loggingLib(std::move(loggingLib)),
           logger(NEW_LOGGER(this->loggingLib)),
           eventStream(std::move(eventStream))
@@ -27,7 +26,7 @@ namespace VmiCore::Linux
     void SystemEventSupervisor::initialize()
     {
         activeProcessesSupervisor->initialize();
-        interruptFactory->initialize();
+        interruptEventSupervisor->initialize();
         startProcForkConnectorMonitoring();
         startProcExecConnectorMonitoring();
         startProcExitConnectorMonitoring();
@@ -38,12 +37,10 @@ namespace VmiCore::Linux
         auto procForkConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_fork_connector");
         logger->debug("Obtained starting address of proc_fork_connector",
                       {logfield::create("VA", fmt::format("{:#x}", procForkConnectorVA))});
-        auto procForkConnectorCallback = InterruptEvent::createInterruptCallback(
-            weak_from_this(), &SystemEventSupervisor::procForkConnectorCallback);
-        procForkConnectorEvent = interruptFactory->createInterruptEvent("procForkConnectorEvent",
-                                                                        procForkConnectorVA,
-                                                                        vmiInterface->convertPidToDtb(SYSTEM_PID),
-                                                                        procForkConnectorCallback);
+        auto procForkConnectorCallback =
+            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procForkConnectorCallback);
+        procForkConnectorEvent = interruptEventSupervisor->createBreakpoint(
+            procForkConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procForkConnectorCallback);
     }
 
     void SystemEventSupervisor::startProcExecConnectorMonitoring()
@@ -51,12 +48,10 @@ namespace VmiCore::Linux
         auto procExecConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_exec_connector");
         logger->debug("Obtained starting address of proc_exec_connector",
                       {logfield::create("VA", fmt::format("{:#x}", procExecConnectorVA))});
-        auto procExecConnectorCallback = InterruptEvent::createInterruptCallback(
-            weak_from_this(), &SystemEventSupervisor::procExecConnectorCallback);
-        procExecConnectorEvent = interruptFactory->createInterruptEvent("procExecConnectorEvent",
-                                                                        procExecConnectorVA,
-                                                                        vmiInterface->convertPidToDtb(SYSTEM_PID),
-                                                                        procExecConnectorCallback);
+        auto procExecConnectorCallback =
+            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExecConnectorCallback);
+        procExecConnectorEvent = interruptEventSupervisor->createBreakpoint(
+            procExecConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExecConnectorCallback);
     }
 
     void SystemEventSupervisor::startProcExitConnectorMonitoring()
@@ -64,40 +59,41 @@ namespace VmiCore::Linux
         auto procExitConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_exit_connector");
         logger->debug("Obtained starting address of proc_exit_connector",
                       {logfield::create("VA", fmt::format("{:#x}", procExitConnectorVA))});
-        auto procExitConnectorCallback = InterruptEvent::createInterruptCallback(
-            weak_from_this(), &SystemEventSupervisor::procExitConnectorCallback);
-        procExitConnectorEvent = interruptFactory->createInterruptEvent("procExitConnectorEvent",
-                                                                        procExitConnectorVA,
-                                                                        vmiInterface->convertPidToDtb(SYSTEM_PID),
-                                                                        procExitConnectorCallback);
+        auto procExitConnectorCallback =
+            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExitConnectorCallback);
+        procExitConnectorEvent = interruptEventSupervisor->createBreakpoint(
+            procExitConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExitConnectorCallback);
     }
 
-    InterruptEvent::InterruptResponse SystemEventSupervisor::procForkConnectorCallback(InterruptEvent& interruptEvent)
+    BpResponse SystemEventSupervisor::procForkConnectorCallback(IInterruptEvent& event)
     {
-        activeProcessesSupervisor->addNewProcess(interruptEvent.getRdi());
-        return InterruptEvent::InterruptResponse::Continue;
+        activeProcessesSupervisor->addNewProcess(event.getRdi());
+        return BpResponse::Continue;
     }
 
-    InterruptEvent::InterruptResponse SystemEventSupervisor::procExecConnectorCallback(InterruptEvent& interruptEvent)
+    BpResponse SystemEventSupervisor::procExecConnectorCallback(IInterruptEvent& event)
     {
-        activeProcessesSupervisor->removeActiveProcess(interruptEvent.getRdi());
-        activeProcessesSupervisor->addNewProcess(interruptEvent.getRdi());
-        return InterruptEvent::InterruptResponse::Continue;
+        activeProcessesSupervisor->removeActiveProcess(event.getRdi());
+        activeProcessesSupervisor->addNewProcess(event.getRdi());
+        return BpResponse::Continue;
     }
 
-    InterruptEvent::InterruptResponse SystemEventSupervisor::procExitConnectorCallback(InterruptEvent& interruptEvent)
+    BpResponse SystemEventSupervisor::procExitConnectorCallback(IInterruptEvent& event)
     {
-        auto taskStructBase = interruptEvent.getRdi();
+        auto taskStructBase = event.getRdi();
 
         pluginSystem->passProcessTerminationEventToRegisteredPlugins(
             activeProcessesSupervisor->getProcessInformationByBase(taskStructBase));
         activeProcessesSupervisor->removeActiveProcess(taskStructBase);
 
-        return InterruptEvent::InterruptResponse::Continue;
+        return BpResponse::Continue;
     }
 
     void SystemEventSupervisor::teardown()
     {
-        interruptFactory->teardown();
+        procForkConnectorEvent->remove();
+        procExecConnectorEvent->remove();
+        procExitConnectorEvent->remove();
+        interruptEventSupervisor->teardown();
     }
 }

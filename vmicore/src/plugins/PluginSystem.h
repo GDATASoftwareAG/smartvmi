@@ -7,6 +7,7 @@
 #include "../io/ILogging.h"
 #include "../io/file/LegacyLogging.h"
 #include "../os/IActiveProcessesSupervisor.h"
+#include "../vmi/InterruptEventSupervisor.h"
 #include "../vmi/LibvmiInterface.h"
 #include <vector>
 #include <vmicore/plugins/PluginInterface.h>
@@ -37,6 +38,7 @@ namespace VmiCore
         PluginSystem(std::shared_ptr<IConfigParser> configInterface,
                      std::shared_ptr<ILibvmiInterface> vmiInterface,
                      std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
+                     std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
                      std::shared_ptr<IFileTransport> pluginLogging,
                      std::shared_ptr<ILogging> loggingLib,
                      std::shared_ptr<IEventStream> eventStream);
@@ -56,6 +58,7 @@ namespace VmiCore
         std::shared_ptr<IConfigParser> configInterface;
         std::shared_ptr<ILibvmiInterface> vmiInterface;
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
+        std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
         std::shared_ptr<IFileTransport> legacyLogging;
         std::vector<Plugin::processTerminationCallback_f> registeredProcessTerminationCallbacks;
         std::vector<Plugin::shutdownCallback_f> registeredShutdownCallbacks;
@@ -77,6 +80,11 @@ namespace VmiCore
         void registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback) override;
 
         void registerShutdownEvent(Plugin::shutdownCallback_f shutdownCallback) override;
+
+        std::shared_ptr<IBreakpoint>
+        createBreakpoint(uint64_t targetVA,
+                         uint64_t processDtb,
+                         const std::function<BpResponse(IInterruptEvent&)>& callbackFunction) override;
 
         void writeToFile(const std::string& filename, const std::string& message) const override;
 

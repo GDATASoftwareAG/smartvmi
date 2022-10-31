@@ -84,7 +84,8 @@ namespace VmiCore
     }
 
     void SingleStepSupervisor::setSingleStepCallback(uint vcpuId,
-                                                     const std::function<void(vmi_event_t*)>& eventCallback)
+                                                     const std::function<void(vmi_event_t*)>& eventCallback,
+                                                     uint64_t data)
     {
         if (callbacks[vcpuId])
         {
@@ -94,6 +95,7 @@ namespace VmiCore
         callbacks[vcpuId] = eventCallback;
         SETUP_SINGLESTEP_EVENT(&singleStepEvents[vcpuId], 0, _defaultSingleStepCallback, true);
         SET_VCPU_SINGLESTEP(singleStepEvents[vcpuId].ss_event, vcpuId);
+        singleStepEvents[vcpuId].data = reinterpret_cast<void*>(data);
         vmiInterface->registerEvent(singleStepEvents[vcpuId]);
     }
 

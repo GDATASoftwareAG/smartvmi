@@ -28,7 +28,7 @@ namespace VmiCore
 
         MOCK_METHOD(void, write8PA, (const uint64_t physicalAddress, const uint8_t value), (override));
 
-        MOCK_METHOD(void, waitForEvent, (), (override));
+        MOCK_METHOD(void, eventsListen, (uint32_t), (override));
 
         MOCK_METHOD(void, registerEvent, (vmi_event_t & event), (override));
 

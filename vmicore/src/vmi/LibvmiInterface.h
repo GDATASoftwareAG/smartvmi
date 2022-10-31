@@ -42,7 +42,7 @@ namespace VmiCore
 
         virtual void write8PA(addr_t physicalAddress, uint8_t value) = 0;
 
-        virtual void waitForEvent() = 0;
+        virtual void eventsListen(uint32_t timeout) = 0;
 
         virtual void registerEvent(vmi_event_t& event) = 0;
 
@@ -116,7 +116,7 @@ namespace VmiCore
 
         void write8PA(addr_t physicalAddress, uint8_t value) override;
 
-        void waitForEvent() override;
+        void eventsListen(uint32_t timeout) override;
 
         void registerEvent(vmi_event_t& event) override;
 

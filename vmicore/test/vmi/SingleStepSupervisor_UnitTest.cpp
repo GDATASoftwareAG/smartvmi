@@ -52,7 +52,7 @@ namespace VmiCore
 
     TEST_F(SingleStepSupvervisorValidStateFixture, setSingleStepCallback_callbackTargetExpired_doesNotThrow)
     {
-        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction);
+        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction, 0);
         mockFunction.reset();
         vmi_event_t testEvent{};
         testEvent.vcpu_id = testVcpuId;
@@ -62,7 +62,7 @@ namespace VmiCore
 
     TEST_F(SingleStepSupvervisorValidStateFixture, setSingleStepCallback_validCallbackTarget_triggersCallback)
     {
-        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction);
+        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction, 0);
         vmi_event_t testEvent{};
         testEvent.vcpu_id = testVcpuId;
 
@@ -73,14 +73,14 @@ namespace VmiCore
     TEST_F(SingleStepSupvervisorValidStateFixture,
            setSingleStepCallback_callbackAlreadyRegisteredForCurrentVcpu_throwsVmiException)
     {
-        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction);
+        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction, 0);
 
-        EXPECT_THROW(singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction), VmiException);
+        EXPECT_THROW(singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction, 0), VmiException);
     }
 
     TEST_F(SingleStepSupvervisorValidStateFixture, setSingleStepCallback_validCallbackTarget_stopSingleStepForVCPU)
     {
-        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction);
+        singleStepSupervisor->setSingleStepCallback(testVcpuId, callbackFunction, 0);
         vmi_event_t testEvent{};
         testEvent.vcpu_id = testVcpuId;
 

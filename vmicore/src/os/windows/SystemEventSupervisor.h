@@ -3,8 +3,7 @@
 
 #include "../../io/IEventStream.h"
 #include "../../plugins/PluginSystem.h"
-#include "../../vmi/InterruptEvent.h"
-#include "../../vmi/InterruptFactory.h"
+#include "../../vmi/InterruptEventSupervisor.h"
 #include "../../vmi/LibvmiInterface.h"
 #include "../../vmi/SingleStepSupervisor.h"
 #include "../ISystemEventSupervisor.h"
@@ -23,15 +22,15 @@ namespace VmiCore::Windows
                               std::shared_ptr<IPluginSystem> pluginSystem,
                               std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
                               std::shared_ptr<IConfigParser> configInterface,
-                              std::shared_ptr<IInterruptFactory> interruptFactory,
+                              std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
                               std::shared_ptr<ILogging> loggingLib,
                               std::shared_ptr<IEventStream> eventStream);
 
         void initialize() override;
 
-        InterruptEvent::InterruptResponse pspCallProcessNotifyRoutinesCallback(InterruptEvent& interruptEvent);
+        BpResponse pspCallProcessNotifyRoutinesCallback(IInterruptEvent& event);
 
-        InterruptEvent::InterruptResponse keBugCheckExCallback(InterruptEvent& interruptEvent);
+        BpResponse keBugCheckExCallback(IInterruptEvent& event);
 
         void teardown() override;
 
@@ -40,9 +39,9 @@ namespace VmiCore::Windows
         std::shared_ptr<IPluginSystem> pluginSystem;
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
         std::shared_ptr<IConfigParser> configInterface;
-        [[maybe_unused]] std::shared_ptr<InterruptEvent> notifyProcessInterruptEvent;
-        [[maybe_unused]] std::shared_ptr<InterruptEvent> bugCheckInterruptEvent;
-        std::shared_ptr<IInterruptFactory> interruptFactory;
+        std::shared_ptr<IBreakpoint> notifyProcessInterruptEvent;
+        std::shared_ptr<IBreakpoint> bugCheckInterruptEvent;
+        std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;

@@ -1,6 +1,5 @@
 #include "LibvmiInterface.h"
 #include "../GlobalControl.h"
-#include "../io/grpc/GRPCLogger.h"
 #include "../os/PagingDefinitions.h"
 #include "VmiException.h"
 #include "VmiInitData.h"
@@ -171,9 +170,9 @@ namespace VmiCore
         return accessContext;
     }
 
-    void LibvmiInterface::waitForEvent()
+    void LibvmiInterface::eventsListen(uint32_t timeout)
     {
-        auto status = vmi_events_listen(vmiInstance, 500);
+        auto status = vmi_events_listen(vmiInstance, timeout);
         if (status != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Error while waiting for vmi events.", __func__));
