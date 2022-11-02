@@ -125,7 +125,7 @@ namespace VmiCore
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
         switch (vmiInterface->getOsType())
         {
-            case VMI_OS_LINUX:
+            case OperatingSystem::LINUX:
             {
                 activeProcessesSupervisor =
                     std::make_shared<Linux::ActiveProcessesSupervisor>(vmiInterface, loggingLib, eventStream);
@@ -145,7 +145,7 @@ namespace VmiCore
                                                                                        eventStream);
                 break;
             }
-            case VMI_OS_WINDOWS:
+            case OperatingSystem::WINDOWS:
             {
                 auto kernelObjectExtractor = std::make_shared<Windows::KernelAccess>(vmiInterface);
                 activeProcessesSupervisor = std::make_shared<Windows::ActiveProcessesSupervisor>(

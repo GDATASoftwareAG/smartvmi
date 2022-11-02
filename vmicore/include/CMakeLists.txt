@@ -9,6 +9,7 @@ target_sources(vmicore_public_headers INTERFACE
         vmicore/os/IMemoryRegionExtractor.h
         vmicore/os/MemoryRegion.h
         vmicore/os/IPageProtection.h
+        vmicore/os/OperatingSystem.h
         vmicore/plugins/IPluginConfig.h
         vmicore/plugins/PluginInit.h
         vmicore/plugins/PluginInterface.h
@@ -19,6 +20,7 @@ target_sources(vmicore_public_headers INTERFACE
         vmicore/test/vmi/mock_InterruptEvent.h
         vmicore/vmi/BpResponse.h
         vmicore/vmi/IBreakpoint.h
-        vmicore/vmi/events/IRegisterReadable.h
-        vmicore/vmi/events/IInterruptEvent.h)
+        vmicore/vmi/IIntrospectionAPI.h
+        vmicore/vmi/events/IInterruptEvent.h
+        vmicore/vmi/events/IRegisterReadable.h)
 target_include_directories(vmicore_public_headers INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")

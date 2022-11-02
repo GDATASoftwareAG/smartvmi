@@ -105,6 +105,8 @@ namespace VmiCore
         void sendErrorEvent(const std::string& message) const override;
 
         void sendInMemDetectionEvent(const std::string& message) const override;
+
+        [[nodiscard]] std::shared_ptr<IIntrospectionAPI> getIntrospectionAPI() const override;
     };
 }
 

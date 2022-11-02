@@ -188,6 +188,11 @@ namespace VmiCore
         eventStream->sendInMemDetectionEvent(message);
     }
 
+    std::shared_ptr<IIntrospectionAPI> PluginSystem::getIntrospectionAPI() const
+    {
+        return vmiInterface;
+    }
+
     std::unique_ptr<std::string> PluginSystem::getResultsDir() const
     {
         return std::make_unique<std::string>(configInterface->getResultsDirectory());

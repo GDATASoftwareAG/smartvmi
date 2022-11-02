@@ -10,7 +10,9 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <vmicore/os/OperatingSystem.h>
 #include <vmicore/types.h>
+#include <vmicore/vmi/IIntrospectionAPI.h>
 
 #define LIBVMI_EXTRA_JSON
 
@@ -19,26 +21,16 @@
 
 namespace VmiCore
 {
-    class ILibvmiInterface
+    class ILibvmiInterface : public IIntrospectionAPI
     {
       public:
         constexpr static addr_t flushAllPTs = ~0ull;
 
-        virtual ~ILibvmiInterface() = default;
+        ~ILibvmiInterface() override = default;
 
         virtual void initializeVmi() = 0;
 
         virtual void clearEvent(vmi_event_t& event, bool deallocate) = 0;
-
-        virtual uint8_t read8PA(addr_t pyhsicalAddress) = 0;
-
-        virtual uint8_t read8VA(addr_t virtualAddress, addr_t cr3) = 0;
-
-        virtual uint32_t read32VA(addr_t virtualAddress, addr_t cr3) = 0;
-
-        virtual uint64_t read64VA(addr_t virtualAddress, addr_t cr3) = 0;
-
-        virtual bool readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content) = 0;
 
         virtual void write8PA(addr_t physicalAddress, uint8_t value) = 0;
 
@@ -46,46 +38,13 @@ namespace VmiCore
 
         virtual void registerEvent(vmi_event_t& event) = 0;
 
-        virtual uint64_t getCurrentVmId() = 0;
-
-        virtual uint getNumberOfVCPUs() = 0;
-
-        virtual addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) = 0;
-
-        virtual addr_t convertVAToPA(addr_t virtualAddress, addr_t cr3Register) = 0;
-
-        virtual addr_t convertPidToDtb(pid_t processID) = 0;
-
-        virtual pid_t convertDtbToPid(addr_t dtb) = 0;
-
         virtual void pauseVm() = 0;
 
         virtual void resumeVm() = 0;
 
         virtual bool areEventsPending() = 0;
 
-        virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
-
-        virtual std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) = 0;
-
         virtual void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) = 0;
-
-        virtual os_t getOsType() = 0;
-
-        virtual addr_t getOffset(const std::string& name) = 0;
-
-        virtual addr_t getKernelStructOffset(const std::string& structName, const std::string& member) = 0;
-
-        virtual std::size_t getStructSizeFromJson(const std::string& struct_name) = 0;
-
-        virtual bool isInitialized() = 0;
-
-        virtual std::tuple<addr_t, std::size_t, std::size_t>
-        getBitfieldOffsetAndSizeFromJson(const std::string& struct_name, const std::string& struct_member) = 0;
-
-        virtual void flushV2PCache(addr_t pt) = 0;
-
-        virtual void flushPageCache() = 0;
 
       protected:
         ILibvmiInterface() = default;
@@ -126,6 +85,10 @@ namespace VmiCore
 
         addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) override;
 
+        addr_t translateUserlandSymbolToVA(addr_t moduleBaseAddress,
+                                           addr_t dtb,
+                                           const std::string& userlandSymbolName) override;
+
         addr_t convertVAToPA(addr_t virtualAddress, addr_t processCr3) override;
 
         addr_t convertPidToDtb(pid_t processID) override;
@@ -144,7 +107,7 @@ namespace VmiCore
 
         void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) override;
 
-        os_t getOsType() override;
+        OperatingSystem getOsType() override;
 
         template <typename T> std::unique_ptr<T> readVa(const addr_t virtualAddress, const addr_t cr3)
         {

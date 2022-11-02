@@ -11,38 +11,37 @@ namespace VmiCore
       public:
         MOCK_METHOD(void, initializeVmi, (), (override));
 
-        MOCK_METHOD(void, clearEvent, (vmi_event_t & event, bool deallocate), (override));
+        MOCK_METHOD(void, clearEvent, (vmi_event_t&, bool), (override));
 
-        MOCK_METHOD(uint8_t, read8PA, (const uint64_t pyhsicalAddress), (override));
+        MOCK_METHOD(uint8_t, read8PA, (const uint64_t), (override));
 
-        MOCK_METHOD(uint8_t, read8VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
+        MOCK_METHOD(uint8_t, read8VA, (const uint64_t, const uint64_t), (override));
 
-        MOCK_METHOD(uint32_t, read32VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
+        MOCK_METHOD(uint32_t, read32VA, (const uint64_t, const uint64_t), (override));
 
-        MOCK_METHOD(uint64_t, read64VA, (const uint64_t virtualAddress, const uint64_t cr3), (override));
+        MOCK_METHOD(uint64_t, read64VA, (const uint64_t, const uint64_t), (override));
 
-        MOCK_METHOD(bool,
-                    readXVA,
-                    (const uint64_t virtualAddress, const uint64_t cr3, std::vector<uint8_t>& content),
-                    (override));
+        MOCK_METHOD(bool, readXVA, (const uint64_t, const uint64_t, std::vector<uint8_t>&), (override));
 
-        MOCK_METHOD(void, write8PA, (const uint64_t physicalAddress, const uint8_t value), (override));
+        MOCK_METHOD(void, write8PA, (const uint64_t, const uint8_t), (override));
 
         MOCK_METHOD(void, eventsListen, (uint32_t), (override));
 
-        MOCK_METHOD(void, registerEvent, (vmi_event_t & event), (override));
+        MOCK_METHOD(void, registerEvent, (vmi_event_t&), (override));
 
         MOCK_METHOD(uint64_t, getCurrentVmId, (), (override));
 
         MOCK_METHOD(uint, getNumberOfVCPUs, (), (override));
 
-        MOCK_METHOD(uint64_t, translateKernelSymbolToVA, (const std::string& kernelSymbolName), (override));
+        MOCK_METHOD(addr_t, translateKernelSymbolToVA, (const std::string&), (override));
 
-        MOCK_METHOD(uint64_t, convertVAToPA, (uint64_t virtualAddress, uint64_t cr3Register), (override));
+        MOCK_METHOD(addr_t, translateUserlandSymbolToVA, (addr_t, addr_t, const std::string&), (override));
 
-        MOCK_METHOD(uint64_t, convertPidToDtb, (pid_t processID), (override));
+        MOCK_METHOD(addr_t, convertVAToPA, (addr_t, addr_t), (override));
 
-        MOCK_METHOD(pid_t, convertDtbToPid, (uint64_t dtb), (override));
+        MOCK_METHOD(addr_t, convertPidToDtb, (pid_t), (override));
+
+        MOCK_METHOD(pid_t, convertDtbToPid, (addr_t), (override));
 
         MOCK_METHOD(void, pauseVm, (), (override));
 
@@ -50,26 +49,17 @@ namespace VmiCore
 
         MOCK_METHOD(bool, areEventsPending, (), (override));
 
-        MOCK_METHOD(std::unique_ptr<std::string>,
-                    extractUnicodeStringAtVA,
-                    (const uint64_t stringVA, const uint64_t cr3),
-                    (override));
+        MOCK_METHOD(std::unique_ptr<std::string>, extractUnicodeStringAtVA, (const addr_t, const addr_t), (override));
 
-        MOCK_METHOD(std::unique_ptr<std::string>,
-                    extractStringAtVA,
-                    (const uint64_t virtualAddress, const uint64_t cr3),
-                    (override));
+        MOCK_METHOD(std::unique_ptr<std::string>, extractStringAtVA, (const addr_t, const addr_t), (override));
 
-        MOCK_METHOD(void, stopSingleStepForVcpu, (vmi_event_t * event, uint vcpuId), (override));
+        MOCK_METHOD(void, stopSingleStepForVcpu, (vmi_event_t*, uint), (override));
 
-        MOCK_METHOD(os_t, getOsType, (), (override));
+        MOCK_METHOD(OperatingSystem, getOsType, (), (override));
 
-        MOCK_METHOD(uint64_t, getOffset, (const std::string& name), (override));
+        MOCK_METHOD(uint64_t, getOffset, (const std::string&), (override));
 
-        MOCK_METHOD(addr_t,
-                    getKernelStructOffset,
-                    (const std::string& structName, const std::string& member),
-                    (override));
+        MOCK_METHOD(addr_t, getKernelStructOffset, (const std::string&, const std::string&), (override));
 
         MOCK_METHOD(bool, isInitialized, (), (override));
 
@@ -78,7 +68,7 @@ namespace VmiCore
                     (const std::string&, const std::string&),
                     (override));
 
-        MOCK_METHOD(size_t, getStructSizeFromJson, (const std::string& struct_name), (override));
+        MOCK_METHOD(size_t, getStructSizeFromJson, (const std::string&), (override));
 
         MOCK_METHOD(void, flushV2PCache, (addr_t), (override));
 

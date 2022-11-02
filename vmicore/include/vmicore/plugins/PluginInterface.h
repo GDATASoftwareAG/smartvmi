@@ -4,6 +4,7 @@
 #include "../os/ActiveProcessInformation.h"
 #include "../types.h"
 #include "../vmi/IBreakpoint.h"
+#include "../vmi/IIntrospectionAPI.h"
 #include "IPluginConfig.h"
 #include <functional>
 #include <memory>
@@ -61,6 +62,8 @@ namespace VmiCore::Plugin
         virtual void sendErrorEvent(const std::string& message) const = 0;
 
         virtual void sendInMemDetectionEvent(const std::string& message) const = 0;
+
+        [[nodiscard]] virtual std::shared_ptr<IIntrospectionAPI> getIntrospectionAPI() const = 0;
 
       protected:
         PluginInterface() = default;
