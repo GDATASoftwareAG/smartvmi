@@ -232,6 +232,26 @@ namespace VmiCore
         return kernelSymbolAddress;
     }
 
+    addr_t LibvmiInterface::translateUserlandSymbolToVA(addr_t moduleBaseAddress,
+                                                        addr_t dtb,
+                                                        const std::string& userlandSymbolName)
+    {
+        auto ctx = createVirtualAddressAccessContext(moduleBaseAddress, dtb);
+        addr_t userlandSymbolVA = 0;
+        if (vmi_translate_sym2v(vmiInstance, &ctx, userlandSymbolName.c_str(), &userlandSymbolVA) != VMI_SUCCESS)
+        {
+            throw VmiException(
+                fmt::format("{}: Unable to get address of userland symbol {} for VA {} with pid {} and dtb {}",
+                            __func__,
+                            userlandSymbolName,
+                            moduleBaseAddress,
+                            dtb,
+                            dtb));
+        }
+
+        return userlandSymbolVA;
+    }
+
     addr_t LibvmiInterface::convertVAToPA(addr_t virtualAddress, addr_t processCr3)
     {
         addr_t physicalAddress = 0;
@@ -319,7 +339,7 @@ namespace VmiCore
     {
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
         std::lock_guard<std::mutex> lock(libvmiLock);
-        auto rawString = vmi_read_str(vmiInstance, &accessContext);
+        auto* rawString = vmi_read_str(vmiInstance, &accessContext);
         if (rawString == nullptr)
         {
             throw VmiException(fmt::format("{}: Unable to read string at VA {:#x}", __func__, virtualAddress));
@@ -337,9 +357,17 @@ namespace VmiCore
         }
     }
 
-    os_t LibvmiInterface::getOsType()
+    OperatingSystem LibvmiInterface::getOsType()
     {
-        return vmi_get_ostype(vmiInstance);
+        switch (vmi_get_ostype(vmiInstance))
+        {
+            case VMI_OS_LINUX:
+                return OperatingSystem::LINUX;
+            case VMI_OS_WINDOWS:
+                return OperatingSystem::WINDOWS;
+            default:
+                return OperatingSystem::INVALID;
+        }
     }
 
     addr_t LibvmiInterface::getOffset(const std::string& name)

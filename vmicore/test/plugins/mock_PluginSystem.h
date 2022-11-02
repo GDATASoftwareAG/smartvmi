@@ -57,5 +57,7 @@ namespace VmiCore
                     (override));
 
         MOCK_METHOD(void, passShutdownEventToRegisteredPlugins, (), (override));
+
+        MOCK_METHOD(std::shared_ptr<IIntrospectionAPI>, getIntrospectionAPI, (), (const override));
     };
 }

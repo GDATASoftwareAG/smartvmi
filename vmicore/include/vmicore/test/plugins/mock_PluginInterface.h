@@ -41,6 +41,8 @@ namespace VmiCore::Plugin
         MOCK_METHOD(void, sendErrorEvent, (const std::string&), (const, override));
 
         MOCK_METHOD(void, sendInMemDetectionEvent, (const std::string&), (const, override));
+
+        MOCK_METHOD(std::shared_ptr<IIntrospectionAPI>, getIntrospectionAPI, (), (const, override));
     };
 }
 
