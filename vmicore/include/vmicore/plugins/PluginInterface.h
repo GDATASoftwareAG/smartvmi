@@ -13,6 +13,7 @@
 
 namespace VmiCore::Plugin
 {
+    using processStartCallback_f = void (*)(std::shared_ptr<const ActiveProcessInformation>);
     using processTerminationCallback_f = void (*)(std::shared_ptr<const ActiveProcessInformation>);
 
     using shutdownCallback_f = void (*)();
@@ -37,6 +38,8 @@ namespace VmiCore::Plugin
 
         [[nodiscard]] virtual std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
         getRunningProcesses() const = 0;
+
+        virtual void registerProcessStartEvent(processStartCallback_f startCallback) = 0;
 
         virtual void registerProcessTerminationEvent(processTerminationCallback_f terminationCallback) = 0;
 

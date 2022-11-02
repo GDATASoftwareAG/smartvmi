@@ -19,6 +19,8 @@ namespace VmiCore::Plugin
                     (),
                     (const, override));
 
+        MOCK_METHOD(void, registerProcessStartEvent, (processStartCallback_f), (override));
+
         MOCK_METHOD(void, registerProcessTerminationEvent, (processTerminationCallback_f), (override));
 
         MOCK_METHOD(void, registerShutdownEvent, (shutdownCallback_f), (override));
