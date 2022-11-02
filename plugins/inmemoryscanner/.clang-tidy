@@ -9,6 +9,7 @@ Checks: '
   -cppcoreguidelines-pro-type-union-access,
   google-*,
   -google-readability-namespace-comments,
+  -google-readability-todo,
   llvm-*,
   -llvm-header-guard,
   -llvm-namespace-comment,
