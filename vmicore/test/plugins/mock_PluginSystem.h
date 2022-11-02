@@ -18,6 +18,8 @@ namespace VmiCore
                     (),
                     (const override));
 
+        MOCK_METHOD(void, registerProcessStartEvent, (Plugin::processStartCallback_f), (override));
+
         MOCK_METHOD(void, registerProcessTerminationEvent, (Plugin::processTerminationCallback_f), (override));
 
         MOCK_METHOD(void, registerShutdownEvent, (Plugin::shutdownCallback_f), (override));
@@ -42,6 +44,11 @@ namespace VmiCore
         MOCK_METHOD(void,
                     initializePlugin,
                     (const std::string&, std::shared_ptr<Plugin::IPluginConfig>, const std::vector<std::string>& args),
+                    (override));
+
+        MOCK_METHOD(void,
+                    passProcessStartEventToRegisteredPlugins,
+                    (std::shared_ptr<const ActiveProcessInformation>),
                     (override));
 
         MOCK_METHOD(void,

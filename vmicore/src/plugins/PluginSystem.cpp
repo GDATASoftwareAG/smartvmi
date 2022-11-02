@@ -105,6 +105,11 @@ namespace VmiCore
         return readPagesWithUnmappedRegionPadding(address, process->processCR3, numberOfPages);
     }
 
+    void PluginSystem::registerProcessStartEvent(Plugin::processStartCallback_f startCallback)
+    {
+        registeredProcessStartCallbacks.push_back(startCallback);
+    }
+
     void PluginSystem::registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback)
     {
         registeredProcessTerminationCallbacks.push_back(terminationCallback);
@@ -242,6 +247,15 @@ namespace VmiCore
         if (!pluginInitFunction(dynamic_cast<Plugin::PluginInterface*>(this), std::move(config), args))
         {
             throw std::runtime_error("Unable to initialize plugin " + pluginName);
+        }
+    }
+
+    void PluginSystem::passProcessStartEventToRegisteredPlugins(
+        std::shared_ptr<const ActiveProcessInformation> processInformation)
+    {
+        for (auto& processStartCallback : registeredProcessStartCallbacks)
+        {
+            processStartCallback(processInformation);
         }
     }
 

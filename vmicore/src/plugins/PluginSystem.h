@@ -23,6 +23,9 @@ namespace VmiCore
                                       std::shared_ptr<Plugin::IPluginConfig> config,
                                       const std::vector<std::string>& args) = 0;
 
+        virtual void passProcessStartEventToRegisteredPlugins(
+            std::shared_ptr<const ActiveProcessInformation> processInformation) = 0;
+
         virtual void passProcessTerminationEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) = 0;
 
@@ -49,6 +52,9 @@ namespace VmiCore
                               std::shared_ptr<Plugin::IPluginConfig> config,
                               const std::vector<std::string>& args) override;
 
+        void passProcessStartEventToRegisteredPlugins(
+            std::shared_ptr<const ActiveProcessInformation> processInformation) override;
+
         void passProcessTerminationEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) override;
 
@@ -60,6 +66,7 @@ namespace VmiCore
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
         std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
         std::shared_ptr<IFileTransport> legacyLogging;
+        std::vector<Plugin::processStartCallback_f> registeredProcessStartCallbacks;
         std::vector<Plugin::processTerminationCallback_f> registeredProcessTerminationCallbacks;
         std::vector<Plugin::shutdownCallback_f> registeredShutdownCallbacks;
         std::shared_ptr<ILogging> loggingLib;
@@ -76,6 +83,8 @@ namespace VmiCore
 
         [[nodiscard]] std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
         getRunningProcesses() const override;
+
+        void registerProcessStartEvent(Plugin::processStartCallback_f startCallback) override;
 
         void registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback) override;
 
