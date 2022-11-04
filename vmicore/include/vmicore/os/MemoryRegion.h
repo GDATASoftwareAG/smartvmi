@@ -1,8 +1,9 @@
 #ifndef VMICORE_MEMORYREGION_H
 #define VMICORE_MEMORYREGION_H
 
+#include "../types.h"
 #include "IPageProtection.h"
-#include <cstdint>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -10,7 +11,7 @@ namespace VmiCore
 {
     struct MemoryRegion
     {
-        MemoryRegion(uint64_t base,
+        MemoryRegion(addr_t base,
                      std::size_t size,
                      std::string moduleName,
                      std::unique_ptr<IPageProtection> protection,
@@ -27,13 +28,13 @@ namespace VmiCore
         {
         }
 
-        uint64_t base{};
-        std::size_t size{};
-        std::string moduleName{};
+        addr_t base;
+        std::size_t size;
+        std::string moduleName;
         std::unique_ptr<IPageProtection> protection;
-        bool isSharedMemory = false;
-        bool isBeingDeleted = false;
-        bool isProcessBaseImage = false;
+        bool isSharedMemory;
+        bool isBeingDeleted;
+        bool isProcessBaseImage;
     };
 }
 
