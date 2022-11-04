@@ -18,6 +18,7 @@ target_sources(vmicore_public_headers INTERFACE
         vmicore/test/plugins/mock_PluginInterface.h
         vmicore/test/vmi/mock_Breakpoint.h
         vmicore/test/vmi/mock_InterruptEvent.h
+        vmicore/test/vmi/mock_IntrospectionAPI.h
         vmicore/vmi/BpResponse.h
         vmicore/vmi/IBreakpoint.h
         vmicore/vmi/IIntrospectionAPI.h
