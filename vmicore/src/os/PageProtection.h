@@ -1,10 +1,10 @@
 #ifndef VMICORE_PAGEPROTECTION_H
 #define VMICORE_PAGEPROTECTION_H
 
-#include "OperatingSystem.h"
 #include <cstdint>
 #include <string>
 #include <vmicore/os/IPageProtection.h>
+#include <vmicore/os/OperatingSystem.h>
 
 namespace VmiCore
 {
