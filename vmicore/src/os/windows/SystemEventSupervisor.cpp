@@ -81,6 +81,8 @@ namespace VmiCore::Windows
         else
         {
             activeProcessesSupervisor->addNewProcess(eprocessBase);
+            pluginSystem->passProcessStartEventToRegisteredPlugins(
+                activeProcessesSupervisor->getProcessInformationByBase(eprocessBase));
         }
         return BpResponse::Continue;
     }

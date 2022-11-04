@@ -67,14 +67,26 @@ namespace VmiCore::Linux
 
     BpResponse SystemEventSupervisor::procForkConnectorCallback(IInterruptEvent& event)
     {
-        activeProcessesSupervisor->addNewProcess(event.getRdi());
+        auto taskStructBase = event.getRdi();
+
+        activeProcessesSupervisor->addNewProcess(taskStructBase);
+        pluginSystem->passProcessStartEventToRegisteredPlugins(
+            activeProcessesSupervisor->getProcessInformationByBase(taskStructBase));
+
         return BpResponse::Continue;
     }
 
     BpResponse SystemEventSupervisor::procExecConnectorCallback(IInterruptEvent& event)
     {
-        activeProcessesSupervisor->removeActiveProcess(event.getRdi());
-        activeProcessesSupervisor->addNewProcess(event.getRdi());
+        auto taskStructBase = event.getRdi();
+
+        pluginSystem->passProcessTerminationEventToRegisteredPlugins(
+            activeProcessesSupervisor->getProcessInformationByBase(taskStructBase));
+        activeProcessesSupervisor->removeActiveProcess(taskStructBase);
+        activeProcessesSupervisor->addNewProcess(taskStructBase);
+        pluginSystem->passProcessStartEventToRegisteredPlugins(
+            activeProcessesSupervisor->getProcessInformationByBase(taskStructBase));
+
         return BpResponse::Continue;
     }
 
