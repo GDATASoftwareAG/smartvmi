@@ -12,16 +12,18 @@ namespace VmiCore
       public:
         MOCK_METHOD(void,
                     sendProcessEvent,
-                    (::grpc::ProcessState processState,
-                     const std::string& processName,
-                     uint32_t processID,
-                     const std::string& cr3),
+                    (::grpc::ProcessState, const std::string_view&, uint32_t, const std::string_view&),
                     (override));
-        MOCK_METHOD(void, sendBSODEvent, (int64_t code), (override));
+
+        MOCK_METHOD(void, sendBSODEvent, (int64_t), (override));
+
         MOCK_METHOD(void, sendReadyEvent, (), (override));
+
         MOCK_METHOD(void, sendTerminationEvent, (), (override));
-        MOCK_METHOD(void, sendErrorEvent, (const std::string& message), (override));
-        MOCK_METHOD(void, sendInMemDetectionEvent, (const std::string& message), (override));
+
+        MOCK_METHOD(void, sendErrorEvent, (const std::string_view&), (override));
+
+        MOCK_METHOD(void, sendInMemDetectionEvent, (const std::string_view&), (override));
     };
 }
 

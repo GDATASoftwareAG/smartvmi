@@ -8,9 +8,9 @@ namespace VmiCore
     class DummyEventStream : public IEventStream
     {
         inline void sendProcessEvent([[maybe_unused]] grpc::ProcessState processState,
-                                     [[maybe_unused]] const std::string& processName,
+                                     [[maybe_unused]] const std::string_view& processName,
                                      [[maybe_unused]] uint32_t processID,
-                                     [[maybe_unused]] const std::string& cr3) override
+                                     [[maybe_unused]] const std::string_view& cr3) override
         {
         }
 
@@ -20,9 +20,9 @@ namespace VmiCore
 
         inline void sendReadyEvent() override {}
 
-        inline void sendErrorEvent([[maybe_unused]] const std::string& message) override {}
+        inline void sendErrorEvent([[maybe_unused]] const std::string_view& message) override {}
 
-        inline void sendInMemDetectionEvent([[maybe_unused]] const std::string& message) override {}
+        inline void sendInMemDetectionEvent([[maybe_unused]] const std::string_view& message) override {}
     };
 }
 

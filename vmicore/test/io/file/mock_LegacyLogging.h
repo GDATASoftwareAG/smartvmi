@@ -11,7 +11,7 @@ namespace VmiCore
       public:
         MOCK_METHOD(void,
                     saveBinaryToFile,
-                    (const std::string& logFileName, const std::vector<uint8_t>& data),
+                    (const std::string_view& logFileName, const std::vector<uint8_t>& data),
                     (override));
     };
 }

@@ -4,38 +4,41 @@ namespace VmiCore
 {
     ConsoleLogger::ConsoleLogger(::rust::Box<::logging::console::ConsoleLogger> logger) : logger(std::move(logger)) {}
 
-    void ConsoleLogger::bind(std::initializer_list<::rust::Box<::logging::LogField>> fields)
+    void ConsoleLogger::bind(const std::initializer_list<rust::Box<::logging::LogField>>& fields)
     {
         logger->bind(rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::debug(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
+    void ConsoleLogger::debug(const std::string_view& message,
+                              const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
         logger->log(::logging::Level::DEBUG,
-                    message,
+                    static_cast<std::string>(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::info(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
+    void ConsoleLogger::info(const std::string_view& message,
+                             const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
 
         logger->log(::logging::Level::INFO,
-                    message,
+                    static_cast<std::string>(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::warning(std::string message,
-                                std::initializer_list<::rust::Box<::logging::LogField>> fields) const
+    void ConsoleLogger::warning(const std::string_view& message,
+                                const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
         logger->log(::logging::Level::WARN,
-                    message,
+                    static_cast<std::string>(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::error(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const
+    void ConsoleLogger::error(const std::string_view& message,
+                              const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
         logger->log(::logging::Level::ERROR,
-                    message,
+                    static_cast<std::string>(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 }

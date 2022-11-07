@@ -178,12 +178,12 @@ namespace VmiCore
         }
     }
 
-    void PluginSystem::sendErrorEvent(const std::string& message) const
+    void PluginSystem::sendErrorEvent(const std::string_view& message) const
     {
         eventStream->sendErrorEvent(message);
     }
 
-    void PluginSystem::sendInMemDetectionEvent(const std::string& message) const
+    void PluginSystem::sendInMemDetectionEvent(const std::string_view& message) const
     {
         eventStream->sendInMemDetectionEvent(message);
     }
@@ -216,7 +216,7 @@ namespace VmiCore
         auto pluginFilename = pluginDirectory / pluginName;
         logger->debug("Loading plugin",
                       {
-                          logfield::create("fileName", pluginFilename),
+                          logfield::create("fileName", pluginFilename.string()),
                       });
 
         void* libraryHandle = dlopen(pluginFilename.c_str(), RTLD_LAZY);
