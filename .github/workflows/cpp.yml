@@ -30,7 +30,7 @@ jobs:
       image: gdatacyberdefense/clang-format:14
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Perform C++ format check
         run: find . -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
@@ -41,7 +41,7 @@ jobs:
       image: ghcr.io/gdatasoftwareag/vmi-build
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Test vmicore
         run: |
@@ -64,7 +64,7 @@ jobs:
       image: ghcr.io/gdatasoftwareag/vmi-build
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build vmicore
         run: |
@@ -88,7 +88,7 @@ jobs:
       image: ghcr.io/gdatasoftwareag/vmi-build
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Test inmemoryscanner
         run: |
@@ -111,7 +111,7 @@ jobs:
       image: ghcr.io/gdatasoftwareag/vmi-build
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build inmemoryscanner
         run: |
