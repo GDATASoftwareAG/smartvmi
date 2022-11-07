@@ -10,7 +10,7 @@ namespace VmiCore
     {
     }
 
-    void LegacyLogging::saveBinaryToFile(const std::string& logFileName, const std::vector<uint8_t>& data)
+    void LegacyLogging::saveBinaryToFile(const std::string_view& logFileName, const std::vector<uint8_t>& data)
     {
         std::filesystem::create_directories(configInterface->getResultsDirectory());
         std::ofstream ofStream;

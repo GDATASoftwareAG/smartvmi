@@ -187,8 +187,7 @@ namespace VmiCore
             std::shared_ptr<NiceMock<MockLogging>> ml = std::make_shared<NiceMock<MockLogging>>();
 
             ON_CALL(*ml, newNamedLogger(_))
-                .WillByDefault([](const std::string& /*name*/)
-                               { return std::make_unique<NiceMock<MockGRPCLogger>>(); });
+                .WillByDefault([](const std::string_view&) { return std::make_unique<NiceMock<MockGRPCLogger>>(); });
 
             return ml;
         }();

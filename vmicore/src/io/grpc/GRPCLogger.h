@@ -16,32 +16,35 @@ namespace VmiCore
         explicit GRPCLogger(rust::Box<::logging::grpc::GrpcLogger> logger);
         ~GRPCLogger() override = default;
 
-        void bind(std::initializer_list<::rust::Box<::logging::LogField>> fields) override;
+        void bind(const std::initializer_list<rust::Box<::logging::LogField>>& fields) override;
 
-        inline void debug(std::string message) const override
+        inline void debug(const std::string_view& message) const override
         {
             debug(message, {});
         };
-        void debug(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const override;
+        void debug(const std::string_view& message,
+                   const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
-        inline void info(std::string message) const override
+        inline void info(const std::string_view& message) const override
         {
             info(message, {});
         };
-        void info(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const override;
+        void info(const std::string_view& message,
+                  const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
-        inline void warning(std::string message) const override
+        inline void warning(const std::string_view& message) const override
         {
             warning(message, {});
         };
-        void warning(std::string message,
-                     std::initializer_list<::rust::Box<::logging::LogField>> fields) const override;
+        void warning(const std::string_view& message,
+                     const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
-        inline void error(std::string message) const override
+        inline void error(const std::string_view& message) const override
         {
             error(message, {});
         };
-        void error(std::string message, std::initializer_list<::rust::Box<::logging::LogField>> fields) const override;
+        void error(const std::string_view& message,
+                   const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
       private:
         ::rust::Box<::logging::grpc::GrpcLogger> logger;

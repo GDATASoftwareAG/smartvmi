@@ -32,9 +32,9 @@ namespace VmiCore
         return std::make_unique<GRPCLogger>((*server)->new_logger());
     }
 
-    std::unique_ptr<ILogger> GRPCServer::newNamedLogger(const std::string& name)
+    std::unique_ptr<ILogger> GRPCServer::newNamedLogger(const std::string_view& name)
     {
-        return std::make_unique<GRPCLogger>((*server)->new_named_logger(name));
+        return std::make_unique<GRPCLogger>((*server)->new_named_logger(static_cast<std::string>(name)));
     }
 
     void GRPCServer::setLogLevel(::logging::Level level)
@@ -42,17 +42,18 @@ namespace VmiCore
         (*server)->set_log_level(level);
     }
 
-    void GRPCServer::saveBinaryToFile(const std::string& logFileName, const std::vector<uint8_t>& data)
+    void GRPCServer::saveBinaryToFile(const std::string_view& logFileName, const std::vector<uint8_t>& data)
     {
-        (*server)->write_message_to_file(logFileName, data);
+        (*server)->write_message_to_file(static_cast<std::string>(logFileName), data);
     }
 
     void GRPCServer::sendProcessEvent(::grpc::ProcessState processState,
-                                      const std::string& processName,
+                                      const std::string_view& processName,
                                       uint32_t processID,
-                                      const std::string& cr3)
+                                      const std::string_view& cr3)
     {
-        (*server)->send_process_event(processState, processName, processID, cr3);
+        (*server)->send_process_event(
+            processState, static_cast<std::string>(processName), processID, static_cast<std::string>(cr3));
     }
 
     void GRPCServer::sendBSODEvent(int64_t code)
@@ -70,13 +71,13 @@ namespace VmiCore
         (*server)->send_termination_event();
     }
 
-    void GRPCServer::sendErrorEvent(const std::string& message)
+    void GRPCServer::sendErrorEvent(const std::string_view& message)
     {
-        (*server)->send_error_event(message);
+        (*server)->send_error_event(static_cast<std::string>(message));
     }
 
-    void GRPCServer::sendInMemDetectionEvent(const std::string& message)
+    void GRPCServer::sendInMemDetectionEvent(const std::string_view& message)
     {
-        (*server)->send_in_mem_detection_event(message);
+        (*server)->send_in_mem_detection_event(static_cast<std::string>(message));
     }
 }
