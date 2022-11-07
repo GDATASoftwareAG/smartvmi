@@ -4,6 +4,7 @@
 #include "../PagingDefinitions.h"
 #include <fmt/core.h>
 #include <unordered_set>
+#include <vmicore/filename.h>
 
 namespace VmiCore::Windows
 {
@@ -16,7 +17,7 @@ namespace VmiCore::Windows
           eprocessBase(eprocessBase),
           pid(pid),
           processName(std::move(processName)),
-          logger(NEW_LOGGER(loggingLib))
+          logger(loggingLib->newNamedLogger(FILENAME_STEM))
     {
     }
 

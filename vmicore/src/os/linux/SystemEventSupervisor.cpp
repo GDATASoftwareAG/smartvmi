@@ -2,6 +2,7 @@
 #include "Constants.h"
 #include <fmt/core.h>
 #include <utility>
+#include <vmicore/filename.h>
 
 namespace VmiCore::Linux
 {
@@ -18,7 +19,7 @@ namespace VmiCore::Linux
           configInterface(std::move(configInterface)),
           interruptEventSupervisor(std::move(interruptFactory)),
           loggingLib(std::move(loggingLib)),
-          logger(NEW_LOGGER(this->loggingLib)),
+          logger(this->loggingLib->newNamedLogger(FILENAME_STEM)),
           eventStream(std::move(eventStream))
     {
     }

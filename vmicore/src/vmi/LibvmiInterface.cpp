@@ -5,6 +5,7 @@
 #include "VmiInitData.h"
 #include "VmiInitError.h"
 #include <utility>
+#include <vmicore/filename.h>
 
 namespace VmiCore
 {
@@ -17,7 +18,7 @@ namespace VmiCore
                                      std::shared_ptr<ILogging> loggingLib,
                                      std::shared_ptr<IEventStream> eventStream)
         : configInterface(std::move(configInterface)),
-          logger(NEW_LOGGER(loggingLib)),
+          logger(loggingLib->newNamedLogger(FILENAME_STEM)),
           eventStream(std::move(eventStream))
     {
         if (libvmiInterfaceInstance != nullptr)

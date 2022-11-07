@@ -3,6 +3,7 @@
 #include "../../vmi/VmiException.h"
 #include <fmt/core.h>
 #include <utility>
+#include <vmicore/filename.h>
 
 namespace VmiCore::Windows
 {
@@ -19,7 +20,7 @@ namespace VmiCore::Windows
           configInterface(std::move(configInterface)),
           interruptEventSupervisor(std::move(interruptEventSupervisor)),
           loggingLib(std::move(loggingLib)),
-          logger(NEW_LOGGER(this->loggingLib)),
+          logger(this->loggingLib->newNamedLogger(FILENAME_STEM)),
           eventStream(std::move(eventStream))
     {
     }
