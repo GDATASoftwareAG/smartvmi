@@ -6,6 +6,7 @@
             "displayName": "Debug Clang",
             "description": "Use Clang toolchain",
             "binaryDir": "build-clang-debug/",
+            "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_COMPILER": "clang",
@@ -17,6 +18,7 @@
             "displayName": "Debug G++",
             "description": "Use gcc toolchain",
             "binaryDir": "build-gcc-debug/",
+            "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_COMPILER": "gcc",
