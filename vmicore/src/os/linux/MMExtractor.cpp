@@ -2,13 +2,17 @@
 #include "../PageProtection.h"
 #include "Constants.h"
 #include "ProtectionValues.h"
+#include <vmicore/filename.h>
 
 namespace VmiCore::Linux
 {
     MMExtractor::MMExtractor(const std::shared_ptr<ILibvmiInterface>& vmiInterface,
                              const std::shared_ptr<ILogging>& logging,
                              uint64_t mm)
-        : vmiInterface(vmiInterface), logger(NEW_LOGGER(logging)), pathExtractor(vmiInterface, logging), mm(mm)
+        : vmiInterface(vmiInterface),
+          logger(logging->newNamedLogger(FILENAME_STEM)),
+          pathExtractor(vmiInterface, logging),
+          mm(mm)
     {
     }
 

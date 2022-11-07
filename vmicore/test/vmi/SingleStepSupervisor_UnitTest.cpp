@@ -1,6 +1,8 @@
+#include "../../src/GlobalControl.h"
 #include "../../src/vmi/SingleStepSupervisor.h"
 #include "../../src/vmi/VmiException.h"
 #include "../io/grpc/mock_GRPCLogger.h"
+#include "../io/mock_EventStream.h"
 #include "../io/mock_Logging.h"
 #include "mock_LibvmiInterface.h"
 #include <gtest/gtest.h>
@@ -47,6 +49,14 @@ namespace VmiCore
             ON_CALL(*vmiInterface, getNumberOfVCPUs()).WillByDefault(Return(numberOfTestVcpus));
             singleStepSupervisor = std::make_unique<SingleStepSupervisor>(vmiInterface, mockLogging);
             singleStepSupervisor->initializeSingleStepEvents();
+
+            GlobalControl::init(std::make_unique<NiceMock<MockGRPCLogger>>(),
+                                std::make_shared<NiceMock<MockEventStream>>());
+        }
+
+        void TearDown() override
+        {
+            GlobalControl::uninit();
         }
     };
 

@@ -3,26 +3,25 @@
 #include "../io/grpc/GRPCLogger.h"
 #include "VmiException.h"
 #include <cmath>
+#include <vmicore/filename.h>
 
 namespace VmiCore
 {
     namespace
     {
         SingleStepSupervisor* singleStepSupervisorSingleton = nullptr;
+        constexpr auto loggerName = FILENAME_STEM;
     }
 
-    std::unique_ptr<ILogger> SingleStepSupervisor::logger;
-
     SingleStepSupervisor::SingleStepSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                                               std::shared_ptr<ILogging> loggingLib)
-        : vmiInterface(std::move(vmiInterface))
+                                               const std::shared_ptr<ILogging>& loggingLib)
+        : vmiInterface(std::move(vmiInterface)), logger(loggingLib->newNamedLogger(loggerName))
     {
         if (singleStepSupervisorSingleton != nullptr)
         {
             throw std::runtime_error("Not allowed to initialize more than one instance of SingleStepSupervisor.");
         }
         singleStepSupervisorSingleton = this;
-        SingleStepSupervisor::logger = NEW_LOGGER(loggingLib);
     }
 
     SingleStepSupervisor::~SingleStepSupervisor()
@@ -111,7 +110,9 @@ namespace VmiCore
         catch (const std::exception& e)
         {
             GlobalControl::endVmi = true;
-            SingleStepSupervisor::logger->error("Unexpected exception", {logfield::create("exception", e.what())});
+            GlobalControl::logger()->error(
+                "Unexpected exception",
+                {logfield::create("logger", loggerName), logfield::create("exception", e.what())});
         }
         return eventResponse;
     }

@@ -4,6 +4,7 @@
 #include "MMExtractor.h"
 #include <fmt/core.h>
 #include <string>
+#include <vmicore/filename.h>
 
 namespace VmiCore::Linux
 {
@@ -12,7 +13,7 @@ namespace VmiCore::Linux
                                                          std::shared_ptr<IEventStream> eventStream)
         : vmiInterface(vmiInterface),
           logging(loggingLib),
-          logger(NEW_LOGGER(loggingLib)),
+          logger(loggingLib->newNamedLogger(FILENAME_STEM)),
           eventStream(std::move(eventStream)),
           pathExtractor(std::move(vmiInterface), loggingLib)
     {

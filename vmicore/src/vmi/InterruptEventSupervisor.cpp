@@ -4,13 +4,14 @@
 #include "InterruptGuard.h"
 #include "VmiException.h"
 #include <memory>
+#include <vmicore/filename.h>
 
 namespace VmiCore
 {
     namespace
     {
         InterruptEventSupervisor* interruptEventSupervisor = nullptr;
-        const std::string loggerName = std::filesystem::path(__FILE__).filename().stem();
+        constexpr auto loggerName = FILENAME_STEM;
     }
 
     InterruptEventSupervisor::InterruptEventSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
@@ -19,7 +20,7 @@ namespace VmiCore
         : vmiInterface(std::move(vmiInterface)),
           singleStepSupervisor(std::move(singleStepSupervisor)),
           loggingLib(std::move(loggingLib)),
-          logger(NEW_LOGGER(this->loggingLib))
+          logger(this->loggingLib->newNamedLogger(loggerName))
     {
         interruptEventSupervisor = this;
     }

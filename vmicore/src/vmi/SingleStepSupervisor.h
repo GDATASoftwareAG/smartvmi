@@ -28,8 +28,8 @@ namespace VmiCore
     class SingleStepSupervisor : public ISingleStepSupervisor
     {
       public:
-        explicit SingleStepSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                                      std::shared_ptr<ILogging> loggingLib);
+        SingleStepSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
+                             const std::shared_ptr<ILogging>& loggingLib);
 
         ~SingleStepSupervisor() override;
 
@@ -63,10 +63,9 @@ namespace VmiCore
 
       private:
         std::shared_ptr<ILibvmiInterface> vmiInterface;
+        std::unique_ptr<ILogger> logger;
         std::vector<vmi_event_t> singleStepEvents{};
-        std::vector<std::function<void(vmi_event_t*)>> callbacks;
-
-        static std::unique_ptr<ILogger> logger;
+        std::vector<std::function<void(vmi_event_t*)>> callbacks{};
 
         event_response_t singleStepCallback(vmi_event_t* event);
     };

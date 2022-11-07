@@ -8,13 +8,14 @@
 #include <csignal>
 #include <memory>
 #include <utility>
+#include <vmicore/filename.h>
 
 namespace VmiCore
 {
     namespace
     {
         int exitCode = 0;
-        const std::string loggerName = std::filesystem::path(__FILE__).filename().stem();
+        constexpr auto loggerName = FILENAME_STEM;
     }
 
     VmiHub::VmiHub(std::shared_ptr<IConfigParser> configInterface,
@@ -25,7 +26,7 @@ namespace VmiCore
         : configInterface(std::move(configInterface)),
           vmiInterface(std::move(vmiInterface)),
           loggingLib(std::move(loggingLib)),
-          logger(NEW_LOGGER(this->loggingLib)),
+          logger(this->loggingLib->newNamedLogger(loggerName)),
           eventStream(std::move(eventStream)),
           interruptEventSupervisor(std::move(interruptEventSupervisor))
     {

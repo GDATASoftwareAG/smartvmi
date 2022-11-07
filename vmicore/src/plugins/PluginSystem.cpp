@@ -5,6 +5,7 @@
 #include <exception>
 #include <fmt/core.h>
 #include <utility>
+#include <vmicore/filename.h>
 
 namespace VmiCore
 {
@@ -32,7 +33,7 @@ namespace VmiCore
           interruptEventSupervisor(std::move(interruptEventSupervisor)),
           legacyLogging(std::move(pluginLogging)),
           loggingLib(std::move(loggingLib)),
-          logger(NEW_LOGGER(this->loggingLib)),
+          logger(this->loggingLib->newNamedLogger(FILENAME_STEM)),
           eventStream(std::move(eventStream))
     {
         if (isInstanciated)

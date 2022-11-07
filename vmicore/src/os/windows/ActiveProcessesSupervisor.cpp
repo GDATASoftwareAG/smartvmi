@@ -3,6 +3,7 @@
 #include "../PagingDefinitions.h"
 #include <fmt/core.h>
 #include <string>
+#include <vmicore/filename.h>
 
 namespace VmiCore::Windows
 {
@@ -17,7 +18,7 @@ namespace VmiCore::Windows
                                                          std::shared_ptr<IEventStream> eventStream)
         : vmiInterface(std::move(vmiInterface)),
           kernelAccess(std::move(kernelAccess)),
-          logger(NEW_LOGGER(loggingLib)),
+          logger(loggingLib->newNamedLogger(FILENAME_STEM)),
           loggingLib(std::move(loggingLib)),
           eventStream(std::move(eventStream))
     {

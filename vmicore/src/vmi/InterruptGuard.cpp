@@ -5,12 +5,13 @@
 #include <fmt/core.h>
 #include <memory>
 #include <utility>
+#include <vmicore/filename.h>
 
 namespace VmiCore
 {
     namespace
     {
-        const std::string loggerName = std::filesystem::path(__FILE__).filename().stem();
+        constexpr auto loggerName = FILENAME_STEM;
     }
 
     InterruptGuard::InterruptGuard(std::shared_ptr<ILibvmiInterface> vmiInterface,
@@ -19,7 +20,7 @@ namespace VmiCore
                                    uint64_t targetGFN,
                                    uint64_t systemCr3)
         : vmiInterface(std::move(vmiInterface)),
-          logger(NEW_LOGGER(logging)),
+          logger(logging->newNamedLogger(loggerName)),
           targetVA(targetVA),
           targetGFN(targetGFN),
           shadowPage(PagingDefinitions::pageSizeInBytes + 16),

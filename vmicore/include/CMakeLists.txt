@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(vmicore_public_headers INTERFACE)
@@ -23,5 +23,7 @@ target_sources(vmicore_public_headers INTERFACE
         vmicore/vmi/IBreakpoint.h
         vmicore/vmi/IIntrospectionAPI.h
         vmicore/vmi/events/IInterruptEvent.h
-        vmicore/vmi/events/IRegisterReadable.h)
+        vmicore/vmi/events/IRegisterReadable.h
+        vmicore/filename.h
+        vmicore/types.h)
 target_include_directories(vmicore_public_headers INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
