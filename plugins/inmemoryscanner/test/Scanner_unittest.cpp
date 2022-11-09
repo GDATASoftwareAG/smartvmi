@@ -5,9 +5,9 @@
 #include "mock_Yara.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <vmicore/test/os/mock_MemoryRegionExtractor.h>
-#include <vmicore/test/os/mock_PageProtection.h>
-#include <vmicore/test/plugins/mock_PluginInterface.h>
+#include <vmicore_test/os/mock_MemoryRegionExtractor.h>
+#include <vmicore_test/os/mock_PageProtection.h>
+#include <vmicore_test/plugins/mock_PluginInterface.h>
 
 using testing::_;
 using testing::An;

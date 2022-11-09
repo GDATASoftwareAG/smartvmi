@@ -45,7 +45,7 @@ jobs:
 
       - name: Test vmicore
         run: |
-          cmake --preset gcc-debug
+          cmake --preset gcc-debug -D VMICORE_TEST_COVERAGE:BOOL=ON
           cmake --build --preset gcc-build-debug --target vmicore-test
           ctest --preset gcc-test
           cd build-gcc-debug

@@ -7,21 +7,21 @@
 #endif
 
 #include "Cmdline.h"
-#include "GlobalControl.h"
-#include "VmiHub.h"
-#include "config/ConfigYAMLParser.h"
-#include "cxxbridge/rust/cxx.h"
-#include "cxxbridge/rust_grpc_server/src/bridge.rs.h"
-#include "io/IEventStream.h"
-#include "io/IFileTransport.h"
-#include "io/ILogging.h"
-#include "io/console/ConsoleLoggerBuilder.h"
-#include "io/console/DummyEventStream.h"
-#include "io/grpc/GRPCServer.h"
-#include "vmi/InterruptEventSupervisor.h"
-#include "vmi/LibvmiInterface.h"
-#include "vmi/VmiException.h"
+#include "lib/GlobalControl.h"
+#include "lib/VmiHub.h"
+#include "lib/config/ConfigYAMLParser.h"
+#include "lib/io/IEventStream.h"
+#include "lib/io/IFileTransport.h"
+#include "lib/io/ILogging.h"
+#include "lib/io/console/ConsoleLoggerBuilder.h"
+#include "lib/io/console/DummyEventStream.h"
+#include "lib/io/grpc/GRPCServer.h"
+#include "lib/vmi/InterruptEventSupervisor.h"
+#include "lib/vmi/LibvmiInterface.h"
+#include "lib/vmi/VmiException.h"
 #include <boost/di.hpp>
+#include <cxxbridge/rust/cxx.h>
+#include <cxxbridge/rust_grpc_server/src/bridge.rs.h>
 #include <iostream>
 #include <memory>
 #include <ostream>
