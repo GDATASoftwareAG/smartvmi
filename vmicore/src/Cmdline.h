@@ -23,7 +23,7 @@ class Cmdline
                                                     "config",
                                                     "YAML file containing the config for the VMI analysis.",
                                                     false,
-                                                    INSTALL_PREFIX "/etc/vmicore.conf",
+                                                    std::filesystem::path(SYSCONF_DIR) / "vmicore.yml",
                                                     "config_file.yml",
                                                     cmd};
     TCLAP::ValueArg<std::string> domainNameArgument{

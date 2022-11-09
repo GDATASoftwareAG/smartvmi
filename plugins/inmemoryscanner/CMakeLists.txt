@@ -40,7 +40,7 @@ add_compile_definitions(YAML_CPP_SUPPORT)
 
 # Add public vmicore headers
 
-add_subdirectory("${VMICORE_DIRECTORY_ROOT}/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore_public_headers")
+add_subdirectory("${VMICORE_DIRECTORY_ROOT}/src/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-headers")
 
 # Variable section
 
@@ -49,7 +49,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(compile_flags -Wunused -Wunreachable-code -Wall -Wextra -Wpedantic)
-set(libraries vmicore_public_headers ${YARA_LINK_LIBRARIES} yaml-cpp)
+set(libraries vmicore-public-headers ${YARA_LINK_LIBRARIES} yaml-cpp)
 
 add_compile_definitions(BUILD_VERSION="${PROGRAM_BUILD_NUMBER}" PLUGIN_VERSION="${PROGRAM_VERSION}")
 
@@ -73,10 +73,14 @@ target_compile_options(inmemoryscanner PRIVATE ${compile_flags})
 target_link_libraries(inmemoryscanner ${libraries})
 
 add_executable(inmemoryscanner-test ${source_files} ${test_files})
-
 target_compile_options(inmemoryscanner-test PRIVATE ${compile_flags} -g -O0 --coverage)
 target_link_options(inmemoryscanner-test PRIVATE --coverage)
 target_link_libraries(inmemoryscanner-test ${libraries} pthread gtest gmock gmock_main)
+
+# Add VmiCore public test headers
+
+add_subdirectory("${VMICORE_DIRECTORY_ROOT}/test/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-test-headers")
+target_link_libraries(inmemoryscanner-test vmicore-public-test-headers)
 
 # Setup test discovery
 

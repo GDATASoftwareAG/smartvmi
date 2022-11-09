@@ -23,7 +23,7 @@ done via a call to `add_subdirectory()` (recommended if working in a single repo
 # Assuming the project resides in the plugins folder
 set(VMICORE_DIRECTORY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../vmicore")
 
-add_subdirectory("${VMICORE_DIRECTORY_ROOT}/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore_public_headers")
+add_subdirectory("${VMICORE_DIRECTORY_ROOT}/src/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-headers")
 ```
 
 or via pulling in *VMICore* as a dependency (recommended if developing in a separate repository).
@@ -34,16 +34,16 @@ FetchContent_Declare(
         vmicore
         GIT_REPOSITORY https://github.com/GDATASoftwareAG/smartvmi.git
         GIT_TAG main
-        SOURCE_SUBDIR vmicore/include/
+        SOURCE_SUBDIR vmicore/src/include/
 )
 FetchContent_MakeAvailable(vmicore)
 ```
 
-Finally, the `vmicore_public_headers` library target has to be added to the link libraries of the plugin target.
+Finally, the `vmicore-public-headers` library target has to be added to the link libraries of the plugin target.
 
 ```cmake
 add_library(myplugin MODULE "src/myplugin.cpp")
-target_link_libraries(myplugin vmicore_public_headers)
+target_link_libraries(myplugin vmicore-public-headers)
 ```
 
 ## Plugin Initialization
@@ -153,3 +153,17 @@ Remarks:
 
 Any given arguments are passed to the `init()` function as a vector of strings. It is recommended to use an argument
 parser like *TCLAP* for parsing as the arguments are already in a correct format for this purpose.
+
+## Unit Testing
+
+*VmiCore* offers `googletest` mocks for various public interfaces. They can be included analogously
+to `vmicore-public-headers` as described above.
+
+```cmake
+add_subdirectory("${VMICORE_DIRECTORY_ROOT}/test/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-test-headers")
+
+add_executable(myplugin-test "test/unittest.cpp")
+target_link_libraries(myplugin vmicore-public-test-headers)
+```
+
+Keep in mind that this target depends on `vmicore-public-headers` as well as `gmock`.
