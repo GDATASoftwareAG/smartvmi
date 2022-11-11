@@ -1,6 +1,8 @@
 #ifndef VMICORE_IREGISTERREADABLE_H
 #define VMICORE_IREGISTERREADABLE_H
 
+#include <cstdint>
+
 namespace VmiCore
 {
     class IRegisterReadable

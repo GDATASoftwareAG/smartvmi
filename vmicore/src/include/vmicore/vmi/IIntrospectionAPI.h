@@ -4,6 +4,7 @@
 #include "../os/OperatingSystem.h"
 #include "../types.h"
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
