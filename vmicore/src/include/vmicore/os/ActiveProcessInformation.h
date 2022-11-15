@@ -19,6 +19,7 @@ namespace VmiCore
         std::unique_ptr<std::string> fullName;
         std::unique_ptr<std::string> processPath;
         std::unique_ptr<IMemoryRegionExtractor> memoryRegionExtractor;
+        bool is32BitProcess;
     };
 }
 

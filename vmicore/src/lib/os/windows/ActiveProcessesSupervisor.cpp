@@ -50,6 +50,7 @@ namespace VmiCore::Windows
         processInformation->pid = kernelAccess->extractPID(eprocessBase);
         processInformation->parentPid = kernelAccess->extractParentID(eprocessBase);
         processInformation->name = kernelAccess->extractImageFileName(eprocessBase);
+        processInformation->is32BitProcess = kernelAccess->extractIsWow64Process(eprocessBase);
         try
         {
             processInformation->processPath = extractProcessPath(eprocessBase);

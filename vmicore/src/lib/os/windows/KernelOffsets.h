@@ -40,6 +40,7 @@ namespace VmiCore::Windows
             addr_t ExitStatus;
             addr_t ImageFilePointer;
             addr_t ImageFileName;
+            addr_t WoW64Process;
         } __attribute__((aligned(64)));
 
         using _mmvad_short = struct _mmvad_short

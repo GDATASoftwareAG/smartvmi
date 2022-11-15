@@ -265,4 +265,13 @@ namespace VmiCore::Windows
 
         return getFlagValue(flagValue, startBit, endBit);
     }
+
+    bool KernelAccess::extractIsWow64Process(uint64_t eprocessBase) const
+    {
+        auto wow64ProcessAddress = eprocessBase + kernelOffsets.eprocess.WoW64Process;
+        auto wow64Process = vmiInterface->read64VA(wow64ProcessAddress, vmiInterface->convertPidToDtb(systemPid));
+
+        return wow64Process != 0;
+    }
+
 }

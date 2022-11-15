@@ -67,6 +67,8 @@ namespace VmiCore::Windows
 
         [[nodiscard]] virtual bool extractIsFile(addr_t controlAreaBaseVA) const = 0;
 
+        [[nodiscard]] virtual bool extractIsWow64Process(uint64_t eprocessBase) const = 0;
+
       protected:
         IKernelAccess() = default;
     };
@@ -132,6 +134,8 @@ namespace VmiCore::Windows
         [[nodiscard]] bool extractIsImage(addr_t controlAreaBaseVA) const override;
 
         [[nodiscard]] bool extractIsFile(addr_t controlAreaBaseVA) const override;
+
+        [[nodiscard]] bool extractIsWow64Process(uint64_t eprocessBase) const override;
 
       private:
         std::shared_ptr<ILibvmiInterface> vmiInterface;
