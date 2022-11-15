@@ -8,8 +8,6 @@ using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner
 {
-    constexpr uint64_t defaultMaxScanSize = 52428800; // 50MB
-
     Config::Config(const PluginInterface* pluginInterface) : pluginInterface(pluginInterface) {}
 
     void Config::parseConfiguration(const IPluginConfig& config)
@@ -19,7 +17,6 @@ namespace InMemoryScanner
         outputPath = rootNode["output_path"].as<std::string>();
         dumpMemory = rootNode["dump_memory"].as<bool>(false);
         scanAllRegions = rootNode["scan_all_regions"].as<bool>(false);
-        maximumScanSize = rootNode["maximum_scan_size"].as<uint64_t>(defaultMaxScanSize);
 
         auto ignoredProcessesVec =
             rootNode["ignored_processes"].as<std::vector<std::string>>(std::vector<std::string>());
@@ -56,11 +53,6 @@ namespace InMemoryScanner
     bool Config::isDumpingMemoryActivated() const
     {
         return dumpMemory;
-    }
-
-    uint64_t Config::getMaximumScanSize() const
-    {
-        return maximumScanSize;
     }
 
     void Config::overrideDumpMemoryFlag(bool value)

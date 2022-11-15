@@ -5,6 +5,7 @@
 #include "VmiInitError.h"
 #include <utility>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {
@@ -152,6 +153,21 @@ namespace VmiCore
             return false;
         }
         return true;
+    }
+
+    std::vector<void*> LibvmiInterface::mmapGuest(addr_t baseVA, addr_t dtb, std::size_t numberOfPages)
+    {
+        auto accessPointers = std::vector<void*>(numberOfPages);
+        auto accessContext = createVirtualAddressAccessContext(baseVA, dtb);
+        std::lock_guard<std::mutex> lock(libvmiLock);
+        if (vmi_mmap_guest(vmiInstance, &accessContext, numberOfPages, accessPointers.data()) != VMI_SUCCESS)
+        {
+            throw VmiException(fmt::format("{}: Unable to create memory mapping for VA {:#x} with number of pages {}",
+                                           __func__,
+                                           baseVA,
+                                           numberOfPages));
+        }
+        return accessPointers;
     }
 
     void LibvmiInterface::write8PA(const addr_t physicalAddress, uint8_t value)

@@ -5,6 +5,7 @@
 #include "../types.h"
 #include "../vmi/IBreakpoint.h"
 #include "../vmi/IIntrospectionAPI.h"
+#include "../vmi/IMemoryMapping.h"
 #include "IPluginConfig.h"
 #include <functional>
 #include <memory>
@@ -31,12 +32,12 @@ namespace VmiCore::Plugin
     class PluginInterface
     {
       public:
-        constexpr static uint8_t API_VERSION = 13;
+        constexpr static uint8_t API_VERSION = 14;
 
         virtual ~PluginInterface() = default;
 
-        [[nodiscard]] virtual std::unique_ptr<std::vector<uint8_t>>
-        readProcessMemoryRegion(pid_t pid, addr_t address, size_t numberOfBytes) const = 0;
+        [[nodiscard]] virtual std::unique_ptr<IMemoryMapping>
+        mapProcessMemoryRegion(addr_t baseVA, addr_t dtb, std::size_t numberOfPages) const = 0;
 
         [[nodiscard]] virtual std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
         getRunningProcesses() const = 0;

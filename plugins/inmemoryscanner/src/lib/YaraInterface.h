@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include <memory>
+#include <vmicore/vmi/IMemoryMapping.h>
 
 namespace InMemoryScanner
 {
@@ -16,7 +17,8 @@ namespace InMemoryScanner
       public:
         virtual ~YaraInterface() = default;
 
-        virtual std::unique_ptr<std::vector<Rule>> scanMemory(std::vector<uint8_t>& buffer) = 0;
+        virtual std::unique_ptr<std::vector<Rule>>
+        scanMemory(const std::vector<VmiCore::MappedRegion>& mappedRegions) = 0;
 
       protected:
         YaraInterface() = default;

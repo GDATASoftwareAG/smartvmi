@@ -5,9 +5,11 @@
 #include <Scanner.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vmicore/os/PagingDefinitions.h>
 #include <vmicore_test/os/mock_MemoryRegionExtractor.h>
 #include <vmicore_test/os/mock_PageProtection.h>
 #include <vmicore_test/plugins/mock_PluginInterface.h>
+#include <vmicore_test/vmi/mock_MemoryMapping.h>
 
 using testing::_;
 using testing::An;
@@ -18,9 +20,12 @@ using testing::NiceMock;
 using testing::Return;
 using testing::Unused;
 using VmiCore::ActiveProcessInformation;
+using VmiCore::addr_t;
 using VmiCore::MemoryRegion;
 using VmiCore::MockMemoryRegionExtractor;
 using VmiCore::MockPageProtection;
+using VmiCore::pid_t;
+using VmiCore::PagingDefinitions::pageSizeInBytes;
 using VmiCore::Plugin::MockPluginInterface;
 
 namespace InMemoryScanner
@@ -28,9 +33,10 @@ namespace InMemoryScanner
     class ScannerTestBaseFixture : public testing::Test
     {
       protected:
-        const size_t maxScanSize = 0x3200000;
         const pid_t testPid = 4;
+        const addr_t testDtb = 0x9876;
         const pid_t processIdWithSharedBaseImageRegion = 5;
+        const addr_t dtbWithSharedBaseImageRegion = 0x8765;
 
         std::unique_ptr<MockPluginInterface> pluginInterface = std::make_unique<MockPluginInterface>();
         std::shared_ptr<MockConfig> configuration = std::make_shared<MockConfig>();
@@ -45,44 +51,46 @@ namespace InMemoryScanner
         std::filesystem::path dumpedRegionsPath = inMemoryDumpsPath / "dumpedRegions";
         VmiCore::addr_t startAddress = 0x1234000;
         size_t size = 0x666;
+        std::vector<uint8_t> testPageContent = std::vector<uint8_t>(size, 1);
+        std::shared_ptr<std::vector<VmiCore::MappedRegion>> regionMappings =
+            std::make_shared<std::vector<VmiCore::MappedRegion>>(1,
+                                                                 VmiCore::MappedRegion(startAddress, testPageContent));
 
         std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>> runningProcesses;
 
         void SetUp() override
         {
-            ON_CALL(*pluginInterface, getResultsDir()).WillByDefault([]() { return std::make_unique<std::string>(); });
-            ON_CALL(*configuration, getMaximumScanSize()).WillByDefault(Return(maxScanSize));
-            // make sure that we return a non-empty memory region or else we might skip important parts
-            ON_CALL(*pluginInterface, readProcessMemoryRegion(_, _, _))
-                .WillByDefault([]() { return std::make_unique<std::vector<uint8_t>>(6, 9); });
-
             ON_CALL(*configuration, getOutputPath())
                 .WillByDefault([inMemoryDumpsPath = inMemoryDumpsPath]() { return inMemoryDumpsPath; });
-            ON_CALL(*configuration, getMaximumScanSize()).WillByDefault(Return(maxScanSize));
 
             runningProcesses = std::make_unique<std::vector<std::shared_ptr<const ActiveProcessInformation>>>();
             auto m1 = std::make_unique<MockMemoryRegionExtractor>();
             systemMemoryRegionExtractorRaw = m1.get();
             runningProcesses->push_back(std::make_shared<ActiveProcessInformation>(
                 ActiveProcessInformation{0,
-                                         0,
+                                         testDtb,
                                          testPid,
                                          0,
                                          "System.exe",
                                          std::make_unique<std::string>("System.exe"),
                                          std::make_unique<std::string>(""),
-                                         std::move(m1)}));
+                                         std::move(m1),
+                                         false}));
             auto m2 = std::make_unique<MockMemoryRegionExtractor>();
             sharedBaseImageMemoryRegionExtractorRaw = m2.get();
             runningProcesses->push_back(std::make_shared<ActiveProcessInformation>(
                 ActiveProcessInformation{0,
-                                         0,
+                                         dtbWithSharedBaseImageRegion,
                                          processIdWithSharedBaseImageRegion,
                                          0,
                                          "SomeProcess.exe",
                                          std::make_unique<std::string>("SomeProcess.exe"),
                                          std::make_unique<std::string>(""),
-                                         std::move(m2)}));
+                                         std::move(m2),
+                                         false}));
+
+            createMemoryMapping(testDtb, startAddress, bytesToNumberOfPages(size), regionMappings);
+            createMemoryMapping(dtbWithSharedBaseImageRegion, startAddress, bytesToNumberOfPages(size), regionMappings);
         };
 
         std::shared_ptr<const ActiveProcessInformation> getProcessInfoFromRunningProcesses(pid_t pid)
@@ -92,6 +100,22 @@ namespace InMemoryScanner
                                  [pid = pid](const std::shared_ptr<const ActiveProcessInformation>& a)
                                  { return a->pid == pid; });
         };
+
+        void createMemoryMapping(addr_t dtb,
+                                 VmiCore::addr_t baseVA,
+                                 std::size_t numberOfPages,
+                                 std::shared_ptr<std::vector<VmiCore::MappedRegion>> mappedRegions)
+        {
+            ON_CALL(*pluginInterface, mapProcessMemoryRegion(baseVA, dtb, numberOfPages))
+                .WillByDefault(
+                    [mappedRegions = std::move(mappedRegions)]()
+                    {
+                        auto mapping = std::make_unique<VmiCore::MockMemoryMapping>();
+                        ON_CALL(*mapping, getMappedRegions())
+                            .WillByDefault([mappedRegions = mappedRegions]() { return mappedRegions; });
+                        return mapping;
+                    });
+        }
     };
 
     class ScannerTestFixtureDumpingDisabled : public ScannerTestBaseFixture
@@ -106,7 +130,9 @@ namespace InMemoryScanner
             ON_CALL(*configuration, isDumpingMemoryActivated()).WillByDefault(Return(false));
             auto dumping = std::make_unique<NiceMock<MockDumping>>();
             dumpingRawPointer = dumping.get();
-            scanner.emplace(pluginInterface.get(), configuration, std::unique_ptr<YaraInterface>{}, std::move(dumping));
+            auto yara = std::make_unique<NiceMock<MockYara>>();
+            ON_CALL(*yara, scanMemory(_)).WillByDefault([]() { return std::make_unique<std::vector<Rule>>(); });
+            scanner.emplace(pluginInterface.get(), configuration, std::move(yara), std::move(dumping));
         };
     };
 
@@ -155,21 +181,17 @@ namespace InMemoryScanner
         }
     };
 
-    TEST_F(ScannerTestFixtureDumpingDisabled, scanProcess_largeMemoryRegion_trimToMaxScanSize)
+    std::vector<uint8_t> constructPaddedRegion(const std::initializer_list<std::vector<uint8_t>>& list)
     {
-        ON_CALL(*systemMemoryRegionExtractorRaw, extractAllMemoryRegions())
-            .WillByDefault(
-                [startAddress = startAddress, maxScanSize = maxScanSize]()
-                {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                    memoryRegions->emplace_back(
-                        startAddress, maxScanSize + 1, "", std::make_unique<MockPageProtection>(), false, false, false);
-                    return memoryRegions;
-                });
+        std::vector<uint8_t> paddedRegion{};
+        paddedRegion.reserve(list.size() * pageSizeInBytes);
 
-        EXPECT_CALL(*pluginInterface, readProcessMemoryRegion(testPid, startAddress, maxScanSize))
-            .WillOnce(Return(ByMove(std::make_unique<std::vector<uint8_t>>())));
-        EXPECT_NO_THROW(scanner->scanProcess(getProcessInfoFromRunningProcesses(testPid)));
+        for (const auto& el : list)
+        {
+            std::copy(el.begin(), el.end(), std::back_inserter(paddedRegion));
+        }
+
+        return paddedRegion;
     }
 
     TEST_F(ScannerTestFixtureDumpingDisabled, scanProcess_smallMemoryRegion_originalReadMemoryRegionSize)
@@ -183,10 +205,19 @@ namespace InMemoryScanner
                         startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
                     return memoryRegions;
                 });
+        auto process = getProcessInfoFromRunningProcesses(testPid);
 
-        EXPECT_CALL(*pluginInterface, readProcessMemoryRegion(testPid, startAddress, size))
-            .WillOnce(Return(ByMove(std::make_unique<std::vector<uint8_t>>())));
-        EXPECT_NO_THROW(scanner->scanProcess(getProcessInfoFromRunningProcesses(testPid)));
+        EXPECT_CALL(*pluginInterface,
+                    mapProcessMemoryRegion(startAddress, process->processCR3, bytesToNumberOfPages(size)))
+            .WillOnce(
+                [regionMappings = regionMappings]()
+                {
+                    auto mapping = std::make_unique<VmiCore::MockMemoryMapping>();
+                    EXPECT_CALL(*mapping, getMappedRegions())
+                        .WillOnce([regionMappings = regionMappings]() { return regionMappings; });
+                    return mapping;
+                });
+        EXPECT_NO_THROW(scanner->scanProcess(process));
     }
 
     TEST_F(ScannerTestFixtureDumpingDisabled, scanProcess_disabledDumping_dumpingNotCalled)
@@ -200,10 +231,8 @@ namespace InMemoryScanner
                         startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
                     return memoryRegions;
                 });
-        EXPECT_CALL(*pluginInterface, readProcessMemoryRegion(testPid, startAddress, size))
-            .WillOnce(Return(ByMove(std::make_unique<std::vector<uint8_t>>())));
-        EXPECT_CALL(*dumpingRawPointer, dumpMemoryRegion(_, _, _, _)).Times(0);
 
+        EXPECT_CALL(*dumpingRawPointer, dumpMemoryRegion(_, _, _, _)).Times(0);
         EXPECT_NO_THROW(scanner->scanProcess(getProcessInfoFromRunningProcesses(testPid)));
     }
 
@@ -211,18 +240,20 @@ namespace InMemoryScanner
     {
         std::string fullProcessName = "abcdefghijklmnopqrstuvwxyz!1!";
         std::string trimmedProcessName = "abcdefghijklmn";
-        auto pid = 123;
+        pid_t pid = 123;
+        addr_t dtb = 0x4444;
         auto memoryRegionExtractor = std::make_unique<MockMemoryRegionExtractor>();
         auto* memoryRegionExtractorRaw = memoryRegionExtractor.get();
         auto processWithLongName = std::make_shared<const ActiveProcessInformation>(
             ActiveProcessInformation{0,
-                                     0,
+                                     dtb,
                                      pid,
                                      0,
                                      trimmedProcessName,
                                      std::make_unique<std::string>(fullProcessName),
                                      std::make_unique<std::string>(),
-                                     std::move(memoryRegionExtractor)});
+                                     std::move(memoryRegionExtractor),
+                                     false});
         // Redefine default mock return because a new MemoryRegionExtractor mock has been created
         ON_CALL(*memoryRegionExtractorRaw, extractAllMemoryRegions())
             .WillByDefault(
@@ -235,6 +266,7 @@ namespace InMemoryScanner
         auto expectedFileNameRegEx = trimmedProcessName + "-" + std::to_string(pid) + "-" + protectionAsString + "-" +
                                      intToHex(startAddress) + "-" + intToHex(startAddress + size) + "-" + uidRegEx;
         auto expectedFileNameWithPathRegEx = "^" + (dumpedRegionsPath / expectedFileNameRegEx).string() + "$";
+        createMemoryMapping(dtb, startAddress, bytesToNumberOfPages(size), regionMappings);
 
         EXPECT_CALL(*pluginInterface,
                     writeToFile(ContainsRegex(expectedFileNameWithPathRegEx), An<const std::vector<uint8_t>&>()));
@@ -266,13 +298,14 @@ namespace InMemoryScanner
         auto* memoryRegionExtractorRaw = memoryRegionExtractor.get();
         auto processInfo = std::make_shared<ActiveProcessInformation>(
             ActiveProcessInformation{0,
-                                     0,
+                                     testDtb,
                                      testPid,
                                      0,
                                      "System.exe",
                                      std::make_unique<std::string>("System.exe"),
                                      std::make_unique<std::string>(""),
-                                     std::move(memoryRegionExtractor)});
+                                     std::move(memoryRegionExtractor),
+                                     false});
         ON_CALL(*pluginInterface, getRunningProcesses())
             .WillByDefault(
                 [&processInfo]()
@@ -300,18 +333,20 @@ namespace InMemoryScanner
     {
         std::string fullProcessName = "abcdefghijklmnop";
         std::string trimmedProcessName = "abcdefghijklmn";
-        auto pid = 123;
+        pid_t pid = 312;
+        addr_t dtb = 0x5555;
         auto memoryRegionExtractor = std::make_unique<MockMemoryRegionExtractor>();
         auto* memoryRegionExtractorRaw = memoryRegionExtractor.get();
         auto processInfo = std::make_shared<ActiveProcessInformation>(
             ActiveProcessInformation{0,
-                                     0,
+                                     dtb,
                                      pid,
                                      0,
                                      "",
                                      std::make_unique<std::string>(fullProcessName),
                                      std::make_unique<std::string>(""),
-                                     std::move(memoryRegionExtractor)});
+                                     std::move(memoryRegionExtractor),
+                                     false});
         auto expectedFileName = inMemoryDumpsPath / "MemoryRegionInformation.json";
         std::string jsonStart = "{";
         std::string expectedFileContent =
@@ -339,11 +374,52 @@ namespace InMemoryScanner
 
                     return memoryRegions;
                 });
+        createMemoryMapping(dtb, startAddress, bytesToNumberOfPages(size), regionMappings);
 
         EXPECT_CALL(*pluginInterface, writeToFile(_, An<const std::string&>())).Times(AnyNumber());
         EXPECT_CALL(*pluginInterface, writeToFile(expectedFileName.string(), expectedFileContent + "\n")).Times(1);
 
         ASSERT_NO_THROW(scanner->scanAllProcesses());
         ASSERT_NO_THROW(scanner->saveOutput());
+    }
+
+    TEST_F(ScannerTestFixtureDumpingEnabled, scanProcess_complexMemoryRegion_regionWithCorrectPaddingDumped)
+    {
+        pid_t pid = 333;
+        addr_t dtb = 0x4554;
+        auto memoryRegionExtractor = std::make_unique<MockMemoryRegionExtractor>();
+        auto* memoryRegionExtractorRaw = memoryRegionExtractor.get();
+        auto processInfo =
+            std::make_shared<ActiveProcessInformation>(ActiveProcessInformation{0,
+                                                                                dtb,
+                                                                                pid,
+                                                                                0,
+                                                                                "",
+                                                                                std::make_unique<std::string>(""),
+                                                                                std::make_unique<std::string>(""),
+                                                                                std::move(memoryRegionExtractor),
+                                                                                false});
+        // Layout of complex region: 1 page, followed by 2 unmapped pages, followed by 2 pages
+        std::size_t complexRegionSize = 5 * pageSizeInBytes;
+        auto complexRegionDescriptor = MemoryRegion(
+            startAddress, complexRegionSize, "", std::make_unique<MockPageProtection>(), false, false, false);
+        ON_CALL(*memoryRegionExtractorRaw, extractAllMemoryRegions())
+            .WillByDefault(
+                [&memoryRegionDescriptor = complexRegionDescriptor]()
+                {
+                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    memoryRegions->push_back(std::move(memoryRegionDescriptor));
+
+                    return memoryRegions;
+                });
+        auto twoPageRegionContent = std::vector<uint8_t>(2 * pageSizeInBytes, 0xCA);
+        auto complexMappings = std::make_shared<std::vector<VmiCore::MappedRegion>>(std::vector<VmiCore::MappedRegion>{
+            {startAddress, testPageContent}, {startAddress + 3 * pageSizeInBytes, twoPageRegionContent}});
+        createMemoryMapping(dtb, startAddress, bytesToNumberOfPages(complexRegionSize), complexMappings);
+        auto paddingPage = std::vector<uint8_t>(pageSizeInBytes, 0);
+        auto expectedPaddedRegion = constructPaddedRegion({testPageContent, paddingPage, twoPageRegionContent});
+
+        EXPECT_CALL(*pluginInterface, writeToFile(_, expectedPaddedRegion)).Times(1);
+        ASSERT_NO_THROW(scanner->scanProcess(processInfo));
     }
 }

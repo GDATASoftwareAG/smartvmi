@@ -31,8 +31,6 @@ namespace InMemoryScanner
 
         [[nodiscard]] virtual bool isDumpingMemoryActivated() const = 0;
 
-        [[nodiscard]] virtual uint64_t getMaximumScanSize() const = 0;
-
         virtual void overrideDumpMemoryFlag(bool value) = 0;
 
       protected:
@@ -58,8 +56,6 @@ namespace InMemoryScanner
 
         [[nodiscard]] bool isDumpingMemoryActivated() const override;
 
-        [[nodiscard]] uint64_t getMaximumScanSize() const override;
-
         void overrideDumpMemoryFlag(bool value) override;
 
       private:
@@ -69,6 +65,5 @@ namespace InMemoryScanner
         std::set<std::string> ignoredProcesses;
         bool dumpMemory{};
         bool scanAllRegions{};
-        uint64_t maximumScanSize{};
     };
 }

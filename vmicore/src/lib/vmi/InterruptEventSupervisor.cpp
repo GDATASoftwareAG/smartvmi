@@ -1,10 +1,10 @@
 #include "InterruptEventSupervisor.h"
-#include "../os/PagingDefinitions.h"
 #include "Event.h"
 #include "InterruptGuard.h"
 #include "VmiException.h"
 #include <memory>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {

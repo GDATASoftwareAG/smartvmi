@@ -14,7 +14,6 @@ namespace InMemoryScanner
         MOCK_METHOD(bool, isProcessIgnored, (const std::string& processName), (const, override));
         MOCK_METHOD(bool, isScanAllRegionsActivated, (), (const, override));
         MOCK_METHOD(bool, isDumpingMemoryActivated, (), (const, override));
-        MOCK_METHOD(uint64_t, getMaximumScanSize, (), (const, override));
         MOCK_METHOD(void, overrideDumpMemoryFlag, (bool value), (override));
     };
 }

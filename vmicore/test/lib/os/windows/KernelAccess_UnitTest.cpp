@@ -1,7 +1,7 @@
 #include "../../vmi/ProcessesMemoryState.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <os/PagingDefinitions.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 using testing::Contains;
 using testing::Not;

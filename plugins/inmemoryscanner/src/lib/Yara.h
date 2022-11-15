@@ -12,7 +12,7 @@ namespace InMemoryScanner
 
         ~Yara() override;
 
-        std::unique_ptr<std::vector<Rule>> scanMemory(std::vector<uint8_t>& buffer) override;
+        std::unique_ptr<std::vector<Rule>> scanMemory(const std::vector<VmiCore::MappedRegion>& mappedRegions) override;
 
       private:
         YR_RULES* rules = nullptr;

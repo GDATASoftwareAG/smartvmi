@@ -1,11 +1,12 @@
 #include "PluginSystem.h"
-#include "../os/PagingDefinitions.h"
+#include "../vmi/MemoryMapping.h"
 #include <cstdint>
 #include <dlfcn.h>
 #include <exception>
 #include <fmt/core.h>
 #include <utility>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {
@@ -48,62 +49,10 @@ namespace VmiCore
         isInstanciated = false;
     }
 
-    std::unique_ptr<std::vector<uint8_t>>
-    PluginSystem::readPagesWithUnmappedRegionPadding(uint64_t pageAlignedVA, uint64_t cr3, uint64_t numberOfPages) const
+    std::unique_ptr<IMemoryMapping>
+    PluginSystem::mapProcessMemoryRegion(addr_t baseVA, addr_t dtb, std::size_t numberOfPages) const
     {
-        if (pageAlignedVA % PagingDefinitions::pageSizeInBytes != 0)
-        {
-            throw std::invalid_argument(
-                fmt::format("{}: Starting address {:#x} is not aligned to page boundary", __func__, pageAlignedVA));
-        }
-        auto vadIdentifier(fmt::format("CR3 {:#x} VAD @ {:#x}-{:#x}",
-                                       cr3,
-                                       pageAlignedVA,
-                                       (pageAlignedVA + numberOfPages * PagingDefinitions::pageSizeInBytes)));
-        auto memoryRegion = std::make_unique<std::vector<uint8_t>>();
-        auto needsPadding = true;
-        for (uint64_t currentPageIndex = 0; currentPageIndex < numberOfPages; currentPageIndex++)
-        {
-            auto memoryPage = std::vector<uint8_t>(PagingDefinitions::pageSizeInBytes);
-            if (vmiInterface->readXVA(pageAlignedVA, cr3, memoryPage))
-            {
-                if (!needsPadding)
-                {
-                    needsPadding = true;
-                    logger->info("First successful page extraction after padding",
-                                 {logfield::create(WRITE_TO_FILE_TAG, paddingLogFile),
-                                  logfield::create("vadIdentifier", vadIdentifier),
-                                  logfield::create("pageAlignedVA", fmt::format("{:#x}", pageAlignedVA))});
-                }
-                memoryRegion->insert(memoryRegion->cend(), memoryPage.cbegin(), memoryPage.cend());
-            }
-            else
-            {
-                if (needsPadding)
-                {
-                    memoryRegion->insert(memoryRegion->cend(), PagingDefinitions::pageSizeInBytes, 0x0);
-                    needsPadding = false;
-                    logger->info("Start of padding",
-                                 {logfield::create(WRITE_TO_FILE_TAG, paddingLogFile),
-                                  logfield::create("vadIdentifier", vadIdentifier),
-                                  logfield::create("pageAlignedVA", fmt::format("{:#x}", pageAlignedVA))});
-                }
-            }
-            pageAlignedVA += PagingDefinitions::pageSizeInBytes;
-        }
-        return memoryRegion;
-    }
-
-    std::unique_ptr<std::vector<uint8_t>>
-    PluginSystem::readProcessMemoryRegion(pid_t pid, addr_t address, size_t count) const
-    {
-        if (count % PagingDefinitions::pageSizeInBytes != 0)
-        {
-            throw std::invalid_argument("Size of memory region must be page size aligned.");
-        }
-        auto numberOfPages = count >> PagingDefinitions::numberOfPageIndexBits;
-        auto process = activeProcessesSupervisor->getProcessInformationByPid(pid);
-        return readPagesWithUnmappedRegionPadding(address, process->processCR3, numberOfPages);
+        return std::make_unique<MemoryMapping>(baseVA, vmiInterface->mmapGuest(baseVA, dtb, numberOfPages), loggingLib);
     }
 
     void PluginSystem::registerProcessStartEvent(Plugin::processStartCallback_f startCallback)

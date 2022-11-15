@@ -5,6 +5,7 @@ add_executable(vmicore-test
         lib/plugins/PluginSystem_UnitTest.cpp
         lib/vmi/InterruptEventSupervisor_UnitTest.cpp
         lib/vmi/LibvmiInterface_UnitTest.cpp
+        lib/vmi/MemoryMapping_UnitTest.cpp
         lib/vmi/SingleStepSupervisor_UnitTest.cpp)
 target_link_libraries(vmicore-test vmicore-lib pthread)
 

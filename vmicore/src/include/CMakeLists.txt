@@ -8,12 +8,15 @@ target_sources(vmicore-public-headers INTERFACE
         vmicore/os/MemoryRegion.h
         vmicore/os/IPageProtection.h
         vmicore/os/OperatingSystem.h
+        vmicore/os/PagingDefinitions.h
         vmicore/plugins/IPluginConfig.h
         vmicore/plugins/PluginInit.h
         vmicore/plugins/PluginInterface.h
         vmicore/vmi/BpResponse.h
         vmicore/vmi/IBreakpoint.h
         vmicore/vmi/IIntrospectionAPI.h
+        vmicore/vmi/IMemoryMapping.h
+        vmicore/vmi/MappedRegion.h
         vmicore/vmi/events/IInterruptEvent.h
         vmicore/vmi/events/IRegisterReadable.h
         vmicore/filename.h

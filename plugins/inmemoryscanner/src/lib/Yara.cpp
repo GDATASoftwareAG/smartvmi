@@ -1,5 +1,7 @@
 #include "Yara.h"
 
+using VmiCore::MappedRegion;
+
 namespace InMemoryScanner
 {
     Yara::Yara(const std::string& rulesFile)
@@ -25,15 +27,18 @@ namespace InMemoryScanner
         yr_finalize();
     }
 
-    std::unique_ptr<std::vector<Rule>> Yara::scanMemory(std::vector<uint8_t>& buffer)
+    std::unique_ptr<std::vector<Rule>> Yara::scanMemory(const std::vector<MappedRegion>& mappedRegions)
     {
         auto results = std::make_unique<std::vector<Rule>>();
-        int err = 0;
 
-        err = yr_rules_scan_mem(rules, buffer.data(), buffer.size(), 0, yaraCallback, results.get(), 0);
-        if (err != ERROR_SUCCESS)
+        for (const auto& mappedRegion : mappedRegions)
         {
-            throw YaraException("Error scanning memory. Error code: " + std::to_string(err));
+            auto err = yr_rules_scan_mem(
+                rules, mappedRegion.mapping.data(), mappedRegion.mapping.size(), 0, yaraCallback, results.get(), 0);
+            if (err != ERROR_SUCCESS)
+            {
+                throw YaraException("Error scanning memory. Error code: " + std::to_string(err));
+            }
         }
 
         return results;

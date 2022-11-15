@@ -4,7 +4,8 @@
 
 namespace InMemoryScanner
 {
-    std::unique_ptr<std::vector<Rule>> FakeYara::scanMemory([[maybe_unused]] std::vector<uint8_t>& buffer)
+    std::unique_ptr<std::vector<Rule>>
+    FakeYara::scanMemory([[maybe_unused]] const std::vector<VmiCore::MappedRegion>& mappedRegions)
     {
         concurrentThreads++;
         if (concurrentThreads > YR_MAX_THREADS)
