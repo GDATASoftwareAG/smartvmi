@@ -4,12 +4,16 @@
 #include <fmt/core.h>
 #include <future>
 #include <iterator>
+#include <span>
 #include <vmicore/callback.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 using VmiCore::ActiveProcessInformation;
 using VmiCore::addr_t;
+using VmiCore::MappedRegion;
 using VmiCore::MemoryRegion;
 using VmiCore::pid_t;
+using VmiCore::PagingDefinitions::pageSizeInBytes;
 using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner
@@ -58,8 +62,43 @@ namespace InMemoryScanner
         return verdict;
     }
 
-    void
-    Scanner::scanMemoryRegion(pid_t pid, const std::string& processName, const MemoryRegion& memoryRegionDescriptor)
+    std::vector<uint8_t> Scanner::constructPaddedMemoryRegion(const std::vector<MappedRegion>& regions)
+    {
+        std::vector<uint8_t> result;
+
+        if (regions.empty())
+        {
+            return result;
+        }
+
+        std::size_t regionSize = 0;
+        for (const auto& region : regions)
+        {
+            regionSize += region.mapping.size();
+            regionSize += pageSizeInBytes;
+        }
+        // last region should not have succeeding padding page
+        regionSize -= pageSizeInBytes;
+
+        result.reserve(regionSize);
+        // copy first region
+        std::copy(regions.front().mapping.begin(), regions.front().mapping.end(), std::back_inserter(result));
+
+        for (std::size_t i = 1; i < regions.size(); i++)
+        {
+            const auto& region = regions[i];
+            // padding page
+            result.insert(result.end(), pageSizeInBytes, 0);
+            std::copy(region.mapping.begin(), region.mapping.end(), std::back_inserter(result));
+        }
+
+        return result;
+    }
+
+    void Scanner::scanMemoryRegion(pid_t pid,
+                                   addr_t dtb,
+                                   const std::string& processName,
+                                   const MemoryRegion& memoryRegionDescriptor)
     {
         logger->info("Scanning Memory region",
                      {{"VA", fmt::format("{:x}", memoryRegionDescriptor.base)},
@@ -68,21 +107,11 @@ namespace InMemoryScanner
 
         if (shouldRegionBeScanned(memoryRegionDescriptor))
         {
-            auto scanSize = memoryRegionDescriptor.size;
-            auto maximumScanSize = configuration->getMaximumScanSize();
-            if (scanSize > maximumScanSize)
-            {
-                logger->info("Memory region is too big, reducing to maximum scan size",
-                             {{"Size", scanSize}, {"MaximumScanSize", maximumScanSize}});
-                scanSize = maximumScanSize;
-            }
+            auto memoryMapping = pluginInterface->mapProcessMemoryRegion(
+                memoryRegionDescriptor.base, dtb, bytesToNumberOfPages(memoryRegionDescriptor.size));
+            auto mappedRegions = memoryMapping->getMappedRegions().lock();
 
-            logger->debug("Start getProcessMemoryRegion", {{"Size", scanSize}});
-
-            auto memoryRegion = pluginInterface->readProcessMemoryRegion(pid, memoryRegionDescriptor.base, scanSize);
-
-            logger->debug("End getProcessMemoryRegion", {{"Size", scanSize}});
-            if (memoryRegion->empty())
+            if (mappedRegions->empty())
             {
                 logger->debug("Extracted memory region has size 0, skipping");
             }
@@ -90,17 +119,19 @@ namespace InMemoryScanner
             {
                 if (configuration->isDumpingMemoryActivated())
                 {
-                    logger->debug("Start dumpVadRegionToFile", {{"Size", memoryRegion->size()}});
-                    dumping->dumpMemoryRegion(processName, pid, memoryRegionDescriptor, *memoryRegion);
-                    logger->debug("End dumpVadRegionToFile");
+                    logger->debug("Start dumpVadRegionToFile", {{"Size", memoryMapping->getSizeInGuest()}});
+
+                    auto paddedRegion = constructPaddedMemoryRegion(*mappedRegions);
+
+                    dumping->dumpMemoryRegion(processName, pid, memoryRegionDescriptor, paddedRegion);
                 }
 
-                logger->debug("Start scanMemory", {{"Size", memoryRegion->size()}});
+                logger->debug("Start scanMemory", {{"Size", memoryMapping->getSizeInGuest()}});
 
                 // The semaphore protects the yara rules from being accessed more than YR_MAX_THREADS (32 atm.) times in
                 // parallel.
                 semaphore.wait();
-                auto results = yaraEngine->scanMemory(*memoryRegion);
+                auto results = yaraEngine->scanMemory(*mappedRegions);
                 semaphore.notify();
 
                 logger->debug("End scanMemory");
@@ -141,8 +172,10 @@ namespace InMemoryScanner
                 {
                     try
                     {
-                        scanMemoryRegion(
-                            processInformation->pid, *processInformation->fullName, memoryRegionDescriptor);
+                        scanMemoryRegion(processInformation->pid,
+                                         processInformation->processUserDtb,
+                                         *processInformation->fullName,
+                                         memoryRegionDescriptor);
                     }
                     catch (const std::exception& exc)
                     {

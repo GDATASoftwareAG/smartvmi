@@ -28,6 +28,7 @@ add_library(vmicore-lib OBJECT
         vmi/InterruptEventSupervisor.cpp
         vmi/InterruptGuard.cpp
         vmi/LibvmiInterface.cpp
+        vmi/MemoryMapping.cpp
         vmi/SingleStepSupervisor.cpp
         vmi/VmiInitData.cpp
         vmi/VmiInitError.cpp)

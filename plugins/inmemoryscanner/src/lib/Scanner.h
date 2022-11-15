@@ -41,7 +41,10 @@ namespace InMemoryScanner
 
         [[nodiscard]] bool shouldRegionBeScanned(const VmiCore::MemoryRegion& memoryRegionDescriptor);
 
+        static std::vector<uint8_t> constructPaddedMemoryRegion(const std::vector<VmiCore::MappedRegion>& regions);
+
         void scanMemoryRegion(pid_t pid,
+                              uint64_t dtb,
                               const std::string& processName,
                               const VmiCore::MemoryRegion& memoryRegionDescriptor);
 

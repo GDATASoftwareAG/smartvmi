@@ -17,6 +17,7 @@
 #include <plugins/PluginSystem.h>
 #include <vmicore/os/PagingDefinitions.h>
 #include <vmicore_test/io/mock_Logger.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {

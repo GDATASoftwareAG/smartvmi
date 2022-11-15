@@ -78,11 +78,8 @@ namespace VmiCore
 
         [[nodiscard]] std::unique_ptr<std::string> getResultsDir() const override;
 
-        [[nodiscard]] std::unique_ptr<std::vector<uint8_t>>
-        readPagesWithUnmappedRegionPadding(uint64_t pageAlignedVA, uint64_t cr3, uint64_t numberOfPages) const;
-
-        [[nodiscard]] std::unique_ptr<std::vector<uint8_t>>
-        readProcessMemoryRegion(pid_t pid, addr_t address, size_t numberOfBytes) const override;
+        [[nodiscard]] std::unique_ptr<IMemoryMapping>
+        mapProcessMemoryRegion(addr_t baseVA, addr_t dtb, std::size_t numberOfPages) const override;
 
         [[nodiscard]] std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
         getRunningProcesses() const override;

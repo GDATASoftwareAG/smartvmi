@@ -27,6 +27,8 @@ namespace VmiCore
 
         MOCK_METHOD(bool, readXVA, (uint64_t, uint64_t, std::vector<uint8_t>&, std::size_t), (override));
 
+        MOCK_METHOD(std::vector<void*>, mmapGuest, (addr_t, addr_t, std::size_t), (override));
+
         MOCK_METHOD(void, write8PA, (uint64_t, uint8_t), (override));
 
         MOCK_METHOD(void, eventsListen, (uint32_t), (override));
