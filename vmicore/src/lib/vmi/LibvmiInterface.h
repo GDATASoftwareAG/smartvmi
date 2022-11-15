@@ -65,6 +65,8 @@ namespace VmiCore
 
         uint8_t read8PA(addr_t pyhsicalAddress) override;
 
+        uint64_t read64PA(const addr_t physicalAddress) override;
+
         uint8_t read8VA(addr_t virtualAddress, addr_t cr3) override;
 
         uint32_t read32VA(addr_t virtualAddress, addr_t cr3) override;

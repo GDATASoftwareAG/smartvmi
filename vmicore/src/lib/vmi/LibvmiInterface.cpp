@@ -95,6 +95,18 @@ namespace VmiCore
         return extractedValue;
     }
 
+    uint64_t LibvmiInterface::read64PA(const addr_t physicalAddress)
+    {
+        uint64_t extractedValue = 0;
+        auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
+        std::lock_guard<std::mutex> lock(libvmiLock);
+        if (vmi_read_64(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
+        {
+            throw VmiException(fmt::format("{}: Unable to read 8 bytes from PA: {:#x}", __func__, physicalAddress));
+        }
+        return extractedValue;
+    }
+
     uint8_t LibvmiInterface::read8VA(const addr_t virtualAddress, const addr_t cr3)
     {
         uint8_t extractedValue = 0;
