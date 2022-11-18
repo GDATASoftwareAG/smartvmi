@@ -15,6 +15,8 @@ namespace VmiCore
 
         MOCK_METHOD(uint8_t, read8PA, (const uint64_t), (override));
 
+        MOCK_METHOD(uint64_t, read64PA, (const uint64_t), (override));
+
         MOCK_METHOD(uint8_t, read8VA, (const uint64_t, const uint64_t), (override));
 
         MOCK_METHOD(uint32_t, read32VA, (const uint64_t, const uint64_t), (override));

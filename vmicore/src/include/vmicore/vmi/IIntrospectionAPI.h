@@ -18,6 +18,8 @@ namespace VmiCore
 
         virtual uint8_t read8PA(addr_t pyhsicalAddress) = 0;
 
+        virtual uint64_t read64PA(const addr_t physicalAddress) = 0;
+
         virtual uint8_t read8VA(addr_t virtualAddress, addr_t cr3) = 0;
 
         virtual uint32_t read32VA(addr_t virtualAddress, addr_t cr3) = 0;
