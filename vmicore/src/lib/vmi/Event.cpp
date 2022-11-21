@@ -36,6 +36,11 @@ namespace VmiCore
         return libvmiEvent->x86_regs->r8;
     }
 
+    uint64_t Event::getR9()
+    {
+        return libvmiEvent->x86_regs->r9;
+    }
+
     uint64_t Event::getRip()
     {
         return libvmiEvent->x86_regs->rip;
