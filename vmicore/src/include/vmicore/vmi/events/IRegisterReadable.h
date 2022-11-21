@@ -22,6 +22,8 @@ namespace VmiCore
 
         virtual uint64_t getR8() = 0;
 
+        virtual uint64_t getR9() = 0;
+
         virtual uint64_t getRip() = 0;
 
         virtual uint64_t getCr3() = 0;

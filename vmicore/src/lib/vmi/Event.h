@@ -30,6 +30,8 @@ namespace VmiCore
 
         uint64_t getR8() override;
 
+        uint64_t getR9() override;
+
         addr_t getGla() override;
 
         addr_t getGfn() override;
