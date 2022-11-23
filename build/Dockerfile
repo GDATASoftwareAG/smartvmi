@@ -20,6 +20,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     make \
     ninja-build \
     pkg-config \
+    protobuf-compiler \
     sudo \
     wget \
     && rm -rf /var/lib/apt/lists/*
