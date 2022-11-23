@@ -8,6 +8,7 @@ mod logging;
 mod unix_socket;
 
 pub mod hive_operations {
+    #![allow(clippy::derive_partial_eq_without_eq)]
     pub mod logging {
         pub mod service {
             tonic::include_proto!("hive_operations.logging.service");

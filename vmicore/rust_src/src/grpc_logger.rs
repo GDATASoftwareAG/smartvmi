@@ -34,12 +34,7 @@ impl GrpcLogger {
         self.base_fields.extend(log_fields.iter().cloned().map(|v| *v));
     }
 
-    pub fn log(
-        self: &GrpcLogger,
-        level: Level,
-        message: String,
-        fields: &[Box<LogField>],
-    ) -> Result<(), Box<dyn Error>> {
+    pub fn log(self: &GrpcLogger, level: Level, message: &str, fields: &[Box<LogField>]) -> Result<(), Box<dyn Error>> {
         if self.sender.is_closed() {
             return Err(Box::new(LogError::LoggingClosedError));
         }
@@ -67,7 +62,7 @@ impl GrpcLogger {
         task::block_on(self.sender.send(LogMessage {
             time_unix: Utc::now().timestamp() as u64,
             level: Into::<LogLevel>::into(level) as i32,
-            msg: message,
+            msg: message.to_string(),
             fields: combined_fields,
         }))?;
         Ok(())

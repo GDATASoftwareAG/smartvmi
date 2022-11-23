@@ -10,6 +10,7 @@ mod unix_socket;
 use crate::grpc_server::new_server;
 
 pub mod hive_operations {
+    #![allow(clippy::derive_partial_eq_without_eq)]
     pub mod logging {
         pub mod service {
             tonic::include_proto!("hive_operations.logging.service");
@@ -22,11 +23,11 @@ pub mod hive_operations {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    cxx::let_cxx_string!(addr = "/mnt/rust/vmi.sock");
-    cxx::let_cxx_string!(name = "FancyLogger");
+    let addr = "/mnt/rust/vmi.sock";
+    let name = "FancyLogger";
 
-    let srv = new_server(&addr, false);
-    let logger = srv.new_named_logger(&name);
+    let srv = new_server(addr, false);
+    let logger = srv.new_named_logger(name);
     let srv_handle = std::sync::Arc::new(srv);
 
     println!("Starting server...");
@@ -37,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     println!("Writing log line");
-    logger.log(bridge::ffi::Level::INFO, "Hello World".to_string(), &[])?;
+    logger.log(bridge::ffi::Level::INFO, "Hello World", &[])?;
 
     println!("Wait for input...");
     std::io::stdin().read_line(&mut String::new())?;
