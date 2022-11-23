@@ -12,7 +12,7 @@ use crate::hive_operations::vmi::{
 
 use async_std::channel::{unbounded, Receiver, Sender};
 use async_std::task;
-use cxx::{CxxString, CxxVector};
+use cxx::CxxVector;
 use futures::TryFutureExt;
 use std::error::Error;
 use std::pin::Pin;
@@ -40,7 +40,7 @@ pub struct GRPCServer {
     event_channel: AsyncQueue<ListenForEventsResponse>,
 }
 
-pub fn new_server(listen_addr: &CxxString, enable_debug: bool) -> Box<GRPCServer> {
+pub fn new_server(listen_addr: &str, enable_debug: bool) -> Box<GRPCServer> {
     let (trigger, listener) = triggered::trigger();
 
     let (sender, receiver) = unbounded();
@@ -118,7 +118,7 @@ impl GRPCServer {
         ))
     }
 
-    pub fn new_named_logger(&self, name: &CxxString) -> Box<GrpcLogger> {
+    pub fn new_named_logger(&self, name: &str) -> Box<GrpcLogger> {
         let log_field = LogField {
             name: "logger".to_string(),
             field: Some(Field::StrField(name.to_string())),
@@ -135,7 +135,7 @@ impl GRPCServer {
         self.log_level = log_level
     }
 
-    pub fn write_message_to_file(&self, name: &CxxString, message: &CxxVector<u8>) -> Result<(), Box<dyn Error>> {
+    pub fn write_message_to_file(&self, name: &str, message: &CxxVector<u8>) -> Result<(), Box<dyn Error>> {
         task::block_on(self.file_channel.sender.send(DumpMsgToFileResponse {
             filename: name.to_string(),
             message: message.iter().cloned().collect(),
@@ -146,9 +146,9 @@ impl GRPCServer {
     pub fn send_process_event(
         &self,
         process_state: ProcessState,
-        process_name: &CxxString,
+        process_name: &str,
         process_id: u32,
-        cr3: &CxxString,
+        cr3: &str,
     ) -> Result<(), Box<dyn Error>> {
         let (process_event, process_message) = match process_state {
             ProcessState::Started => (
@@ -205,7 +205,7 @@ impl GRPCServer {
         Ok(())
     }
 
-    pub fn send_error_event(self: &GRPCServer, message: &CxxString) -> Result<(), Box<dyn Error>> {
+    pub fn send_error_event(self: &GRPCServer, message: &str) -> Result<(), Box<dyn Error>> {
         task::block_on(self.event_channel.sender.send(ListenForEventsResponse {
             event: Event::Error.into(),
             timestamp: Some(SystemTime::now().into()),
@@ -216,7 +216,7 @@ impl GRPCServer {
         Ok(())
     }
 
-    pub fn send_in_mem_detection_event(self: &GRPCServer, message: &CxxString) -> Result<(), Box<dyn Error>> {
+    pub fn send_in_mem_detection_event(self: &GRPCServer, message: &str) -> Result<(), Box<dyn Error>> {
         task::block_on(self.event_channel.sender.send(ListenForEventsResponse {
             event: Event::InMemDetection.into(),
             timestamp: Some(SystemTime::now().into()),

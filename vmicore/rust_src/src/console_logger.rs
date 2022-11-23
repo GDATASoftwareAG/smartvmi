@@ -1,7 +1,6 @@
 use std::error::Error;
 
 use chrono::Utc;
-use cxx::CxxString;
 
 use crate::bridge::ffi::Level;
 use crate::hive_operations::logging::{log_field::Field, LogField};
@@ -22,7 +21,7 @@ impl ConsoleLoggerBuilder {
         })
     }
 
-    pub fn new_named_logger(&self, name: &CxxString) -> Box<ConsoleLogger> {
+    pub fn new_named_logger(&self, name: &str) -> Box<ConsoleLogger> {
         let log_field = LogField {
             name: "logger".to_string(),
             field: Some(Field::StrField(name.to_string())),
@@ -51,7 +50,7 @@ impl ConsoleLogger {
     pub fn log(
         self: &ConsoleLogger,
         level: Level,
-        message: String,
+        message: &str,
         fields: &[Box<LogField>],
     ) -> Result<(), Box<dyn Error>> {
         if level < self.log_level {
