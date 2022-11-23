@@ -280,8 +280,10 @@ namespace VmiCore
             {
                 ON_CALL(*mockVmiInterface, readXVA(memoryRegionInfo.virtualAddress, memoryRegionInfo.cr3, _))
                     .WillByDefault(
-                        [memoryPageContent = memoryRegionInfo.memoryPageContent](
-                            uint64_t virtualAddress, uint64_t cr3, std::vector<uint8_t>& buffer)
+                        [memoryPageContent =
+                             memoryRegionInfo.memoryPageContent]([[maybe_unused]] uint64_t virtualAddress,
+                                                                 [[maybe_unused]] uint64_t cr3,
+                                                                 std::vector<uint8_t>& buffer)
                         {
                             buffer = memoryPageContent;
                             return true;

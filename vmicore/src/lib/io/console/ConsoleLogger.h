@@ -13,32 +13,32 @@ namespace VmiCore
 
         void bind(const std::initializer_list<rust::Box<::logging::LogField>>& fields) override;
 
-        inline void debug(const std::string_view& message) const override
+        inline void debug(std::string_view message) const override
         {
             debug(message, {});
         };
-        void debug(const std::string_view& message,
+        void debug(std::string_view message,
                    const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
-        inline void info(const std::string_view& message) const override
+        inline void info(std::string_view message) const override
         {
             info(message, {});
         };
-        void info(const std::string_view& message,
+        void info(std::string_view message,
                   const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
-        inline void warning(const std::string_view& message) const override
+        inline void warning(std::string_view message) const override
         {
             warning(message, {});
         };
-        void warning(const std::string_view& message,
+        void warning(std::string_view message,
                      const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
-        inline void error(const std::string_view& message) const override
+        inline void error(std::string_view message) const override
         {
             error(message, {});
         };
-        void error(const std::string_view& message,
+        void error(std::string_view message,
                    const std::initializer_list<rust::Box<::logging::LogField>>& fields) const override;
 
       private:

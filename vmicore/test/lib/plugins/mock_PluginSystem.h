@@ -37,9 +37,9 @@ namespace VmiCore
 
         MOCK_METHOD(void, logMessage, (Plugin::LogLevel, const std::string&, const std::string&), (const override));
 
-        MOCK_METHOD(void, sendErrorEvent, (const std::string_view&), (const override));
+        MOCK_METHOD(void, sendErrorEvent, (std::string_view), (const override));
 
-        MOCK_METHOD(void, sendInMemDetectionEvent, (const std::string_view&), (const override));
+        MOCK_METHOD(void, sendInMemDetectionEvent, (std::string_view), (const override));
 
         MOCK_METHOD(void,
                     initializePlugin,

@@ -60,9 +60,9 @@ namespace VmiCore::Plugin
 
         virtual void logMessage(LogLevel logLevel, const std::string& filename, const std::string& message) const = 0;
 
-        virtual void sendErrorEvent(const std::string_view& message) const = 0;
+        virtual void sendErrorEvent(std::string_view message) const = 0;
 
-        virtual void sendInMemDetectionEvent(const std::string_view& message) const = 0;
+        virtual void sendInMemDetectionEvent(std::string_view message) const = 0;
 
         [[nodiscard]] virtual std::shared_ptr<IIntrospectionAPI> getIntrospectionAPI() const = 0;
 

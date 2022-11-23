@@ -18,7 +18,7 @@ namespace VmiCore
 
         std::unique_ptr<ILogger> newLogger() override;
 
-        std::unique_ptr<ILogger> newNamedLogger(const std::string_view& name) override;
+        std::unique_ptr<ILogger> newNamedLogger(std::string_view name) override;
 
         void setLogLevel(::logging::Level level) override;
 

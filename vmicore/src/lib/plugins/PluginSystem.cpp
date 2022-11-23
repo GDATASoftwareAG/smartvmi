@@ -179,12 +179,12 @@ namespace VmiCore
         }
     }
 
-    void PluginSystem::sendErrorEvent(const std::string_view& message) const
+    void PluginSystem::sendErrorEvent(std::string_view message) const
     {
         eventStream->sendErrorEvent(message);
     }
 
-    void PluginSystem::sendInMemDetectionEvent(const std::string_view& message) const
+    void PluginSystem::sendInMemDetectionEvent(std::string_view message) const
     {
         eventStream->sendInMemDetectionEvent(message);
     }

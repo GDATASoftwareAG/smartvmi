@@ -104,7 +104,7 @@ namespace VmiCore
             // Required for InterruptGuard
             ON_CALL(*vmiInterface, readXVA(_, _, _)).WillByDefault(Return(true));
             ON_CALL(*mockLogging, newNamedLogger(_))
-                .WillByDefault([](const std::string_view&) { return std::make_unique<MockGRPCLogger>(); });
+                .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
 
             // Gain access to internal interrupt event within InterruptEventSupervisor
             ON_CALL(*vmiInterface, registerEvent(_))
