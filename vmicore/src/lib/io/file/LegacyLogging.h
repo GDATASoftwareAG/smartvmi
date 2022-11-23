@@ -15,7 +15,7 @@ namespace VmiCore
         explicit LegacyLogging(std::shared_ptr<IConfigParser> configInterface);
         ~LegacyLogging() override = default;
 
-        void saveBinaryToFile(const std::string_view& logFileName, const std::vector<uint8_t>& data) override;
+        void saveBinaryToFile(std::string_view logFileName, const std::vector<uint8_t>& data) override;
 
       private:
         std::shared_ptr<IConfigParser> configInterface;

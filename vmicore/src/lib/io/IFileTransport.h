@@ -12,7 +12,7 @@ namespace VmiCore
       public:
         virtual ~IFileTransport() = default;
 
-        virtual void saveBinaryToFile(const std::string_view& logFileName, const std::vector<uint8_t>& data) = 0;
+        virtual void saveBinaryToFile(std::string_view logFileName, const std::vector<uint8_t>& data) = 0;
 
       protected:
         IFileTransport() = default;

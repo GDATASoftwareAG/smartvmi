@@ -102,9 +102,9 @@ namespace VmiCore
         void
         logMessage(Plugin::LogLevel logLevel, const std::string& filename, const std::string& message) const override;
 
-        void sendErrorEvent(const std::string_view& message) const override;
+        void sendErrorEvent(std::string_view message) const override;
 
-        void sendInMemDetectionEvent(const std::string_view& message) const override;
+        void sendInMemDetectionEvent(std::string_view message) const override;
 
         [[nodiscard]] std::shared_ptr<IIntrospectionAPI> getIntrospectionAPI() const override;
     };

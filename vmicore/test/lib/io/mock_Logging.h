@@ -15,7 +15,7 @@ namespace VmiCore
 
         MOCK_METHOD(std::unique_ptr<ILogger>, newLogger, (), (override));
 
-        MOCK_METHOD(std::unique_ptr<ILogger>, newNamedLogger, (const std::string_view&), (override));
+        MOCK_METHOD(std::unique_ptr<ILogger>, newNamedLogger, (std::string_view), (override));
 
         MOCK_METHOD(void, setLogLevel, (::logging::Level), (override));
     };

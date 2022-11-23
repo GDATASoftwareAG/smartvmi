@@ -9,36 +9,36 @@ namespace VmiCore
         logger->bind(rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::debug(const std::string_view& message,
+    void ConsoleLogger::debug(std::string_view message,
                               const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
         logger->log(::logging::Level::DEBUG,
-                    static_cast<std::string>(message),
+                    toRustStr(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::info(const std::string_view& message,
+    void ConsoleLogger::info(std::string_view message,
                              const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
 
         logger->log(::logging::Level::INFO,
-                    static_cast<std::string>(message),
+                    toRustStr(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::warning(const std::string_view& message,
+    void ConsoleLogger::warning(std::string_view message,
                                 const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
         logger->log(::logging::Level::WARN,
-                    static_cast<std::string>(message),
+                    toRustStr(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 
-    void ConsoleLogger::error(const std::string_view& message,
+    void ConsoleLogger::error(std::string_view message,
                               const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
     {
         logger->log(::logging::Level::ERROR,
-                    static_cast<std::string>(message),
+                    toRustStr(message),
                     rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
     }
 }

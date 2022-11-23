@@ -34,7 +34,7 @@ namespace VmiCore
         void SetUp() override
         {
             ON_CALL(*logging, newNamedLogger(_))
-                .WillByDefault([](const std::string_view&) { return std::make_unique<MockGRPCLogger>(); });
+                .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
             systemEventSupervisor = std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
                                                                                      pluginSystem,
                                                                                      activeProcessSupervisor,

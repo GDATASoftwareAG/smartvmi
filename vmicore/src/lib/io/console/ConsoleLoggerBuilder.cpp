@@ -15,10 +15,9 @@ namespace VmiCore
         return std::make_unique<ConsoleLogger>((*consoleLoggerBuilder)->new_logger());
     }
 
-    std::unique_ptr<ILogger> ConsoleLoggerBuilder::newNamedLogger(const std::string_view& name)
+    std::unique_ptr<ILogger> ConsoleLoggerBuilder::newNamedLogger(std::string_view name)
     {
-        return std::make_unique<ConsoleLogger>(
-            (*consoleLoggerBuilder)->new_named_logger(static_cast<std::string>(name)));
+        return std::make_unique<ConsoleLogger>((*consoleLoggerBuilder)->new_named_logger(toRustStr(name)));
     }
 
     void ConsoleLoggerBuilder::setLogLevel(::logging::Level level)

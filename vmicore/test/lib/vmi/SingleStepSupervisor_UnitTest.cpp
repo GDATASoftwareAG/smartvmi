@@ -18,7 +18,7 @@ namespace VmiCore
     {
         std::shared_ptr<NiceMock<MockLogging>> mockLogging = std::make_shared<NiceMock<MockLogging>>();
         ON_CALL(*mockLogging, newNamedLogger(_))
-            .WillByDefault([](const std::string_view&) { return std::make_unique<MockGRPCLogger>(); });
+            .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
 
         std::shared_ptr<ILibvmiInterface> vmiInterface = std::make_shared<MockLibvmiInterface>();
         SingleStepSupervisor firstInstance(vmiInterface, mockLogging);
@@ -44,7 +44,7 @@ namespace VmiCore
         void SetUp() override
         {
             ON_CALL(*mockLogging, newNamedLogger(_))
-                .WillByDefault([](const std::string_view&) { return std::make_unique<MockGRPCLogger>(); });
+                .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
 
             ON_CALL(*vmiInterface, getNumberOfVCPUs()).WillByDefault(Return(numberOfTestVcpus));
             singleStepSupervisor = std::make_unique<SingleStepSupervisor>(vmiInterface, mockLogging);

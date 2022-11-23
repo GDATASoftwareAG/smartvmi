@@ -23,16 +23,16 @@ namespace VmiCore
 
         std::unique_ptr<ILogger> newLogger() override;
 
-        std::unique_ptr<ILogger> newNamedLogger(const std::string_view& name) override;
+        std::unique_ptr<ILogger> newNamedLogger(std::string_view name) override;
 
         void setLogLevel(::logging::Level level) override;
 
-        void saveBinaryToFile(const std::string_view& logFileName, const std::vector<uint8_t>& data) override;
+        void saveBinaryToFile(std::string_view logFileName, const std::vector<uint8_t>& data) override;
 
         void sendProcessEvent(::grpc::ProcessState processState,
-                              const std::string_view& processName,
+                              std::string_view processName,
                               uint32_t processID,
-                              const std::string_view& cr3) override;
+                              std::string_view cr3) override;
 
         void sendBSODEvent(int64_t code) override;
 
@@ -40,9 +40,9 @@ namespace VmiCore
 
         void sendReadyEvent() override;
 
-        void sendErrorEvent(const std::string_view& message) override;
+        void sendErrorEvent(std::string_view message) override;
 
-        void sendInMemDetectionEvent(const std::string_view& message) override;
+        void sendInMemDetectionEvent(std::string_view message) override;
 
       private:
         std::shared_ptr<::rust::Box<grpc::GRPCServer>> server;
