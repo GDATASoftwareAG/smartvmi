@@ -3,6 +3,7 @@
 #include <memory>
 
 using testing::_;
+using testing::Return;
 using testing::UnorderedElementsAre;
 using testing::Unused;
 
