@@ -72,16 +72,6 @@ jobs:
           cmake --build --preset clang-build-debug --target vmicore
         working-directory: vmicore
 
-      - name: Generate clang-tidy output for codacy
-        run: clang-tidy -p build-clang-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
-        working-directory: vmicore
-
-      - name: Upload clang-tidy artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: clang_tidy_vmicore
-          path: vmicore/clang-tidy-output
-
   test_inmemoryscanner:
     runs-on: ubuntu-latest
     container:
@@ -118,13 +108,3 @@ jobs:
           cmake --preset clang-debug
           cmake --build --preset clang-build-debug --target inmemoryscanner
         working-directory: plugins/inmemoryscanner
-
-      - name: Generate clang-tidy output for codacy
-        run: clang-tidy -p build-clang-debug/ $(find src/ -iname *.h -o -iname *.cpp) > clang-tidy-output
-        working-directory: plugins/inmemoryscanner
-
-      - name: Upload clang-tidy artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: clang_tidy_inmemoryscanner
-          path: plugins/inmemoryscanner/clang-tidy-output
