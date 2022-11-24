@@ -2,10 +2,10 @@ use crate::bridge::ffi::{Level, ProcessState};
 use crate::grpc_log_service::GRPCLogService;
 use crate::grpc_logger::GrpcLogger;
 use crate::grpc_vmi_service::GRPCVmiService;
-use crate::hive_operations::logging::log_field::Field;
-use crate::hive_operations::logging::service::log_service_server::LogServiceServer;
-use crate::hive_operations::logging::{LogField, LogMessage};
-use crate::hive_operations::vmi::{
+use crate::pkg::logging::api::v1::log_field::Field;
+use crate::pkg::logging::api::v1::{LogField, LogMessage};
+use crate::pkg::logging::service::v1::log_service_server::LogServiceServer;
+use crate::pkg::vmi::v1::{
     listen_for_events_response::Message, vmi_service_server::VmiServiceServer, BsodDetected, DumpMsgToFileResponse,
     Event, ListenForEventsResponse, VmProcessEnd, VmProcessStart, VmiFinished, VmiReady,
 };
@@ -209,7 +209,7 @@ impl GRPCServer {
         task::block_on(self.event_channel.sender.send(ListenForEventsResponse {
             event: Event::Error.into(),
             timestamp: Some(SystemTime::now().into()),
-            message: Some(Message::Error(crate::hive_operations::vmi::Error {
+            message: Some(Message::Error(crate::pkg::vmi::v1::Error {
                 message: message.to_string(),
             })),
         }))?;
@@ -220,7 +220,7 @@ impl GRPCServer {
         task::block_on(self.event_channel.sender.send(ListenForEventsResponse {
             event: Event::InMemDetection.into(),
             timestamp: Some(SystemTime::now().into()),
-            message: Some(Message::InMemDetection(crate::hive_operations::vmi::InMemDetection {
+            message: Some(Message::InMemDetection(crate::pkg::vmi::v1::InMemDetection {
                 detection: message.to_string(),
             })),
         }))?;

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package hiveOperations.vmi;
+package pkg.vmi.v1;
 
 import "google/protobuf/timestamp.proto";
 

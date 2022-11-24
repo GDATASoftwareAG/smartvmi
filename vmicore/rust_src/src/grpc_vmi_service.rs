@@ -1,6 +1,6 @@
 use crate::grpc_server::{GRPCServer, Stream};
-use crate::hive_operations::vmi::vmi_service_server::VmiService;
-use crate::hive_operations::vmi::{
+use crate::pkg::vmi::v1::vmi_service_server::VmiService;
+use crate::pkg::vmi::v1::{
     DumpMsgToFileRequest, DumpMsgToFileResponse, ListenForEventsRequest, ListenForEventsResponse,
 };
 use async_std::channel::Receiver;

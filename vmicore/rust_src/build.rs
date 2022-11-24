@@ -1,8 +1,8 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     tonic_build::configure().build_client(false).compile(
         &[
-            "./protos/pkg/logging/service/log_svc.proto",
-            "./protos/pkg/vmi/vmi_svc.proto",
+            "./protos/pkg/logging/service/v1/log_svc.proto",
+            "./protos/pkg/vmi/v1/vmi_svc.proto",
         ],
         &["./protos"],
     )?;

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package pkg.logging.service.v1;
+
+import "pkg/logging/api/v1/message.proto";
+
+service LogService {
+    rpc ReadLogs(stream pkg.logging.api.v1.ReadLogRequest) returns (stream pkg.logging.api.v1.ReadLogResponse);
+}

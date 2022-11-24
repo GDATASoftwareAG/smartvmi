@@ -5,7 +5,7 @@ use async_std::task;
 use chrono::Utc;
 
 use crate::bridge::ffi::Level;
-use crate::hive_operations::logging::{LogField, LogLevel, LogMessage};
+use crate::pkg::logging::api::v1::{LogField, LogLevel, LogMessage};
 
 #[derive(thiserror::Error, Debug)]
 pub enum LogError {
