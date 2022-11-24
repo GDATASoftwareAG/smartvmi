@@ -16,6 +16,8 @@ on:
 jobs:
   rust-lint:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
 
     steps:
       - uses: actions/checkout@v3
