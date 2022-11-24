@@ -1,4 +1,4 @@
-use crate::hive_operations::logging::LogField;
+use crate::pkg::logging::api::v1::LogField;
 
 use crate::console_logger::{new_console_logger_builder, ConsoleLogger, ConsoleLoggerBuilder};
 use crate::grpc_logger::GrpcLogger;

@@ -1,7 +1,7 @@
 use crate::bridge::ffi::Level;
 use crate::grpc_server::{GRPCServer, Stream};
-use crate::hive_operations::logging::service::log_service_server::LogService;
-use crate::hive_operations::logging::{LogLevel, LogMessage, ReadLogRequest, ReadLogResponse};
+use crate::pkg::logging::api::v1::{LogLevel, LogMessage, ReadLogRequest, ReadLogResponse};
+use crate::pkg::logging::service::v1::log_service_server::LogService;
 use async_std::channel::Receiver;
 use async_stream::try_stream;
 use tonic::{Request, Response, Status, Streaming};

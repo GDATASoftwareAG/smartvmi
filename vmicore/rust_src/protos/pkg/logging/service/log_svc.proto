@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package hiveOperations.logging.service;
-
-import "pkg/logging/api/message.proto";
-
-service LogService {
-    rpc ReadLogs(stream hiveOperations.logging.ReadLogRequest) returns (stream hiveOperations.logging.ReadLogResponse);
-}

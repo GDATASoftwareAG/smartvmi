@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package hiveOperations.logging;
+package pkg.logging.api.v1;
 
 enum LogLevel {
     LOG_LEVEL_INFO = 0;

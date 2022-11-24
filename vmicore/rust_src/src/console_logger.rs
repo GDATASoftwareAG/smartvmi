@@ -3,7 +3,7 @@ use std::error::Error;
 use chrono::Utc;
 
 use crate::bridge::ffi::Level;
-use crate::hive_operations::logging::{log_field::Field, LogField};
+use crate::pkg::logging::api::v1::{log_field::Field, LogField};
 
 pub struct ConsoleLoggerBuilder {
     log_level: Level,

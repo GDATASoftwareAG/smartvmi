@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::{
     bridge::ffi::Level,
-    hive_operations::logging::{log_field::Field, LogField},
+    pkg::logging::api::v1::{log_field::Field, LogField},
 };
 
 #[derive(thiserror::Error, Debug)]

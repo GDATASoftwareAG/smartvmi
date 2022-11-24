@@ -9,16 +9,24 @@ mod unix_socket;
 
 use crate::grpc_server::new_server;
 
-pub mod hive_operations {
+pub mod pkg {
     #![allow(clippy::derive_partial_eq_without_eq)]
     pub mod logging {
         pub mod service {
-            tonic::include_proto!("hive_operations.logging.service");
+            pub mod v1 {
+                tonic::include_proto!("pkg.logging.service.v1");
+            }
         }
-        tonic::include_proto!("hive_operations.logging");
+        pub mod api {
+            pub mod v1 {
+                tonic::include_proto!("pkg.logging.api.v1");
+            }
+        }
     }
     pub mod vmi {
-        tonic::include_proto!("hive_operations.vmi");
+        pub mod v1 {
+            tonic::include_proto!("pkg.vmi.v1");
+        }
     }
 }
 

@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package hiveOperations.logging;
+package pkg.logging.api.v1;
 
-import "pkg/logging/api/level.proto";
-import "pkg/logging/api/field.proto";
+import "pkg/logging/api/v1/field.proto";
+import "pkg/logging/api/v1/level.proto";
 
 message LogMessage {
     fixed64 time_unix = 1;
