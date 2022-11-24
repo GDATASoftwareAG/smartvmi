@@ -1,0 +1,60 @@
+---
+name: C++ Lint
+
+on:
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - '**.h'
+      - '**.cpp'
+      - '**/CMakeLists.txt'
+      - '**/CMakePresets.json'
+      - '**/.clang-tidy'
+      - '**/.clang-format'
+
+jobs:
+  lint_core:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure vmicore
+        run: cmake --preset clang-debug
+        working-directory: vmicore
+
+      - name: Generate clang-tidy output for codacy
+        if: github.event_name == "pull_request"
+        run: git diff ${GITHUB_BASE_REF} | $(find /usr/lib/ -name clang-tidy-diff.py) -j 4 -p 2 -path build-clang-debug/ -regex '^src.*(\.h|\.cpp)' > clang-tidy-output
+        working-directory: vmicore
+
+      - name: Upload clang-tidy artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: clang_tidy_vmicore
+          path: vmicore/clang-tidy-output
+
+  lint_inmemoryscanner:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure inmemoryscanner
+        run: cmake --preset clang-debug
+        working-directory: plugins/inmemoryscanner
+
+      - name: Generate clang-tidy output for codacy
+        run: git diff ${GITHUB_BASE_REF} | $(find /usr/lib/ -name clang-tidy-diff.py) -j 4 -p 2 -path build-clang-debug/ -regex '^src.*(\.h|\.cpp)' > clang-tidy-output
+        working-directory: plugins/inmemoryscanner
+
+      - name: Upload clang-tidy artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: clang_tidy_inmemoryscanner
+          path: plugins/inmemoryscanner/clang-tidy-output
