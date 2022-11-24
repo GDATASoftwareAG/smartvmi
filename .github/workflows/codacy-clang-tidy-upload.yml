@@ -1,8 +1,9 @@
+---
 name: Codacy Clang Tidy Upload
 
 on:
   workflow_run:
-    workflows: [ "C++ Lint", "C++ Periodic Lint" ]
+    workflows: [CPP Lint, CPP Periodic Lint]
     types:
       - completed
 

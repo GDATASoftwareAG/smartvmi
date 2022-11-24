@@ -1,8 +1,9 @@
+---
 name: Codacy Coverage Upload
 
 on:
   workflow_run:
-    workflows: [ "C++ CI" ]
+    workflows: [CPP CI]
     types:
       - completed
 

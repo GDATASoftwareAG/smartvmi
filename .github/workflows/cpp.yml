@@ -1,5 +1,5 @@
 ---
-name: C++ CI
+name: CPP CI
 
 on:
   push:
