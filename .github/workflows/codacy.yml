@@ -6,6 +6,7 @@ on:
     branches:
       - "main"
     paths:
+      - '**'
       - '!**.h'
       - '!**.cpp'
       - '!**/CMakeLists.txt'
@@ -16,6 +17,7 @@ on:
     branches:
       - "main"
     paths:
+      - '**'
       - '!**.h'
       - '!**.cpp'
       - '!**/CMakeLists.txt'
