@@ -22,6 +22,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     pkg-config \
     protobuf-compiler \
     sudo \
+    unzip \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
