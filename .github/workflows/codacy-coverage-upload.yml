@@ -56,12 +56,12 @@ jobs:
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/coverage_inmemoryscanner.zip`, Buffer.from(download.data));
 
-      - run: unzip -j -d plugins/inmemoryscanner/ coverage_inmemoryscanner.zip
+      - run: unzip -j -d inmemoryscanner/ coverage_inmemoryscanner.zip
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: vmicore/cobertura.xml,plugins/inmemoryscanner/cobertura.xml
+          coverage-reports: vmicore/cobertura.xml,inmemoryscanner/cobertura.xml
           language: CPP
           force-coverage-parser: cobertura

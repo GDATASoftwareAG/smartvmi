@@ -62,12 +62,12 @@ jobs:
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/clang_tidy_inmemoryscanner.zip`, Buffer.from(download.data));
 
-      - run: unzip -j -d plugins/inmemoryscanner/ clang_tidy_inmemoryscanner.zip
+      - run: unzip -j -d inmemoryscanner/ clang_tidy_inmemoryscanner.zip
 
       - name: Consolidate clang-tidy output
         run: |
           cat vmicore/clang-tidy-output > clang-tidy-output
-          cat plugins/inmemoryscanner/clang-tidy-output >> clang-tidy-output
+          cat inmemoryscanner/clang-tidy-output >> clang-tidy-output
 
       - name: Run Codacy Analysis CLI
         uses: rageagainsthepc/codacy-analysis-cli-action@fix-action-path
