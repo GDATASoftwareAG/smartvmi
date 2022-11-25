@@ -1,9 +1,7 @@
 ---
-name: CPP Periodic Lint
+name: CPP Thorough Lint
 
-on:
-  schedule:
-    - cron: '0 0 * * 0'
+on: workflow_dispatch
 
 jobs:
   lint_core:
