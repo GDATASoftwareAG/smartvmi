@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/YaraInterface.h"
+#include <YaraInterface.h>
 
 namespace InMemoryScanner
 {

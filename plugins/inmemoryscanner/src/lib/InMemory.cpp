@@ -1,3 +1,11 @@
+#ifndef PLUGIN_VERSION
+#define PLUGIN_VERSION "0.0.0"
+#endif
+
+#ifndef BUILD_VERSION
+#define BUILD_VERSION "TestBuild"
+#endif
+
 #include "Config.h"
 #include "Dumping.h"
 #include "Filenames.h"
