@@ -11,7 +11,7 @@ jobs:
   clang_tidy_upload:
     runs-on: ubuntu-latest
     # Required because codacy's conversion tool relativizes paths in respect to the current working directory.
-    # Since the project path inside a container is different than the path inside a "raw" worker VM we need to
+    # Since the project path inside a container is different from the path inside a "raw" worker VM we need to
     # make sure that we match the environment where the clang-tidy output was created (though any container
     # image would do, most likely).
     container:
