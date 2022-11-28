@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/Dumping.h"
+#include <Dumping.h>
 #include <gmock/gmock.h>
 
 namespace InMemoryScanner

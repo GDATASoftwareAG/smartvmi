@@ -1,8 +1,8 @@
-#include "../src/Scanner.h"
 #include "FakeYara.h"
 #include "mock_Config.h"
 #include "mock_Dumping.h"
 #include "mock_Yara.h"
+#include <Scanner.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <vmicore_test/os/mock_MemoryRegionExtractor.h>

@@ -82,7 +82,7 @@ jobs:
 
       - name: Test inmemoryscanner
         run: |
-          cmake --preset gcc-debug
+          cmake --preset gcc-debug -D INMEMORYSCANNER_TEST_COVERAGE:BOOL=ON
           cmake --build --preset gcc-build-debug --target inmemoryscanner-test
           ctest --preset gcc-test
           cd build-gcc-debug

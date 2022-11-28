@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/Config.h"
+#include <Config.h>
 #include <gmock/gmock.h>
 
 namespace InMemoryScanner

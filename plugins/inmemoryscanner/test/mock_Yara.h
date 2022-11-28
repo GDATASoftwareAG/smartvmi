@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/YaraInterface.h"
+#include <YaraInterface.h>
 #include <gmock/gmock.h>
 
 namespace InMemoryScanner
