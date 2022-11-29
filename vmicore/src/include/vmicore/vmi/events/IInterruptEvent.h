@@ -11,11 +11,11 @@ namespace VmiCore
       public:
         ~IInterruptEvent() override = default;
 
-        virtual addr_t getGla() = 0;
+        [[nodiscard]] virtual addr_t getGla() const = 0;
 
-        virtual addr_t getGfn() = 0;
+        [[nodiscard]] virtual addr_t getGfn() const = 0;
 
-        virtual addr_t getOffset() = 0;
+        [[nodiscard]] virtual addr_t getOffset() const = 0;
 
       protected:
         IInterruptEvent() = default;

@@ -21,7 +21,7 @@ namespace VmiCore
 
         MOCK_METHOD(bool, readXVA, (uint64_t, uint64_t, std::vector<uint8_t>&), (override));
 
-        MOCK_METHOD(uint64_t, getCurrentVmId, (), (override));
+        MOCK_METHOD(uint64_t, getCurrentVmId, (), (const override));
 
         MOCK_METHOD(uint, getNumberOfVCPUs, (), (override));
 
@@ -52,7 +52,7 @@ namespace VmiCore
                     (const std::string&, const std::string&),
                     (override));
 
-        MOCK_METHOD(size_t, getStructSizeFromJson, (const std::string&), (override));
+        MOCK_METHOD(size_t, getStructSizeFromJson, (const std::string&), (const override));
 
         MOCK_METHOD(void, flushV2PCache, (addr_t), (override));
 

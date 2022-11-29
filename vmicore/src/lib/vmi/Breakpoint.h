@@ -18,7 +18,7 @@ namespace VmiCore
                    std::function<void(Breakpoint*)> notifyDelete,
                    std::function<BpResponse(IInterruptEvent&)> callback);
 
-        addr_t getTargetPA() override;
+        addr_t getTargetPA() const override;
 
         void remove() override;
 
