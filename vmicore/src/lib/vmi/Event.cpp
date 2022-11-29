@@ -46,6 +46,11 @@ namespace VmiCore
         return libvmiEvent->x86_regs->rip;
     }
 
+    uint64_t Event::getRsp() const
+    {
+        return libvmiEvent->x86_regs->rsp;
+    }
+
     uint64_t Event::getCr3() const
     {
         return libvmiEvent->x86_regs->cr3;
