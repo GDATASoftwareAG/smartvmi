@@ -10,23 +10,23 @@ namespace VmiCore
       public:
         virtual ~IRegisterReadable() = default;
 
-        virtual uint64_t getRax() = 0;
+        virtual uint64_t getRax() const = 0;
 
-        virtual uint64_t getRbx() = 0;
+        virtual uint64_t getRbx() const = 0;
 
-        virtual uint64_t getRcx() = 0;
+        virtual uint64_t getRcx() const = 0;
 
-        virtual uint64_t getRdx() = 0;
+        virtual uint64_t getRdx() const = 0;
 
-        virtual uint64_t getRdi() = 0;
+        virtual uint64_t getRdi() const = 0;
 
-        virtual uint64_t getR8() = 0;
+        virtual uint64_t getR8() const = 0;
 
-        virtual uint64_t getR9() = 0;
+        virtual uint64_t getR9() const = 0;
 
-        virtual uint64_t getRip() = 0;
+        virtual uint64_t getRip() const = 0;
 
-        virtual uint64_t getCr3() = 0;
+        virtual uint64_t getCr3() const = 0;
 
       protected:
         IRegisterReadable() = default;

@@ -28,37 +28,38 @@ namespace VmiCore
 
         virtual bool readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content) = 0;
 
-        virtual uint64_t getCurrentVmId() = 0;
+        [[nodiscard]] virtual uint64_t getCurrentVmId() const = 0;
 
-        virtual uint getNumberOfVCPUs() = 0;
+        [[nodiscard]] virtual uint getNumberOfVCPUs() const = 0;
 
         virtual addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) = 0;
 
         virtual addr_t
         translateUserlandSymbolToVA(addr_t moduleBaseAddress, addr_t dtb, const std::string& userlandSymbolName) = 0;
 
-        virtual addr_t convertVAToPA(addr_t virtualAddress, addr_t cr3Register) = 0;
+        [[nodiscard]] virtual addr_t convertVAToPA(addr_t virtualAddress, addr_t cr3Register) const = 0;
 
-        virtual addr_t convertPidToDtb(pid_t processID) = 0;
+        [[nodiscard]] virtual addr_t convertPidToDtb(pid_t processID) const = 0;
 
-        virtual pid_t convertDtbToPid(addr_t dtb) = 0;
+        [[nodiscard]] virtual pid_t convertDtbToPid(addr_t dtb) const = 0;
 
         virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
 
         virtual std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) = 0;
 
-        virtual OperatingSystem getOsType() = 0;
+        [[nodiscard]] virtual OperatingSystem getOsType() const = 0;
 
-        virtual addr_t getOffset(const std::string& name) = 0;
+        [[nodiscard]] virtual addr_t getOffset(const std::string& name) const = 0;
 
-        virtual addr_t getKernelStructOffset(const std::string& structName, const std::string& member) = 0;
+        [[nodiscard]] virtual addr_t getKernelStructOffset(const std::string& structName,
+                                                           const std::string& member) const = 0;
 
-        virtual std::size_t getStructSizeFromJson(const std::string& struct_name) = 0;
+        [[nodiscard]] virtual std::size_t getStructSizeFromJson(const std::string& struct_name) const = 0;
 
-        virtual bool isInitialized() = 0;
+        [[nodiscard]] virtual bool isInitialized() const = 0;
 
-        virtual std::tuple<addr_t, std::size_t, std::size_t>
-        getBitfieldOffsetAndSizeFromJson(const std::string& struct_name, const std::string& struct_member) = 0;
+        [[nodiscard]] virtual std::tuple<addr_t, std::size_t, std::size_t>
+        getBitfieldOffsetAndSizeFromJson(const std::string& struct_name, const std::string& struct_member) const = 0;
 
         virtual void flushV2PCache(addr_t pt) = 0;
 

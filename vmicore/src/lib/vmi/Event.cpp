@@ -6,52 +6,52 @@ namespace VmiCore
 {
     Event::Event(vmi_event_t* libvmiEvent) : libvmiEvent(libvmiEvent) {}
 
-    uint64_t Event::getRax()
+    uint64_t Event::getRax() const
     {
         return libvmiEvent->x86_regs->rax;
     }
 
-    uint64_t Event::getRbx()
+    uint64_t Event::getRbx() const
     {
         return libvmiEvent->x86_regs->rbx;
     }
 
-    uint64_t Event::getRcx()
+    uint64_t Event::getRcx() const
     {
         return libvmiEvent->x86_regs->rcx;
     }
 
-    uint64_t Event::getRdx()
+    uint64_t Event::getRdx() const
     {
         return libvmiEvent->x86_regs->rdx;
     }
 
-    uint64_t Event::getRdi()
+    uint64_t Event::getRdi() const
     {
         return libvmiEvent->x86_regs->rdi;
     }
 
-    uint64_t Event::getR8()
+    uint64_t Event::getR8() const
     {
         return libvmiEvent->x86_regs->r8;
     }
 
-    uint64_t Event::getR9()
+    uint64_t Event::getR9() const
     {
         return libvmiEvent->x86_regs->r9;
     }
 
-    uint64_t Event::getRip()
+    uint64_t Event::getRip() const
     {
         return libvmiEvent->x86_regs->rip;
     }
 
-    uint64_t Event::getCr3()
+    uint64_t Event::getCr3() const
     {
         return libvmiEvent->x86_regs->cr3;
     }
 
-    addr_t Event::getGla()
+    addr_t Event::getGla() const
     {
         switch (libvmiEvent->type)
         {
@@ -71,7 +71,7 @@ namespace VmiCore
         }
     }
 
-    addr_t Event::getGfn()
+    addr_t Event::getGfn() const
     {
         switch (libvmiEvent->type)
         {
@@ -91,7 +91,7 @@ namespace VmiCore
         }
     }
 
-    addr_t Event::getOffset()
+    addr_t Event::getOffset() const
     {
         switch (libvmiEvent->type)
         {

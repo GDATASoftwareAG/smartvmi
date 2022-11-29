@@ -9,31 +9,29 @@ namespace VmiCore
     class MockInterruptEvent : public IInterruptEvent
     {
       public:
-        MOCK_METHOD(uint64_t, getRax, (), (override));
+        MOCK_METHOD(uint64_t, getRax, (), (const override));
 
-        MOCK_METHOD(uint64_t, getRbx, (), (override));
+        MOCK_METHOD(uint64_t, getRbx, (), (const override));
 
-        MOCK_METHOD(uint64_t, getRcx, (), (override));
+        MOCK_METHOD(uint64_t, getRcx, (), (const override));
 
-        MOCK_METHOD(uint64_t, getRdx, (), (override));
+        MOCK_METHOD(uint64_t, getRdx, (), (const override));
 
-        MOCK_METHOD(uint64_t, getRdi, (), (override));
+        MOCK_METHOD(uint64_t, getRdi, (), (const override));
 
-        MOCK_METHOD(uint64_t, getR8, (), (override));
+        MOCK_METHOD(uint64_t, getR8, (), (const override));
 
-        MOCK_METHOD(uint64_t, getR9, (), (override));
+        MOCK_METHOD(uint64_t, getR9, (), (const override));
 
-        MOCK_METHOD(uint64_t, getRip, (), (override));
+        MOCK_METHOD(uint64_t, getRip, (), (const override));
 
-        MOCK_METHOD(uint64_t, getRsp, (), (override));
+        MOCK_METHOD(uint64_t, getCr3, (), (const override));
 
-        MOCK_METHOD(uint64_t, getCr3, (), (override));
+        MOCK_METHOD(addr_t, getGla, (), (const override));
 
-        MOCK_METHOD(addr_t, getGla, (), (override));
+        MOCK_METHOD(addr_t, getGfn, (), (const override));
 
-        MOCK_METHOD(addr_t, getGfn, (), (override));
-
-        MOCK_METHOD(addr_t, getOffset, (), (override));
+        MOCK_METHOD(addr_t, getOffset, (), (const override));
     };
 }
 

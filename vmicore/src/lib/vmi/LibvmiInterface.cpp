@@ -225,12 +225,12 @@ namespace VmiCore
         }
     }
 
-    uint64_t LibvmiInterface::getCurrentVmId()
+    uint64_t LibvmiInterface::getCurrentVmId() const
     {
         return (vmi_get_vmid(vmiInstance));
     }
 
-    uint LibvmiInterface::getNumberOfVCPUs()
+    uint LibvmiInterface::getNumberOfVCPUs() const
     {
         return numberOfVCPUs;
     }
@@ -265,7 +265,7 @@ namespace VmiCore
         return userlandSymbolVA;
     }
 
-    addr_t LibvmiInterface::convertVAToPA(addr_t virtualAddress, addr_t processCr3)
+    addr_t LibvmiInterface::convertVAToPA(addr_t virtualAddress, addr_t processCr3) const
     {
         addr_t physicalAddress = 0;
         if (vmi_pagetable_lookup(vmiInstance, processCr3, virtualAddress, &physicalAddress) != VMI_SUCCESS)
@@ -276,7 +276,7 @@ namespace VmiCore
         return physicalAddress;
     }
 
-    addr_t LibvmiInterface::convertPidToDtb(pid_t processID)
+    addr_t LibvmiInterface::convertPidToDtb(pid_t processID) const
     {
         addr_t dtb = 0;
         if (vmi_pid_to_dtb(vmiInstance, processID, &dtb) != VMI_SUCCESS)
@@ -286,7 +286,7 @@ namespace VmiCore
         return dtb;
     }
 
-    pid_t LibvmiInterface::convertDtbToPid(addr_t dtb)
+    pid_t LibvmiInterface::convertDtbToPid(addr_t dtb) const
     {
         vmi_pid_t pid = 0;
         if (vmi_dtb_to_pid(vmiInstance, dtb, &pid) != VMI_SUCCESS)
@@ -314,7 +314,7 @@ namespace VmiCore
         }
     }
 
-    bool LibvmiInterface::areEventsPending()
+    bool LibvmiInterface::areEventsPending() const
     {
         bool pending = false;
         auto areEventsPendingReturn = vmi_are_events_pending(vmiInstance);
@@ -370,7 +370,7 @@ namespace VmiCore
         }
     }
 
-    OperatingSystem LibvmiInterface::getOsType()
+    OperatingSystem LibvmiInterface::getOsType() const
     {
         switch (vmi_get_ostype(vmiInstance))
         {
@@ -383,7 +383,7 @@ namespace VmiCore
         }
     }
 
-    addr_t LibvmiInterface::getOffset(const std::string& name)
+    addr_t LibvmiInterface::getOffset(const std::string& name) const
     {
         addr_t offset = 0;
         if (vmi_get_offset(vmiInstance, name.c_str(), &offset) != VMI_SUCCESS)
@@ -393,7 +393,7 @@ namespace VmiCore
         return offset;
     }
 
-    addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, const std::string& member)
+    addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, const std::string& member) const
     {
         addr_t memberAddress = 0;
         if (vmi_get_kernel_struct_offset(vmiInstance, structName.c_str(), member.c_str(), &memberAddress) !=
@@ -405,7 +405,7 @@ namespace VmiCore
         return memberAddress;
     }
 
-    size_t LibvmiInterface::getStructSizeFromJson(const std::string& struct_name)
+    size_t LibvmiInterface::getStructSizeFromJson(const std::string& struct_name) const
     {
         size_t size = 0;
         if (vmi_get_struct_size_from_json(vmiInstance, vmi_get_kernel_json(vmiInstance), struct_name.c_str(), &size) !=
@@ -416,13 +416,14 @@ namespace VmiCore
         return size;
     }
 
-    bool LibvmiInterface::isInitialized()
+    bool LibvmiInterface::isInitialized() const
     {
         return vmiInstance != nullptr;
     }
 
     std::tuple<addr_t, size_t, size_t>
-    LibvmiInterface::getBitfieldOffsetAndSizeFromJson(const std::string& structName, const std::string& structMember)
+    LibvmiInterface::getBitfieldOffsetAndSizeFromJson(const std::string& structName,
+                                                      const std::string& structMember) const
     {
         addr_t offset{};
         size_t startBit{};

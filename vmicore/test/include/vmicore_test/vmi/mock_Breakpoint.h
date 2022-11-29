@@ -9,7 +9,7 @@ namespace VmiCore
     class MockBreakpoint : public IBreakpoint
     {
       public:
-        MOCK_METHOD(addr_t, getTargetPA, (), (override));
+        MOCK_METHOD(addr_t, getTargetPA, (), (const override));
 
         MOCK_METHOD(void, remove, (), (override));
     };

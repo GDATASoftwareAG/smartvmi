@@ -13,7 +13,7 @@ namespace VmiCore
     {
     }
 
-    addr_t Breakpoint::getTargetPA()
+    addr_t Breakpoint::getTargetPA() const
     {
         return targetPA;
     }
