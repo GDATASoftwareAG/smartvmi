@@ -25,6 +25,8 @@ namespace VmiCore
 
         MOCK_METHOD(uint64_t, getRip, (), (const override));
 
+        MOCK_METHOD(uint64_t, getRsp, (), (const override));
+
         MOCK_METHOD(uint64_t, getCr3, (), (const override));
 
         MOCK_METHOD(addr_t, getGla, (), (const override));

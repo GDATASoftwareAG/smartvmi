@@ -24,13 +24,15 @@ namespace VmiCore
 
         uint64_t getRdi() const override;
 
-        uint64_t getRip() const override;
-
-        uint64_t getCr3() const override;
-
         uint64_t getR8() const override;
 
         uint64_t getR9() const override;
+
+        uint64_t getRip() const override;
+
+        uint64_t getRsp() const override;
+
+        uint64_t getCr3() const override;
 
         addr_t getGla() const override;
 

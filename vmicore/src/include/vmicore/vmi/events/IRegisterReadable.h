@@ -26,6 +26,8 @@ namespace VmiCore
 
         virtual uint64_t getRip() const = 0;
 
+        virtual uint64_t getRsp() const = 0;
+
         virtual uint64_t getCr3() const = 0;
 
       protected:
