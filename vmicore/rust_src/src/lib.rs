@@ -1,8 +1,8 @@
-mod bridge;
+pub mod bridge;
 mod console_logger;
 mod grpc_log_service;
 mod grpc_logger;
-mod grpc_server;
+pub mod grpc_server;
 mod grpc_vmi_service;
 mod logging;
 mod unix_socket;

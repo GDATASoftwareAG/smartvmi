@@ -1,37 +1,8 @@
-mod bridge;
-mod console_logger;
-mod grpc_log_service;
-mod grpc_logger;
-mod grpc_server;
-mod grpc_vmi_service;
-mod logging;
-mod unix_socket;
-
-use crate::grpc_server::new_server;
-
-pub mod pkg {
-    #![allow(clippy::derive_partial_eq_without_eq)]
-    pub mod logging {
-        pub mod service {
-            pub mod v1 {
-                tonic::include_proto!("pkg.logging.service.v1");
-            }
-        }
-        pub mod api {
-            pub mod v1 {
-                tonic::include_proto!("pkg.logging.api.v1");
-            }
-        }
-    }
-    pub mod vmi {
-        pub mod v1 {
-            tonic::include_proto!("pkg.vmi.v1");
-        }
-    }
-}
+use rust_grpc_server::bridge::ffi::Level;
+use rust_grpc_server::grpc_server::new_server;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "/mnt/rust/vmi.sock";
+    let addr = "/tmp/vmi.sock";
     let name = "FancyLogger";
 
     let srv = new_server(addr, false);
@@ -46,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     println!("Writing log line");
-    logger.log(bridge::ffi::Level::INFO, "Hello World", &[])?;
+    logger.log(Level::INFO, "Hello World", &[])?;
 
     println!("Wait for input...");
     std::io::stdin().read_line(&mut String::new())?;
