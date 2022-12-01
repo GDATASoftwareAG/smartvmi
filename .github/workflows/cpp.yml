@@ -69,7 +69,7 @@ jobs:
       - name: Build vmicore
         run: |
           cmake --preset clang-debug
-          cmake --build --preset clang-build-debug --target vmicore
+          cmake --build --preset clang-build-debug
         working-directory: vmicore
 
   test_inmemoryscanner:
@@ -106,5 +106,5 @@ jobs:
       - name: Build inmemoryscanner
         run: |
           cmake --preset clang-debug
-          cmake --build --preset clang-build-debug --target inmemoryscanner
+          cmake --build --preset clang-build-debug
         working-directory: plugins/inmemoryscanner
