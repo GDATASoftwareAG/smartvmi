@@ -4,11 +4,7 @@ version = "0.1.0"
 edition = "2018"
 
 [lib]
-crate-type = ["staticlib"]
-
-[[bin]]
-name = "rust_grpc_server"
-path = "src/main.rs"
+crate-type = ["lib", "staticlib"]
 
 [dependencies]
 tonic = "0.8.2"
