@@ -24,6 +24,10 @@ target_link_libraries(vmicore-test gtest gmock gmock_main)
 add_subdirectory(include)
 target_link_libraries(vmicore-test vmicore-public-test-headers)
 
+# Dummy executable for testing potentially unused mocks
+
+add_subdirectory(mocks)
+
 # Setup test discovery
 
 include(GoogleTest)
