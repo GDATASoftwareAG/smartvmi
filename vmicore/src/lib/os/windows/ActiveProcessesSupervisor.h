@@ -18,7 +18,7 @@ namespace VmiCore::Windows
       public:
         ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                   std::shared_ptr<IKernelAccess> kernelAccess,
-                                  std::shared_ptr<ILogging> loggingLib,
+                                  std::shared_ptr<ILogging> logging,
                                   std::shared_ptr<IEventStream> eventStream);
 
         void initialize() override;
@@ -41,7 +41,7 @@ namespace VmiCore::Windows
         std::map<pid_t, std::shared_ptr<ActiveProcessInformation>> processInformationByPid;
         std::map<uint64_t, pid_t> pidsByEprocessBase;
         std::unique_ptr<ILogger> logger;
-        std::shared_ptr<ILogging> loggingLib;
+        std::shared_ptr<ILogging> logging;
         std::shared_ptr<IEventStream> eventStream;
 
         [[nodiscard]] bool isProcessActive(uint64_t eprocessBase) const;

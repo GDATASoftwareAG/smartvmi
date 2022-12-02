@@ -14,12 +14,12 @@ namespace VmiCore::Windows
 
     ActiveProcessesSupervisor::ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                                          std::shared_ptr<IKernelAccess> kernelAccess,
-                                                         std::shared_ptr<ILogging> loggingLib,
+                                                         std::shared_ptr<ILogging> logging,
                                                          std::shared_ptr<IEventStream> eventStream)
         : vmiInterface(std::move(vmiInterface)),
           kernelAccess(std::move(kernelAccess)),
-          logger(loggingLib->newNamedLogger(FILENAME_STEM)),
-          loggingLib(std::move(loggingLib)),
+          logger(logging->newNamedLogger(FILENAME_STEM)),
+          logging(std::move(logging)),
           eventStream(std::move(eventStream))
     {
     }
@@ -66,7 +66,7 @@ namespace VmiCore::Windows
                              logfield::create("Exception", e.what())});
         }
         processInformation->memoryRegionExtractor = std::make_unique<VadTreeWin10>(
-            kernelAccess, eprocessBase, processInformation->pid, processInformation->name, loggingLib);
+            kernelAccess, eprocessBase, processInformation->pid, processInformation->name, logging);
 
         return processInformation;
     }

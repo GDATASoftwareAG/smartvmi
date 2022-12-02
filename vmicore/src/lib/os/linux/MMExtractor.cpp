@@ -6,12 +6,12 @@
 
 namespace VmiCore::Linux
 {
-    MMExtractor::MMExtractor(const std::shared_ptr<ILibvmiInterface>& vmiInterface,
+    MMExtractor::MMExtractor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                              const std::shared_ptr<ILogging>& logging,
                              uint64_t mm)
-        : vmiInterface(vmiInterface),
+        : vmiInterface(std::move(vmiInterface)),
           logger(logging->newNamedLogger(FILENAME_STEM)),
-          pathExtractor(vmiInterface, logging),
+          pathExtractor(this->vmiInterface, logging),
           mm(mm)
     {
     }

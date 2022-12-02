@@ -13,9 +13,10 @@ namespace VmiCore
         constexpr auto loggerName = FILENAME_STEM;
     }
 
-    SingleStepSupervisor::SingleStepSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                                               const std::shared_ptr<ILogging>& loggingLib)
-        : vmiInterface(std::move(vmiInterface)), logger(loggingLib->newNamedLogger(loggerName))
+    SingleStepSupervisor::SingleStepSupervisor(
+        std::shared_ptr<ILibvmiInterface> vmiInterface,
+        std::shared_ptr<ILogging> logging) // NOLINT(performance-unnecessary-value-param)
+        : vmiInterface(std::move(vmiInterface)), logger(logging->newNamedLogger(loggerName))
     {
         if (singleStepSupervisorSingleton != nullptr)
         {

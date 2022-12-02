@@ -8,9 +8,10 @@
 
 namespace VmiCore::Linux
 {
-    ActiveProcessesSupervisor::ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                                                         const std::shared_ptr<ILogging>& loggingLib,
-                                                         std::shared_ptr<IEventStream> eventStream)
+    ActiveProcessesSupervisor::ActiveProcessesSupervisor(
+        std::shared_ptr<ILibvmiInterface> vmiInterface,
+        std::shared_ptr<ILogging> loggingLib, // NOLINT(performance-unnecessary-value-param)
+        std::shared_ptr<IEventStream> eventStream)
         : vmiInterface(vmiInterface),
           logging(loggingLib),
           logger(loggingLib->newNamedLogger(FILENAME_STEM)),

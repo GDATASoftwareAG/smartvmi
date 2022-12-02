@@ -16,7 +16,7 @@ namespace VmiCore::Linux
     {
       public:
         ActiveProcessesSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                                  const std::shared_ptr<ILogging>& loggingLib,
+                                  std::shared_ptr<ILogging> loggingLib,
                                   std::shared_ptr<IEventStream> eventStream);
 
         void initialize() override;
