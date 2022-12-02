@@ -28,8 +28,7 @@ namespace VmiCore
     class SingleStepSupervisor : public ISingleStepSupervisor
     {
       public:
-        SingleStepSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
-                             const std::shared_ptr<ILogging>& loggingLib);
+        SingleStepSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface, std::shared_ptr<ILogging> logging);
 
         ~SingleStepSupervisor() override;
 

@@ -12,12 +12,12 @@ namespace VmiCore::Windows
                                uint64_t eprocessBase,
                                pid_t pid,
                                std::string processName,
-                               const std::shared_ptr<ILogging>& loggingLib)
+                               const std::shared_ptr<ILogging>& logging)
         : kernelAccess(std::move(kernelAccess)),
           eprocessBase(eprocessBase),
           pid(pid),
           processName(std::move(processName)),
-          logger(loggingLib->newNamedLogger(FILENAME_STEM))
+          logger(logging->newNamedLogger(FILENAME_STEM))
     {
     }
 

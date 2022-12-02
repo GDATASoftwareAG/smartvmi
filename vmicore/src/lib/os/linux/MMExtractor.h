@@ -12,7 +12,7 @@ namespace VmiCore::Linux
     class MMExtractor : public IMemoryRegionExtractor
     {
       public:
-        MMExtractor(const std::shared_ptr<ILibvmiInterface>& vmiInterface,
+        MMExtractor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                     const std::shared_ptr<ILogging>& logging,
                     uint64_t mm);
 

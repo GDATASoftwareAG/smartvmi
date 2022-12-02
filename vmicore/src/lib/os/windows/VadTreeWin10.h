@@ -17,7 +17,7 @@ namespace VmiCore::Windows
                      uint64_t eprocessBase,
                      pid_t pid,
                      std::string processName,
-                     const std::shared_ptr<ILogging>& loggingLib);
+                     const std::shared_ptr<ILogging>& logging);
 
         [[nodiscard]] std::unique_ptr<std::list<MemoryRegion>> extractAllMemoryRegions() const override;
 
