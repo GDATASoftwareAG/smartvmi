@@ -7,6 +7,8 @@
 
 #ifdef YAML_CPP_SUPPORT
 #include <yaml-cpp/yaml.h>
+#else
+#include <stdexcept>
 #endif
 
 namespace VmiCore::Plugin
@@ -20,6 +22,12 @@ namespace VmiCore::Plugin
 
 #ifdef YAML_CPP_SUPPORT
         [[nodiscard]] virtual const YAML::Node& rootNode() const = 0;
+#else
+        // Keep vtable ordinals consistent
+        virtual void dummy()
+        {
+            throw std::runtime_error("This function should never be called!");
+        }
 #endif
 
         [[nodiscard]] virtual std::optional<std::filesystem::path> configFilePath() const = 0;
