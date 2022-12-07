@@ -48,3 +48,31 @@ jobs:
         with:
           name: clang_tidy_inmemoryscanner
           path: clang-tidy-output
+
+  consolidate_output:
+    needs: [lint_core, lint_inmemoryscanner]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download vmicore clang-tidy artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: clang_tidy_vmicore
+          path: vmicore
+
+      - name: Download inmemoryscanner clang-tidy artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: clang_tidy_inmemoryscanner
+          path: plugins/inmemoryscanner
+
+      - name: Consolidate clang-tidy output
+        run: |
+          cat vmicore/clang-tidy-output > clang-tidy-output
+          cat plugins/inmemoryscanner/clang-tidy-output >> clang-tidy-output
+
+      - name: Upload consolidated clang-tidy artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: clang_tidy_all
+          path: clang-tidy-output
