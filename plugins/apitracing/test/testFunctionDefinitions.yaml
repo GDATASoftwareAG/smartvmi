@@ -1,0 +1,84 @@
+Modules:
+  crypt32.dll:
+    CertOpenSystemStoreA:
+      Parameters:
+        hProv: HCRYPTPROV
+        szSubsystemProtocol: LPCSTR
+      ReturnValue: HCERTSTORE
+      ReturnParameters:
+        - szSubsystemProtocol
+  KernelBase.dll:
+    Sleep:
+      Parameters:
+        dwMilliseconds: DWORD
+      ReturnValue: DWORD
+    TestFunction:
+      Parameters:
+        testParameter: size_t
+      ReturnValue: size_t
+    InvalidTestFunction:
+      Parameters:
+        invalidTestParameter: invalidParameterType
+  ntdll.dll:
+    NtCreateFile:
+      Parameters:
+        FileHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        IoStatusBlock: PIO_STATUS_BLOCK
+        AllocationSize: PLARGE_INTEGER
+        FileAttributes: ULONG
+        ShareAccess: ULONG
+        CreateDisposition: ULONG
+        CreateOptions: ULONG
+        EaBuffer: PVOID
+        EaLength: ULONG
+      ReturnValue: NTSTATUS
+      ReturnParameters:
+        - FileHandle
+        - IoStatusBlock
+Structures:
+  POBJECT_ATTRIBUTES:
+    Length: ULONG
+    RootDirectory: HANDLE
+    ObjectName: PUNICODE_STRING
+    Attributes: DWORD
+    SecurityDescriptor: PVOID
+    SecurityQualityOfService: PVOID
+HighLevelParameterTypes:
+  AddressWidth32Bit:
+    ACCESS_MASK: DWORD
+    DWORD: unsigned long
+    HANDLE: unsigned int
+    HCRYPTPROV: ULONG_PTR
+    LPCSTR: LPSTR_32
+    PHANDLE: HANDLE
+    PIO_STATUS_BLOCK: HANDLE #TODO: Add a struct to real config: https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
+    PLARGE_INTEGER: HANDLE #TODO: Add a struct to real config: https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-large_integer-r1
+    PUNICODE_STRING: UNICODE_WSTR_32
+    PVOID: unsigned int
+    size_t: ULONG_PTR
+    ULONG: unsigned long
+    ULONG_PTR: unsigned long
+  AddressWidth64Bit:
+    ACCESS_MASK: DWORD
+    DWORD: unsigned long
+    HANDLE: unsigned __int64
+    HCRYPTPROV: ULONG_PTR
+    LPCSTR: LPSTR_64
+    PHANDLE: HANDLE
+    PIO_STATUS_BLOCK: HANDLE #TODO: Add a struct to real config: https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
+    PLARGE_INTEGER: HANDLE #TODO: Add a struct to real config: https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-large_integer-r1
+    PUNICODE_STRING: UNICODE_WSTR_64
+    PVOID: unsigned __int64
+    size_t: ULONG_PTR
+    ULONG: unsigned long
+    ULONG_PTR: unsigned long
+BackingParameterTypes:
+  LPSTR_32: 4
+  LPSTR_64: 8
+  UNICODE_WSTR_32: 4
+  UNICODE_WSTR_64: 8
+  unsigned long: 4
+  unsigned __int64: 8
+  unsigned int: 4

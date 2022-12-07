@@ -1,0 +1,11 @@
+---
+traced_processes:
+  calc.exe:
+    trace_children: true
+    traced_modules:
+      ntdll.dll:
+        - function1
+        - function2
+      kernel32.dll:
+        - kernelfunction1
+        - kernelfunction2

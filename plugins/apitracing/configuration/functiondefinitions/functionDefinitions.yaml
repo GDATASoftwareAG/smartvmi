@@ -1,0 +1,4959 @@
+Modules:
+  crypt32.dll:
+    CertOpenSystemStoreA:
+      Parameters:
+        hProv: HCRYPTPROV
+        szSubsystemProtocol: LPCSTR
+      ReturnValue: HCERTSTORE
+      ReturnParameters:
+        - szSubsystemProtocol
+    CertOpenSystemStoreW:
+      Parameters:
+        hProv: HCRYPTPROV
+        szSubsystemProtocol: LPCWSTR
+      ReturnValue: HCERTSTORE
+      ReturnParameters:
+        - szSubsystemProtocol
+    CertControlStore:
+      Parameters:
+        hCertStore: HCERTSTORE
+        dwFlags: DWORD
+        dwCtrlType: DWORD
+        pvCtrlPara: void
+      ReturnValue: BOOL
+    CertCreateCertificateContext:
+      Parameters:
+        dwCertEncodingType: DWORD
+        pbCertEncoded: BYTE
+        cbCertEncoded: DWORD
+      ReturnValue: PCCERT_CONTEXT
+    CryptProtectData:
+      Parameters:
+        pDataIn: DATA_BLOB
+        szDataDescr: LPCWSTR
+        pOptionalEntropy: DATA_BLOB
+        pvReserved: PVOID
+        pPromptStruct: CRYPTPROTECT_PROMPTSTRUCT
+        dwFlags: DWORD
+        pDataOut: DATA_BLOB
+      ReturnValue: BOOL
+    CryptUnprotectData:
+      Parameters:
+        pDataIn: DATA_BLOB
+        ppszDataDescr: LPWSTR
+        pOptionalEntropy: DATA_BLOB
+        pvReserved: PVOID
+        pPromptStruct: CRYPTPROTECT_PROMPTSTRUCT
+        dwFlags: DWORD
+        pDataOut: DATA_BLOB
+      ReturnValue: BOOL
+    CryptProtectMemory:
+      Parameters:
+        pData: LPVOID
+        cbData: DWORD
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    CryptUnprotectMemory:
+      Parameters:
+        pData: LPVOID
+        cbData: DWORD
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    CryptDecodeMessage:
+      Parameters:
+        dwMsgTypeFlags: DWORD
+        pDecryptPara: PCRYPT_DECRYPT_MESSAGE_PARA
+        pVerifyPara: PCRYPT_VERIFY_MESSAGE_PARA
+        dwSignerIndex: DWORD
+        pbEncodedBlob: BYTE
+        cbEncodedBlob: DWORD
+        dwPrevInnerContentType: DWORD
+        pdwMsgType: DWORD
+        pdwInnerContentType: DWORD
+        pbDecoded: BYTE
+        pcbDecoded: DWORD
+        ppXchgCert: PCCERT_CONTEXT
+        ppSignerCert: PCCERT_CONTEXT
+      ReturnValue: BOOL
+    CryptDecryptMessage:
+      Parameters:
+        pDecryptPara: PCRYPT_DECRYPT_MESSAGE_PARA
+        pbEncryptedBlob: BYTE
+        cbEncryptedBlob: DWORD
+        pbDecrypted: BYTE
+        pcbDecrypted: DWORD
+        ppXchgCert: PCCERT_CONTEXT
+      ReturnValue: BOOL
+    CryptEncryptMessage:
+      Parameters:
+        pEncryptPara: PCRYPT_ENCRYPT_MESSAGE_PARA
+        cRecipientCert: DWORD
+        rgpRecipientCert[]: PCCERT_CONTEXT
+        pbToBeEncrypted: BYTE
+        cbToBeEncrypted: DWORD
+        pbEncryptedBlob: BYTE
+        pcbEncryptedBlob: DWORD
+      ReturnValue: BOOL
+    CryptHashMessage:
+      Parameters:
+        pHashPara: PCRYPT_HASH_MESSAGE_PARA
+        fDetachedHash: BOOL
+        cToBeHashed: DWORD
+        rgpbToBeHashed[]: BYTE
+        rgcbToBeHashed[]: DWORD
+        pbHashedBlob: BYTE
+        pcbHashedBlob: DWORD
+        pbComputedHash: BYTE
+        pcbComputedHash: DWORD
+      ReturnValue: BOOL
+    CryptDecodeObjectEx:
+      Parameters:
+        dwCertEncodingType: DWORD
+        lpszStructType: LPCSTR
+        pbEncoded: BYTE
+        cbEncoded: DWORD
+        dwFlags: DWORD
+        pDecodePara: PCRYPT_DECODE_PARA
+        pvStructInfo: void
+        pcbStructInfo: DWORD
+      ReturnValue: BOOL
+    CertOpenStore:
+      Parameters:
+        lpszStoreProvider: LPCSTR
+        dwMsgAndCertEncodingType: DWORD
+        hCryptProv: HCRYPTPROV
+        dwFlags: DWORD
+        pvPara: void
+      ReturnValue: HCERTSTORE
+  advapi32.dll:
+    CryptAcquireContextA:
+      Parameters:
+        phProv: HCRYPTPROV
+        szContainer: LPCSTR
+        szProvider: LPCSTR
+        dwProvType: DWORD
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    CryptAcquireContextW:
+      Parameters:
+        phProv: HCRYPTPROV
+        szContainer: LPCWSTR
+        szProvider: LPCWSTR
+        dwProvType: DWORD
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    CryptDecrypt:
+      Parameters:
+        hKey: HCRYPTKEY
+        hHash: HCRYPTHASH
+        Final: BOOL
+        dwFlags: DWORD
+        pbData: BYTE
+        pdwDataLen: DWORD
+      ReturnValue: BOOL
+    CryptEncrypt:
+      Parameters:
+        hKey: HCRYPTKEY
+        hHash: HCRYPTHASH
+        Final: BOOL
+        dwFlags: DWORD
+        pbData: BYTE
+        pdwDataLen: DWORD
+        dwBufLen: DWORD
+      ReturnValue: BOOL
+    CryptHashData:
+      Parameters:
+        hHash: HCRYPTHASH
+        pbData: BYTE
+        dwDataLen: DWORD
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    CryptExportKey:
+      Parameters:
+        hKey: HCRYPTKEY
+        hExpKey: HCRYPTKEY
+        dwBlobType: DWORD
+        dwFlags: DWORD
+        pbData: BYTE
+        pdwDataLen: DWORD
+      ReturnValue: BOOL
+    CryptGenKey:
+      Parameters:
+        hProv: HCRYPTPROV
+        Algid: ALG_ID
+        dwFlags: DWORD
+        phKey: HCRYPTKEY
+      ReturnValue: BOOL
+    CryptCreateHash:
+      Parameters:
+        hProv: HCRYPTPROV
+        Algid: ALG_ID
+        hKey: HCRYPTKEY
+        dwFlags: DWORD
+        phHash: HCRYPTHASH
+      ReturnValue: BOOL
+    GetUserNameA:
+      Parameters:
+        lpBuffer: LPSTR
+        lpnSize: LPDWORD
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpBuffer
+    GetUserNameW:
+      Parameters:
+        lpBuffer: LPWSTR
+        lpnSize: LPDWORD
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpBuffer
+    LookupAccountSidW:
+      Parameters:
+        lpSystemName: LPCWSTR
+        lpSid: PSID
+        lpName: LPWSTR
+        cchName: LPDWORD
+        lpReferencedDomainName: LPWSTR
+        cchReferencedDomainName: LPDWORD
+        peUse: PSID_NAME_USE
+      ReturnValue: BOOL
+    NotifyBootConfigStatus:
+      Parameters:
+        BootAcceptable: BOOL
+      ReturnValue: BOOL
+    RegOpenKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegOpenKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        Reserved: DWORD
+        lpClass: LPSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        Reserved: DWORD
+        lpClass: LPWSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegDeleteKeyA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+      ReturnValue: LONG
+    RegDeleteKeyW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+      ReturnValue: LONG
+    RegEnumKeyW:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpName: LPWSTR
+        cchName: DWORD
+      ReturnValue: LONG
+    RegEnumKeyExA:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpName: LPSTR
+        lpcName: LPDWORD
+        lpReserved: LPDWORD
+        lpClass: LPSTR
+        lpcClass: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpName
+    RegEnumKeyExW:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpName: LPWSTR
+        lpcName: LPDWORD
+        lpReserved: LPDWORD
+        lpClass: LPWSTR
+        lpcClass: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpName
+    RegEnumValueA:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpValueName: LPSTR
+        lpcchValueName: LPDWORD
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValueName
+    RegEnumValueW:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpValueName: LPWSTR
+        lpcchValueName: LPDWORD
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValueName
+    RegSetValueExA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        Reserved: DWORD
+        dwType: DWORD
+        lpData: BYTE
+        cbData: DWORD
+      ReturnValue: LONG
+    RegSetValueExW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        Reserved: DWORD
+        dwType: DWORD
+        lpData: BYTE
+        cbData: DWORD
+      ReturnValue: LONG
+    RegQueryValueExA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+    RegQueryValueExW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+    RegDeleteValueA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+      ReturnValue: LONG
+    RegDeleteValueW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+      ReturnValue: LONG
+    RegQueryInfoKeyA:
+      Parameters:
+        hKey: HKEY
+        lpClass: LPSTR
+        lpcClass: LPDWORD
+        lpReserved: LPDWORD
+        lpcSubKeys: LPDWORD
+        lpcMaxSubKeyLen: LPDWORD
+        lpcMaxClassLen: LPDWORD
+        lpcValues: LPDWORD
+        lpcMaxValueNameLen: LPDWORD
+        lpcMaxValueLen: LPDWORD
+        lpcbSecurityDescriptor: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+    RegQueryInfoKeyW:
+      Parameters:
+        hKey: HKEY
+        lpClass: LPWSTR
+        lpcClass: LPDWORD
+        lpReserved: LPDWORD
+        lpcSubKeys: LPDWORD
+        lpcMaxSubKeyLen: LPDWORD
+        lpcMaxClassLen: LPDWORD
+        lpcValues: LPDWORD
+        lpcMaxValueNameLen: LPDWORD
+        lpcMaxValueLen: LPDWORD
+        lpcbSecurityDescriptor: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+    RegCloseKey:
+      Parameters:
+        hKey: HKEY
+      ReturnValue: LONG
+    OpenSCManagerA:
+      Parameters:
+        lpMachineName: LPCSTR
+        lpDatabaseName: LPCSTR
+        dwDesiredAccess: DWORD
+      ReturnValue: SC_HANDLE
+    OpenSCManagerW:
+      Parameters:
+        lpMachineName: LPCWSTR
+        lpDatabaseName: LPCWSTR
+        dwDesiredAccess: DWORD
+      ReturnValue: SC_HANDLE
+    CreateServiceA:
+      Parameters:
+        hSCManager: SC_HANDLE
+        lpServiceName: LPCSTR
+        lpDisplayName: LPCSTR
+        dwDesiredAccess: DWORD
+        dwServiceType: DWORD
+        dwStartType: DWORD
+        dwErrorControl: DWORD
+        lpBinaryPathName: LPCSTR
+        lpLoadOrderGroup: LPCSTR
+        lpdwTagId: LPDWORD
+        lpDependencies: LPCSTR
+        lpServiceStartName: LPCSTR
+        lpPassword: LPCSTR
+      ReturnValue: SC_HANDLE
+    CreateServiceW:
+      Parameters:
+        hSCManager: SC_HANDLE
+        lpServiceName: LPCWSTR
+        lpDisplayName: LPCWSTR
+        dwDesiredAccess: DWORD
+        dwServiceType: DWORD
+        dwStartType: DWORD
+        dwErrorControl: DWORD
+        lpBinaryPathName: LPCWSTR
+        lpLoadOrderGroup: LPCWSTR
+        lpdwTagId: LPDWORD
+        lpDependencies: LPCWSTR
+        lpServiceStartName: LPCWSTR
+        lpPassword: LPCWSTR
+      ReturnValue: SC_HANDLE
+    OpenServiceA:
+      Parameters:
+        hSCManager: SC_HANDLE
+        lpServiceName: LPCSTR
+        dwDesiredAccess: DWORD
+      ReturnValue: SC_HANDLE
+    OpenServiceW:
+      Parameters:
+        hSCManager: SC_HANDLE
+        lpServiceName: LPCWSTR
+        dwDesiredAccess: DWORD
+      ReturnValue: SC_HANDLE
+    StartServiceA:
+      Parameters:
+        hService: SC_HANDLE
+        dwNumServiceArgs: DWORD
+        lpServiceArgVectors: LPCSTR
+      ReturnValue: BOOL
+    StartServiceW:
+      Parameters:
+        hService: SC_HANDLE
+        dwNumServiceArgs: DWORD
+        lpServiceArgVectors: LPCWSTR
+      ReturnValue: BOOL
+    ControlService:
+      Parameters:
+        hService: SC_HANDLE
+        dwControl: DWORD
+        lpServiceStatus: LPSERVICE_STATUS
+      ReturnValue: BOOL
+    DeleteService:
+      Parameters:
+        hService: SC_HANDLE
+      ReturnValue: BOOL
+    EnumServicesStatusA:
+      Parameters:
+        hSCManager: SC_HANDLE
+        dwServiceType: DWORD
+        dwServiceState: DWORD
+        lpServices: LPENUM_SERVICE_STATUS
+        cbBufSize: DWORD
+        pcbBytesNeeded: LPDWORD
+        lpServicesReturned: LPDWORD
+        lpResumeHandle: LPDWORD
+      ReturnValue: BOOL
+    EnumServicesStatusW:
+      Parameters:
+        hSCManager: SC_HANDLE
+        dwServiceType: DWORD
+        dwServiceState: DWORD
+        lpServices: LPENUM_SERVICE_STATUS
+        cbBufSize: DWORD
+        pcbBytesNeeded: LPDWORD
+        lpServicesReturned: LPDWORD
+        lpResumeHandle: LPDWORD
+      ReturnValue: BOOL
+    StartServiceCtrlDispatcherW:
+      Parameters:
+        lpServiceTable: SERVICE_TABLE_ENTRYW
+      ReturnValue: BOOL
+    RegCreateKeyA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyTransactedA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        Reserved: DWORD
+        lpClass: LPSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+        hTransaction: HANDLE
+        pExtendedParemeter: PVOID
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyTransactedW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        Reserved: DWORD
+        lpClass: LPWSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+        hTransaction: HANDLE
+        pExtendedParemeter: PVOID
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegDeleteKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+      ReturnValue: LONG
+    RegDeleteKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+      ReturnValue: LONG
+    RegDeleteKeyTransactedA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+        hTransaction: HANDLE
+        pExtendedParameter: PVOID
+      ReturnValue: LONG
+    RegDeleteKeyTransactedW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+        hTransaction: HANDLE
+        pExtendedParameter: PVOID
+      ReturnValue: LONG
+    RegDeleteKeyValueA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        lpValueName: LPCSTR
+      ReturnValue: LONG
+    RegDeleteKeyValueW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        lpValueName: LPCWSTR
+      ReturnValue: LONG
+    RegDeleteTreeA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+      ReturnValue: LONG
+    RegDeleteTreeW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+      ReturnValue: LONG
+    RegEnumKeyA:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpSubKey: LPSTR
+        cchName: DWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpSubKey
+    RegGetValueA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        lpValue: LPCSTR
+        dwFlags: DWORD
+        pdwType: LPDWORD
+        pvData: PVOID
+        pcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - pvData
+    RegGetValueW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        lpValue: LPCWSTR
+        dwFlags: DWORD
+        pdwType: LPDWORD
+        pvData: PVOID
+        pcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - pvData
+    RegOpenKeyA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegOpenKeyW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegOpenKeyTransactedA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+        hTransaction: HANDLE
+        pExtendedParameter: PVOID
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegOpenKeyTransactedW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+        hTransaction: HANDLE
+        pExtendedParameter: PVOID
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegOpenUserClassesRoot:
+      Parameters:
+        hToken: HANDLE
+        dwOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegQueryValueA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        lpValue: LPSTR
+        lpcbValue: PLONG
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValue
+    RegQueryValueW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        lpValue: LPWSTR
+        lpcbValue: PLONG
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValue
+    RegSetKeyValueA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        lpValueName: LPCSTR
+        dwType: DWORD
+        lpData: LPCVOID
+        cbData: DWORD
+      ReturnValue: LONG
+    RegSetKeyValueW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        lpValueName: LPCWSTR
+        dwType: DWORD
+        lpData: LPCVOID
+        cbData: DWORD
+      ReturnValue: LONG
+    RegSetValueA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        dwType: DWORD
+        lpData: LPCSTR
+        cbData: DWORD
+      ReturnValue: LONG
+    RegSetValueW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        dwType: DWORD
+        lpData: LPCWSTR
+        cbData: DWORD
+      ReturnValue: LONG
+  secur32.dll:
+    EncryptMessage:
+      Parameters:
+        phContext: PCtxtHandle
+        fQOP: ULONG
+        pMessage: PSecBufferDesc
+        MessageSeqNo: ULONG
+      ReturnValue: SECURITY_STATUS
+    DecryptMessage:
+      Parameters:
+        phContext: PCtxtHandle
+        pMessage: PSecBufferDesc
+        MessageSeqNo: ULONG
+        pfQOP: PULONG
+      ReturnValue: SECURITY_STATUS
+    GetUserNameExA:
+      Parameters:
+        NameFormat: EXTENDED_NAME_FORMAT
+        lpNameBuffer: LPSTR
+        lpnSize: PULONG
+      ReturnValue: BOOL
+    GetUserNameExW:
+      Parameters:
+        NameFormat: EXTENDED_NAME_FORMAT
+        lpNameBuffer: LPWSTR
+        lpnSize: PULONG
+      ReturnValue: BOOL
+  kernel32.dll:
+    Sleep:
+      Parameters:
+        dwMilliseconds: DWORD
+      ReturnValue: DWORD
+    GetLastError:
+      ReturnValue: DWORD
+    SetUnhandledExceptionFilter:
+      Parameters:
+        lpTopLevelExceptionFilter: LPTOP_LEVEL_EXCEPTION_FILTER
+      ReturnValue: LPTOP_LEVEL_EXCEPTION_FILTER
+    CreateDirectoryW:
+      Parameters:
+        lpPathName: LPWSTR
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+      ReturnValue: BOOL
+    CreateDirectoryExW:
+      Parameters:
+        lpTemplateDirectory: LPWSTR
+        lpNewDirectory: LPWSTR
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+      ReturnValue: BOOL
+    CreateProcessA:
+      Parameters:
+        lpApplicationName: LPCSTR
+        lpCommandLine: LPSTR
+        lpProcessAttributes: LPSECURITY_ATTRIBUTES
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        bInheritHandles: BOOL
+        dwCreationFlags: DWORD
+        lpEnvironment: LPVOID
+        lpCurrentDirectory: LPCSTR
+        lpStartupInfo: LPSTARTUPINFOA
+        lpProcessInformation: LPPROCESS_INFORMATION
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpProcessInformation
+    CreateProcessW:
+      Parameters:
+        lpApplicationName: LPCWSTR
+        lpCommandLine: LPWSTR
+        lpProcessAttributes: LPSECURITY_ATTRIBUTES
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        bInheritHandles: BOOL
+        dwCreationFlags: DWORD
+        lpEnvironment: LPVOID
+        lpCurrentDirectory: LPCWSTR
+        lpStartupInfo: LPSTARTUPINFOW
+        lpProcessInformation: LPPROCESS_INFORMATION
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpApplicationName
+        - lpCurrentDirectory
+        - lpProcessInformation
+    RemoveDirectoryA:
+      Parameters:
+        lpPathName: LPCSTR
+      ReturnValue: BOOL
+    RemoveDirectoryW:
+      Parameters:
+        lpPathName: LPCWSTR
+      ReturnValue: BOOL
+    MoveFileWithProgressW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    FindFirstFileExA:
+      Parameters:
+        lpFileName: LPCSTR
+        fInfoLevelId: FINDEX_INFO_LEVELS
+        lpFindFileData: LPVOID
+        fSearchOp: FINDEX_SEARCH_OPS
+        lpSearchFilter: LPVOID
+        dwAdditionalFlags: DWORD
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    FindFirstFileExW:
+      Parameters:
+        lpFileName: LPCWSTR
+        fInfoLevelId: FINDEX_INFO_LEVELS
+        lpFindFileData: LPVOID
+        fSearchOp: FINDEX_SEARCH_OPS
+        lpSearchFilter: LPVOID
+        dwAdditionalFlags: DWORD
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    CopyFileA:
+      Parameters:
+        lpExistingFileName: LPCSTR
+        lpNewFileName: LPCSTR
+        bFailIfExists: BOOL
+      ReturnValue: BOOL
+    CopyFileW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        bFailIfExists: BOOL
+      ReturnValue: BOOL
+    CopyFileExW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        pbCancel: LPBOOL
+        dwCopyFlags: DWORD
+      ReturnValue: BOOL
+    DeleteFileW:
+      Parameters:
+        lpFileName: LPCWSTR
+      ReturnValue: BOOL
+    GetFileType:
+      Parameters:
+        hFile: HANDLE
+      ReturnValue: DWORD
+    GetFileSize:
+      Parameters:
+        hFile: HANDLE
+        lpFileSizeHigh: LPDWORD
+      ReturnValue: DWORD
+    GetFileSizeEx:
+      Parameters:
+        hFile: HANDLE
+        lpFileSize: PLARGE_INTEGER
+      ReturnValue: BOOL
+    GetFileInformationByHandle:
+      Parameters:
+        hFile: HANDLE
+        lpFIleInformation: LPBY_HANDLE_FILE_INFORMATION
+      ReturnValue: BOOL
+    GetFileInformationByHandleEx:
+      Parameters:
+        hFile: HANDLE
+        FileInformationClass: FILE_INFO_BY_HANDLE_CLASS
+        lpFIleInformation: LPVOID
+        dwBufferSize: DWORD
+      ReturnValue: BOOL
+    SetFilePointer:
+      Parameters:
+        hFile: HANDLE
+        lDistanceToMove: LONG
+        lpDistanceToMoveHigh: PLONG
+        dwMoveMethod: DWORD
+      ReturnValue: DWORD
+    SetFilePointerEx:
+      Parameters:
+        hFile: HANDLE
+        liDistanceToMove: LARGE_INTEGER
+        lpNewFilePointer: PLARGE_INTEGER
+        dwMoveMethod: DWORD
+      ReturnValue: BOOL
+    SetFileInformationByHandle:
+      Parameters:
+        hFile: HANDLE
+        FileInformationClass: FILE_INFO_BY_HANDLE_CLASS
+        lpFileInformation: LPVOID
+        dwBufferSize: DWORD
+      ReturnValue: BOOL
+    DeviceIoControl:
+      Parameters:
+        hDevice: HANDLE
+        dwIoControlCode: DWORD
+        lpInBuffer: LPVOID
+        nInBufferSize: DWORD
+        lpOutBuffer: LPVOID
+        nOutBufferSize: DWORD
+        lpBytesReturned: LPDWORD
+        lpOverlapped: LPOVERLAPPED
+      ReturnValue: BOOL
+    GetSystemDirectoryA:
+      Parameters:
+        lpBuffer: LPSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetSystemDirectoryW:
+      Parameters:
+        lpBuffer: LPWSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetSystemWindowsDirectoryA:
+      Parameters:
+        lpBuffer: LPSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetSystemWindowsDirectoryW:
+      Parameters:
+        lpBuffer: LPWSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetTempPathW:
+      Parameters:
+        nBufferLength: DWORD
+        lpBuffer: LPWSTR
+      ReturnValue: DWORD
+    SetFileAttributesW:
+      Parameters:
+        lpFileName: LPCWSTR
+        dwFileAttributes: DWORD
+      ReturnValue: BOOL
+    GetFileAttributesW:
+      Parameters:
+        lpFileName: LPCWSTR
+      ReturnValue: DWORD
+    GetFileAttributesExW:
+      Parameters:
+        lpFileName: LPCWSTR
+        fInfoLevelId: GET_FILEEX_INFO_LEVELS
+        lpFileInformation: LPVOID
+      ReturnValue: BOOL
+    SetEndOfFile:
+      Parameters:
+        hFile: HANDLE
+      ReturnValue: BOOL
+    GetVolumeNameForVolumeMountPointW:
+      Parameters:
+        lpszVolumeMountPoint: LPCWSTR
+        lpszVolumeName: LPWSTR
+        cchBufferLength: DWORD
+      ReturnValue: BOOL
+    GetVolumePathNamesForVolumeNameW:
+      Parameters:
+        lpszVolumeName: LPCWSTR
+        lpszVolumePathNames: LPWSTR
+        cchBufferLength: DWORD
+        lpcchReturnLength: PDWORD
+      ReturnValue: BOOL
+    GetVolumePathNameW:
+      Parameters:
+        lpszFileName: LPCWSTR
+        lpszVolumePathName: LPWSTR
+        cchBufferLength: DWORD
+      ReturnValue: BOOL
+    GetShortPathNameW:
+      Parameters:
+        lpszLongPath: LPCWSTR
+        lpszShortPath: LPWSTR
+        cchBuffer: DWORD
+      ReturnValue: DWORD
+    SearchPathW:
+      Parameters:
+        lpPath: LPCWSTR
+        lpFileName: LPCWSTR
+        lpExtension: LPCWSTR
+        nBufferLength: DWORD
+        lpBuffer: LPWSTR
+        lpFilePart: LPWSTR
+      ReturnValue: DWORD
+    SetFileTime:
+      Parameters:
+        hFile: HANDLE
+        lpCreationTime: FILETIME
+        lpLastAccessTime: FILETIME
+        lpLastWriteTime: FILETIME
+      ReturnValue: BOOL
+    GetComputerNameA:
+      Parameters:
+        lpBuffer: LPSTR
+        lpnSize: LPDWORD
+      ReturnValue: BOOL
+    GetComputerNameW:
+      Parameters:
+        lpBuffer: LPWSTR
+        lpnSize: LPDWORD
+      ReturnValue: BOOL
+    GetDiskFreeSpaceW:
+      Parameters:
+        lpRootPathName: LPCWSTR
+        lpSectorsPerCluster: LPDWORD
+        lpBytesPerSector: LPDWORD
+        lpNumberOfFreeClusters: LPDWORD
+        lpTotalNumberOfClusters: LPDWORD
+      ReturnValue: BOOL
+    GetDiskFreeSpaceExW:
+      Parameters:
+        lpDirectoryName: LPCWSTR
+        lpFreeBytesAvailable: PULARGE_INTEGER
+        lpTotalNumberOfBytes: PULARGE_INTEGER
+        lpTotalNumberOfFreeBytes: PULARGE_INTEGER
+      ReturnValue: BOOL
+    WriteConsoleA:
+      Parameters:
+        hConsoleOutput: HANDLE
+        lpBuffer: VOID
+        nNumberOfCharsToWrite: DWORD
+        lpNumberOfCharsWritten: LPDWORD
+        lpReseverd: LPVOID
+      ReturnValue: BOOL
+    WriteConsoleW:
+      Parameters:
+        hConsoleOutput: HANDLE
+        lpBuffer: VOID
+        nNumberOfCharsToWrite: DWORD
+        lpNumberOfCharsWritten: LPDWORD
+        lpReseverd: LPVOID
+      ReturnValue: BOOL
+    GetTimeZoneInformation:
+      Parameters:
+        lpTimeZoneInformation: LPTIME_ZONE_INFORMATION
+      ReturnValue: DWORD
+    CreateActCtxW:
+      Parameters:
+        pActCtx: PACTCTX
+      ReturnValue: HANDLE
+    CreateProcessInternalW:
+      Parameters:
+        lpUnknown1: LPVOID
+        lpApplicationName: LPWSTR
+        lpCommandLine: LPWSTR
+        lpProcessAttributes: LPSECURITY_ATTRIBUTES
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        bInheritHandles: BOOL
+        dwCreationFlags: DWORD
+        lpEnvironment: LPVOID
+        lpCurrentDirectory: LPWSTR
+        lpStartupInfo: LPSTARTUPINFO
+        lpProcessInformation: LPPROCESS_INFORMATION
+        lpUnknown2: LPVOID
+      ReturnValue: BOOL
+    ReadProcessMemory:
+      Parameters:
+        hProcess: HANDLE
+        lpBaseAddress: LPCVOID
+        lpBuffer: LPVOID
+        nSize: SIZE_T
+        lpNumberOfBytesRead: SIZE_T
+      ReturnValue: BOOL
+    WriteProcessMemory:
+      Parameters:
+        hProcess: HANDLE
+        lpBaseAddress: LPVOID
+        lpBuffer: LPCVOID
+        nSize: SIZE_T
+        lpNumberOfBytesWritten: SIZE_T
+      ReturnValue: BOOL
+    CreateToolhelp32Snapshot:
+      Parameters:
+        dwFlags: DWORD
+        th32ProcessID: DWORD
+      ReturnValue: HANDLE
+    Module32FirstW:
+      Parameters:
+        hSnapshot: HANDLE
+        lpme: LPMODULEENTRY32W
+      ReturnValue: BOOL
+    Module32NextW:
+      Parameters:
+        hSnapshot: HANDLE
+        lpme: LPMODULEENTRY32W
+      ReturnValue: BOOL
+    FindResourceA:
+      Parameters:
+        hModule: HMODULE
+        lpName: LPCSTR
+        lpType: LPCSTR
+      ReturnValue: HRSRC
+    FindResourceW:
+      Parameters:
+        hModule: HMODULE
+        lpName: LPCWSTR
+        lpType: LPCWSTR
+      ReturnValue: HRSRC
+    FindResourceExA:
+      Parameters:
+        hModule: HMODULE
+        lpName: LPCSTR
+        lpType: LPCSTR
+        wLanguage: WORD
+      ReturnValue: HRSRC
+    FindResourceExW:
+      Parameters:
+        hModule: HMODULE
+        lpName: LPCWSTR
+        lpType: LPCWSTR
+        wLanguage: WORD
+      ReturnValue: HRSRC
+    LoadResource:
+      Parameters:
+        hModule: HMODULE
+        hResInfo: HRSRC
+      ReturnValue: HGLOBAL
+    SizeofResource:
+      Parameters:
+        hModule: HMODULE
+        hResInfo: HRSRC
+      ReturnValue: DWORD
+    GetLocalTime:
+      Parameters:
+        lpSystemTime: LPSYSTEMTIME
+      ReturnValue: void
+    GetSystemTime:
+      Parameters:
+        lpSystemTime: LPSYSTEMTIME
+      ReturnValue: void
+    GetTickCount:
+      Parameters:
+        lpSystemTimeAsFileTime: LPFILETIME
+      ReturnValue: DWORD
+    OutputDebugStringA:
+      Parameters:
+        lpOutputString: LPCSTR
+      ReturnValue: void
+    IsDebuggerPresent:
+      ReturnValue: BOOL
+    GetSystemInfo:
+      Parameters:
+        lpSystemInfo: LPSYSTEM_INFO
+      ReturnValue: void
+    GetNativeSystemInfo:
+      Parameters:
+        lpSystemInfo: LPSYSTEM_INFO
+      ReturnValue: void
+    SetErrorMode:
+      Parameters:
+        uMode: UINT
+      ReturnValue: UINT
+    GlobalMemoryStatus:
+      Parameters:
+        lpBuffer: LPMEMORYSTATUS
+      ReturnValue: BOOL
+    GlobalMemoryStatusEx:
+      Parameters:
+        lpBuffer: LPMEMORYSTATUSEX
+      ReturnValue: BOOL
+    CreateThread:
+      Parameters:
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        dwStackSize: SIZE_T
+        lpStartAddress: LPTHREAD_START_ROUTINE
+        lpParameter: LPVOID
+        dwCreationFlags: DWORD
+        lpThreadId: LPDWORD
+      ReturnValue: HANDLE
+    CreateRemoteThread:
+      Parameters:
+        hProcess: HANDLE
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        dwStackSize: SIZE_T
+        lpStartAddress: LPTHREAD_START_ROUTINE
+        lpParameter: LPVOID
+        dwCreationFlags: DWORD
+        lpThreadId: LPDWORD
+      ReturnValue: HANDLE
+    CreateRemoteThreadEx:
+      Parameters:
+        hProcess: HANDLE
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        dwStackSize: SIZE_T
+        lpStartAddress: LPTHREAD_START_ROUTINE
+        lpParameter: LPVOID
+        dwCreationFlags: DWORD
+        lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST
+        lpThreadId: LPDWORD
+      ReturnValue: HANDLE
+    Thread32First:
+      Parameters:
+        hSnapshot: HANDLE
+        lpte: LPTHREADENTRY32
+      ReturnValue: BOOL
+    Thread32Next:
+      Parameters:
+        hSnapshot: HANDLE
+        lpte: LPTHREADENTRY32
+      ReturnValue: BOOL
+    CloseHandle:
+      Parameters:
+        hObject: HANDLE
+      ReturnValue: BOOL
+    GetModuleFileNameA:
+      Parameters:
+        hModule: HMODULE
+        lpFilename: LPSTR
+        nSize: DWORD
+      ReturnValue: DWORD
+      ReturnParameters:
+        - lpFilename
+    GetModuleFileNameW:
+      Parameters:
+        hModule: HMODULE
+        lpFilename: LPWSTR
+        nSize: DWORD
+      ReturnValue: DWORD
+      ReturnParameters:
+        - lpFilename
+    GetModuleHandleA:
+      Parameters:
+        lpModuleName: LPCSTR
+      ReturnValue: HMODULE
+    GetModuleHandleW:
+      Parameters:
+        lpModuleName: LPCWSTR
+      ReturnValue: HMODULE
+    GetModuleHandleExA:
+      Parameters:
+        dwFlags: DWORD
+        lpModuleName: LPCSTR
+        phModule: HMODULE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - phModule
+    GetModuleHandleExW:
+      Parameters:
+        dwFlags: DWORD
+        lpModuleName: LPCWSTR
+        phModule: HMODULE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - phModule
+    GetProcAddress:
+      Parameters:
+        hModule: HMODULE
+        lpProcName: LPCSTR
+      ReturnValue: FARPROC
+    LoadLibraryA:
+      Parameters:
+        lpFileName: LPCSTR
+      ReturnValue: HMODULE
+    LoadLibraryW:
+      Parameters:
+        lpFileName: LPCWSTR
+      ReturnValue: HMODULE
+    LoadLibraryExA:
+      Parameters:
+        lpFileName: LPCSTR
+        hFile: HANDLE
+        dwFlags: DWORD
+      ReturnValue: HMODULE
+    LoadLibraryExW:
+      Parameters:
+        lpFileName: LPCWSTR
+        hFile: HANDLE
+        dwFlags: DWORD
+      ReturnValue: HMODULE
+    CopyFileExA:
+      Parameters:
+        lpExistingFileName: LPCSTR
+        lpNewFileName: LPCSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        pbCancel: LPBOOL
+        dwCopyFlags: DWORD
+      ReturnValue: BOOL
+    CopyFileTransactedA:
+      Parameters:
+        lpExistingFileName: LPCSTR
+        lpNewFileName: LPCSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        pbCancel: LPBOOL
+        dwCopyFlags: DWORD
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    CopyFileTransactedW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        pbCancel: LPBOOL
+        dwCopyFlags: DWORD
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    CreateFileA:
+      Parameters:
+        lpFileName: LPCSTR
+        dwDesiredAccess: DWORD
+        dwShareMode: DWORD
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        dwCreationDisposition: DWORD
+        dwFlagsAndAttributes: DWORD
+        hTemplateFile: HANDLE
+      ReturnValue: HANDLE
+    CreateFileW:
+      Parameters:
+        lpFileName: LPCWSTR
+        dwDesiredAccess: DWORD
+        dwShareMode: DWORD
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        dwCreationDisposition: DWORD
+        dwFlagsAndAttributes: DWORD
+        hTemplateFile: HANDLE
+      ReturnValue: HANDLE
+    CreateFileTransactedA:
+      Parameters:
+        lpFileName: LPCSTR
+        dwDesiredAccess: DWORD
+        dwShareMode: DWORD
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        dwCreationDisposition: DWORD
+        dwFlagsAndAttributes: DWORD
+        hTemplateFile: HANDLE
+        pusMiniVersion: HANDLE
+        hTransaction: PUSHORT
+        pExtendedParameter: PVOID
+      ReturnValue: HANDLE
+    CreateFileTransactedW:
+      Parameters:
+        lpFileName: LPCWSTR
+        dwDesiredAccess: DWORD
+        dwShareMode: DWORD
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        dwCreationDisposition: DWORD
+        dwFlagsAndAttributes: DWORD
+        hTemplateFile: HANDLE
+        pusMiniVersion: HANDLE
+        hTransaction: PUSHORT
+        pExtendedParameter: PVOID
+      ReturnValue: HANDLE
+    DeleteFileA:
+      Parameters:
+        lpNewFileName: LPCSTR
+      ReturnValue: BOOL
+    DeleteFileTransactedA:
+      Parameters:
+        lpNewFileName: LPCSTR
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    DeleteFileTransactedW:
+      Parameters:
+        lpNewFileName: LPCWSTR
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    FindFirstFileA:
+      Parameters:
+        lpFileName: LPCSTR
+        lpFindFileData: DEFAULT
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    FindFirstFileW:
+      Parameters:
+        lpFileName: LPCWSTR
+        lpFindFileData: DEFAULT
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    FindNextFileA:
+      Parameters:
+        hFindFile: HANDLE
+        lpFindFileData: DEFAULT
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFindFileData
+    FindNextFileW:
+      Parameters:
+        hFindFile: HANDLE
+        lpFindFileData: DEFAULT
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFindFileData
+    GetFileAttributesA:
+      Parameters:
+        lpFileName: LPCSTR
+      ReturnValue: DWORD
+    GetFileAttributesExA:
+      Parameters:
+        lpFileName: LPCSTR
+        fInfoLevelId: GET_FILEEX_INFO_LEVELS
+        lpFileInformation: LPVOID
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFileInformation
+    GetFileAttributesTransactedA:
+      Parameters:
+        lpFileName: LPCSTR
+        fInfoLevelId: GET_FILEEX_INFO_LEVELS
+        lpFileInformation: LPVOID
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFileInformation
+        - hTransaction
+    GetFileAttributesTransactedW:
+      Parameters:
+        lpFileName: LPCSTR
+        fInfoLevelId: GET_FILEEX_INFO_LEVELS
+        lpFileInformation: LPVOID
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFileInformation
+        - hTransaction
+    GetShortPathNameA:
+      Parameters:
+        lpszLongPath: LPCSTR
+        lpszShortPath: LPSTR
+        cchBuffer: DWORD
+      ReturnValue: DWORD
+    GetTempPathA:
+      Parameters:
+        nBufferLength: DWORD
+        lpBuffer: LPSTR
+      ReturnValue: DWORD
+    MoveFileA:
+      Parameters:
+        lpExistingFileName: LPCSTR
+        lpNewFileName: LPCSTR
+      ReturnValue: BOOL
+    MoveFileW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+      ReturnValue: BOOL
+    MoveFileExA:
+      Parameters:
+        lpExistingFileName: LPCSTR
+        lpNewFileName: LPCSTR
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    MoveFileExW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    MoveFileTransactedA:
+      Parameters:
+        lpExistingFileName: LPCSTR
+        lpNewFileName: LPCSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        dwFlags: DWORD
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    MoveFileTransactedW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        dwFlags: DWORD
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    MoveFileWithProgressA:
+      Parameters:
+        lpExistingFileName: LPCSTR
+        lpNewFileName: LPCSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    ReadFile:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPVOID
+        nNumberOfBytesToRead: DWORD
+        lpNumberOfBytesRead: LPDWORD
+        lpOverlapped: LPOVERLAPPED
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpBuffer
+        - lpNumberOfBytesRead
+    ReadFileEx:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPVOID
+        nNumberOfBytesToRead: DWORD
+        lpOverlapped: LPOVERLAPPED
+        lpCompletionRoutine: LPOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpBuffer
+    SearchPathA:
+      Parameters:
+        lpPath: LPCSTR
+        lpFileName: LPCSTR
+        lpExtension: LPCSTR
+        nBufferLength: DWORD
+        lpBuffer: LPSTR
+        lpFilePart: LPSTR
+      ReturnValue: DWORD
+    SetFileAttributesA:
+      Parameters:
+        lpFileName: LPCSTR
+        dwFileAttributes: DWORD
+      ReturnValue: BOOL
+    SetFileAttributesTransactedA:
+      Parameters:
+        lpFileName: LPCSTR
+        dwFileAttributes: DWORD
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    SetFileAttributesTransactedW:
+      Parameters:
+        lpFileName: LPCWSTR
+        dwFileAttributes: DWORD
+        hTransaction: HANDLE
+      ReturnValue: BOOL
+    WriteFile:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPCVOID
+        nNumberOfBytesToWrite: DWORD
+        lpNumberOfBytesWritten: LPDWORD
+        lpOverlapped: LPOVERLAPPED
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpNumberOfBytesWritten
+    WriteFileEx:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPCVOID
+        nNumberOfBytesToWrite: DWORD
+        lpOverlapped: LPOVERLAPPED
+        lpCompletionRoutine: LPOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: BOOL
+    VirtualAlloc:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flAllocationType: DWORD
+        flProtect: DWORD
+      ReturnValue: LPVOID
+    VirtualAllocEx:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flAllocationType: DWORD
+        flProtect: DWORD
+      ReturnValue: LPVOID
+    VirtualAllocExNuma:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flAllocationType: DWORD
+        flProtect: DWORD
+        nndPreferred: DWORD
+      ReturnValue: LPVOID
+    VirtualFree:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        dwFreeType: DWORD
+      ReturnValue: BOOL
+    VirtualFreeEx:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        dwFreeType: DWORD
+      ReturnValue: BOOL
+    VirtualLock:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+      ReturnValue: BOOL
+    VirtualProtect:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flNewProtect: DWORD
+        lpflOldProtect: PDWORD
+      ReturnValue: BOOL
+    VirtualProtectEx:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flNewProtect: DWORD
+        lpflOldProtect: PDWORD
+      ReturnValue: BOOL
+    VirtualUnlock:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+      ReturnValue: BOOL
+    ExitProcess:
+      Parameters:
+        uExitCode: UINT
+      ReturnValue: VOID
+    GetCurrentProcess:
+      ReturnValue: HANDLE
+    GetProcessId:
+      Parameters:
+        Process: HANDLE
+      ReturnValue: DWORD
+    OpenProcess:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        dwProcessId: DWORD
+      ReturnValue: HANDLE
+    Process32First:
+      Parameters:
+        hSnapshot: HANDLE
+        lppe: LPPROCESSENTRY32
+      ReturnValue: BOOL
+    Process32FirstW:
+      Parameters:
+        hSnapshot: HANDLE
+        lppe: LPPROCESSENTRY32W
+      ReturnValue: BOOL
+    Process32Next:
+      Parameters:
+        hSnapshot: HANDLE
+        lppe: LPPROCESSENTRY32
+      ReturnValue: BOOL
+    Process32NextW:
+      Parameters:
+        hSnapshot: HANDLE
+        lppe: LPPROCESSENTRY32W
+      ReturnValue: BOOL
+    OpenThread:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        dwThreadId: DWORD
+      ReturnValue: HANDLE
+    ResumeThread:
+      Parameters:
+        hThread: HANDLE
+      ReturnValue: DWORD
+    SuspendThread:
+      Parameters:
+        hThread: HANDLE
+      ReturnValue: DWORD
+    GetThreadContext:
+      Parameters:
+        dwDesiredAccess: HANDLE
+        lpContext: LPCONTEXT
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpContext
+    SetThreadContext:
+      Parameters:
+        dwDesiredAccess: HANDLE
+        lpContext: CONTEXT
+      ReturnValue: BOOL
+    CreateEventA:
+      Parameters:
+        lpEventAttributes: LPSECURITY_ATTRIBUTES
+        bManualReset: BOOL
+        bInitialState: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    CreateEventW:
+      Parameters:
+        dwDesiredAccess: LPSECURITY_ATTRIBUTES
+        bManualReset: BOOL
+        bInitialState: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateEventExA:
+      Parameters:
+        lpEventAttributes: LPSECURITY_ATTRIBUTES
+        lpName: LPCSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    CreateEventExW:
+      Parameters:
+        lpEventAttributes: LPSECURITY_ATTRIBUTES
+        lpName: LPCWSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    OpenEventA:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    OpenEventW:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateMutexA:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        bInitialOwner: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    CreateMutexW:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        bInitialOwner: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateMutexExA:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        lpName: LPCSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    CreateMutexExW:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        lpName: LPCWSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    OpenMutexA:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    OpenMutexW:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    ReleaseMutex:
+      Parameters:
+        hMutex: HANDLE
+      ReturnValue: BOOL
+    CreateSemaphoreA:
+      Parameters:
+        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES
+        lInitialCount: long
+        lMaximumCount: long
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    CreateSemaphoreW:
+      Parameters:
+        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES
+        lInitialCount: long
+        lMaximumCount: long
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateSemaphoreExA:
+      Parameters:
+        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES
+        lInitialCount: long
+        lMaximumCount: long
+        lpName: LPCSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    CreateSemaphoreExW:
+      Parameters:
+        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES
+        lInitialCount: long
+        lMaximumCount: long
+        lpName: LPCWSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    OpenSemaphoreA:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    OpenSemaphoreW:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    RegOpenKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegOpenKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        Reserved: DWORD
+        lpClass: LPSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        Reserved: DWORD
+        lpClass: LPWSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegEnumKeyExA:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpName: LPSTR
+        lpcName: LPDWORD
+        lpReserved: LPDWORD
+        lpClass: LPSTR
+        lpcClass: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpName
+    RegEnumKeyExW:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpName: LPWSTR
+        lpcName: LPDWORD
+        lpReserved: LPDWORD
+        lpClass: LPWSTR
+        lpcClass: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpName
+    RegEnumValueA:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpValueName: LPSTR
+        lpcchValueName: LPDWORD
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValueName
+    RegEnumValueW:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpValueName: LPWSTR
+        lpcchValueName: LPDWORD
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValueName
+    RegSetValueExA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        Reserved: DWORD
+        dwType: DWORD
+        lpData: BYTE
+        cbData: DWORD
+      ReturnValue: LONG
+    RegSetValueExW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        Reserved: DWORD
+        dwType: DWORD
+        lpData: BYTE
+        cbData: DWORD
+      ReturnValue: LONG
+    RegQueryValueExA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+    RegQueryValueExW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+    RegDeleteValueA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+      ReturnValue: LONG
+    RegDeleteValueW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+      ReturnValue: LONG
+    RegQueryInfoKeyA:
+      Parameters:
+        hKey: HKEY
+        lpClass: LPSTR
+        lpcClass: LPDWORD
+        lpReserved: LPDWORD
+        lpcSubKeys: LPDWORD
+        lpcMaxSubKeyLen: LPDWORD
+        lpcMaxClassLen: LPDWORD
+        lpcValues: LPDWORD
+        lpcMaxValueNameLen: LPDWORD
+        lpcMaxValueLen: LPDWORD
+        lpcbSecurityDescriptor: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+    RegQueryInfoKeyW:
+      Parameters:
+        hKey: HKEY
+        lpClass: LPWSTR
+        lpcClass: LPDWORD
+        lpReserved: LPDWORD
+        lpcSubKeys: LPDWORD
+        lpcMaxSubKeyLen: LPDWORD
+        lpcMaxClassLen: LPDWORD
+        lpcValues: LPDWORD
+        lpcMaxValueNameLen: LPDWORD
+        lpcMaxValueLen: LPDWORD
+        lpcbSecurityDescriptor: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+    RegCloseKey:
+      Parameters:
+        hKey: HKEY
+      ReturnValue: LONG
+    RegDeleteKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+      ReturnValue: LONG
+    RegDeleteKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+      ReturnValue: LONG
+    RegDeleteTreeA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+      ReturnValue: LONG
+    RegDeleteTreeW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+      ReturnValue: LONG
+    RegGetValueA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        lpValue: LPCSTR
+        dwFlags: DWORD
+        pdwType: LPDWORD
+        pvData: PVOID
+        pcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - pvData
+    RegGetValueW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        lpValue: LPCWSTR
+        dwFlags: DWORD
+        pdwType: LPDWORD
+        pvData: PVOID
+        pcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - pvData
+    RegOpenUserClassesRoot:
+      Parameters:
+        hToken: HANDLE
+        dwOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    WaitForSingleObject:
+      Parameters:
+        hHandle: HANDLE
+        dwMilliseconds: DWORD
+      ReturnValue: DWORD
+    WaitForSingleObjectEx:
+      Parameters:
+        hHandle: HANDLE
+        dwMilliseconds: DWORD
+        bAlertable: BOOL
+      ReturnValue: DWORD
+    WaitForMultipleObjects:
+      Parameters:
+        nCount: DWORD
+        lpHandles: LPVOID
+        bWaitAll: BOOL
+        dwMilliseconds: DWORD
+      ReturnValue: DWORD
+    WaitForMultipleObjectsEx:
+      Parameters:
+        nCount: DWORD
+        lpHandles: LPVOID
+        bWaitAll: BOOL
+        dwMilliseconds: DWORD
+        bAlertable: BOOL
+      ReturnValue: DWORD
+    OpenFile:
+      Parameters:
+        lpFileName: LPCSTR
+        lpReOpenBuff: LPVOID
+        uStyle: UINT
+      ReturnValue: HFILE
+  KernelBase.dll:
+    Sleep:
+      Parameters:
+        dwMilliseconds: DWORD
+      ReturnValue: DWORD
+    GetLastError:
+      ReturnValue: DWORD
+    SetUnhandledExceptionFilter:
+      Parameters:
+        lpTopLevelExceptionFilter: LPTOP_LEVEL_EXCEPTION_FILTER
+      ReturnValue: LPTOP_LEVEL_EXCEPTION_FILTER
+    CreateDirectoryW:
+      Parameters:
+        lpPathName: LPWSTR
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+      ReturnValue: BOOL
+    CreateDirectoryExW:
+      Parameters:
+        lpTemplateDirectory: LPWSTR
+        lpNewDirectory: LPWSTR
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+      ReturnValue: BOOL
+    CreateProcessA:
+      Parameters:
+        lpApplicationName: LPCSTR
+        lpCommandLine: LPSTR
+        lpProcessAttributes: LPSECURITY_ATTRIBUTES
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        bInheritHandles: BOOL
+        dwCreationFlags: DWORD
+        lpEnvironment: LPVOID
+        lpCurrentDirectory: LPCSTR
+        lpStartupInfo: LPSTARTUPINFOA
+        lpProcessInformation: LPPROCESS_INFORMATION
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpProcessInformation
+    CreateProcessW:
+      Parameters:
+        lpApplicationName: LPCWSTR
+        lpCommandLine: LPWSTR
+        lpProcessAttributes: LPSECURITY_ATTRIBUTES
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        bInheritHandles: BOOL
+        dwCreationFlags: DWORD
+        lpEnvironment: LPVOID
+        lpCurrentDirectory: LPCWSTR
+        lpStartupInfo: LPSTARTUPINFOW
+        lpProcessInformation: LPPROCESS_INFORMATION
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpApplicationName
+        - lpCurrentDirectory
+        - lpProcessInformation
+    RemoveDirectoryA:
+      Parameters:
+        lpPathName: LPCSTR
+      ReturnValue: BOOL
+    RemoveDirectoryW:
+      Parameters:
+        lpPathName: LPCWSTR
+      ReturnValue: BOOL
+    MoveFileWithProgressW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    FindFirstFileExA:
+      Parameters:
+        lpFileName: LPCSTR
+        fInfoLevelId: FINDEX_INFO_LEVELS
+        lpFindFileData: LPVOID
+        fSearchOp: FINDEX_SEARCH_OPS
+        lpSearchFilter: LPVOID
+        dwAdditionalFlags: DWORD
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    FindFirstFileExW:
+      Parameters:
+        lpFileName: LPCWSTR
+        fInfoLevelId: FINDEX_INFO_LEVELS
+        lpFindFileData: LPVOID
+        fSearchOp: FINDEX_SEARCH_OPS
+        lpSearchFilter: LPVOID
+        dwAdditionalFlags: DWORD
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    CopyFileW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        bFailIfExists: BOOL
+      ReturnValue: BOOL
+    CopyFileExW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        lpProgressRoutine: LPPROGRESS_ROUTINE
+        lpData: LPVOID
+        pbCancel: LPBOOL
+        dwCopyFlags: DWORD
+      ReturnValue: BOOL
+    DeleteFileW:
+      Parameters:
+        lpFileName: LPCWSTR
+      ReturnValue: BOOL
+    GetFileType:
+      Parameters:
+        hFile: HANDLE
+      ReturnValue: DWORD
+    GetFileSize:
+      Parameters:
+        hFile: HANDLE
+        lpFileSizeHigh: LPDWORD
+      ReturnValue: DWORD
+    GetFileSizeEx:
+      Parameters:
+        hFile: HANDLE
+        lpFileSize: PLARGE_INTEGER
+      ReturnValue: BOOL
+    GetFileInformationByHandle:
+      Parameters:
+        hFile: HANDLE
+        lpFIleInformation: LPBY_HANDLE_FILE_INFORMATION
+      ReturnValue: BOOL
+    GetFileInformationByHandleEx:
+      Parameters:
+        hFile: HANDLE
+        FileInformationClass: FILE_INFO_BY_HANDLE_CLASS
+        lpFIleInformation: LPVOID
+        dwBufferSize: DWORD
+      ReturnValue: BOOL
+    SetFilePointer:
+      Parameters:
+        hFile: HANDLE
+        lDistanceToMove: LONG
+        lpDistanceToMoveHigh: PLONG
+        dwMoveMethod: DWORD
+      ReturnValue: DWORD
+    SetFilePointerEx:
+      Parameters:
+        hFile: HANDLE
+        liDistanceToMove: LARGE_INTEGER
+        lpNewFilePointer: PLARGE_INTEGER
+        dwMoveMethod: DWORD
+      ReturnValue: BOOL
+    SetFileInformationByHandle:
+      Parameters:
+        hFile: HANDLE
+        FileInformationClass: FILE_INFO_BY_HANDLE_CLASS
+        lpFileInformation: LPVOID
+        dwBufferSize: DWORD
+      ReturnValue: BOOL
+    DeviceIoControl:
+      Parameters:
+        hDevice: HANDLE
+        dwIoControlCode: DWORD
+        lpInBuffer: LPVOID
+        nInBufferSize: DWORD
+        lpOutBuffer: LPVOID
+        nOutBufferSize: DWORD
+        lpBytesReturned: LPDWORD
+        lpOverlapped: LPOVERLAPPED
+      ReturnValue: BOOL
+    GetSystemDirectoryA:
+      Parameters:
+        lpBuffer: LPSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetSystemDirectoryW:
+      Parameters:
+        lpBuffer: LPWSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetSystemWindowsDirectoryA:
+      Parameters:
+        lpBuffer: LPSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetSystemWindowsDirectoryW:
+      Parameters:
+        lpBuffer: LPWSTR
+        uSize: UINT
+      ReturnValue: UINT
+    GetTempPathW:
+      Parameters:
+        nBufferLength: DWORD
+        lpBuffer: LPWSTR
+      ReturnValue: DWORD
+    SetFileAttributesW:
+      Parameters:
+        lpFileName: LPCWSTR
+        dwFileAttributes: DWORD
+      ReturnValue: BOOL
+    GetFileAttributesW:
+      Parameters:
+        lpFileName: LPCWSTR
+      ReturnValue: DWORD
+    GetFileAttributesExW:
+      Parameters:
+        lpFileName: LPCWSTR
+        fInfoLevelId: GET_FILEEX_INFO_LEVELS
+        lpFileInformation: LPVOID
+      ReturnValue: BOOL
+    SetEndOfFile:
+      Parameters:
+        hFile: HANDLE
+      ReturnValue: BOOL
+    GetVolumeNameForVolumeMountPointW:
+      Parameters:
+        lpszVolumeMountPoint: LPCWSTR
+        lpszVolumeName: LPWSTR
+        cchBufferLength: DWORD
+      ReturnValue: BOOL
+    GetVolumePathNamesForVolumeNameW:
+      Parameters:
+        lpszVolumeName: LPCWSTR
+        lpszVolumePathNames: LPWSTR
+        cchBufferLength: DWORD
+        lpcchReturnLength: PDWORD
+      ReturnValue: BOOL
+    GetVolumePathNameW:
+      Parameters:
+        lpszFileName: LPCWSTR
+        lpszVolumePathName: LPWSTR
+        cchBufferLength: DWORD
+      ReturnValue: BOOL
+    GetShortPathNameW:
+      Parameters:
+        lpszLongPath: LPCWSTR
+        lpszShortPath: LPWSTR
+        cchBuffer: DWORD
+      ReturnValue: DWORD
+    SearchPathW:
+      Parameters:
+        lpPath: LPCWSTR
+        lpFileName: LPCWSTR
+        lpExtension: LPCWSTR
+        nBufferLength: DWORD
+        lpBuffer: LPWSTR
+        lpFilePart: LPWSTR
+      ReturnValue: DWORD
+    SetFileTime:
+      Parameters:
+        hFile: HANDLE
+        lpCreationTime: FILETIME
+        lpLastAccessTime: FILETIME
+        lpLastWriteTime: FILETIME
+      ReturnValue: BOOL
+    GetDiskFreeSpaceW:
+      Parameters:
+        lpRootPathName: LPCWSTR
+        lpSectorsPerCluster: LPDWORD
+        lpBytesPerSector: LPDWORD
+        lpNumberOfFreeClusters: LPDWORD
+        lpTotalNumberOfClusters: LPDWORD
+      ReturnValue: BOOL
+    GetDiskFreeSpaceExW:
+      Parameters:
+        lpDirectoryName: LPCWSTR
+        lpFreeBytesAvailable: PULARGE_INTEGER
+        lpTotalNumberOfBytes: PULARGE_INTEGER
+        lpTotalNumberOfFreeBytes: PULARGE_INTEGER
+      ReturnValue: BOOL
+    WriteConsoleA:
+      Parameters:
+        hConsoleOutput: HANDLE
+        lpBuffer: VOID
+        nNumberOfCharsToWrite: DWORD
+        lpNumberOfCharsWritten: LPDWORD
+        lpReseverd: LPVOID
+      ReturnValue: BOOL
+    WriteConsoleW:
+      Parameters:
+        hConsoleOutput: HANDLE
+        lpBuffer: VOID
+        nNumberOfCharsToWrite: DWORD
+        lpNumberOfCharsWritten: LPDWORD
+        lpReseverd: LPVOID
+      ReturnValue: BOOL
+    GetTimeZoneInformation:
+      Parameters:
+        lpTimeZoneInformation: LPTIME_ZONE_INFORMATION
+      ReturnValue: DWORD
+    CreateActCtxW:
+      Parameters:
+        pActCtx: PACTCTX
+      ReturnValue: HANDLE
+    CreateProcessInternalW:
+      Parameters:
+        lpUnknown1: LPVOID
+        lpApplicationName: LPWSTR
+        lpCommandLine: LPWSTR
+        lpProcessAttributes: LPSECURITY_ATTRIBUTES
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        bInheritHandles: BOOL
+        dwCreationFlags: DWORD
+        lpEnvironment: LPVOID
+        lpCurrentDirectory: LPWSTR
+        lpStartupInfo: LPSTARTUPINFO
+        lpProcessInformation: LPPROCESS_INFORMATION
+        lpUnknown2: LPVOID
+      ReturnValue: BOOL
+    ReadProcessMemory:
+      Parameters:
+        hProcess: HANDLE
+        lpBaseAddress: LPCVOID
+        lpBuffer: LPVOID
+        nSize: SIZE_T
+        lpNumberOfBytesRead: SIZE_T
+      ReturnValue: BOOL
+    WriteProcessMemory:
+      Parameters:
+        hProcess: HANDLE
+        lpBaseAddress: LPVOID
+        lpBuffer: LPCVOID
+        nSize: SIZE_T
+        lpNumberOfBytesWritten: SIZE_T
+      ReturnValue: BOOL
+    FindResourceW:
+      Parameters:
+        hModule: HMODULE
+        lpName: LPCWSTR
+        lpType: LPCWSTR
+      ReturnValue: HRSRC
+    FindResourceExW:
+      Parameters:
+        hModule: HMODULE
+        lpName: LPCWSTR
+        lpType: LPCWSTR
+        wLanguage: WORD
+      ReturnValue: HRSRC
+    LoadResource:
+      Parameters:
+        hModule: HMODULE
+        hResInfo: HRSRC
+      ReturnValue: HGLOBAL
+    SizeofResource:
+      Parameters:
+        hModule: HMODULE
+        hResInfo: HRSRC
+      ReturnValue: DWORD
+    GetLocalTime:
+      Parameters:
+        lpSystemTime: LPSYSTEMTIME
+      ReturnValue: void
+    GetSystemTime:
+      Parameters:
+        lpSystemTime: LPSYSTEMTIME
+      ReturnValue: void
+    GetTickCount:
+      Parameters:
+        lpSystemTimeAsFileTime: LPFILETIME
+      ReturnValue: DWORD
+    OutputDebugStringA:
+      Parameters:
+        lpOutputString: LPCSTR
+      ReturnValue: void
+    IsDebuggerPresent:
+      ReturnValue: BOOL
+    GetSystemInfo:
+      Parameters:
+        lpSystemInfo: LPSYSTEM_INFO
+      ReturnValue: void
+    GetNativeSystemInfo:
+      Parameters:
+        lpSystemInfo: LPSYSTEM_INFO
+      ReturnValue: void
+    SetErrorMode:
+      Parameters:
+        uMode: UINT
+      ReturnValue: UINT
+    GlobalMemoryStatusEx:
+      Parameters:
+        lpBuffer: LPMEMORYSTATUSEX
+      ReturnValue: BOOL
+    CreateThread:
+      Parameters:
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        dwStackSize: SIZE_T
+        lpStartAddress: LPTHREAD_START_ROUTINE
+        lpParameter: LPVOID
+        dwCreationFlags: DWORD
+        lpThreadId: LPDWORD
+      ReturnValue: HANDLE
+    CreateRemoteThread:
+      Parameters:
+        hProcess: HANDLE
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        dwStackSize: SIZE_T
+        lpStartAddress: LPTHREAD_START_ROUTINE
+        lpParameter: LPVOID
+        dwCreationFlags: DWORD
+        lpThreadId: LPDWORD
+      ReturnValue: HANDLE
+    CreateRemoteThreadEx:
+      Parameters:
+        hProcess: HANDLE
+        lpThreadAttributes: LPSECURITY_ATTRIBUTES
+        dwStackSize: SIZE_T
+        lpStartAddress: LPTHREAD_START_ROUTINE
+        lpParameter: LPVOID
+        dwCreationFlags: DWORD
+        lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST
+        lpThreadId: LPDWORD
+      ReturnValue: HANDLE
+    CloseHandle:
+      Parameters:
+        hObject: HANDLE
+      ReturnValue: BOOL
+    GetModuleFileNameA:
+      Parameters:
+        hModule: HMODULE
+        lpFilename: LPSTR
+        nSize: DWORD
+      ReturnValue: DWORD
+      ReturnParameters:
+        - lpFilename
+    GetModuleFileNameW:
+      Parameters:
+        hModule: HMODULE
+        lpFilename: LPWSTR
+        nSize: DWORD
+      ReturnValue: DWORD
+      ReturnParameters:
+        - lpFilename
+    GetModuleHandleA:
+      Parameters:
+        lpModuleName: LPCSTR
+      ReturnValue: HMODULE
+    GetModuleHandleW:
+      Parameters:
+        lpModuleName: LPCWSTR
+      ReturnValue: HMODULE
+    GetModuleHandleExA:
+      Parameters:
+        dwFlags: DWORD
+        lpModuleName: LPCSTR
+        phModule: HMODULE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - phModule
+    GetModuleHandleExW:
+      Parameters:
+        dwFlags: DWORD
+        lpModuleName: LPCWSTR
+        phModule: HMODULE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - phModule
+    GetProcAddress:
+      Parameters:
+        hModule: HMODULE
+        lpProcName: LPCSTR
+      ReturnValue: FARPROC
+    LoadLibraryA:
+      Parameters:
+        lpFileName: LPCSTR
+      ReturnValue: HMODULE
+    LoadLibraryW:
+      Parameters:
+        lpFileName: LPCWSTR
+      ReturnValue: HMODULE
+    LoadLibraryExA:
+      Parameters:
+        lpFileName: LPCSTR
+        hFile: HANDLE
+        dwFlags: DWORD
+      ReturnValue: HMODULE
+    LoadLibraryExW:
+      Parameters:
+        lpFileName: LPCWSTR
+        hFile: HANDLE
+        dwFlags: DWORD
+      ReturnValue: HMODULE
+    CreateFileA:
+      Parameters:
+        lpFileName: LPCSTR
+        dwDesiredAccess: DWORD
+        dwShareMode: DWORD
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        dwCreationDisposition: DWORD
+        dwFlagsAndAttributes: DWORD
+        hTemplateFile: HANDLE
+      ReturnValue: HANDLE
+    CreateFileW:
+      Parameters:
+        lpFileName: LPCWSTR
+        dwDesiredAccess: DWORD
+        dwShareMode: DWORD
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        dwCreationDisposition: DWORD
+        dwFlagsAndAttributes: DWORD
+        hTemplateFile: HANDLE
+      ReturnValue: HANDLE
+    DeleteFileA:
+      Parameters:
+        lpNewFileName: LPCSTR
+      ReturnValue: BOOL
+    FindFirstFileA:
+      Parameters:
+        lpFileName: LPCSTR
+        lpFindFileData: DEFAULT
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    FindFirstFileW:
+      Parameters:
+        lpFileName: LPCWSTR
+        lpFindFileData: DEFAULT
+      ReturnValue: HANDLE
+      ReturnParameters:
+        - lpFindFileData
+    FindNextFileA:
+      Parameters:
+        hFindFile: HANDLE
+        lpFindFileData: DEFAULT
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFindFileData
+    FindNextFileW:
+      Parameters:
+        hFindFile: HANDLE
+        lpFindFileData: DEFAULT
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFindFileData
+    GetFileAttributesA:
+      Parameters:
+        lpFileName: LPCSTR
+      ReturnValue: DWORD
+    GetFileAttributesExA:
+      Parameters:
+        lpFileName: LPCSTR
+        fInfoLevelId: GET_FILEEX_INFO_LEVELS
+        lpFileInformation: LPVOID
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpFileInformation
+    GetTempPathA:
+      Parameters:
+        nBufferLength: DWORD
+        lpBuffer: LPSTR
+      ReturnValue: DWORD
+    MoveFileExW:
+      Parameters:
+        lpExistingFileName: LPCWSTR
+        lpNewFileName: LPCWSTR
+        dwFlags: DWORD
+      ReturnValue: BOOL
+    ReadFile:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPVOID
+        nNumberOfBytesToRead: DWORD
+        lpNumberOfBytesRead: LPDWORD
+        lpOverlapped: LPOVERLAPPED
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpBuffer
+        - lpNumberOfBytesRead
+    ReadFileEx:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPVOID
+        nNumberOfBytesToRead: DWORD
+        lpOverlapped: LPOVERLAPPED
+        lpCompletionRoutine: LPOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpBuffer
+    SearchPathA:
+      Parameters:
+        lpPath: LPCSTR
+        lpFileName: LPCSTR
+        lpExtension: LPCSTR
+        nBufferLength: DWORD
+        lpBuffer: LPSTR
+        lpFilePart: LPSTR
+      ReturnValue: DWORD
+    SetFileAttributesA:
+      Parameters:
+        lpFileName: LPCSTR
+        dwFileAttributes: DWORD
+      ReturnValue: BOOL
+    WriteFile:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPCVOID
+        nNumberOfBytesToWrite: DWORD
+        lpNumberOfBytesWritten: LPDWORD
+        lpOverlapped: LPOVERLAPPED
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpNumberOfBytesWritten
+    WriteFileEx:
+      Parameters:
+        hFile: HANDLE
+        lpBuffer: LPCVOID
+        nNumberOfBytesToWrite: DWORD
+        lpOverlapped: LPOVERLAPPED
+        lpCompletionRoutine: LPOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: BOOL
+    VirtualAlloc:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flAllocationType: DWORD
+        flProtect: DWORD
+      ReturnValue: LPVOID
+    VirtualAllocEx:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flAllocationType: DWORD
+        flProtect: DWORD
+      ReturnValue: LPVOID
+    VirtualAllocExNuma:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flAllocationType: DWORD
+        flProtect: DWORD
+        nndPreferred: DWORD
+      ReturnValue: LPVOID
+    VirtualFree:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        dwFreeType: DWORD
+      ReturnValue: BOOL
+    VirtualFreeEx:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        dwFreeType: DWORD
+      ReturnValue: BOOL
+    VirtualLock:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+      ReturnValue: BOOL
+    VirtualProtect:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flNewProtect: DWORD
+        lpflOldProtect: PDWORD
+      ReturnValue: BOOL
+    VirtualProtectEx:
+      Parameters:
+        hProcess: HANDLE
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+        flNewProtect: DWORD
+        lpflOldProtect: PDWORD
+      ReturnValue: BOOL
+    VirtualUnlock:
+      Parameters:
+        lpAddress: LPVOID
+        dwSize: SIZE_T
+      ReturnValue: BOOL
+    ExitProcess:
+      Parameters:
+        uExitCode: UINT
+      ReturnValue: VOID
+    GetCurrentProcess:
+      ReturnValue: HANDLE
+    GetProcessId:
+      Parameters:
+        Process: HANDLE
+      ReturnValue: DWORD
+    OpenProcess:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        dwProcessId: DWORD
+      ReturnValue: HANDLE
+    OpenThread:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        dwThreadId: DWORD
+      ReturnValue: HANDLE
+    ResumeThread:
+      Parameters:
+        hThread: HANDLE
+      ReturnValue: DWORD
+    SuspendThread:
+      Parameters:
+        hThread: HANDLE
+      ReturnValue: DWORD
+    GetThreadContext:
+      Parameters:
+        dwDesiredAccess: HANDLE
+        lpContext: LPCONTEXT
+      ReturnValue: BOOL
+      ReturnParameters:
+        - lpContext
+    SetThreadContext:
+      Parameters:
+        dwDesiredAccess: HANDLE
+        lpContext: CONTEXT
+      ReturnValue: BOOL
+    CreateEventA:
+      Parameters:
+        lpEventAttributes: LPSECURITY_ATTRIBUTES
+        bManualReset: BOOL
+        bInitialState: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    CreateEventW:
+      Parameters:
+        dwDesiredAccess: LPSECURITY_ATTRIBUTES
+        bManualReset: BOOL
+        bInitialState: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateEventExA:
+      Parameters:
+        lpEventAttributes: LPSECURITY_ATTRIBUTES
+        lpName: LPCSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    OpenEventA:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    OpenEventW:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateMutexA:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        bInitialOwner: BOOL
+        lpName: LPCSTR
+      ReturnValue: HANDLE
+    CreateMutexW:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        bInitialOwner: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateMutexExA:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        lpName: LPCSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    CreateMutexExW:
+      Parameters:
+        lpMutexAttributes: LPSECURITY_ATTRIBUTES
+        lpName: LPCWSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    OpenMutexW:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    ReleaseMutex:
+      Parameters:
+        hMutex: HANDLE
+      ReturnValue: BOOL
+    CreateSemaphoreW:
+      Parameters:
+        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES
+        lInitialCount: long
+        lMaximumCount: long
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    CreateSemaphoreExW:
+      Parameters:
+        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES
+        lInitialCount: long
+        lMaximumCount: long
+        lpName: LPCWSTR
+        dwFlags: DWORD
+        dwDesiredAccess: DWORD
+      ReturnValue: HANDLE
+    OpenSemaphoreW:
+      Parameters:
+        dwDesiredAccess: DWORD
+        bInheritHandle: BOOL
+        lpName: LPCWSTR
+      ReturnValue: HANDLE
+    RegOpenKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegOpenKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        ulOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        Reserved: DWORD
+        lpClass: LPSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegCreateKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        Reserved: DWORD
+        lpClass: LPWSTR
+        dwOptions: DWORD
+        samDesired: REGSAM
+        lpSecurityAttributes: LPSECURITY_ATTRIBUTES
+        phkResult: PHKEY
+        lpdwDisposition: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegEnumKeyExA:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpName: LPSTR
+        lpcName: LPDWORD
+        lpReserved: LPDWORD
+        lpClass: LPSTR
+        lpcClass: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpName
+    RegEnumKeyExW:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpName: LPWSTR
+        lpcName: LPDWORD
+        lpReserved: LPDWORD
+        lpClass: LPWSTR
+        lpcClass: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpName
+    RegEnumValueA:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpValueName: LPSTR
+        lpcchValueName: LPDWORD
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValueName
+    RegEnumValueW:
+      Parameters:
+        hKey: HKEY
+        dwIndex: DWORD
+        lpValueName: LPWSTR
+        lpcchValueName: LPDWORD
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - lpValueName
+    RegSetValueExA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        Reserved: DWORD
+        dwType: DWORD
+        lpData: BYTE
+        cbData: DWORD
+      ReturnValue: LONG
+    RegSetValueExW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        Reserved: DWORD
+        dwType: DWORD
+        lpData: BYTE
+        cbData: DWORD
+      ReturnValue: LONG
+    RegQueryValueExA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+    RegQueryValueExW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+        lpReserved: LPDWORD
+        lpType: LPDWORD
+        lpData: LPBYTE
+        lpcbData: LPDWORD
+      ReturnValue: LONG
+    RegDeleteValueA:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCSTR
+      ReturnValue: LONG
+    RegDeleteValueW:
+      Parameters:
+        hKey: HKEY
+        lpValueName: LPCWSTR
+      ReturnValue: LONG
+    RegQueryInfoKeyA:
+      Parameters:
+        hKey: HKEY
+        lpClass: LPSTR
+        lpcClass: LPDWORD
+        lpReserved: LPDWORD
+        lpcSubKeys: LPDWORD
+        lpcMaxSubKeyLen: LPDWORD
+        lpcMaxClassLen: LPDWORD
+        lpcValues: LPDWORD
+        lpcMaxValueNameLen: LPDWORD
+        lpcMaxValueLen: LPDWORD
+        lpcbSecurityDescriptor: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+    RegQueryInfoKeyW:
+      Parameters:
+        hKey: HKEY
+        lpClass: LPWSTR
+        lpcClass: LPDWORD
+        lpReserved: LPDWORD
+        lpcSubKeys: LPDWORD
+        lpcMaxSubKeyLen: LPDWORD
+        lpcMaxClassLen: LPDWORD
+        lpcValues: LPDWORD
+        lpcMaxValueNameLen: LPDWORD
+        lpcMaxValueLen: LPDWORD
+        lpcbSecurityDescriptor: LPDWORD
+        lpftLastWriteTime: PFILETIME
+      ReturnValue: LONG
+    RegCloseKey:
+      Parameters:
+        hKey: HKEY
+      ReturnValue: LONG
+    RegDeleteKeyExA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+      ReturnValue: LONG
+    RegDeleteKeyExW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        samDesired: REGSAM
+        Reserved: DWORD
+      ReturnValue: LONG
+    RegDeleteKeyValueA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        lpValueName: LPCSTR
+      ReturnValue: LONG
+    RegDeleteKeyValueW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        lpValueName: LPCWSTR
+      ReturnValue: LONG
+    RegDeleteTreeA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+      ReturnValue: LONG
+    RegDeleteTreeW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+      ReturnValue: LONG
+    RegGetValueA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        lpValue: LPCSTR
+        dwFlags: DWORD
+        pdwType: LPDWORD
+        pvData: PVOID
+        pcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - pvData
+    RegGetValueW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        lpValue: LPCWSTR
+        dwFlags: DWORD
+        pdwType: LPDWORD
+        pvData: PVOID
+        pcbData: LPDWORD
+      ReturnValue: LONG
+      ReturnParameters:
+        - pvData
+    RegOpenUserClassesRoot:
+      Parameters:
+        hToken: HANDLE
+        dwOptions: DWORD
+        samDesired: REGSAM
+        phkResult: PHKEY
+      ReturnValue: LONG
+      ReturnParameters:
+        - phkResult
+    RegSetKeyValueA:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCSTR
+        lpValueName: LPCSTR
+        dwType: DWORD
+        lpData: LPCVOID
+        cbData: DWORD
+      ReturnValue: LONG
+    RegSetKeyValueW:
+      Parameters:
+        hKey: HKEY
+        lpSubKey: LPCWSTR
+        lpValueName: LPCWSTR
+        dwType: DWORD
+        lpData: LPCVOID
+        cbData: DWORD
+      ReturnValue: LONG
+    WaitForSingleObject:
+      Parameters:
+        hHandle: HANDLE
+        dwMilliseconds: DWORD
+      ReturnValue: DWORD
+    WaitForSingleObjectEx:
+      Parameters:
+        hHandle: HANDLE
+        dwMilliseconds: DWORD
+        bAlertable: BOOL
+      ReturnValue: DWORD
+    WaitForMultipleObjects:
+      Parameters:
+        nCount: DWORD
+        lpHandles: LPVOID
+        bWaitAll: BOOL
+        dwMilliseconds: DWORD
+      ReturnValue: DWORD
+    WaitForMultipleObjectsEx:
+      Parameters:
+        nCount: DWORD
+        lpHandles: LPVOID
+        bWaitAll: BOOL
+        dwMilliseconds: DWORD
+        bAlertable: BOOL
+      ReturnValue: DWORD
+  psapi.dll:
+    EnumProcesses:
+      Parameters:
+        pProcessIds: DWORD
+        cb: DWORD
+        pBytesReturned: DWORD
+      ReturnValue: BOOL
+      ReturnParameters:
+        - pProcessIds
+        - pBytesReturned
+  ntdll.dll:
+    RtlAddVectoredExceptionHandler:
+      Parameters:
+        FirstHandler: ULONG
+        VectoredHandler: PVECTORED_EXCEPTION_HANDLER
+      ReturnValue: PVOID
+    RtlAddVectoredContinueHandler:
+      Parameters:
+        FirstHandler: ULONG
+        VectoredHandler: PVECTORED_EXCEPTION_HANDLER
+      ReturnValue: PVOID
+    RtlRemoveVectoredExceptionHandler:
+      Parameters:
+        VectoredHandlerHandle: PVOID
+      ReturnValue: ULONG
+    RtlRemoveVectoredContinueHandler:
+      Parameters:
+        VectoredHandlerHandle: PVOID
+      ReturnValue: ULONG
+    RtlRaiseException:
+      Parameters:
+        ExceptionRecord: EXCEPTION_RECORD
+      ReturnValue: void
+    NtRaiseException:
+      Parameters:
+        ExceptionRecord: EXCEPTION_RECORD
+        Context: CONTEXT
+        HandleException: BOOLEAN
+      ReturnValue: NTSTATUS
+    NtCreateFile:
+      Parameters:
+        FileHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        IoStatusBlock: PIO_STATUS_BLOCK
+        AllocationSize: PLARGE_INTEGER
+        FileAttributes: ULONG
+        ShareAccess: ULONG
+        CreateDisposition: ULONG
+        CreateOptions: ULONG
+        EaBuffer: PVOID
+        EaLength: ULONG
+      ReturnValue: NTSTATUS
+      ReturnParameters:
+        - FileHandle
+        - IoStatusBlock
+    NtDeleteFile:
+      Parameters:
+        ObjectAttributes: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+    NtOpenFile:
+      Parameters:
+        FileHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        IoStatusBlock: PIO_STATUS_BLOCK
+        ShareAccess: ULONG
+        OpenOptions: ULONG
+      ReturnValue: NTSTATUS
+      ReturnParameters:
+        - FileHandle
+    NtReadFile:
+      Parameters:
+        FileHandle: HANDLE
+        Event: HANDLE
+        ApcRoutine: PIO_APC_ROUTINE
+        ApcContext: PVOID
+        IoStatusBlock: PIO_STATUS_BLOCK
+        Buffer: PVOID
+        Length: ULONG
+        ByteOffset: PLARGE_INTEGER
+        Key: PULONG
+      ReturnValue: NTSTATUS
+    NtWriteFile:
+      Parameters:
+        FileHandle: HANDLE
+        Event: HANDLE
+        ApcRoutine: PIO_APC_ROUTINE
+        ApcContext: PVOID
+        IoStatusBlock: PIO_STATUS_BLOCK
+        Buffer: PVOID
+        Length: ULONG
+        ByteOffset: PLARGE_INTEGER
+        Key: PULONG
+      ReturnValue: NTSTATUS
+    NtDeviceIoControlFile:
+      Parameters:
+        FileHandle: HANDLE
+        Event: HANDLE
+        ApcRoutine: PIO_APC_ROUTINE
+        ApcContext: PVOID
+        IoStatusBlock: PIO_STATUS_BLOCK
+        IoControlCode: ULONG
+        InputBuffer: PVOID
+        InputBufferLength: ULONG
+        OutputBuffer: PVOID
+        OutputBufferLength: ULONG
+      ReturnValue: NTSTATUS
+    NtQueryDirectoryFile:
+      Parameters:
+        FileHandle: HANDLE
+        Event: HANDLE
+        ApcRoutine: PIO_APC_ROUTINE
+        ApcContext: PVOID
+        IoStatusBlock: PIO_STATUS_BLOCK
+        FileInformation: PVOID
+        Length: ULONG
+        FileInformationClass: FILE_INFORMATION_CLASS
+        ReturnSingleEntry: BOOLEAN
+        FileName: PUNICODE_STRING
+        RestartScan: BOOLEAN
+      ReturnValue: NTSTATUS
+    NtQueryInformationFile:
+      Parameters:
+        FileHandle: HANDLE
+        IoStatusBlock: PIO_STATUS_BLOCK
+        FileInformation: PVOID
+        Length: ULONG
+        FileInformationClass: FILE_INFORMATION_CLASS
+      ReturnValue: NTSTATUS
+    NtSetInformationFile:
+      Parameters:
+        FileHandle: HANDLE
+        IoStatusBlock: PIO_STATUS_BLOCK
+        FileInformation: PVOID
+        Length: ULONG
+        FileInformationClass: FILE_INFORMATION_CLASS
+      ReturnValue: NTSTATUS
+    NtOpenDirectoryObject:
+      Parameters:
+        DirectoryHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+    NtCreateDirectoryObject:
+      Parameters:
+        DirectoryHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+    NtQueryAttributesFile:
+      Parameters:
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        FileInformation: void
+      ReturnValue: NTSTATUS
+    NtQueryFullAttributesFile:
+      Parameters:
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        FileInformation: void
+      ReturnValue: NTSTATUS
+    NtCreateProcess:
+      Parameters:
+        ProcessHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        ParentProcess: HANDLE
+        InheritObjectTable: BOOLEAN
+        SectionHandle: HANDLE
+        DebugPort: HANDLE
+        ExceptionPort: HANDLE
+      ReturnValue: NTSTATUS
+    NtCreateProcessEx:
+      Parameters:
+        ProcessHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        ParentProcess: HANDLE
+        Flags: ULONG
+        SectionHandle: HANDLE
+        DebugPort: HANDLE
+        ExceptionPort: HANDLE
+        InJob: BOOLEAN
+      ReturnValue: NTSTATUS
+    NtCreateUserProcess:
+      Parameters:
+        ProcessHandle: PHANDLE
+        ThreadHandle: PHANDLE
+        ProcessDesiredAccess: ACCESS_MASK
+        ThreadDesiredAccess: ACCESS_MASK
+        ProcessObjectAttributes: POBJECT_ATTRIBUTES
+        ThreadObjectAttributes: POBJECT_ATTRIBUTES
+        ProcessFlags: ULONG
+        ThreadFlags: ULONG
+        ProcessParameters: PRTL_USER_PROCESS_PARAMETERS
+        CreateInfo: PPS_CREATE_INFO
+        AttributeList: PPS_ATTRIBUTE_LIST
+      ReturnValue: NTSTATUS
+    RtlCreateUserProcess:
+      Parameters:
+        ImagePath: PUNICODE_STRING
+        ObjectAttributes: ULONG
+        ProcessParameters: PRTL_USER_PROCESS_PARAMETERS
+        ProcessSecurityDescriptor: PSECURITY_DESCRIPTOR
+        ThreadSecurityDescriptor: PSECURITY_DESCRIPTOR
+        ParentProcess: HANDLE
+        InheritHandles: BOOLEAN
+        DebugPort: HANDLE
+        ExceptionPort: HANDLE
+        ProcessInformation: PRTL_USER_PROCESS_INFORMATION
+      ReturnValue: NTSTATUS
+    NtOpenProcess:
+      Parameters:
+        ProcessHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        ClientId: PCLIENT_ID
+      ReturnValue: NTSTATUS
+    NtTerminateProcess:
+      Parameters:
+        ProcessHandle: HANDLE
+        ExitStatus: NTSTATUS
+      ReturnValue: NTSTATUS
+    NtCreateSection:
+      Parameters:
+        SectionHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        MaximumSize: PLARGE_INTEGER
+        SectionPageProtection: ULONG
+        AllocationAttributes: ULONG
+        FileHandle: HANDLE
+      ReturnValue: NTSTATUS
+    NtMakeTemporaryObject:
+      Parameters:
+        ObjectHandle: HANDLE
+      ReturnValue: NTSTATUS
+    NtMakePermanentObject:
+      Parameters:
+        ObjectHandle: HANDLE
+      ReturnValue: NTSTATUS
+    NtOpenSection:
+      Parameters:
+        SectionHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+    NtUnmapViewOfSection:
+      Parameters:
+        ProcessHandle: HANDLE
+        BaseAddress: PVOID
+      ReturnValue: NTSTATUS
+    NtAllocateVirtualMemory:
+      Parameters:
+        ProcessHandle: HANDLE
+        BaseAddress: PVOID
+        ZeroBits: ULONG_PTR
+        RegionSize: PSIZE_T
+        AllocationType: ULONG
+        Protect: ULONG
+      ReturnValue: NTSTATUS
+    NtReadVirtualMemory:
+      Parameters:
+        ProcessHandle: HANDLE
+        BaseAddress: LPCVOID
+        Buffer: LPVOID
+        NumberOfBytesToRead: SIZE_T
+        NumberOfBytesReaded: PSIZE_T
+      ReturnValue: NTSTATUS
+    NtWriteVirtualMemory:
+      Parameters:
+        ProcessHandle: HANDLE
+        BaseAddress: LPVOID
+        Buffer: LPCVOID
+        NumberOfBytesToWrite: SIZE_T
+        NumberOfBytesWritten: PSIZE_T
+      ReturnValue: NTSTATUS
+    NtProtectVirtualMemory:
+      Parameters:
+        ProcessHandle: HANDLE
+        BaseAddress: PVOID
+        NumberOfBytesToProtect: PSIZE_T
+        NewAccessProtection: ULONG
+        OldAccessProtection: PULONG
+      ReturnValue: NTSTATUS
+    NtFreeVirtualMemory:
+      Parameters:
+        ProcessHandle: HANDLE
+        BaseAddress: PVOID
+        RegionSize: PSIZE_T
+        FreeType: ULONG
+      ReturnValue: NTSTATUS
+    NtMapViewOfSection:
+      Parameters:
+        SectionHandle: HANDLE
+        ProcessHandle: HANDLE
+        BaseAddress: PVOID
+        ZeroBits: ULONG_PTR
+        CommitSize: SIZE_T
+        SectionOffset: PLARGE_INTEGER
+        ViewSize: PSIZE_T
+        InheritDisposition: UINT
+        AllocationType: ULONG
+        Win32Protect: ULONG
+      ReturnValue: NTSTATUS
+    NtCreateKey:
+      Parameters:
+        KeyHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        TitleIndex: ULONG
+        Class: PUNICODE_STRING
+        CreateOptions: ULONG
+        Disposition: PULONG
+      ReturnValue: NTSTATUS
+    NtOpenKey:
+      Parameters:
+        KeyHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+      ReturnParameters:
+        - ObjectAttributes
+    NtOpenKeyEx:
+      Parameters:
+        KeyHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        OpenOptions: ULONG
+      ReturnValue: NTSTATUS
+    NtRenameKey:
+      Parameters:
+        KeyHandle: HANDLE
+        NewName: PUNICODE_STRING
+      ReturnValue: NTSTATUS
+    NtReplaceKey:
+      Parameters:
+        NewHiveFileName: POBJECT_ATTRIBUTES
+        KeyHandle: HANDLE
+        BackupHiveFileName: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+    NtEnumerateKey:
+      Parameters:
+        KeyHandle: HANDLE
+        Index: ULONG
+        KeyInformationClass: KEY_INFORMATION_CLASS
+        KeyInformation: PVOID
+        Length: ULONG
+        ResultLength: PULONG
+      ReturnValue: NTSTATUS
+    NtEnumerateValueKey:
+      Parameters:
+        KeyHandle: HANDLE
+        Index: ULONG
+        KeyValueInformationClass: KEY_VALUE_INFORMATION_CLASS
+        KeyValueInformation: PVOID
+        Length: ULONG
+        ResultLength: PULONG
+      ReturnValue: NTSTATUS
+    NtSetValueKey:
+      Parameters:
+        KeyHandle: HANDLE
+        ValueName: PUNICODE_STRING
+        TitleIndex: ULONG
+        Type: ULONG
+        Data: PVOID
+        DataSize: ULONG
+      ReturnValue: NTSTATUS
+    NtQueryValueKey:
+      Parameters:
+        KeyHandle: HANDLE
+        ValueName: PUNICODE_STRING
+        KeyValueInformationClass: KEY_VALUE_INFORMATION_CLASS
+        KeyValueInformation: PVOID
+        Length: ULONG
+        ResultLength: PULONG
+      ReturnValue: NTSTATUS
+    NtQueryMultipleValueKey:
+      Parameters:
+        KeyHandle: HANDLE
+        ValueEntries: PKEY_VALUE_ENTRY
+        EntryCount: ULONG
+        ValueBuffer: PVOID
+        BufferLength: PULONG
+        RequiredBufferLength: PULONG
+      ReturnValue: NTSTATUS
+    NtDeleteKey:
+      Parameters:
+        KeyHandle: HANDLE
+      ReturnValue: NTSTATUS
+    NtDeleteValueKey:
+      Parameters:
+        KeyHandle: HANDLE
+        ValueName: PUNICODE_STRING
+      ReturnValue: NTSTATUS
+    NtLoadKey:
+      Parameters:
+        TargetKey: POBJECT_ATTRIBUTES
+        SourceFile: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+    NtLoadKey2:
+      Parameters:
+        TargetKey: POBJECT_ATTRIBUTES
+        SourceFile: POBJECT_ATTRIBUTES
+        Flags: ULONG
+      ReturnValue: NTSTATUS
+    NtLoadKeyEx:
+      Parameters:
+        TargetKey: POBJECT_ATTRIBUTES
+        SourceFile: POBJECT_ATTRIBUTES
+        Flags: ULONG
+        TrustClassKey: HANDLE
+      ReturnValue: NTSTATUS
+    NtQueryKey:
+      Parameters:
+        KeyHandle: HANDLE
+        KeyInformationClass: KEY_INFORMATION_CLASS
+        KeyInformation: PVOID
+        Length: ULONG
+        ResultLength: PULONG
+      ReturnValue: NTSTATUS
+    NtSaveKey:
+      Parameters:
+        KeyHandle: HANDLE
+        FileHandle: HANDLE
+      ReturnValue: NTSTATUS
+    NtSaveKeyEx:
+      Parameters:
+        KeyHandle: HANDLE
+        FileHandle: HANDLE
+        Format: ULONG
+      ReturnValue: NTSTATUS
+    NtDelayExecution:
+      Parameters:
+        Alertable: BOOLEAN
+        DelayInterval: PLARGE_INTEGER
+      ReturnValue: NTSTATUS
+    NtQuerySystemTime:
+      Parameters:
+        SystemTime: PLARGE_INTEGER
+      ReturnValue: NTSTATUS
+    NtCreateMutant:
+      Parameters:
+        MutantHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        InitialOwner: BOOLEAN
+      ReturnValue: NTSTATUS
+    NtOpenMutant:
+      Parameters:
+        MutantHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+      ReturnValue: NTSTATUS
+    LdrLoadDll:
+      Parameters:
+        PathToFile: PWCHAR
+        Flags: PULONG
+        ModuleFileName: PUNICODE_STRING
+        ModuleHandle: PHANDLE
+      ReturnValue: NTSTATUS
+    LdrUnloadDll:
+      Parameters:
+        ModuleHandle: HANDLE
+      ReturnValue: NTSTATUS
+    LdrGetDllHandle:
+      Parameters:
+        pwPath: PWORD
+        Unused: PVOID
+        ModuleFileName: PUNICODE_STRING
+        pHModule: PHANDLE
+      ReturnValue: NTSTATUS
+    LdrGetProcedureAddress:
+      Parameters:
+        ModuleHandle: HMODULE
+        FunctionName: PANSI_STRING
+        Ordinal: WORD
+        FunctionAddress: PVOID
+      ReturnValue: NTSTATUS
+    NtDuplicateObject:
+      Parameters:
+        SourceProcessHandle: HANDLE
+        SourceHandle: HANDLE
+        TargetProcessHandle: HANDLE
+        TargetHandle: HANDLE
+        DesiredAccess: ACCESS_MASK
+        HandleAttributes: ULONG
+        Options: ULONG
+      ReturnValue: NTSTATUS
+    NtClose:
+      Parameters:
+        Handle: HANDLE
+      ReturnValue: NTSTATUS
+    NtLoadDriver:
+      Parameters:
+        DriverServiceName: PUNICODE_STRING
+      ReturnValue: NTSTATUS
+    NtUnloadDriver:
+      Parameters:
+        DriverServiceName: PUNICODE_STRING
+      ReturnValue: NTSTATUS
+    RtlCompressBuffer:
+      Parameters:
+        CompressionFormatAndEngine: USHORT
+        UncompressedBuffer: PUCHAR
+        UncompressedBufferSize: ULONG
+        CompressedBuffer: PUCHAR
+        CompressedBufferSize: ULONG
+        UncompressedChunkSize: ULONG
+        FinalCompressedSize: PULONG
+        WorkSpace: PVOID
+      ReturnValue: NTSTATUS
+    RtlDecompressBuffer:
+      Parameters:
+        CompressionFormat: USHORT
+        UncompressedBuffer: PUCHAR
+        UncompressedBufferSize: ULONG
+        CompressedBuffer: PUCHAR
+        CompressedBufferSize: ULONG
+        FinalUncompressedSize: PULONG
+      ReturnValue: NTSTATUS
+    RtlDecompressFragment:
+      Parameters:
+        CompressionFormat: USHORT
+        UncompressedFragment: PUCHAR
+        UncompressedFragmentSize: ULONG
+        CompressedBuffer: PUCHAR
+        CompressedBufferSize: ULONG
+        FragmentOffset: ULONG
+        FinalUncompressedSize: PULONG
+        WorkSpace: PVOID
+      ReturnValue: NTSTATUS
+    NtQuerySystemInformation:
+      Parameters:
+        SystemInformationClass: SYSTEM_INFORMATION_CLASS
+        SystemInformation: PVOID
+        SystemInformationLength: ULONG
+        ReturnLength: PULONG
+      ReturnValue: NTSTATUS
+    NtShutdownSystem:
+      Parameters:
+        Action: SHUTDOWN_ACTION
+      ReturnValue: NTSTATUS
+    NtCreateThread:
+      Parameters:
+        ThreadHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        ProcessHandle: HANDLE
+        ClientId: PCLIENT_ID
+        ThreadContext: PCONTEXT
+        InitialTeb: PINITIAL_TEB
+        CreateSuspended: BOOLEAN
+      ReturnValue: NTSTATUS
+    NtCreateThreadEx:
+      Parameters:
+        hThread: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: PVOID
+        ProcessHandle: HANDLE
+        lpStartAddress: LPTHREAD_START_ROUTINE
+        lpParameter: PVOID
+        CreateSuspended: BOOL
+        StackZeroBits: LONG
+        SizeOfStackCommit: LONG
+        SizeOfStackReserve: LONG
+        lpBytesBuffer: PVOID
+      ReturnValue: NTSTATUS
+    NtOpenThread:
+      Parameters:
+        ThreadHandle: PHANDLE
+        DesiredAccess: ACCESS_MASK
+        ObjectAttributes: POBJECT_ATTRIBUTES
+        ClientId: PCLIENT_ID
+      ReturnValue: NTSTATUS
+    NtGetContextThread:
+      Parameters:
+        ThreadHandle: HANDLE
+        Context: LPCONTEXT
+      ReturnValue: NTSTATUS
+    NtSetContextThread:
+      Parameters:
+        ThreadHandle: HANDLE
+        Context: CONTEXT
+      ReturnValue: NTSTATUS
+    NtSuspendThread:
+      Parameters:
+        ThreadHandle: HANDLE
+        PreviousSuspendCount: ULONG
+      ReturnValue: NTSTATUS
+    NtResumeThread:
+      Parameters:
+        ThreadHandle: HANDLE
+        SuspendCount: ULONG
+      ReturnValue: NTSTATUS
+    NtTerminateThread:
+      Parameters:
+        ThreadHandle: HANDLE
+        ExitStatus: NTSTATUS
+      ReturnValue: NTSTATUS
+    RtlCreateUserThread:
+      Parameters:
+        ProcessHandle: HANDLE
+        SecurityDescriptor: PSECURITY_DESCRIPTOR
+        CreateSuspended: BOOLEAN
+        StackZeroBits: ULONG
+        StackReserved: PULONG
+        StackCommit: PULONG
+        StartAddress: PVOID
+        StartParameter: PVOID
+        ThreadHandle: PHANDLE
+        ClientId: PCLIENT_ID
+      ReturnValue: NTSTATUS
+    NtQueueApcThread:
+      Parameters:
+        ThreadHandle: HANDLE
+        ApcRoutine: PIO_APC_ROUTINE
+        ApcRoutineContext: PVOID
+        ApcStatusBlock: PIO_STATUS_BLOCK
+        ApcReserved: ULONG
+      ReturnValue: NTSTATUS
+    NtRaiseHardError:
+      Parameters:
+        ErrorStatus: NTSTATUS
+        NumberOfParameters: ULONG
+        UnicodeStringParameterMask: PUNICODE_STRING
+        Parameters: PVOID
+        ResponseOption: HARDERROR_RESPONSE_OPTION
+        Response: PHARDERROR_RESPONSE
+      ReturnValue: NTSTATUS
+      ReturnParameters:
+        - Response
+  user32.dll:
+    GetSystemMetrics:
+      Parameters:
+        nIndex: int
+      ReturnValue: int
+    GetCursorPos:
+      Parameters:
+        lpPoint: LPPOINT
+      ReturnValue: BOOL
+    EnumWindows:
+      Parameters:
+        lpEnumProc: WNDENUMPROC
+        lParam: LPARAM
+      ReturnValue: BOOL
+    RegisterHotKey:
+      Parameters:
+        hWnd: HWND
+        id: int
+        fsModifiers: UINT
+        vk: UINT
+      ReturnValue: BOOL
+    SetWindowsHookExA:
+      Parameters:
+        idHook: int
+        lpfn: HOOKPROC
+        hMod: HINSTANCE
+        dwThreadId: DWORD
+      ReturnValue: HHOOK
+    SetWindowsHookExW:
+      Parameters:
+        idHook: int
+        lpfn: HOOKPROC
+        hMod: HINSTANCE
+        dwThreadId: DWORD
+      ReturnValue: HHOOK
+    UnhookWindowsHookEx:
+      Parameters:
+        hhk: HHOOK
+      ReturnValue: BOOL
+    ExitWindowsEx:
+      Parameters:
+        uFlags: UINT
+        dwReason: DWORD
+      ReturnValue: BOOL
+    GetAsyncKeyState:
+      Parameters:
+        vKey: int
+      ReturnValue: SHORT
+    GetKeyboardState:
+      Parameters:
+        lpKeyState: PBYTE
+      ReturnValue: BOOL
+    GetKeyState:
+      Parameters:
+        nVirtKey: int
+      ReturnValue: SHORT
+    SendNotifyMessageA:
+      Parameters:
+        hWnd: HWND
+        uMsg: UINT
+        wParam: WPARAM
+        lParam: LPARAM
+      ReturnValue: BOOL
+    SendNotifyMessageW:
+      Parameters:
+        hWnd: HWND
+        uMsg: UINT
+        wParam: WPARAM
+        lParam: LPARAM
+      ReturnValue: BOOL
+    FindWindowA:
+      Parameters:
+        lpClassName: LPCSTR
+        lpWindowName: LPCSTR
+      ReturnValue: HWND
+    FindWindowW:
+      Parameters:
+        lpClassName: LPCWSTR
+        lpWindowName: LPCWSTR
+      ReturnValue: HWND
+    FindWindowExA:
+      Parameters:
+        hwndParent: HWND
+        hwndChildAfter: HWND
+        lpszClass: LPCSTR
+        lpszWindow: LPCSTR
+      ReturnValue: HWND
+    FindWindowExW:
+      Parameters:
+        hwndParent: HWND
+        hwndChildAfter: HWND
+        lpszClass: LPCWSTR
+        lpszWindow: LPCWSTR
+      ReturnValue: HWND
+    GetForegroundWindow:
+      Parameters:
+        hWnd: HWND
+        lpText: LPCTSTR
+        lpCaption: LPCTSTR
+        uType: UINT
+        wLanguageId: WORD
+        Unknown: INT
+      ReturnValue: HWND
+    MessageBoxTimeoutW:
+      Parameters:
+        hWnd: HWND
+        lpText: LPWSTR
+        lpCaption: LPWSTR
+        uType: UINT
+        wLanguageId: WORD
+        Unknown: INT
+      ReturnValue: int
+    DrawTextExA:
+      Parameters:
+        hdc: HDC
+        lpchText: LPSTR
+        cchText: int
+        lprc: LPRECT
+        dwDTFormat: UINT
+        lpDTParams: LPDRAWTEXTPARAMS
+      ReturnValue: int
+    DrawTextExW:
+      Parameters:
+        hdc: HDC
+        lpchText: LPWSTR
+        cchText: int
+        lprc: LPRECT
+        dwDTFormat: UINT
+        lpDTParams: LPDRAWTEXTPARAMS
+      ReturnValue: int
+    LoadStringA:
+      Parameters:
+        hInstance: HINSTANCE
+        uID: UINT
+        lpBuffer: LPSTR
+        nBufferMax: int
+      ReturnValue: int
+    LoadStringW:
+      Parameters:
+        hInstance: HINSTANCE
+        uID: UINT
+        lpBuffer: LPWSTR
+        nBufferMax: int
+      ReturnValue: int
+    CreateWindowExA:
+      Parameters:
+        dwExStyle: DWORD
+        lpClassName: LPCSTR
+        lpWindowName: LPCSTR
+        dwStyle: DWORD
+        x: int
+        y: int
+        nWidth: int
+        nHeight: int
+        hWndParent: HWND
+        hMenu: HMENU
+        hInstance: HINSTANCE
+        lpParam: LPVOID
+      ReturnValue: HWND
+    CreateWindowExW:
+      Parameters:
+        dwExStyle: DWORD
+        lpClassName: LPCWSTR
+        lpWindowName: LPCWSTR
+        dwStyle: DWORD
+        x: int
+        y: int
+        nWidth: int
+        nHeight: int
+        hWndParent: HWND
+        hMenu: HMENU
+        hInstance: HINSTANCE
+        lpParam: LPVOID
+      ReturnValue: HWND
+    DialogBoxIndirectParamA:
+      ReturnValue: NULL
+  shell32.dll:
+    SHGetSpecialFolderLocation:
+      Parameters:
+        hwndOwner: HWND
+        nFolder: int
+        ppidl: void
+      ReturnValue: HRESULT
+    SHGetFolderPathW:
+      Parameters:
+        hwndOwner: HWND
+        nFolder: int
+        hToken: HANDLE
+        dwFlags: DWORD
+        pszPath: LPWSTR
+      ReturnValue: HRESULT
+    ReadCabinetState:
+      Parameters:
+        pcs: CABINETSTATE
+        cLength: int
+      ReturnValue: BOOL
+    ShellExecuteExW:
+      Parameters:
+        pExecInfo: SHELLEXECUTEINFOW
+      ReturnValue: BOOL
+    ShellExecuteA:
+      Parameters:
+        hwnd: HWND
+        lpOperation: LPCSTR
+        lpFile: LPCSTR
+        lpParameters: LPCSTR
+        lpDirectory: LPCSTR
+        nShowCmd: int
+      ReturnValue: HINSTANCE
+    ShellExecuteW:
+      Parameters:
+        hwnd: HWND
+        lpOperation: LPCWSTR
+        lpFile: LPCWSTR
+        lpParameters: LPCWSTR
+        lpDirectory: LPCWSTR
+        nShowCmd: int
+      ReturnValue: HINSTANCE
+    SHGetKnownFolderPath:
+      Parameters:
+        rfid: REFKNOWNFOLDERID
+        dwFlags: DWORD
+        hToken: HANDLE
+        ppszPath: PWSTR
+      ReturnValue: HRESULT
+      ReturnParameters:
+        - ppszPath
+  rpcrt4.dll:
+    UuidCreate:
+      Parameters:
+        Uuid: UUID
+      ReturnValue: RPC_STATUS
+  version.dll:
+    GetFileVersionInfoSizeW:
+      Parameters:
+        lptstrFilename: LPCWSTR
+        lpdwHandle: LPDWORD
+      ReturnValue: DWORD
+    GetFileVersionInfoSizeExW:
+      Parameters:
+        dwFlags: DWORD
+        lptstrFilename: LPCWSTR
+        lpdwHandle: LPDWORD
+      ReturnValue: DWORD
+    GetFileVersionInfoW:
+      Parameters:
+        lptstrFilename: LPCWSTR
+        dwHandle: DWORD
+        dwLen: DWORD
+        lpData: LPVOID
+      ReturnValue: BOOL
+    GetFileVersionInfoExW:
+      Parameters:
+        dwFlags: DWORD
+        lptstrFilename: LPCWSTR
+        dwHandle: DWORD
+        dwLen: DWORD
+        lpData: LPVOID
+      ReturnValue: BOOL
+  comctl32.dll:
+    TaskDialog:
+      Parameters:
+        hWndParent: HWND
+        hInstance: HINSTANCE
+        pszWindowTitle: PCWSTR
+        pszMainInstruction: PCWSTR
+        pszContent: PCWSTR
+        dwCommonButtons: TASKDIALOG_COMMON_BUTTON_FLAGS
+        pszIcon: PCWSTR
+        pnButton: int
+      ReturnValue: HRESULT
+  netapi32.dll:
+    NetGetJoinInformation:
+      Parameters:
+        lpServer: LPCWSTR
+        lpNameBuffer: LPWSTR
+        BufferType: PNETSETUP_JOIN_STATUS
+      ReturnValue: NET_API_STATUS
+    NetUserGetInfo:
+      Parameters:
+        servername: LPCWSTR
+        username: LPCWSTR
+        level: DWORD
+        bufptr: LPBYTE
+      ReturnValue: int
+    NetUserGetLocalGroups:
+      Parameters:
+        servername: LPCWSTR
+        username: LPCWSTR
+        level: DWORD
+        flags: DWORD
+        bufptr: LPBYTE
+        prefmaxlen: DWORD
+        entriesread: LPDWORD
+        totalentries: LPDWORD
+      ReturnValue: NET_API_STATUS
+    NetShareEnum:
+      Parameters:
+        servername: LPWSTR
+        level: DWORD
+        bufptr: LPBYTE
+        prefmaxlen: DWORD
+        entriesread: LPDWORD
+        totalentries: LPDWORD
+        resume_handle: LPDWORD
+      ReturnValue: NET_API_STATUS
+  urlmon.dll:
+    URLDownloadToFileW:
+      Parameters:
+        pCaller: LPUNKNOWN
+        szURL: LPCWSTR
+        szFileName: LPCWSTR
+        dwReserved: DWORD
+        lpfnCB: LPVOID
+      ReturnValue: HRESULT
+    ObtainUserAgentString:
+      Parameters:
+        dwOption: DWORD
+        pcszUAOut: LPSTR
+        cbSize: DWORD
+      ReturnValue: HRESULT
+    URLDownloadToFileA:
+      Parameters:
+        pCaller: LPUNKNOWN
+        szURL: LPCSTR
+        szFileName: LPCSTR
+        dwReserved: DWORD
+        lpfnCB: LPVOID
+      ReturnValue: HRESULT
+  wininet.dll:
+    InternetCrackUrlA:
+      Parameters:
+        lpszUrl: LPCSTR
+        dwUrlLength: DWORD
+        dwFlags: DWORD
+        lpUrlComponents: LPURL_COMPONENTSA
+      ReturnValue: BOOL
+    InternetCrackUrlW:
+      Parameters:
+        lpszUrl: LPCWSTR
+        dwUrlLength: DWORD
+        dwFlags: DWORD
+        lpUrlComponents: LPURL_COMPONENTSW
+      ReturnValue: BOOL
+    InternetOpenA:
+      Parameters:
+        lpszAgent: LPCSTR
+        dwAccessType: DWORD
+        lpszProxyName: LPCTSTR
+        lpszProxyBypass: LPCTSTR
+        dwFlags: DWORD
+      ReturnValue: HINTERNET
+    InternetOpenW:
+      Parameters:
+        lpszAgent: LPCWSTR
+        dwAccessType: DWORD
+        lpszProxyName: LPWSTR
+        lpszProxyBypass: LPWSTR
+        dwFlags: DWORD
+      ReturnValue: HINTERNET
+    InternetConnectA:
+      Parameters:
+        hInternet: HINTERNET
+        lpszServerName: LPCSTR
+        nServerPort: INTERNET_PORT
+        lpszUsername: LPCTSTR
+        lpszPassword: LPCTSTR
+        dwService: DWORD
+        dwFlags: DWORD
+        dwContext: DWORD_PTR
+      ReturnValue: HINTERNET
+    InternetConnectW:
+      Parameters:
+        hInternet: HINTERNET
+        lpszServerName: LPCWSTR
+        nServerPort: INTERNET_PORT
+        lpszUsername: LPWSTR
+        lpszPassword: LPWSTR
+        dwService: DWORD
+        dwFlags: DWORD
+        dwContext: DWORD_PTR
+      ReturnValue: HINTERNET
+    InternetOpenUrlA:
+      Parameters:
+        hInternet: HINTERNET
+        lpszUrl: LPCSTR
+        lpszHeaders: LPCSTR
+        dwHeadersLength: DWORD
+        dwFlags: DWORD
+        dwContext: DWORD_PTR
+      ReturnValue: HINTERNET
+    InternetOpenUrlW:
+      Parameters:
+        hInternet: HINTERNET
+        lpszUrl: LPCWSTR
+        lpszHeaders: LPCWSTR
+        dwHeadersLength: DWORD
+        dwFlags: DWORD
+        dwContext: DWORD_PTR
+      ReturnValue: HINTERNET
+    InternetQueryOptionA:
+      Parameters:
+        hInternet: HINTERNET
+        dwOption: DWORD
+        lpBuffer: LPVOID
+        lpdwBufferLength: LPDWORD
+      ReturnValue: BOOL
+    InternetSetOptionA:
+      Parameters:
+        hInternet: HINTERNET
+        dwOption: DWORD
+        lpBuffer: LPVOID
+        dwBufferLength: DWORD
+      ReturnValue: BOOL
+    HttpOpenRequestA:
+      Parameters:
+        hConnect: HINTERNET
+        lpszVerb: LPCSTR
+        lpszObjectName: LPCSTR
+        lpszVersion: LPCSTR
+        lpszReferer: LPCSTR
+        lplpszAcceptTypes: LPCSTR
+        dwFlags: DWORD
+        dwContext: DWORD_PTR
+      ReturnValue: HINTERNET
+    HttpOpenRequestW:
+      Parameters:
+        hConnect: HINTERNET
+        lpszVerb: LPCWSTR
+        lpszObjectName: LPCWSTR
+        lpszVersion: LPCWSTR
+        lpszReferer: LPCWSTR
+        lplpszAcceptTypes: LPCWSTR
+        dwFlags: DWORD
+        dwContext: DWORD_PTR
+      ReturnValue: HINTERNET
+    HttpSendRequestA:
+      Parameters:
+        hRequest: HINTERNET
+        lpszHeaders: LPCSTR
+        dwHeadersLength: DWORD
+        lpOptional: LPVOID
+        dwOptionalLength: DWORD
+      ReturnValue: BOOL
+    HttpSendRequestW:
+      Parameters:
+        hRequest: HINTERNET
+        lpszHeaders: LPCWSTR
+        dwHeadersLength: DWORD
+        lpOptional: LPVOID
+        dwOptionalLength: DWORD
+      ReturnValue: BOOL
+    InternetReadFile:
+      Parameters:
+        hFile: HINTERNET
+        lpBuffer: LPVOID
+        dwNumberOfBytesToRead: DWORD
+        lpdwNumberOfBytesRead: LPDWORD
+      ReturnValue: BOOL
+    InternetWriteFile:
+      Parameters:
+        hFile: HINTERNET
+        lpBuffer: LPCVOID
+        dwNumberOfBytesToWrite: DWORD
+        lpdwNumberOfBytesWritten: LPDWORD
+      ReturnValue: BOOL
+    InternetCloseHandle:
+      Parameters:
+        hInternet: HINTERNET
+      ReturnValue: BOOL
+    InternetGetConnectedState:
+      Parameters:
+        lpdwFlags: LPDWORD
+        dwReserved: DWORD
+      ReturnValue: BOOL
+    InternetGetConnectedStateEx:
+      Parameters:
+        lpdwFlags: LPDWORD
+        lpszConnectionName: LPSTR
+        dwNameLen: DWORD
+        dwReserved: DWORD
+      ReturnValue: BOOL
+    InternetGetConnectedStateExW:
+      Parameters:
+        lpdwFlags: LPDWORD
+        lpszConnectionName: LPWSTR
+        dwNameLen: DWORD
+        dwReserved: DWORD
+      ReturnValue: BOOL
+    InternetSetStatusCallback:
+      Parameters:
+        hInternet: HINTERNET
+        lpfnInternetCallback: INTERNET_STATUS_CALLBACK
+      ReturnValue: INTERNET_STATUS_CALLBACK
+    DeleteUrlCacheEntry:
+      Parameters:
+        lpszUrlName: LPCSTR
+      ReturnValue: BOOL
+    DeleteUrlCacheEntryW:
+      Parameters:
+        lpszUrlName: LPCWSTR
+      ReturnValue: BOOL
+    HttpQueryInfoA:
+      Parameters:
+        hRequest: HINTERNET
+        dwInfoLevel: DWORD
+        lpvBuffer: LPVOID
+        lpdwBufferLength: LPDWORD
+        lpdwIndex: LPDWORD
+      ReturnValue: BOOL
+  dnsapi.dll:
+    DnsQuery_A:
+      Parameters:
+        lpstrName: LPCSTR
+        wType: WORD
+        Options: DWORD
+        pExtra: PVOID
+        ppQueryResultsSet: PDNS_RECORD
+        pReserved: PVOID
+      ReturnValue: DNS_STATUS
+    DnsQuery_UTF8:
+      Parameters:
+        lpstrName: LPBYTE
+        wType: WORD
+        Options: DWORD
+        pExtra: PVOID
+        ppQueryResultsSet: PDNS_RECORD
+        pReserved: PVOID
+      ReturnValue: DNS_STATUS
+    DnsQuery_W:
+      Parameters:
+        lpstrName: LPCWSTR
+        wType: WORD
+        Options: DWORD
+        pExtra: PVOID
+        ppQueryResultsSet: PDNS_RECORD
+        pReserved: PVOID
+      ReturnValue: DNS_STATUS
+  ws2_32.dll:
+    getaddrinfo:
+      Parameters:
+        pNodeName: PCSTR
+        pServiceName: PCSTR
+        pHints: ADDRINFOA
+        ppResult: PADDRINFOA
+      ReturnValue: int
+    GetAddrInfoW:
+      Parameters:
+        pNodeName: PCWSTR
+        pServiceName: PCWSTR
+        pHints: ADDRINFOW
+        ppResult: PADDRINFOW
+      ReturnValue: int
+    WSAStartup:
+      Parameters:
+        wVersionRequested: WORD
+        lpWSAData: LPWSADATA
+      ReturnValue: int
+    gethostbyname:
+      Parameters:
+        a: const char
+      ReturnValue: struct hostent
+    socket:
+      Parameters:
+        af: int
+        type: int
+        protocol: int
+      ReturnValue: SOCKET
+    getsockname:
+      Parameters:
+        s: SOCKET
+        sockaddr: struct
+        namelen: int
+      ReturnValue: int
+    connect:
+      Parameters:
+        s: SOCKET
+        name: const sockaddr
+        namelen: int
+      ReturnValue: int
+    send:
+      Parameters:
+        s: SOCKET
+        buf: char
+        len: int
+        flags: int
+      ReturnValue: int
+    sendto:
+      Parameters:
+        s: SOCKET
+        buf: char
+        len: int
+        flags: int
+        to: const sockaddr
+        tolen: int
+      ReturnValue: int
+    recv:
+      Parameters:
+        s: SOCKET
+        buf: char
+        len: int
+        flags: int
+      ReturnValue: int
+    recvfrom:
+      Parameters:
+        s: SOCKET
+        buf: char
+        len: int
+        flags: int
+        from: sockaddr
+        fromlen: int
+      ReturnValue: int
+    accept:
+      Parameters:
+        s: SOCKET
+        addr: sockaddr
+        addrlen: int
+      ReturnValue: SOCKET
+    bind:
+      Parameters:
+        s: SOCKET
+        sockaddr: addr
+        namelen: int
+      ReturnValue: int
+    listen:
+      Parameters:
+        s: SOCKET
+        backlog: int
+      ReturnValue: int
+    select:
+      Parameters:
+        s: SOCKET
+        readfds: fd_set
+        writefds: fd_set
+        exceptfds: fd_set
+        timeout: timeval
+      ReturnValue: int
+    setsockopt:
+      Parameters:
+        s: SOCKET
+        level: int
+        optname: int
+        optval: char
+        optlen: int
+      ReturnValue: int
+    ioctlsocket:
+      Parameters:
+        s: SOCKET
+        cmd: long
+        argp: u_long
+      ReturnValue: int
+    closesocket:
+      Parameters:
+        s: SOCKET
+      ReturnValue: int
+    shutdown:
+      Parameters:
+        s: SOCKET
+        how: int
+      ReturnValue: int
+    WSAAccept:
+      Parameters:
+        s: SOCKET
+        addr: sockaddr
+        addrlen: LPINT
+        lpfnCondition: LPCONDITIONPROC
+        dwCallbackData: DWORD_PTR
+      ReturnValue: SOCKET
+    WSARecv:
+      Parameters:
+        s: SOCKET
+        lpBuffers: LPWSABUF
+        dwBufferCount: DWORD
+        lpNumberOfBytesRecvd: LPDWORD
+        lpFlags: LPDWORD
+        lpOverlapped: LPWSAOVERLAPPED
+        lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: int
+    WSARecvFrom:
+      Parameters:
+        s: SOCKET
+        lpBuffers: LPWSABUF
+        dwBufferCount: DWORD
+        lpNumberOfBytesRecvd: LPDWORD
+        lpFlags: LPDWORD
+        lpfrom: sockaddr
+        lpFromlen: LPINT
+        lpOverlapped: LPWSAOVERLAPPED
+        lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: int
+    WSASend:
+      Parameters:
+        s: SOCKET
+        lpBuffers: LPWSABUF
+        dwBufferCount: DWORD
+        lpNumberOfBytesSent: LPDWORD
+        dwFlags: DWORD
+        lpOverlapped: LPWSAOVERLAPPED
+        lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: int
+    WSASendTo:
+      Parameters:
+        s: SOCKET
+        lpBuffers: LPWSABUF
+        dwBufferCount: DWORD
+        lpNumberOfBytesSent: LPDWORD
+        dwFlags: DWORD
+        lptp: const sockaddr
+        iToLen: int
+        lpOverlapped: LPWSAOVERLAPPED
+        lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE
+      ReturnValue: int
+    WSASocketA:
+      Parameters:
+        af: int
+        type: int
+        protocol: int
+        lpProtocolInfo: LPWSAPROTOCOL_INFO
+        g: GROUP
+        dwFlags: DWORD
+      ReturnValue: SOCKET
+    WSASocketW:
+      Parameters:
+        af: int
+        type: int
+        protocol: int
+        lpProtocolInfo: LPWSAPROTOCOL_INFO
+        g: GROUP
+        dwFlags: DWORD
+      ReturnValue: SOCKET
+    WSAConnect:
+      Parameters:
+        s: SOCKET
+        name: const sockaddr
+        namelen: int
+        lpCallerData: LPWSABUF
+        lpCalleeData: LPWSABUF
+        lpSQOS: LPQOS
+        lpGQOS: LPQOS
+      ReturnValue: int
+  IPHLPAPI.DLL:
+    GetInterfaceInfo:
+      Parameters:
+        pIfTable: PIP_INTERFACE_INFO
+        dwOutBufLen: PULONG
+      ReturnValue: DWORD
+    GetAdaptersInfo:
+      Parameters:
+        pAdapterInfo: PIP_ADAPTER_INFO
+        pOutBufLen: PULONG
+      ReturnValue: DWORD
+    GetAdaptersAddresses:
+      Parameters:
+        Family: ULONG
+        Flags: ULONG
+        Reserved: PVOID
+        AdapterAddresses: PIP_ADAPTER_ADDRESSES
+        SizePointer: PULONG
+      ReturnValue: ULONG
+    GetBestInterfaceEx:
+      Parameters:
+        pDestAddr: sockaddr
+        pdwBestIfIndex: PDWORD
+      ReturnValue: DWORD
+    IcmpSendEcho:
+      Parameters:
+        IcmpHandle: HANDLE
+        DestinationAddress: DWORD
+        RequestData: LPVOID
+        RequestSize: WORD
+        RequestOptions: LPVOID
+        ReplyBuffer: LPVOID
+        ReplySize: DWORD
+        Timeout: DWORD
+      ReturnValue: DWORD
+  mpr.dll:
+    WNetGetProviderNameW:
+      Parameters:
+        dwNetType: DWORD
+        lpProviderName: LPWSTR
+        lpBufferSize: LPDWORD
+      ReturnValue: DWORD
+  vbe6.dll:
+    vbe6_StringConcat:
+      Parameters:
+        this: void
+        dst: VARIANT
+        src2: VARIANT
+        src1: VARIANT
+      ReturnValue: void
+    vbe6_CreateObject:
+      Parameters:
+        this: void
+        object_name: BSTR
+        unk1: void
+      ReturnValue: void
+    vbe6_GetObject:
+      Parameters:
+        this: void
+        object_name: VARIANT
+        unk1: void
+      ReturnValue: void
+    vbe6_GetIDFromName:
+      Parameters:
+        funcname: wchar_t
+        this: void
+      ReturnValue: void
+    vbe6_CallByName:
+      Parameters:
+        result: void
+        this: void
+        funcname: wchar_t
+        unk1: void
+        args: SAFEARRAY
+        unk3: void
+      ReturnValue: void
+    vbe6_Invoke:
+      Parameters:
+        this: void
+        funcidx: int
+        unk1: void
+        unk2: void
+        unk3: void
+        args: uint8_t
+        result: VARIANT
+        unk8: void
+        unk9: void
+      ReturnValue: void
+    vbe6_Shell:
+      Parameters:
+        command_line: VARIANT
+        show_type: int
+      ReturnValue: void
+    vbe6_Import:
+      Parameters:
+        args: void
+        unk1: void
+        unk2: void
+        unk3: void
+        unk4: void
+      ReturnValue: void
+    vbe6_Open:
+      Parameters:
+        mode: int
+        unk1: void
+        fd: int
+        wchar_t: const wchar_t
+      ReturnValue: void
+    vbe6_Print:
+      Parameters:
+        unk1: void
+        unk2: void
+        buf: VARIANT
+        unk4: void
+      ReturnValue: void
+    vbe6_Close:
+      Parameters:
+        this: void
+        fd: int
+      ReturnValue: void
+  ole32.dll:
+    CoCreateInstance:
+      Parameters:
+        rclsid: REFCLSID
+        pUnkOuter: LPUNKNOWN
+        dwClsContext: DWORD
+        riid: REFIID
+        ppv: LPVOID
+      ReturnValue: HRESULT
+    OleInitialize:
+      Parameters:
+        pvReserved: LPVOID
+      ReturnValue: HRESULT
+    CoInitializeEx:
+      Parameters:
+        pvReserved: LPVOID
+        dwCoInit: DWORD
+      ReturnValue: HRESULT
+    CoUninitialize:
+      Parameters:
+        pSecDesc: PSECURITY_DESCRIPTOR
+        cAuthSvc: LONG
+        asAuthSvc: SOLE_AUTHENTICATION_SERVICE
+        pReserved1: void
+        dwAuthnLevel: DWORD
+        dwImpLevel: DWORD
+        pAuthList: void
+        dwCapabilities: DWORD
+        pReserved3: void
+      ReturnValue: HRESULT
+    CoCreateInstanceEx:
+      Parameters:
+        rclsid: REFCLSID
+        punkOuter: IUnknown
+        dwClsCtx: DWORD
+        pServerInfo: COSERVERINFO
+        dwCount: DWORD
+        pResults: MULTI_QI
+      ReturnValue: HRESULT
+    CoGetClassObject:
+      Parameters:
+        rclsid: REFCLSID
+        dwClsContext: DWORD
+        pServerInfo: COSERVERINFO
+        riid: REFIID
+        ppv: LPVOID
+      ReturnValue: HRESULT
+  escript.api.dll:
+    pdf_eval:
+      Parameters:
+        unk1: void
+        unk2: void
+        unk3: void
+        args: void
+        unk4: void
+      ReturnValue: void
+    pdf_unescape:
+      Parameters:
+        unk1: void
+        unk2: void
+        unk3: void
+        args: void
+        unk4: void
+      ReturnValue: void
+  msvcrt.dll:
+    system:
+      Parameters:
+        command: char
+      ReturnValue: int
+  winmm.dll:
+    timeGetTime:
+      ReturnValue: DWORD
+  __wmi__.dll:
+    IWbemServices_ExecQuery:
+      Parameters:
+        This: IWbemServices
+        strQueryLanguage: const BSTR
+        strQuery: const BSTR
+        lFlags: ULONG
+        pCtx: IWbemContext
+        ppEnum: IEnumWbemClassObject
+      ReturnValue: HRESULT
+    IWbemServices_ExecQueryAsync:
+      Parameters:
+        This: IWbemServices
+        strQueryLanguage: const BSTR
+        strQuery: const BSTR
+        lFlags: long
+        pCtx: IWbemContext
+        pResponseHandler: IWbemObjectSink
+      ReturnValue: HRESULT
+  srvcli.dll:
+    NetShareEnum:
+      Parameters:
+        servername: LPWSTR
+        level: DWORD
+        bufptr: LPBYTE
+        prefmaxlen: DWORD
+        entriesread: LPDWORD
+        totalentries: LPDWORD
+        resume_handle: LPDWORD
+      ReturnValue: NET_API_STATUS
+  shlwapi.dll:
+    PathFileExists:
+      Parameters:
+        pszPath: LPCTSTR
+      ReturnValue: BOOL
+Structures:
+  LPDWORD:
+    DWORD: DWORD
+  PHANDLE:
+    HANDLE: HANDLE
+  PHARDERROR_RESPONSE:
+    HARDERROR_RESPONSE: HARDERROR_RESPONSE
+  PHKEY:
+    HKEY: HKEY
+  LPPROCESS_INFORMATION:
+    hProcess: HANDLE
+    hThread: HANDLE
+    dwProcessId: DWORD
+    dwThreadId: DWORD
+  POBJECT_ATTRIBUTES:
+    Length: ULONG
+    RootDirectory: HANDLE
+    ObjectName: PUNICODE_STRING
+    Attributes: DWORD
+    SecurityDescriptor: PVOID
+    SecurityQualityOfService: PVOID
+  LPSTARTUPINFOA:
+    cb: DWORD
+    lpReserved: LPSTR
+    lpDesktop: LPSTR
+    lpTitle: LPSTR
+    dwX: DWORD
+    dwY: DWORD
+    dwXSize: DWORD
+    dwYSize: DWORD
+    dwXCountChars: DWORD
+    dwYCountChars: DWORD
+    dwFillAttribute: DWORD
+    dwFlags: DWORD
+    wShowWindow: WORD
+    cbReserved2: WORD
+    lpReserved2: LPBYTE
+    hStdInput: HANDLE
+    hStdOutput: HANDLE
+    hStdError: HANDLE
+  LPSTARTUPINFOW:
+    cb: DWORD
+    lpReserved: LPWSTR
+    lpDesktop: LPWSTR
+    lpTitle: LPWSTR
+    dwX: DWORD
+    dwY: DWORD
+    dwXSize: DWORD
+    dwYSize: DWORD
+    dwXCountChars: DWORD
+    dwYCountChars: DWORD
+    dwFillAttribute: DWORD
+    dwFlags: DWORD
+    wShowWindow: WORD
+    cbReserved2: WORD
+    lpReserved2: LPBYTE
+    hStdInput: HANDLE
+    hStdOutput: HANDLE
+    hStdError: HANDLE
+  LPSECURITY_ATTRIBUTES:
+    nLength: DWORD
+    lpSecurityDescriptor: LPVOID
+    bInheritHandle: BOOL
+HighLevelParameterTypes:
+  AddressWidth32Bit:
+    BOOL : int
+    DEFAULT : unsigned int
+    DWORD : unsigned long
+    FARPROC : unsigned int
+    HANDLE : unsigned int
+    HFILE : unsigned int
+    HMODULE : unsigned int
+    HINSTANCE : unsigned int
+    LPCSTR : LPSTR_32
+    LPSTR : LPSTR_32
+    LPCWSTR : LPWSTR_32
+    LPWSTR : LPWSTR_32
+    PWSTR : LPWSTR_32
+    PUNICODE_STRING : UNICODE_WSTR_32
+    PWCHAR : PUNICODE_STRING
+    PUSHORT : unsigned int
+    LPVOID : unsigned int
+    LPCVOID : unsigned int
+    LPDWORD : unsigned int
+    LPBYTE : unsigned int
+    UINT : unsigned int
+    UINT_PTR : unsigned int
+    ULONG_PTR : unsigned long
+    PULONG : ULONG_PTR
+    ULONG : unsigned long
+    size_t : ULONG_PTR
+    WORD : unsigned short
+    HKEY : HANDLE
+    PHANDLE : HANDLE
+    ACCESS_MASK : DWORD
+    PVOID : unsigned int
+    HARDERROR_RESPONSE_OPTION : unsigned int
+    HARDERROR_RESPONSE : unsigned int
+    LPSECURITY_ATTRIBUTES : unsigned int
+  AddressWidth64Bit:
+    BOOL : __int64
+    DEFAULT : unsigned __int64
+    DWORD : unsigned long
+    FARPROC : unsigned __int64
+    HANDLE : unsigned __int64
+    HFILE : unsigned __int64
+    HMODULE : unsigned __int64
+    HINSTANCE : unsigned __int64
+    LPCSTR : LPSTR_64
+    LPSTR : LPSTR_64
+    LPCWSTR : LPWSTR_64
+    LPWSTR : LPWSTR_64
+    PWSTR : LPWSTR_64
+    PUNICODE_STRING : UNICODE_WSTR_64
+    PWCHAR : PUNICODE_STRING
+    PUSHORT : unsigned __int64
+    LPVOID : unsigned __int64
+    LPCVOID : unsigned __int64
+    LPDWORD : unsigned __int64
+    LPBYTE : unsigned __int64
+    UINT : unsigned __int64
+    UINT_PTR : unsigned __int64
+    ULONG_PTR : unsigned __int64
+    PULONG : ULONG_PTR
+    ULONG : unsigned long
+    WORD : unsigned short
+    HKEY : HANDLE
+    PHANDLE : HANDLE
+    ACCESS_MASK : DWORD
+    PVOID : unsigned __int64
+    HARDERROR_RESPONSE_OPTION : unsigned int
+    HARDERROR_RESPONSE : unsigned int
+    LPSECURITY_ATTRIBUTES : unsigned __int64
+BackingParameterTypes:
+  __ptr32 : 4
+  __ptr64 : 8
+  int : 4
+  long : 4
+  LPSTR_32 : 4
+  LPSTR_64 : 8
+  __int64 : 8
+  LPWSTR_32 : 4
+  LPWSTR_64 : 8
+  UNICODE_WSTR_32 : 4
+  UNICODE_WSTR_64 : 8
+  unsigned __int64 : 8
+  unsigned long : 4
+  unsigned int : 4
+  unsigned short : 2
