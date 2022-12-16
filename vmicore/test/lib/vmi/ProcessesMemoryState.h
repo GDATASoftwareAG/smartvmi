@@ -363,7 +363,7 @@ namespace VmiCore
             ((vadRootNodeEndingVpn + 1) << PagingDefinitions::numberOfPageIndexBits) - 1;
         size_t vadRootNodeMemoryRegionSize = vadRootNodeEndingAddress - vadRootNodeStartingAddress + 1;
         std::unique_ptr<IPageProtection> vadRootNodeMemoryRegionProtection = std::make_unique<PageProtection>(
-            static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), OperatingSystem::WINDOWS);
+            static_cast<uint32_t>(Windows::ProtectionValues::PAGE_READWRITE), OperatingSystem::WINDOWS);
         MemoryRegion expectedMemoryRegion1{vadRootNodeStartingAddress,
                                            vadRootNodeMemoryRegionSize,
                                            std::string{},
@@ -382,7 +382,7 @@ namespace VmiCore
             vadRootNodeChildEndingAddress - vadRootNodeRightChildStartingAddress + 1;
         std::string fileNameString = std::string(R"(\Windows\IAMSYSTEM.exe)");
         std::unique_ptr<IPageProtection> vadRootNodeChildMemoryRegionProtection = std::make_unique<PageProtection>(
-            static_cast<uint32_t>(Windows::ProtectionValues::MM_EXECUTE_WRITECOPY), OperatingSystem::WINDOWS);
+            static_cast<uint32_t>(Windows::ProtectionValues::PAGE_EXECUTE_WRITECOPY), OperatingSystem::WINDOWS);
         MemoryRegion expectedMemoryRegion2{vadRootNodeRightChildStartingAddress,
                                            vadRootNodeChildMemoryRegionSize,
                                            fileNameString,
@@ -403,7 +403,7 @@ namespace VmiCore
             vadRootNodeLeftChildStartingAddress,
             vadRootNodeLeftChildMemoryRegionSize,
             std::string{},
-            std::make_unique<PageProtection>(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE),
+            std::make_unique<PageProtection>(static_cast<uint32_t>(Windows::ProtectionValues::PAGE_READWRITE),
                                              OperatingSystem::WINDOWS),
             false,
             false,
@@ -433,10 +433,10 @@ namespace VmiCore
                 .WillByDefault(testing::Return(vadRootNodeEndingVpn));
             ON_CALL(*mockVmiInterface, read64VA(vadRootNodeBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
                 .WillByDefault(testing::Return(
-                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
+                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::PAGE_READWRITE), true)));
             ON_CALL(*mockVmiInterface, read32VA(vadRootNodeBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
                 .WillByDefault(testing::Return(
-                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
+                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::PAGE_READWRITE), true)));
         }
 
         void systemVadTreeRightChildOfRootNodeMemoryState()
@@ -469,7 +469,7 @@ namespace VmiCore
                 .WillByDefault(testing::Return(vadRootNodeRightChildEndingVpn));
             ON_CALL(*mockVmiInterface, read32VA(vadRootNodeRightChildBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
                 .WillByDefault(testing::Return(
-                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_EXECUTE_WRITECOPY), false)));
+                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::PAGE_EXECUTE_WRITECOPY), false)));
             ON_CALL(*mockVmiInterface, read64VA(vadRootNodeRightChildBase + _MMVAD_OFFSETS::Subsection, systemCR3))
                 .WillByDefault(testing::Return(subsectionAddress));
             ON_CALL(*mockVmiInterface, read64VA(subsectionAddress + _SUBSECTION_OFFSETS::ControlArea, systemCR3))
@@ -517,10 +517,10 @@ namespace VmiCore
                 .WillByDefault(testing::Return(vadRootNodeLeftChildEndingVpn));
             ON_CALL(*mockVmiInterface, read64VA(vadRootNodeLeftChildBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
                 .WillByDefault(testing::Return(
-                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
+                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::PAGE_READWRITE), true)));
             ON_CALL(*mockVmiInterface, read32VA(vadRootNodeLeftChildBase + __MMVAD_SHORT_OFFSETS::Flags, systemCR3))
                 .WillByDefault(testing::Return(
-                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::MM_READWRITE), true)));
+                    createMmvadFlags(static_cast<uint32_t>(Windows::ProtectionValues::PAGE_READWRITE), true)));
         }
 
         static uint32_t createMmvadFlags(uint32_t protection, bool privateMemory)

@@ -274,4 +274,24 @@ namespace VmiCore::Windows
         return wow64Process != 0;
     }
 
+    std::vector<uint32_t> KernelAccess::extractMmProtectToValue()
+    {
+        if (mmProtectToValue.has_value())
+        {
+            return mmProtectToValue.value();
+        }
+
+        constexpr std::size_t mmProtectToValueLength = 32;
+        mmProtectToValue = std::vector<uint32_t>{};
+        mmProtectToValue.value().reserve(mmProtectToValueLength);
+        auto mmProtectToValueAddress = vmiInterface->translateKernelSymbolToVA("MmProtectToValue");
+
+        for (std::size_t i = 0; i < mmProtectToValueLength; i++)
+        {
+            mmProtectToValue.value().push_back(vmiInterface->read32VA(mmProtectToValueAddress + i * sizeof(uint32_t),
+                                                                      vmiInterface->convertPidToDtb(systemPid)));
+        }
+
+        return mmProtectToValue.value();
+    }
 }

@@ -6,6 +6,7 @@
 #include "Vadt.h"
 #include <list>
 #include <memory>
+#include <vector>
 #include <vmicore/os/IMemoryRegionExtractor.h>
 
 namespace VmiCore::Windows
@@ -27,6 +28,7 @@ namespace VmiCore::Windows
         pid_t pid;
         std::string processName;
         std::unique_ptr<ILogger> logger;
+        std::vector<uint32_t> mmProtectToValue;
 
         [[nodiscard]] std::unique_ptr<Vadt> createVadt(uint64_t vadEntryBaseVA) const;
 
