@@ -13,7 +13,7 @@ namespace VmiCore::Windows
         uint64_t startingVPN;
         uint64_t endingVPN;
         std::string fileName;
-        ProtectionValues protection;
+        uint8_t protection;
         bool isFileBacked;
         bool isSharedMemory;
         bool isBeingDeleted;

@@ -17,7 +17,8 @@ namespace VmiCore::Windows
           eprocessBase(eprocessBase),
           pid(pid),
           processName(std::move(processName)),
-          logger(logging->newNamedLogger(FILENAME_STEM))
+          logger(logging->newNamedLogger(FILENAME_STEM)),
+          mmProtectToValue(this->kernelAccess->extractMmProtectToValue())
     {
     }
 
@@ -82,7 +83,7 @@ namespace VmiCore::Windows
                 regions->emplace_back(startAddress,
                                       size,
                                       currentVad->fileName,
-                                      std::make_unique<PageProtection>(static_cast<uint32_t>(currentVad->protection),
+                                      std::make_unique<PageProtection>(mmProtectToValue.at(currentVad->protection),
                                                                        OperatingSystem::WINDOWS),
                                       currentVad->isSharedMemory,
                                       currentVad->isBeingDeleted,
@@ -110,7 +111,7 @@ namespace VmiCore::Windows
         auto vadt = std::make_unique<Vadt>();
         auto vadShortBaseVA = kernelAccess->getVadShortBaseVA(vadEntryBaseVA);
         std::tie(vadt->startingVPN, vadt->endingVPN) = kernelAccess->extractMmVadShortVpns(vadShortBaseVA);
-        vadt->protection = static_cast<ProtectionValues>(kernelAccess->extractProtectionFlagValue(vadShortBaseVA));
+        vadt->protection = kernelAccess->extractProtectionFlagValue(vadShortBaseVA);
         vadt->isFileBacked = false;
         vadt->isBeingDeleted = false;
         vadt->isSharedMemory = !kernelAccess->extractIsPrivateMemory(vadShortBaseVA);

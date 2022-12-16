@@ -11,48 +11,10 @@ namespace VmiCore
         {
             case OperatingSystem::WINDOWS:
             {
-                switch (static_cast<Windows::ProtectionValues>(value))
-                {
-                    case Windows::ProtectionValues::MM_READONLY:
-                    {
-                        protection = {.readable = 1};
-                        break;
-                    }
-                    case Windows::ProtectionValues::MM_EXECUTE:
-                    {
-                        protection = {.executable = 1};
-                        break;
-                    }
-                    case Windows::ProtectionValues::MM_EXECUTE_READ:
-                    {
-                        protection = {.readable = 1, .executable = 1};
-                        break;
-                    }
-                    case Windows::ProtectionValues::MM_READWRITE:
-                    {
-                        protection = {.readable = 1, .writeable = 1};
-                        break;
-                    }
-                    case Windows::ProtectionValues::MM_WRITECOPY:
-                    {
-                        protection = {.readable = 1, .writeable = 1, .copyOnWrite = 1};
-                        break;
-                    }
-                    case Windows::ProtectionValues::MM_EXECUTE_READWRITE:
-                    {
-                        protection = {.readable = 1, .writeable = 1, .executable = 1};
-                        break;
-                    }
-                    case Windows::ProtectionValues::MM_EXECUTE_WRITECOPY:
-                    {
-                        protection = {.readable = 1, .writeable = 1, .executable = 1, .copyOnWrite = 1};
-                        break;
-                    }
-                    default:
-                    {
-                        throw std::runtime_error("Unknown windows protection value.");
-                    }
-                }
+                protection = {.readable = static_cast<uint8_t>((value & Windows::READ_MASK) != 0),
+                              .writeable = static_cast<uint8_t>((value & Windows::WRITE_MASK) != 0),
+                              .executable = static_cast<uint8_t>((value & Windows::EXEC_MASK) != 0),
+                              .copyOnWrite = static_cast<uint8_t>((value & Windows::WRITE_COPY_MASK) != 0)};
                 break;
             }
             case OperatingSystem::LINUX:
@@ -62,9 +24,12 @@ namespace VmiCore
                     throw std::runtime_error("Value must not be larger than a byte.");
                 }
                 protection = {
-                    .readable = static_cast<uint8_t>(value & static_cast<uint8_t>(Linux::ProtectionValues::VM_READ)),
-                    .writeable = static_cast<uint8_t>(value & static_cast<uint8_t>(Linux::ProtectionValues::VM_WRITE)),
-                    .executable = static_cast<uint8_t>(value & static_cast<uint8_t>(Linux::ProtectionValues::VM_EXEC)),
+                    .readable =
+                        static_cast<uint8_t>((value & static_cast<uint8_t>(Linux::ProtectionValues::VM_READ)) != 0),
+                    .writeable =
+                        static_cast<uint8_t>((value & static_cast<uint8_t>(Linux::ProtectionValues::VM_WRITE)) != 0),
+                    .executable =
+                        static_cast<uint8_t>((value & static_cast<uint8_t>(Linux::ProtectionValues::VM_EXEC)) != 0),
                     .copyOnWrite =
                         static_cast<uint8_t>((value & (static_cast<uint8_t>(Linux::ProtectionValues::VM_SHARED) |
                                                        static_cast<uint8_t>(Linux::ProtectionValues::VM_MAYWRITE))) ==
