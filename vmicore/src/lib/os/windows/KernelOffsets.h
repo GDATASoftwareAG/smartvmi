@@ -109,18 +109,18 @@ namespace VmiCore::Windows
       public:
         static KernelOffsets init(const std::shared_ptr<ILibvmiInterface>& vmiInterface);
 
+        KernelStructOffsets::mmvad_flags mmvadFlags{};
+        KernelStructOffsets::mmsection_flags mmsectionFlags{};
+        KernelStructOffsets::_mmvad_short mmVadShort{};
+        KernelStructOffsets::_eprocess eprocess{};
         KernelStructOffsets::_control_area controlArea{};
+        KernelStructOffsets::_mmvad mmVad{};
+        KernelStructOffsets::_rtl_balanced_node rtlBalancedNode{};
         KernelStructOffsets::_file_object fileObject{};
         KernelStructOffsets::_section section{};
         KernelStructOffsets::_kprocess kprocess{};
-        KernelStructOffsets::_eprocess eprocess{};
-        KernelStructOffsets::_mmvad_short mmVadShort{};
-        KernelStructOffsets::_mmvad mmVad{};
         KernelStructOffsets::_subsection subSection{};
         KernelStructOffsets::_ex_fast_ref exFastRef{};
-        KernelStructOffsets::_rtl_balanced_node rtlBalancedNode{};
-        KernelStructOffsets::mmvad_flags mmvadFlags{};
-        KernelStructOffsets::mmsection_flags mmsectionFlags{};
     };
 }
 
