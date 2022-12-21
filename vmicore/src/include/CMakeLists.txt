@@ -14,7 +14,7 @@ target_sources(vmicore-public-headers INTERFACE
         vmicore/vmi/BpResponse.h
         vmicore/vmi/IBreakpoint.h
         vmicore/vmi/IIntrospectionAPI.h
-        vmicore/vmi/VmiUnicodeStruct.h
+        vmicore/vmi/IVmiUnicodeStruct.h
         vmicore/vmi/events/IInterruptEvent.h
         vmicore/vmi/events/IRegisterReadable.h
         vmicore/filename.h

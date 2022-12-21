@@ -4,6 +4,7 @@
 #include "../config/IConfigParser.h"
 #include "../io/IEventStream.h"
 #include "../io/ILogging.h"
+#include "VmiUnicodeStruct.h"
 #include <fmt/core.h>
 #include <libvmi/events.h>
 #include <memory>
@@ -13,7 +14,6 @@
 #include <vmicore/os/OperatingSystem.h>
 #include <vmicore/types.h>
 #include <vmicore/vmi/IIntrospectionAPI.h>
-#include <vmicore/vmi/VmiUnicodeStruct.h>
 
 #define LIBVMI_EXTRA_JSON
 
@@ -44,6 +44,8 @@ namespace VmiCore
         virtual void resumeVm() = 0;
 
         virtual bool areEventsPending() = 0;
+
+        virtual VmiUnicodeStruct extractUnicodeStringInternal(addr_t stringVA, addr_t cr3) = 0;
 
         virtual void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) = 0;
 
@@ -104,7 +106,9 @@ namespace VmiCore
 
         [[nodiscard]] bool areEventsPending() override;
 
-        [[nodiscard]] VmiUnicodeStruct extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
+        [[nodiscard]] VmiUnicodeStruct extractUnicodeStringInternal(addr_t stringVA, addr_t cr3) override;
+
+        [[nodiscard]] std::unique_ptr<IVmiUnicodeStruct> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
 
         [[nodiscard]] std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) override;
 

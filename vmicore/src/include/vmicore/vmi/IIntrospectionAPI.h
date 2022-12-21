@@ -3,7 +3,7 @@
 
 #include "../os/OperatingSystem.h"
 #include "../types.h"
-#include "VmiUnicodeStruct.h"
+#include "IVmiUnicodeStruct.h"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -44,7 +44,7 @@ namespace VmiCore
 
         [[nodiscard]] virtual pid_t convertDtbToPid(addr_t dtb) = 0;
 
-        virtual VmiUnicodeStruct extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
+        virtual std::unique_ptr<IVmiUnicodeStruct> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
 
         virtual std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) = 0;
 

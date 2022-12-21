@@ -37,7 +37,7 @@ namespace VmiCore::Windows
     VmiUnicodeStruct KernelAccess::extractFileName(addr_t fileObjectBaseAddress) const
     {
         expectSaneKernelAddress(fileObjectBaseAddress, static_cast<const char*>(__func__));
-        return vmiInterface->extractUnicodeStringAtVA(fileObjectBaseAddress + kernelOffsets.fileObject.FileName,
+        return vmiInterface->extractUnicodeStringInternal(fileObjectBaseAddress + kernelOffsets.fileObject.FileName,
                                                       vmiInterface->convertPidToDtb(systemPid));
     }
 
@@ -168,7 +168,7 @@ namespace VmiCore::Windows
     VmiUnicodeStruct KernelAccess::extractProcessPath(addr_t filePointerAddress) const
     {
         expectSaneKernelAddress(filePointerAddress, static_cast<const char*>(__func__));
-        return vmiInterface->extractUnicodeStringAtVA(filePointerAddress + kernelOffsets.fileObject.FileName,
+        return vmiInterface->extractUnicodeStringInternal(filePointerAddress + kernelOffsets.fileObject.FileName,
                                                       vmiInterface->convertPidToDtb(systemPid));
     }
 

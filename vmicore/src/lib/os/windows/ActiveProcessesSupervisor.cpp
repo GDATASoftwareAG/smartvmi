@@ -53,8 +53,9 @@ namespace VmiCore::Windows
         processInformation->is32BitProcess = kernelAccess->extractIsWow64Process(eprocessBase);
         try
         {
-            processInformation->processPathData = extractProcessPath(eprocessBase);
-            processInformation->processPath = get<VmiUnicodeStruct>(processInformation->processPathData);
+            processInformation->processPathData = std::make_unique<VmiUnicodeStruct>(extractProcessPath(eprocessBase));
+            processInformation->processPath =
+                *get<std::unique_ptr<IVmiUnicodeStruct>>(processInformation->processPathData);
             processInformation->fullName = splitProcessFileNameFromPath(processInformation->processPath);
         }
         catch (const std::exception& e)
@@ -207,7 +208,7 @@ namespace VmiCore::Windows
         return runningProcesses;
     }
 
-    VmiUnicodeStruct  ActiveProcessesSupervisor::extractProcessPath(uint64_t eprocessBase) const
+    VmiUnicodeStruct ActiveProcessesSupervisor::extractProcessPath(uint64_t eprocessBase) const
     {
         auto sectionAddress = kernelAccess->extractSectionAddress(eprocessBase);
         auto controlAreaAddress = kernelAccess->extractControlAreaAddress(sectionAddress);
@@ -223,7 +224,7 @@ namespace VmiCore::Windows
 
     std::string_view ActiveProcessesSupervisor::splitProcessFileNameFromPath(const std::string_view& path)
     {
-        const auto *substringStartIterator =
+        const auto* substringStartIterator =
             std::find_if(path.crbegin(), path.crend(), [](const char c) { return c == '\\'; }).base();
         if (substringStartIterator == path.cbegin())
         {

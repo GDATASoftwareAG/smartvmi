@@ -1,7 +1,7 @@
 #ifndef VMICORE_ACTIVEPROCESSINFORMATION_H
 #define VMICORE_ACTIVEPROCESSINFORMATION_H
 
-#include "../vmi/VmiUnicodeStruct.h"
+#include "../vmi/IVmiUnicodeStruct.h"
 #include "IMemoryRegionExtractor.h"
 #include <cstdint>
 #include <memory>
@@ -21,7 +21,7 @@ namespace VmiCore
         std::string name;
         std::string_view fullName;
         std::string_view processPath;
-        std::variant<std::string, VmiUnicodeStruct> processPathData;
+        std::variant<std::string, std::unique_ptr<IVmiUnicodeStruct>> processPathData;
         std::unique_ptr<IMemoryRegionExtractor> memoryRegionExtractor;
         bool is32BitProcess;
     };

@@ -29,7 +29,8 @@ add_library(vmicore-lib OBJECT
         vmi/LibvmiInterface.cpp
         vmi/SingleStepSupervisor.cpp
         vmi/VmiInitData.cpp
-        vmi/VmiInitError.cpp)
+        vmi/VmiInitError.cpp
+        vmi/VmiUnicodeStruct.cpp)
 target_compile_features(vmicore-lib PUBLIC cxx_std_20)
 set_target_properties(vmicore-lib PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_link_libraries(vmicore-lib PUBLIC vmicore-public-headers dl)

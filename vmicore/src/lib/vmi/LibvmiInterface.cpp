@@ -343,7 +343,7 @@ namespace VmiCore
         return pending;
     }
 
-    VmiUnicodeStruct LibvmiInterface::extractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3)
+    VmiUnicodeStruct LibvmiInterface::extractUnicodeStringInternal(const addr_t stringVA, const addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
         std::lock_guard<std::mutex> lock(libvmiLock);
@@ -358,6 +358,11 @@ namespace VmiCore
         }
 
         return convertedUnicodeString;
+    }
+
+    std::unique_ptr<IVmiUnicodeStruct> LibvmiInterface::extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3)
+    {
+        return std::make_unique<VmiUnicodeStruct>(extractUnicodeStringInternal(stringVA, cr3));
     }
 
     std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(const addr_t virtualAddress, const addr_t cr3)
