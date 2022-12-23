@@ -14,9 +14,7 @@ namespace InMemoryScanner
     Dumping::Dumping(const PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration)
         : pluginInterface(pluginInterface), configuration(std::move(configuration))
     {
-        inMemoryDumpingFolder = *this->pluginInterface->getResultsDir();
-        inMemoryDumpingFolder /= this->configuration->getOutputPath();
-        dumpingPath = inMemoryDumpingFolder / "dumpedRegions";
+        dumpingPath = this->configuration->getOutputPath() / "dumpedRegions";
     }
 
     void Dumping::dumpMemoryRegion(const std::string& processName,
