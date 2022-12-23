@@ -63,7 +63,7 @@ namespace VmiCore
 
     void InterruptGuard::disableEvent()
     {
-        vmiInterface->clearEvent(guardEvent, true);
+        vmiInterface->clearEvent(guardEvent, false);
     }
 
     event_response_t InterruptGuard::_guardCallback(__attribute__((unused)) vmi_instance_t vmiInstance,

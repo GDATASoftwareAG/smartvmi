@@ -289,10 +289,10 @@ namespace VmiCore
         auto _breakpoint2 = interruptEventSupervisor->createBreakpoint(testVA2, testSystemCr3, breakpointCallback);
         EXPECT_CALL(*vmiInterface, clearEvent(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface,
-                    clearEvent(IsCorrectMemEvent(testPA >> PagingDefinitions::numberOfPageIndexBits), true))
+                    clearEvent(IsCorrectMemEvent(testPA >> PagingDefinitions::numberOfPageIndexBits), false))
             .Times(1);
         EXPECT_CALL(*vmiInterface,
-                    clearEvent(IsCorrectMemEvent(testPA2 >> PagingDefinitions::numberOfPageIndexBits), true))
+                    clearEvent(IsCorrectMemEvent(testPA2 >> PagingDefinitions::numberOfPageIndexBits), false))
             .Times(1);
 
         interruptEventSupervisor->teardown();
