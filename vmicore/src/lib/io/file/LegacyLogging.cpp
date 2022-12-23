@@ -12,10 +12,16 @@ namespace VmiCore
 
     void LegacyLogging::saveBinaryToFile(std::string_view logFileName, const std::vector<uint8_t>& data)
     {
-        std::filesystem::create_directories(configInterface->getResultsDirectory());
+        auto path = configInterface->getResultsDirectory() / logFileName;
+        auto parentPath = path.parent_path();
+        if (!parentPath.empty())
+        {
+            std::filesystem::create_directories(parentPath);
+        }
+
         std::ofstream ofStream;
         ofStream.exceptions(std::ios::failbit | std::ios::badbit);
-        ofStream.open(configInterface->getResultsDirectory() / logFileName, std::ios::app | std::ios::binary);
+        ofStream.open(path, std::ios::app | std::ios::binary);
         try
         {
             ofStream.write(reinterpret_cast<const char*>(data.data()), data.size());

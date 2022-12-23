@@ -149,7 +149,6 @@ namespace InMemoryScanner
         std::shared_ptr<IConfig> configuration;
 
         std::filesystem::path dumpingPath;
-        std::filesystem::path inMemoryDumpingFolder;
         std::mutex lock{};
         std::vector<std::string> memoryRegionInfo{};
         int memoryRegionCounter{};

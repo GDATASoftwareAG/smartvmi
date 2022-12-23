@@ -39,14 +39,10 @@ namespace InMemoryScanner
         MockMemoryRegionExtractor* sharedBaseImageMemoryRegionExtractorRaw = nullptr;
 
         std::string uidRegEx = "[0-9]+";
-        std::string vmiResultsOutputDir = "vmiResultsOutput";
-        std::string inMemOutputDir = "inMemDumps";
-        std::string dumpedRegionsDir = "dumpedRegions";
-
         std::string protectionAsString = "RWX";
 
-        std::filesystem::path inMemoryDumpsPath = std::filesystem::path(vmiResultsOutputDir) / inMemOutputDir;
-        std::filesystem::path dumpedRegionsPath = inMemoryDumpsPath / dumpedRegionsDir;
+        std::filesystem::path inMemoryDumpsPath = "inMemDumps";
+        std::filesystem::path dumpedRegionsPath = inMemoryDumpsPath / "dumpedRegions";
         VmiCore::addr_t startAddress = 0x1234000;
         size_t size = 0x666;
 
@@ -60,11 +56,8 @@ namespace InMemoryScanner
             ON_CALL(*pluginInterface, readProcessMemoryRegion(_, _, _))
                 .WillByDefault([]() { return std::make_unique<std::vector<uint8_t>>(6, 9); });
 
-            ON_CALL(*pluginInterface, getResultsDir())
-                .WillByDefault([vmiResultsOutputDir = vmiResultsOutputDir]()
-                               { return std::make_unique<std::string>(vmiResultsOutputDir); });
             ON_CALL(*configuration, getOutputPath())
-                .WillByDefault([inMemOutputDir = inMemOutputDir]() { return inMemOutputDir + "/"; });
+                .WillByDefault([inMemoryDumpsPath = inMemoryDumpsPath]() { return inMemoryDumpsPath; });
             ON_CALL(*configuration, getMaximumScanSize()).WillByDefault(Return(maxScanSize));
 
             runningProcesses = std::make_unique<std::vector<std::shared_ptr<const ActiveProcessInformation>>>();
@@ -319,7 +312,7 @@ namespace InMemoryScanner
                                      std::make_unique<std::string>(fullProcessName),
                                      std::make_unique<std::string>(""),
                                      std::move(memoryRegionExtractor)});
-        auto expectedFileName = inMemOutputDir + "/MemoryRegionInformation.json";
+        auto expectedFileName = inMemoryDumpsPath / "MemoryRegionInformation.json";
         std::string jsonStart = "{";
         std::string expectedFileContent =
             jsonStart + R"("ProcessName": ")" + fullProcessName + "\", " + "\"ProcessId\": " + std::to_string(pid) +
@@ -348,7 +341,7 @@ namespace InMemoryScanner
                 });
 
         EXPECT_CALL(*pluginInterface, writeToFile(_, An<const std::string&>())).Times(AnyNumber());
-        EXPECT_CALL(*pluginInterface, writeToFile(expectedFileName, expectedFileContent + "\n")).Times(1);
+        EXPECT_CALL(*pluginInterface, writeToFile(expectedFileName.string(), expectedFileContent + "\n")).Times(1);
 
         ASSERT_NO_THROW(scanner->scanAllProcesses());
         ASSERT_NO_THROW(scanner->saveOutput());
