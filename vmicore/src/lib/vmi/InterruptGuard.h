@@ -18,7 +18,7 @@ namespace VmiCore
                        const std::shared_ptr<ILogging>& logging,
                        uint64_t targetVA,
                        uint64_t targetGFN,
-                       uint64_t systemCr3);
+                       uint64_t processDtb);
 
         // This object has to be non-copyable and non-movable because we store a self reference in a vmi event that we
         // pass to libvmi. Therefore, we need to avoid invalidating this reference.
@@ -41,7 +41,7 @@ namespace VmiCore
         uint64_t targetGFN;
         vmi_event_t guardEvent{}; // This is okay because the enclosing object is non-copyable and non-movable
         std::vector<uint8_t> shadowPage;
-        uint64_t systemCr3;
+        uint64_t processDtb;
         emul_read_t emulateReadData{};
         bool interruptGuardHit = false;
 
