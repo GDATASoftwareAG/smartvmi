@@ -18,13 +18,13 @@ namespace VmiCore
                                    const std::shared_ptr<ILogging>& logging,
                                    uint64_t targetVA,
                                    uint64_t targetGFN,
-                                   uint64_t systemCr3)
+                                   uint64_t processDtb)
         : vmiInterface(std::move(vmiInterface)),
           logger(logging->newNamedLogger(loggerName)),
           targetVA(targetVA),
           targetGFN(targetGFN),
           shadowPage(PagingDefinitions::pageSizeInBytes + 16),
-          systemCr3(systemCr3)
+          processDtb(processDtb)
     {
     }
 
@@ -40,15 +40,14 @@ namespace VmiCore
 
         auto pageBaseVA = targetVA & PagingDefinitions::stripPageOffsetMask;
         // we need a small buffer of data from the subsequent page because memory reads may be overlapping
-        if (!vmiInterface->readXVA(pageBaseVA, systemCr3, shadowPage))
+        if (!vmiInterface->readXVA(pageBaseVA, processDtb, shadowPage))
         {
             throw VmiException(fmt::format(
-                "{}: Unable to create Interrupt @ {:#x} in system with cr3 {:#x}", __func__, pageBaseVA, systemCr3));
+                "{}: Unable to create Interrupt @ {:#x} in system with cr3 {:#x}", __func__, pageBaseVA, processDtb));
         }
         enableEvent();
         logger->debug("Interrupt guard: Register RW event on gfn",
-                      {logfield::create("targetGFN",
-                                        fmt::format("{:#x}", targetGFN >> PagingDefinitions::numberOfPageIndexBits))});
+                      {logfield::create("targetGFN", fmt::format("{:#x}", targetGFN))});
     }
 
     void InterruptGuard::teardown()
@@ -69,7 +68,7 @@ namespace VmiCore
     event_response_t InterruptGuard::_guardCallback(__attribute__((unused)) vmi_instance_t vmiInstance,
                                                     vmi_event_t* event)
     {
-        auto eventResponse = VMI_EVENT_RESPONSE_NONE;
+        event_response_t eventResponse = VMI_EVENT_RESPONSE_NONE;
         try
         {
             eventResponse = reinterpret_cast<InterruptGuard*>(event->data)->guardCallback(event);

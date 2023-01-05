@@ -18,7 +18,7 @@ namespace VmiCore
                        const std::shared_ptr<ILogging>& logging,
                        uint64_t targetVA,
                        uint64_t targetGFN,
-                       uint64_t systemCr3);
+                       uint64_t processDtb);
 
         void initialize();
 
@@ -31,7 +31,7 @@ namespace VmiCore
         uint64_t targetGFN;
         vmi_event_t guardEvent{};
         std::vector<uint8_t> shadowPage;
-        uint64_t systemCr3;
+        uint64_t processDtb;
         emul_read_t emulateReadData{};
         bool interruptGuardHit = false;
 

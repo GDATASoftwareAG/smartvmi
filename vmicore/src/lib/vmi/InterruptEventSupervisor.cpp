@@ -235,7 +235,7 @@ namespace VmiCore
     {
         auto originalValue = vmiInterface->read8PA(targetPA);
         GlobalControl::logger()->debug("Save original value",
-                                       {logfield::create("targetGFN", fmt::format("{:#x}", targetPA)),
+                                       {logfield::create("targetPA", fmt::format("{:#x}", targetPA)),
                                         logfield::create("originalValue", fmt::format("{:#x}", originalValue))});
         if (originalValue == INT3_BREAKPOINT)
         {
