@@ -174,6 +174,18 @@ namespace VmiCore
         InterruptEventSupervisor::_defaultInterruptCallback(vmiInstanceStub, interruptEvent);
     }
 
+    TEST_F(InterruptEventFixture, teardown_twoDistinctEventsRegisteredOnSamePage_doesNotThrow)
+    {
+        ON_CALL(*vmiInterface, convertVAToPA(testVA, testSystemCr3)).WillByDefault(Return(testPA));
+        auto breakpoint1 =
+            interruptEventSupervisor->createBreakpoint(testVA, testSystemCr3, breakpointCallbackFunction_t{});
+        ON_CALL(*vmiInterface, convertVAToPA(testVA + 1, testSystemCr3)).WillByDefault(Return(testPA + 1));
+        auto breakpoint2 =
+            interruptEventSupervisor->createBreakpoint(testVA + 1, testSystemCr3, breakpointCallbackFunction_t{});
+
+        EXPECT_NO_THROW(interruptEventSupervisor->teardown());
+    }
+
     TEST_F(InterruptEventFixture, _defaultInterruptCallback_eventReadingR8_CorrectContent)
     {
         uint64_t result = 0;

@@ -8,6 +8,7 @@
 #include "InterruptGuard.h"
 #include "LibvmiInterface.h"
 #include "SingleStepSupervisor.h"
+#include <map>
 #include <mutex>
 #include <optional>
 #include <unordered_map>
@@ -15,6 +16,12 @@
 
 namespace VmiCore
 {
+    struct BpPage
+    {
+        std::map<addr_t, std::vector<std::shared_ptr<Breakpoint>>> Breakpoints;
+        InterruptGuard PageGuard;
+    };
+
     class IInterruptEventSupervisor
     {
       public:
@@ -79,14 +86,13 @@ namespace VmiCore
         std::unique_ptr<ILogger> logger;
 
         std::unordered_map<addr_t, uint8_t> originalValuesByTargetPA;
-        std::unordered_map<addr_t, std::unique_ptr<InterruptGuard>> interruptGuardsByGFN{};
-        std::unordered_map<addr_t, std::vector<std::shared_ptr<Breakpoint>>> breakpointsByPA{};
+        std::unordered_map<addr_t, BpPage> breakpointsByGFN{};
         std::function<void(vmi_event_t*)> singleStepCallbackFunction;
         vmi_event_t event = vmi_event_t{};
         Event interruptEvent{&event};
         std::mutex lock{};
 
-        std::unique_ptr<InterruptGuard> createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN);
+        InterruptGuard createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN);
 
         void storeOriginalValue(addr_t targetPA);
 
