@@ -50,8 +50,8 @@ namespace VmiCore
     std::shared_ptr<IBreakpoint> InterruptEventSupervisor::createBreakpoint(
         uint64_t targetVA, uint64_t processDtb, const std::function<BpResponse(IInterruptEvent&)>& callbackFunction)
     {
-
         auto targetPA = vmiInterface->convertVAToPA(targetVA, processDtb);
+        auto targetGFN = targetPA >> PagingDefinitions::numberOfPageIndexBits;
         auto breakpoint = std::make_shared<Breakpoint>(
             targetPA,
             [supervisor = weak_from_this()](Breakpoint* bp)
@@ -64,27 +64,32 @@ namespace VmiCore
             callbackFunction);
 
         std::scoped_lock guard(lock);
-        // Register new INT3
-        if (!breakpointsByPA.contains(targetPA))
+        auto bpPage = breakpointsByGFN.find(targetGFN);
+        // Check if there already is an interrupt registered on this page
+        if (bpPage == breakpointsByGFN.end())
         {
-            auto targetGFN = targetPA >> PagingDefinitions::numberOfPageIndexBits;
-            // One PageGuard guards a whole memory page on which several interrupts may reside.
-            if (!interruptGuardsByGFN.contains(targetGFN))
-            {
-                interruptGuardsByGFN[targetGFN] = createPageGuard(targetVA, processDtb, targetGFN);
-            }
+            bpPage =
+                breakpointsByGFN
+                    .insert({targetGFN,
+                             BpPage{// One PageGuard guards a whole memory page on which several interrupts may reside
+                                    .PageGuard = createPageGuard(targetVA, processDtb, targetGFN)}})
+                    .first;
+        }
 
+        // Register new INT3
+        if (!bpPage->second.Breakpoints.contains(targetPA))
+        {
             vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
             vmiInterface->flushPageCache();
             storeOriginalValue(targetPA);
             enableEvent(targetPA);
 
-            breakpointsByPA[targetPA] = std::vector<std::shared_ptr<Breakpoint>>{breakpoint};
+            bpPage->second.Breakpoints[targetPA] = std::vector<std::shared_ptr<Breakpoint>>{breakpoint};
         }
         // If there is already an interrupt registered to that PA, simply add the event to management
         else
         {
-            breakpointsByPA.at(targetPA).push_back(breakpoint);
+            bpPage->second.Breakpoints.at(targetPA).push_back(breakpoint);
         }
 
         return breakpoint;
@@ -95,7 +100,9 @@ namespace VmiCore
         std::scoped_lock guard(lock);
 
         auto targetPA = breakpoint->getTargetPA();
-        auto breakpointsAtPA = breakpointsByPA.find(targetPA);
+        auto breakpointsAtGFN = breakpointsByGFN.find(targetPA >> PagingDefinitions::numberOfPageIndexBits);
+        auto breakpointsAtPA = breakpointsAtGFN->second.Breakpoints.find(targetPA);
+
         eraseBreakpointAtAddress(breakpointsAtPA->second, breakpoint);
         if (breakpointsAtPA->second.empty())
         {
@@ -109,9 +116,13 @@ namespace VmiCore
                 vmiInterface->eventsListen(0);
             }
             removeInterrupt(targetPA);
-            vmiInterface->resumeVm();
+            if (breakpointsAtGFN->second.Breakpoints.empty())
+            {
+                breakpointsAtGFN->second.PageGuard.teardown();
+                breakpointsByGFN.erase(breakpointsAtGFN);
+            }
 
-            breakpointsByPA.erase(breakpointsAtPA);
+            vmiInterface->resumeVm();
         }
     }
 
@@ -148,12 +159,16 @@ namespace VmiCore
         }
         auto eventPA =
             interruptEventSupervisor->vmiInterface->convertVAToPA(event->interrupt_event.gla, event->x86_regs->cr3);
-
-        auto breakpointsAtEventPA = interruptEventSupervisor->breakpointsByPA.find(eventPA);
-        if (breakpointsAtEventPA != interruptEventSupervisor->breakpointsByPA.end())
+        auto breakpointsAtEventGFN =
+            interruptEventSupervisor->breakpointsByGFN.find(eventPA >> PagingDefinitions::numberOfPageIndexBits);
+        if (breakpointsAtEventGFN != interruptEventSupervisor->breakpointsByGFN.end())
         {
-            event->interrupt_event.reinject = DONT_REINJECT_INTERRUPT;
-            interruptEventSupervisor->interruptCallback(eventPA, event->vcpu_id, breakpointsAtEventPA->second);
+            auto breakpointsAtEventPA = breakpointsAtEventGFN->second.Breakpoints.find(eventPA);
+            if (breakpointsAtEventPA != breakpointsAtEventGFN->second.Breakpoints.end())
+            {
+                event->interrupt_event.reinject = DONT_REINJECT_INTERRUPT;
+                interruptEventSupervisor->interruptCallback(eventPA, event->vcpu_id, breakpointsAtEventPA->second);
+            }
         }
         else
         {
@@ -208,13 +223,11 @@ namespace VmiCore
         enableEvent(reinterpret_cast<addr_t>(singleStepEvent->data));
     }
 
-    std::unique_ptr<InterruptGuard>
-    InterruptEventSupervisor::createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN)
+    InterruptGuard InterruptEventSupervisor::createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN)
     {
-        auto interruptGuard =
-            std::make_unique<InterruptGuard>(vmiInterface, loggingLib, targetVA, targetGFN, processDtb);
+        auto interruptGuard = InterruptGuard(vmiInterface, loggingLib, targetVA, targetGFN, processDtb);
+        interruptGuard.initialize();
 
-        interruptGuard->initialize();
         return interruptGuard;
     }
 
@@ -237,13 +250,18 @@ namespace VmiCore
     {
         vmiInterface->pauseVm();
 
-        for (const auto& breakpointsAtPA : breakpointsByPA)
+        for (auto& breakpointsAtGFN : breakpointsByGFN)
         {
-            removeInterrupt(breakpointsAtPA.first);
+            for (const auto& breakpointsAtPA : breakpointsAtGFN.second.Breakpoints)
+            {
+                removeInterrupt(breakpointsAtPA.first);
+            }
+            breakpointsAtGFN.second.PageGuard.teardown();
         }
-        breakpointsByPA.clear();
 
+        breakpointsByGFN.clear();
         vmiInterface->clearEvent(event, false);
+
         vmiInterface->resumeVm();
     }
 
@@ -261,9 +279,5 @@ namespace VmiCore
     {
         auto originalValue = originalValuesByTargetPA.extract(targetPA);
         vmiInterface->write8PA(targetPA, originalValue.mapped());
-
-        auto targetGFN = targetPA >> PagingDefinitions::numberOfPageIndexBits;
-        auto interruptGuard = interruptGuardsByGFN.extract(targetGFN);
-        interruptGuard.mapped()->teardown();
     }
 }
