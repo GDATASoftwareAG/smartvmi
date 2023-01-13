@@ -30,7 +30,7 @@ namespace VmiCore::Windows
 
         BpResponse pspCallProcessNotifyRoutinesCallback(IInterruptEvent& event);
 
-        BpResponse keBugCheckExCallback(IInterruptEvent& event);
+        BpResponse keBugCheck2Callback(IInterruptEvent& event);
 
         void teardown() override;
 
@@ -48,7 +48,7 @@ namespace VmiCore::Windows
 
         void startPspCallProcessNotifyRoutinesMonitoring();
 
-        void startKeBugCheckExMonitoring();
+        void startKeBugCheck2Monitoring();
     };
 }
 
