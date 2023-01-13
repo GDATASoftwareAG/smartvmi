@@ -30,7 +30,7 @@ namespace VmiCore::Windows
         activeProcessesSupervisor->initialize();
         interruptEventSupervisor->initialize();
         startPspCallProcessNotifyRoutinesMonitoring();
-        startKeBugCheckExMonitoring();
+        startKeBugCheck2Monitoring();
     }
 
     void SystemEventSupervisor::startPspCallProcessNotifyRoutinesMonitoring()
@@ -45,13 +45,13 @@ namespace VmiCore::Windows
             processNotifyFunctionVA, vmiInterface->convertPidToDtb(systemPid), notifyProcessCallbackFunction);
     }
 
-    void SystemEventSupervisor::startKeBugCheckExMonitoring()
+    void SystemEventSupervisor::startKeBugCheck2Monitoring()
     {
-        auto bugCheckFunctionVA = vmiInterface->translateKernelSymbolToVA("KeBugCheckEx");
-        logger->debug("Obtained starting address of KeBugCheckEx",
+        auto bugCheckFunctionVA = vmiInterface->translateKernelSymbolToVA("KeBugCheck2");
+        logger->debug("Obtained starting address of KeBugCheck2",
                       {logfield::create("VA", fmt::format("{:#x}", bugCheckFunctionVA))});
         auto bugCheckCallbackFunction =
-            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::keBugCheckExCallback);
+            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::keBugCheck2Callback);
 
         bugCheckInterruptEvent = interruptEventSupervisor->createBreakpoint(
             bugCheckFunctionVA, vmiInterface->convertPidToDtb(systemPid), bugCheckCallbackFunction);
@@ -88,7 +88,7 @@ namespace VmiCore::Windows
         return BpResponse::Continue;
     }
 
-    BpResponse SystemEventSupervisor::keBugCheckExCallback(IInterruptEvent& event)
+    BpResponse SystemEventSupervisor::keBugCheck2Callback(IInterruptEvent& event)
     {
         auto bugCheckCode = event.getRcx();
         eventStream->sendBSODEvent(static_cast<int64_t>(bugCheckCode));
