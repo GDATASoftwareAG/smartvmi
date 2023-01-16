@@ -67,17 +67,17 @@ namespace VmiCore
         // Register new INT3
         if (!breakpointsByPA.contains(targetPA))
         {
-            vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
-            vmiInterface->flushPageCache();
-            storeOriginalValue(targetPA);
-            enableEvent(targetPA);
-
             auto targetGFN = targetPA >> PagingDefinitions::numberOfPageIndexBits;
             // One PageGuard guards a whole memory page on which several interrupts may reside.
             if (!interruptGuardsByGFN.contains(targetGFN))
             {
                 interruptGuardsByGFN[targetGFN] = createPageGuard(targetVA, processDtb, targetGFN);
             }
+
+            vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
+            vmiInterface->flushPageCache();
+            storeOriginalValue(targetPA);
+            enableEvent(targetPA);
 
             breakpointsByPA[targetPA] = std::vector<std::shared_ptr<Breakpoint>>{breakpoint};
         }

@@ -148,6 +148,17 @@ namespace VmiCore
         EXPECT_NO_THROW(interruptEventSupervisor->createBreakpoint(testVA, testSystemCr3, breakpointCallback));
     }
 
+    TEST_F(InterruptEventFixture, createBreakpoint_newInt3OnNewPage_guardCreatedBeforeInt3Write)
+    {
+        testing::Sequence s1;
+        setupBreakpoint(testVA, testPA, testSystemCr3);
+        EXPECT_CALL(*vmiInterface, readXVA(testVA, testSystemCr3, _)).Times(1).InSequence(s1).RetiresOnSaturation();
+        EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
+        EXPECT_CALL(*vmiInterface, write8PA(testPA, INT3_BREAKPOINT)).Times(1).InSequence(s1).RetiresOnSaturation();
+
+        EXPECT_NO_THROW(interruptEventSupervisor->createBreakpoint(testVA, testSystemCr3, breakpointCallback));
+    }
+
     TEST_F(InterruptEventFixture, _defaultInterruptCallback_twoEventsRegistered_bothCallbacksCalled)
     {
         setupBreakpoint(testVA, testPA, testSystemCr3);
