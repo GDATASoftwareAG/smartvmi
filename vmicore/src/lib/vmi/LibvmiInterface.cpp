@@ -44,6 +44,7 @@ namespace VmiCore
         auto initData = VmiInitData(configInterface->getSocketPath());
         vmi_init_error initError;
 
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_init_complete(&vmiInstance,
                               reinterpret_cast<const void*>(configInterface->getVmName().c_str()),
                               VMI_INIT_DOMAINNAME | VMI_INIT_EVENTS,
@@ -77,6 +78,7 @@ namespace VmiCore
 
     void LibvmiInterface::clearEvent(vmi_event_t& event, bool deallocate)
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_clear_event(vmiInstance, &event, deallocate ? &LibvmiInterface::freeEvent : nullptr) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to clear event.", __func__));
@@ -185,6 +187,7 @@ namespace VmiCore
 
     void LibvmiInterface::eventsListen(uint32_t timeout)
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         auto status = vmi_events_listen(vmiInstance, timeout);
         if (status != VMI_SUCCESS)
         {
@@ -218,6 +221,7 @@ namespace VmiCore
 
     void LibvmiInterface::registerEvent(vmi_event_t& event)
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_register_event(vmiInstance, &event) == VMI_FAILURE)
         {
             throw VmiException(
@@ -225,9 +229,10 @@ namespace VmiCore
         }
     }
 
-    uint64_t LibvmiInterface::getCurrentVmId() const
+    uint64_t LibvmiInterface::getCurrentVmId()
     {
-        return (vmi_get_vmid(vmiInstance));
+        std::lock_guard<std::mutex> lock(libvmiLock);
+        return vmi_get_vmid(vmiInstance);
     }
 
     uint LibvmiInterface::getNumberOfVCPUs() const
@@ -238,6 +243,7 @@ namespace VmiCore
     addr_t LibvmiInterface::translateKernelSymbolToVA(const std::string& kernelSymbolName)
     {
         addr_t kernelSymbolAddress = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_translate_ksym2v(vmiInstance, kernelSymbolName.c_str(), &kernelSymbolAddress) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to find kernel symbol {}", __func__, kernelSymbolName));
@@ -251,6 +257,7 @@ namespace VmiCore
     {
         auto ctx = createVirtualAddressAccessContext(moduleBaseAddress, dtb);
         addr_t userlandSymbolVA = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_translate_sym2v(vmiInstance, &ctx, userlandSymbolName.c_str(), &userlandSymbolVA) != VMI_SUCCESS)
         {
             throw VmiException(
@@ -265,9 +272,10 @@ namespace VmiCore
         return userlandSymbolVA;
     }
 
-    addr_t LibvmiInterface::convertVAToPA(addr_t virtualAddress, addr_t processCr3) const
+    addr_t LibvmiInterface::convertVAToPA(addr_t virtualAddress, addr_t processCr3)
     {
         addr_t physicalAddress = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_pagetable_lookup(vmiInstance, processCr3, virtualAddress, &physicalAddress) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format(
@@ -276,9 +284,10 @@ namespace VmiCore
         return physicalAddress;
     }
 
-    addr_t LibvmiInterface::convertPidToDtb(pid_t processID) const
+    addr_t LibvmiInterface::convertPidToDtb(pid_t processID)
     {
         addr_t dtb = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_pid_to_dtb(vmiInstance, processID, &dtb) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("Unable to obtain the dtb for pid {}", processID));
@@ -286,9 +295,10 @@ namespace VmiCore
         return dtb;
     }
 
-    pid_t LibvmiInterface::convertDtbToPid(addr_t dtb) const
+    pid_t LibvmiInterface::convertDtbToPid(addr_t dtb)
     {
         vmi_pid_t pid = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_dtb_to_pid(vmiInstance, dtb, &pid) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("Unable obtain the pid for dtb {:#x}", dtb));
@@ -298,6 +308,7 @@ namespace VmiCore
 
     void LibvmiInterface::pauseVm()
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         auto status = vmi_pause_vm(vmiInstance);
         if (status != VMI_SUCCESS)
         {
@@ -307,6 +318,7 @@ namespace VmiCore
 
     void LibvmiInterface::resumeVm()
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         auto status = vmi_resume_vm(vmiInstance);
         if (status != VMI_SUCCESS)
         {
@@ -314,9 +326,10 @@ namespace VmiCore
         }
     }
 
-    bool LibvmiInterface::areEventsPending() const
+    bool LibvmiInterface::areEventsPending()
     {
         bool pending = false;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         auto areEventsPendingReturn = vmi_are_events_pending(vmiInstance);
         if (areEventsPendingReturn == -1)
         {
@@ -364,14 +377,16 @@ namespace VmiCore
 
     void LibvmiInterface::stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId)
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_stop_single_step_vcpu(vmiInstance, event, vcpuId) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("Failed to stop single stepping for vcpu {}", vcpuId));
         }
     }
 
-    OperatingSystem LibvmiInterface::getOsType() const
+    OperatingSystem LibvmiInterface::getOsType()
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         switch (vmi_get_ostype(vmiInstance))
         {
             case VMI_OS_LINUX:
@@ -383,9 +398,10 @@ namespace VmiCore
         }
     }
 
-    addr_t LibvmiInterface::getOffset(const std::string& name) const
+    addr_t LibvmiInterface::getOffset(const std::string& name)
     {
         addr_t offset = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_get_offset(vmiInstance, name.c_str(), &offset) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to find offset {}", __func__, name));
@@ -393,9 +409,10 @@ namespace VmiCore
         return offset;
     }
 
-    addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, const std::string& member) const
+    addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, const std::string& member)
     {
         addr_t memberAddress = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_get_kernel_struct_offset(vmiInstance, structName.c_str(), member.c_str(), &memberAddress) !=
             VMI_SUCCESS)
         {
@@ -405,9 +422,10 @@ namespace VmiCore
         return memberAddress;
     }
 
-    size_t LibvmiInterface::getStructSizeFromJson(const std::string& struct_name) const
+    size_t LibvmiInterface::getStructSizeFromJson(const std::string& struct_name)
     {
         size_t size = 0;
+        std::lock_guard<std::mutex> lock(libvmiLock);
         if (vmi_get_struct_size_from_json(vmiInstance, vmi_get_kernel_json(vmiInstance), struct_name.c_str(), &size) !=
             VMI_SUCCESS)
         {
@@ -422,13 +440,13 @@ namespace VmiCore
     }
 
     std::tuple<addr_t, size_t, size_t>
-    LibvmiInterface::getBitfieldOffsetAndSizeFromJson(const std::string& structName,
-                                                      const std::string& structMember) const
+    LibvmiInterface::getBitfieldOffsetAndSizeFromJson(const std::string& structName, const std::string& structMember)
     {
         addr_t offset{};
         size_t startBit{};
         size_t endBit{};
 
+        std::lock_guard<std::mutex> lock(libvmiLock);
         auto ret = vmi_get_bitfield_offset_and_size_from_json(vmiInstance,
                                                               vmi_get_kernel_json(vmiInstance),
                                                               structName.c_str(),
@@ -448,11 +466,13 @@ namespace VmiCore
 
     void LibvmiInterface::flushV2PCache(addr_t pt)
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         vmi_v2pcache_flush(vmiInstance, pt);
     }
 
     void LibvmiInterface::flushPageCache()
     {
+        std::lock_guard<std::mutex> lock(libvmiLock);
         vmi_pagecache_flush(vmiInstance);
     }
 }
