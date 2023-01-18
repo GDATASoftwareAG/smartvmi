@@ -276,6 +276,16 @@ namespace VmiCore
         }
     };
 
+    TEST_F(InterruptEventFixtureWithoutInterruptEventSupervisorTeardown, teardown_singleRemovedInterrupt_noThrow)
+    {
+        setupBreakpoint(testVA, testPA, testSystemCr3, testOriginalMemoryContent);
+        auto breakpoint = interruptEventSupervisor->createBreakpoint(testVA, testSystemCr3, breakpointCallback);
+
+        ASSERT_NO_THROW(breakpoint->remove());
+
+        EXPECT_NO_THROW(interruptEventSupervisor->teardown());
+    }
+
     TEST_F(InterruptEventFixtureWithoutInterruptEventSupervisorTeardown, teardown_activeInterrupt_vmPausedAndResumed)
     {
         setupBreakpoint(testVA, testPA, testSystemCr3, testOriginalMemoryContent);

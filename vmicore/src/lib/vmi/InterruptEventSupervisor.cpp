@@ -106,6 +106,8 @@ namespace VmiCore
         eraseBreakpointAtAddress(breakpointsAtPA->second, breakpoint);
         if (breakpointsAtPA->second.empty())
         {
+            breakpointsAtGFN->second.Breakpoints.erase(breakpointsAtPA);
+
             // Prevent new events from happening while we are removing the INT3 from memory
             vmiInterface->pauseVm();
             if (vmiInterface->areEventsPending())
