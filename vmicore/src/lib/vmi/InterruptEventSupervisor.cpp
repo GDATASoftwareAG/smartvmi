@@ -32,10 +32,10 @@ namespace VmiCore
 
     void InterruptEventSupervisor::initialize()
     {
-        SETUP_INTERRUPT_EVENT(&event, _defaultInterruptCallback);
-        event.interrupt_event.reinject = DONT_REINJECT_INTERRUPT;
-        event.interrupt_event.insn_length = 1;
-        vmiInterface->registerEvent(event);
+        SETUP_INTERRUPT_EVENT(event, _defaultInterruptCallback);
+        event->interrupt_event.reinject = DONT_REINJECT_INTERRUPT;
+        event->interrupt_event.insn_length = 1;
+        vmiInterface->registerEvent(*event);
         singleStepSupervisor->initializeSingleStepEvents();
         singleStepCallbackFunction = SingleStepSupervisor::createSingleStepCallback(
             shared_from_this(), &InterruptEventSupervisor::singleStepCallback);
@@ -118,7 +118,7 @@ namespace VmiCore
             removeInterrupt(targetPA);
             if (breakpointsAtGFN->second.Breakpoints.empty())
             {
-                breakpointsAtGFN->second.PageGuard.teardown();
+                breakpointsAtGFN->second.PageGuard->teardown();
                 breakpointsByGFN.erase(breakpointsAtGFN);
             }
 
@@ -223,10 +223,12 @@ namespace VmiCore
         enableEvent(reinterpret_cast<addr_t>(singleStepEvent->data));
     }
 
-    InterruptGuard InterruptEventSupervisor::createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN)
+    std::unique_ptr<InterruptGuard>
+    InterruptEventSupervisor::createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN)
     {
-        auto interruptGuard = InterruptGuard(vmiInterface, loggingLib, targetVA, targetGFN, processDtb);
-        interruptGuard.initialize();
+        auto interruptGuard =
+            std::make_unique<InterruptGuard>(vmiInterface, loggingLib, targetVA, targetGFN, processDtb);
+        interruptGuard->initialize();
 
         return interruptGuard;
     }
@@ -256,11 +258,11 @@ namespace VmiCore
             {
                 removeInterrupt(breakpointsAtPA.first);
             }
-            breakpointsAtGFN.second.PageGuard.teardown();
+            breakpointsAtGFN.second.PageGuard->teardown();
         }
 
         breakpointsByGFN.clear();
-        vmiInterface->clearEvent(event, false);
+        vmiInterface->clearEvent(*event, false);
 
         vmiInterface->resumeVm();
     }

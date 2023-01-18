@@ -19,7 +19,7 @@ namespace VmiCore
     struct BpPage
     {
         std::map<addr_t, std::vector<std::shared_ptr<Breakpoint>>> Breakpoints;
-        InterruptGuard PageGuard;
+        std::unique_ptr<InterruptGuard> PageGuard;
     };
 
     class IInterruptEventSupervisor
@@ -88,11 +88,13 @@ namespace VmiCore
         std::unordered_map<addr_t, uint8_t> originalValuesByTargetPA;
         std::unordered_map<addr_t, BpPage> breakpointsByGFN{};
         std::function<void(vmi_event_t*)> singleStepCallbackFunction;
-        vmi_event_t event = vmi_event_t{};
-        Event interruptEvent{&event};
+        // Event needs to be allocated separately in order to avoid invalidating references (e.g. in libvmi) when the
+        // enclosing object is moved or copied. Therefore, it is wrapped in a unique pointer.
+        std::unique_ptr<vmi_event_t> event = std::make_unique<vmi_event_t>();
+        Event interruptEvent{event.get()};
         std::mutex lock{};
 
-        InterruptGuard createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN);
+        std::unique_ptr<InterruptGuard> createPageGuard(uint64_t targetVA, uint64_t processDtb, uint64_t targetGFN);
 
         void storeOriginalValue(addr_t targetPA);
 
