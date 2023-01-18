@@ -53,7 +53,14 @@ namespace VmiCore
 
     void InterruptGuard::teardown()
     {
-        disableEvent();
+        if (guardEvent.type == VMI_EVENT_INVALID)
+        {
+            logger->debug("Guard not initialized. Skipping teardown.");
+        }
+        else
+        {
+            disableEvent();
+        }
     }
 
     void InterruptGuard::enableEvent()
