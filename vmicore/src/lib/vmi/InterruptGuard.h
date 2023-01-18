@@ -20,6 +20,16 @@ namespace VmiCore
                        uint64_t targetGFN,
                        uint64_t systemCr3);
 
+        // This object has to be non-copyable and non-movable because we store a self reference in a vmi event that we
+        // pass to libvmi. Therefore, we need to avoid invalidating this reference.
+        InterruptGuard(const InterruptGuard&) = delete;
+
+        InterruptGuard(const InterruptGuard&&) = delete;
+
+        InterruptGuard& operator=(const InterruptGuard&) = delete;
+
+        InterruptGuard& operator=(const InterruptGuard&&) = delete;
+
         void initialize();
 
         void teardown();
@@ -29,7 +39,7 @@ namespace VmiCore
         std::unique_ptr<ILogger> logger;
         uint64_t targetVA;
         uint64_t targetGFN;
-        vmi_event_t guardEvent{};
+        vmi_event_t guardEvent{}; // This is okay because the enclosing object is non-copyable and non-movable
         std::vector<uint8_t> shadowPage;
         uint64_t systemCr3;
         emul_read_t emulateReadData{};
