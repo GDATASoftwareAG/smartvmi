@@ -42,7 +42,7 @@ namespace VmiCore
 
         virtual void resumeVm() = 0;
 
-        virtual bool areEventsPending() const = 0;
+        virtual bool areEventsPending() = 0;
 
         virtual void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) = 0;
 
@@ -81,7 +81,7 @@ namespace VmiCore
 
         void registerEvent(vmi_event_t& event) override;
 
-        [[nodiscard]] uint64_t getCurrentVmId() const override;
+        [[nodiscard]] uint64_t getCurrentVmId() override;
 
         [[nodiscard]] uint getNumberOfVCPUs() const override;
 
@@ -91,17 +91,17 @@ namespace VmiCore
                                            addr_t dtb,
                                            const std::string& userlandSymbolName) override;
 
-        [[nodiscard]] addr_t convertVAToPA(addr_t virtualAddress, addr_t processCr3) const override;
+        [[nodiscard]] addr_t convertVAToPA(addr_t virtualAddress, addr_t processCr3) override;
 
-        [[nodiscard]] addr_t convertPidToDtb(pid_t processID) const override;
+        [[nodiscard]] addr_t convertPidToDtb(pid_t processID) override;
 
-        [[nodiscard]] pid_t convertDtbToPid(addr_t dtb) const override;
+        [[nodiscard]] pid_t convertDtbToPid(addr_t dtb) override;
 
         void pauseVm() override;
 
         void resumeVm() override;
 
-        [[nodiscard]] bool areEventsPending() const override;
+        [[nodiscard]] bool areEventsPending() override;
 
         [[nodiscard]] std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
 
@@ -109,7 +109,7 @@ namespace VmiCore
 
         void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) override;
 
-        [[nodiscard]] OperatingSystem getOsType() const override;
+        [[nodiscard]] OperatingSystem getOsType() override;
 
         template <typename T> std::unique_ptr<T> readVa(const addr_t virtualAddress, const addr_t cr3)
         {
@@ -127,17 +127,16 @@ namespace VmiCore
             return exctractedValue;
         }
 
-        [[nodiscard]] addr_t getOffset(const std::string& name) const override;
+        [[nodiscard]] addr_t getOffset(const std::string& name) override;
 
-        [[nodiscard]] addr_t getKernelStructOffset(const std::string& structName,
-                                                   const std::string& member) const override;
+        [[nodiscard]] addr_t getKernelStructOffset(const std::string& structName, const std::string& member) override;
 
-        [[nodiscard]] std::size_t getStructSizeFromJson(const std::string& struct_name) const override;
+        [[nodiscard]] std::size_t getStructSizeFromJson(const std::string& struct_name) override;
 
-        bool isInitialized() const override;
+        [[nodiscard]] bool isInitialized() const override;
 
         [[nodiscard]] std::tuple<addr_t, std::size_t, std::size_t>
-        getBitfieldOffsetAndSizeFromJson(const std::string& structName, const std::string& structMember) const override;
+        getBitfieldOffsetAndSizeFromJson(const std::string& structName, const std::string& structMember) override;
 
       private:
         uint numberOfVCPUs{};
