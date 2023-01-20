@@ -1,0 +1,6 @@
+- Problem: Linking of vmicore fails with clang toolchain.
+  Solution: Wait for vcpkg target triplet x64-linux-clang.
+  Workaround: Use custom x64-linux-clang target triplet.
+- Problem: Corrosion is not available via vcpkg
+  Solution: Apparently this issue https://github.com/microsoft/vcpkg/issues/20619 prevents corrosion integration. Wait for issue to be addressed.
+

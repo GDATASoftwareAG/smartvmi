@@ -1,0 +1,24 @@
+{
+  "dependencies": [
+    {
+      "name": "fmt",
+      "version>=": "11.0.2#1"
+    },
+    {
+      "name": "gtest",
+      "version>=": "1.15.2"
+    },
+    {
+      "name": "tclap",
+      "version>=": "1.2.5"
+    },
+    {
+      "name": "yaml-cpp",
+      "version>=": "0.8.0"
+    },
+    {
+      "name": "jsoncpp",
+      "version>=": "1.9.6"
+    }
+  ]
+}

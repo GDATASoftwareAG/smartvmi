@@ -100,23 +100,30 @@ winlogon.exe-488-private-RW-1f43b593000-1f43b599000-BeingDeleted_FALSE
 
     -   g++ or clang
     -   cmake
-    -   libyara (with headers)
+    -   vcpkg
 
 -   Clone this repository
 
--   **\[Optionally]** Create an output directory
-
--   Inside the output directory (or your current working directory for that matter), run:
+-   Inside the source directory, run:
 
 ```console
-[user@localhost output_dir]$ cmake -D CMAKE_BUILD_TYPE=<Buildtype> -D PROGRAM_BUILD_NUMBER=<Buildnumber> <path_to_top_level_project_dir>
-[user@localhost output_dir]$ cmake --build .
+[user@localhost source_dir]$ cmake -D PROGRAM_BUILD_NUMBER=<Buildnumber> --preset <gcc/clang>-debug
+[user@localhost source_dir]$ cmake --build --preset <gcc/clang>-build-debug
 ```
 
 **Caveats**:
 
 -   External headers will only be downloaded if they are missing, so a clean rebuild is advised
     if updates for those are available.
+
+### Troubleshooting
+
+Yara requires openssl as a dependency which in turn requires a perl distribution in order to
+run its build scripts. If vcpkg is unable to build yara, make sure to have these perl requirements
+installed specifically:
+
+-   perl-Findbin
+-   perl-IPC-Cmd
 
 ## How to Run
 
