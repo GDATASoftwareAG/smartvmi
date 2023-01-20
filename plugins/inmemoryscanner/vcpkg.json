@@ -1,0 +1,18 @@
+{
+  "name" : "inmemoryscanner",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "f1c9431598c2b8aa5168c35485c9a28321ff9f09",
+  "dependencies" : [ {
+    "name" : "yara",
+    "version>=" : "4.2.3"
+  }, {
+    "name" : "yaml-cpp",
+    "version>=" : "0.7.0#1"
+  }, {
+    "name" : "tclap",
+    "version>=" : "1.2.5"
+  }, {
+    "name" : "gtest",
+    "version>=" : "1.12.1"
+  } ]
+}

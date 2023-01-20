@@ -103,6 +103,9 @@ winlogon.exe-488-private-RW-1f43b593000-1f43b599000-BeingDeleted_FALSE
     -   g++ or clang
     -   cmake
     -   libyara (with headers)
+    - vcpkg -> yara -> openssl
+      - perl-FindBin
+      - perl-IPC-Cmd
 
 -   Clone this repository
 

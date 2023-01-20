@@ -1,0 +1,22 @@
+{
+  "name" : "vmicore",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "f1c9431598c2b8aa5168c35485c9a28321ff9f09",
+  "dependencies" : [ {
+    "name" : "fmt",
+    "version>=" : "9.1.0#1",
+    "$comment" : "    find_package(fmt CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE fmt::fmt)\n"
+  }, {
+    "name" : "gtest",
+    "version>=" : "1.12.1"
+  }, {
+    "name" : "ms-gsl",
+    "version>=" : "4.0.0"
+  }, {
+    "name" : "yaml-cpp",
+    "version>=" : "0.7.0#1"
+  }, {
+    "name" : "tclap",
+    "version>=" : "1.2.5"
+  } ]
+}
