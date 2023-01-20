@@ -167,3 +167,17 @@ typedef struct _OBJECT_ATTRIBUTES {
 The parameter *ObjectName* is a pointer to a unicode and forms an exception since it is extracted directly.
 Both *PVOID* at the end are structs, that are currently not covered by our definitions.
 You can find a list under the struct section in the [function definitions file](configuration/functiondefinitions/functionDefinitions.yaml).
+
+## How to Build
+
+- Install Build Requirements
+  - g++ or clang
+  - cmake
+  - vcpkg
+- Clone this repository
+- Inside the source directory, run:
+
+```console
+[user@localhost source_dir]$ cmake --preset <gcc/clang>-debug
+[user@localhost source_dir]$ cmake --build --preset <gcc/clang>-build-debug
+```

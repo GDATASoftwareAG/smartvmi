@@ -10,23 +10,17 @@ add_executable(vmicore-test
         lib/vmi/MemoryMapping_UnitTest.cpp
         lib/vmi/SingleStepSupervisor_UnitTest.cpp)
 target_compile_options(vmicore-test PRIVATE -Wno-missing-field-initializers)
-target_link_libraries(vmicore-test vmicore-lib pthread)
+target_link_libraries(vmicore-test PRIVATE vmicore-lib)
 
 # Setup bundled google test framework
 
-FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.12.1
-)
-option(INSTALL_GTEST "" OFF)
-FetchContent_MakeAvailable(googletest)
-target_link_libraries(vmicore-test gtest gmock gmock_main)
+find_package(GTest CONFIG REQUIRED)
+target_link_libraries(vmicore-test PRIVATE GTest::gmock GTest::gtest GTest::gmock_main)
 
 # Public test headers
 
 add_subdirectory(include)
-target_link_libraries(vmicore-test vmicore-public-test-headers)
+target_link_libraries(vmicore-test PRIVATE vmicore-public-test-headers)
 
 # Dummy executable for testing potentially unused mocks
 

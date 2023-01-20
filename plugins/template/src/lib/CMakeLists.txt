@@ -8,9 +8,10 @@ target_compile_features(template-obj PUBLIC cxx_std_20)
 set_target_properties(template-obj PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_include_directories(template-obj INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
-include(FindPkgConfig)
+# Setup tclap
 
-pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
+find_path(TCLAP_INCLUDE_DIRS "tclap/Arg.h" REQUIRED)
+target_include_directories(template-obj PRIVATE ${TCLAP_INCLUDE_DIRS})
 
 include(FetchContent)
 

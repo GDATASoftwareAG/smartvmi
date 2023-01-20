@@ -59,35 +59,16 @@ target_link_libraries(vmicore-lib PUBLIC vmi_shared)
 
 # Setup yaml-cpp
 
-FetchContent_Declare(
-        yaml-cpp
-        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-        GIT_TAG yaml-cpp-0.7.0
-)
-option(YAML_BUILD_SHARED_LIBS "" OFF)
-option(YAML_CPP_BUILD_TOOLS "" OFF)
-FetchContent_MakeAvailable(yaml-cpp)
-set_target_properties(yaml-cpp PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-# Enable optional feature from plugin config header in order to be able to implement it
+find_package(yaml-cpp CONFIG REQUIRED)
 target_compile_definitions(vmicore-lib PUBLIC YAML_CPP_SUPPORT)
-target_link_libraries(vmicore-lib PUBLIC yaml-cpp)
+target_link_libraries(vmicore-lib PUBLIC yaml-cpp::yaml-cpp)
 
 # Setup Guideline Support Library
 
-FetchContent_Declare(
-        gsl
-        GIT_REPOSITORY https://github.com/microsoft/GSL.git
-        GIT_TAG v4.0.0
-)
-FetchContent_MakeAvailable(gsl)
-target_link_libraries(vmicore-lib PUBLIC GSL)
+find_package(Microsoft.GSL CONFIG REQUIRED)
+target_link_libraries(vmicore-lib PUBLIC Microsoft.GSL::GSL)
 
 # Setup fmt library as it is not available yet in gnu stdlib
 
-FetchContent_Declare(
-        fmt
-        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG 11.0.2
-)
-FetchContent_MakeAvailable(fmt)
-target_link_libraries(vmicore-lib PUBLIC fmt-header-only)
+find_package(fmt CONFIG REQUIRED)
+target_link_libraries(vmicore-lib PUBLIC fmt::fmt)

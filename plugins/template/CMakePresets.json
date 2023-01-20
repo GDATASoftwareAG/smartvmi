@@ -1,28 +1,53 @@
 {
-  "version": 2,
+  "version": 3,
   "configurePresets": [
     {
       "name": "clang-debug",
-      "displayName": "Debug Clang",
+      "displayName": "Clang Debug",
       "description": "Use Clang toolchain",
-      "generator": "Ninja",
       "binaryDir": "build-clang-debug/",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=lld",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg/triplets/",
+        "VCPKG_TARGET_TRIPLET": "x64-linux-clang"
+      }
+    },
+    {
+      "name": "clang-release",
+      "displayName": "Clang Release",
+      "inherits": "clang-debug",
+      "binaryDir": "build-clang-release/",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {
       "name": "gcc-debug",
-      "displayName": "Debug G++",
+      "displayName": "G++ Debug",
       "description": "Use gcc toolchain",
-      "generator": "Ninja",
       "binaryDir": "build-gcc-debug/",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++"
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "G++ Release",
+      "inherits": "gcc-debug",
+      "binaryDir": "build-gcc-release/",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     }
   ],
@@ -33,9 +58,19 @@
       "configurePreset": "clang-debug"
     },
     {
+      "name": "clang-build-release",
+      "displayName": "Build Clang Release",
+      "configurePreset": "clang-release"
+    },
+    {
       "name": "gcc-build-debug",
       "displayName": "Build G++ Debug",
       "configurePreset": "gcc-debug"
+    },
+    {
+      "name": "gcc-build-release",
+      "displayName": "Build G++ Release",
+      "configurePreset": "gcc-release"
     }
   ],
   "testPresets": [

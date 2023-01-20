@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+    {
+      "name": "tclap",
+      "version>=": "1.2.5"
+    },
+    {
+      "name": "gtest",
+      "version>=": "1.15.2"
+    }
+  ]
+}

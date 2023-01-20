@@ -1,11 +1,8 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.16)
 project(vmicore)
 
 include(CheckPIESupported)
 check_pie_supported()
-
-include(FindPkgConfig)
-pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
 
 add_subdirectory(include)
 add_subdirectory(lib)
@@ -15,22 +12,15 @@ target_compile_features(vmicore PRIVATE cxx_std_20)
 set_target_properties(vmicore PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_link_libraries(vmicore vmicore-lib)
 
+# Setup tclap
+
+find_path(TCLAP_INCLUDE_DIRS "tclap/Arg.h" REQUIRED)
+target_include_directories(vmicore PRIVATE ${TCLAP_INCLUDE_DIRS})
+
 # Setup Boost DI
 
-FetchContent_Declare(
-        Boost
-        GIT_REPOSITORY https://github.com/boostorg/headers
-        GIT_TAG master
-        OVERRIDE_FIND_PACKAGE
-)
-
-FetchContent_Declare(
-        boost-di
-        GIT_REPOSITORY https://github.com/boost-ext/di.git
-        GIT_TAG cpp14
-)
-FetchContent_MakeAvailable(boost-di)
-target_link_libraries(vmicore Boost.DI)
+find_path(BEXT_DI_INCLUDE_DIRS "boost/di.hpp")
+target_include_directories(vmicore PRIVATE ${BEXT_DI_INCLUDE_DIRS})
 
 # Installation
 
