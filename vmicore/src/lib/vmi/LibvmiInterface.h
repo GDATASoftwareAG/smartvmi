@@ -145,6 +145,7 @@ namespace VmiCore
         std::shared_ptr<IEventStream> eventStream;
         vmi_instance_t vmiInstance{};
         std::mutex libvmiLock{};
+        std::mutex eventsListenLock{};
 
         static std::unique_ptr<std::string> createConfigString(const std::string& offsetsFile);
 
