@@ -1,6 +1,5 @@
 #include "LibvmiInterface.h"
 #include "../GlobalControl.h"
-#include "../os/PagingDefinitions.h"
 #include "VmiException.h"
 #include "VmiInitData.h"
 #include "VmiInitError.h"
@@ -38,7 +37,6 @@ namespace VmiCore
     void LibvmiInterface::initializeVmi()
     {
         logger->info("Initialize libvmi", {logfield::create("domain", configInterface->getVmName())});
-        logger->info("Initialize successfully initialized", {logfield::create("domain", configInterface->getVmName())});
 
         auto configString = createConfigString(configInterface->getOffsetsFile());
         auto initData = VmiInitData(configInterface->getSocketPath());
@@ -187,7 +185,7 @@ namespace VmiCore
 
     void LibvmiInterface::eventsListen(uint32_t timeout)
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::lock_guard<std::mutex> lock(eventsListenLock);
         auto status = vmi_events_listen(vmiInstance, timeout);
         if (status != VMI_SUCCESS)
         {
