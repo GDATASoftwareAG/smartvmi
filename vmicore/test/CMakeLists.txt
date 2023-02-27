@@ -12,14 +12,8 @@ target_link_libraries(vmicore-test vmicore-lib pthread)
 
 # Setup bundled google test framework
 
-FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.12.1
-)
-option(INSTALL_GTEST "" OFF)
-FetchContent_MakeAvailable(googletest)
-target_link_libraries(vmicore-test gtest gmock gmock_main)
+find_package(GTest CONFIG REQUIRED)
+target_link_libraries(vmicore-test gtest::gtest)
 
 # Public test headers
 

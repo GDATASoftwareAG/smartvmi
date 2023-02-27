@@ -1,0 +1,7 @@
+[requires]
+gtest/1.13.0
+tclap/1.2.5
+
+[generators]
+CMakeDeps
+CMakeToolchain

@@ -16,7 +16,6 @@ include(FindPkgConfig)
 
 pkg_check_modules(YARA REQUIRED yara>=4)
 target_link_libraries(inmemoryscanner-obj PUBLIC ${YARA_LINK_LIBRARIES})
-pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
 
 include(FetchContent)
 
@@ -25,26 +24,18 @@ include(FetchContent)
 add_subdirectory("${VMICORE_DIRECTORY_ROOT}/src/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-headers")
 target_link_libraries(inmemoryscanner-obj PUBLIC vmicore-public-headers)
 
+# TClap
+
+find_package(tclap CONFIG REQUIRED)
+target_link_libraries(inmemoryscanner-obj PUBLIC tclap::tclap)
+
 # Setup yaml-cpp
 
-FetchContent_Declare(
-        yaml-cpp
-        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-        GIT_TAG yaml-cpp-0.7.0
-)
-option(YAML_BUILD_SHARED_LIBS "" OFF)
-option(YAML_CPP_BUILD_TOOLS "" OFF)
-FetchContent_MakeAvailable(yaml-cpp)
-set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
-target_compile_definitions(inmemoryscanner-obj PUBLIC YAML_CPP_SUPPORT)
+find_package(yaml-cpp CONFIG REQUIRED)
 target_link_libraries(inmemoryscanner-obj PUBLIC yaml-cpp)
+target_compile_definitions(inmemoryscanner-obj PUBLIC YAML_CPP_SUPPORT)
 
 # Setup fmt library
 
-FetchContent_Declare(
-        fmt
-        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG 8.1.1
-)
-FetchContent_MakeAvailable(fmt)
-target_link_libraries(inmemoryscanner-obj PUBLIC fmt-header-only)
+find_package(fmt CONFIG REQUIRED)
+target_link_libraries(inmemoryscanner-obj PUBLIC fmt::fmt)

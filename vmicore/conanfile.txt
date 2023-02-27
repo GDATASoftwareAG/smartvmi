@@ -1,0 +1,11 @@
+[requires]
+fmt/10.0.0
+gtest/1.13.0
+libvmi/0.1
+ms-gsl/4.0.0
+tclap/1.2.5
+yaml-cpp/0.7.0
+
+[generators]
+CMakeDeps
+CMakeToolchain

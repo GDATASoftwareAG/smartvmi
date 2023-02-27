@@ -4,16 +4,18 @@ project(vmicore)
 include(CheckPIESupported)
 check_pie_supported()
 
-include(FindPkgConfig)
-pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
-
 add_subdirectory(include)
 add_subdirectory(lib)
 
 add_executable(vmicore main.cpp Cmdline.cpp)
 target_compile_features(vmicore PRIVATE cxx_std_20)
 set_target_properties(vmicore PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-target_link_libraries(vmicore vmicore-lib)
+target_link_libraries(vmicore PRIVATE vmicore-lib)
+
+# TClap
+
+find_package(tclap CONFIG REQUIRED)
+target_link_libraries(vmicore PRIVATE tclap::tclap)
 
 # Setup Boost DI
 
@@ -23,7 +25,7 @@ FetchContent_Declare(
         GIT_TAG cpp14
 )
 FetchContent_MakeAvailable(boost-di)
-target_link_libraries(vmicore Boost.DI)
+target_link_libraries(vmicore PRIVATE Boost.DI)
 
 # Installation
 

@@ -5,7 +5,7 @@ if (NOT TARGET vmicore-public-headers)
     message(SEND_ERROR "VmiCore public headers target missing.")
 endif ()
 
-if (NOT TARGET gmock)
+if (NOT TARGET gmock AND NOT TARGET GTest::gmock)
     message(SEND_ERROR "Google mock target missing.")
 endif ()
 
