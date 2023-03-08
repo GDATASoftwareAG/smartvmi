@@ -20,7 +20,8 @@ namespace VmiCore
                std::shared_ptr<ILibvmiInterface> vmiInterface,
                std::shared_ptr<ILogging> loggingLib,
                std::shared_ptr<IEventStream> eventStream,
-               std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor);
+               std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
+               std::shared_ptr<IFileTransport> pluginTransport);
 
         uint run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs);
 
@@ -33,6 +34,7 @@ namespace VmiCore
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;
         std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
+        std::shared_ptr<IFileTransport> pluginTransport;
 
         void waitForEvents() const;
     };
