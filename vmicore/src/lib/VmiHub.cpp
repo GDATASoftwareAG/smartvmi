@@ -22,13 +22,15 @@ namespace VmiCore
                    std::shared_ptr<ILibvmiInterface> vmiInterface,
                    std::shared_ptr<ILogging> loggingLib,
                    std::shared_ptr<IEventStream> eventStream,
-                   std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor)
+                   std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
+                   std::shared_ptr<IFileTransport> pluginTransport)
         : configInterface(std::move(configInterface)),
           vmiInterface(std::move(vmiInterface)),
           loggingLib(std::move(loggingLib)),
           logger(this->loggingLib->newNamedLogger(loggerName)),
           eventStream(std::move(eventStream)),
-          interruptEventSupervisor(std::move(interruptEventSupervisor))
+          interruptEventSupervisor(std::move(interruptEventSupervisor)),
+          pluginTransport(std::move(pluginTransport))
     {
     }
 
@@ -134,7 +136,7 @@ namespace VmiCore
                                                               vmiInterface,
                                                               activeProcessesSupervisor,
                                                               interruptEventSupervisor,
-                                                              std::make_shared<LegacyLogging>(configInterface),
+                                                              pluginTransport,
                                                               loggingLib,
                                                               eventStream);
                 systemEventSupervisor = std::make_shared<Linux::SystemEventSupervisor>(vmiInterface,
@@ -155,7 +157,7 @@ namespace VmiCore
                                                               vmiInterface,
                                                               activeProcessesSupervisor,
                                                               interruptEventSupervisor,
-                                                              std::make_shared<LegacyLogging>(configInterface),
+                                                              pluginTransport,
                                                               loggingLib,
                                                               eventStream);
                 systemEventSupervisor = std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
