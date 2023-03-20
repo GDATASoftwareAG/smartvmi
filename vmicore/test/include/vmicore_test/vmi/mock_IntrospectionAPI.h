@@ -37,6 +37,11 @@ namespace VmiCore
 
         MOCK_METHOD(std::unique_ptr<std::string>, extractUnicodeStringAtVA, (addr_t, addr_t), (override));
 
+        MOCK_METHOD(std::optional<std::unique_ptr<std::string>>,
+                    tryExtractUnicodeStringAtVA,
+                    (addr_t, addr_t),
+                    (override));
+
         MOCK_METHOD(std::unique_ptr<std::string>, extractStringAtVA, (addr_t, addr_t), (override));
 
         MOCK_METHOD(OperatingSystem, getOsType, (), (override));

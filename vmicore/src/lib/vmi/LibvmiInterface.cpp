@@ -343,6 +343,18 @@ namespace VmiCore
 
     std::unique_ptr<std::string> LibvmiInterface::extractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3)
     {
+        auto extractedString = tryExtractUnicodeStringAtVA(stringVA, cr3);
+
+        if (!extractedString)
+        {
+            throw VmiException(fmt::format("{}: Unable to convert unicode string", __func__));
+        }
+        return std::move(extractedString.value());
+    }
+
+    std::optional<std::unique_ptr<std::string>> LibvmiInterface::tryExtractUnicodeStringAtVA(const addr_t stringVA,
+                                                                                             const addr_t cr3)
+    {
         auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
         std::lock_guard<std::mutex> lock(libvmiLock);
         auto* extractedUnicodeString = vmi_read_unicode_str(vmiInstance, &accessContext);
@@ -351,7 +363,7 @@ namespace VmiCore
         vmi_free_unicode_str(extractedUnicodeString);
         if (success != VMI_SUCCESS)
         {
-            throw VmiException(fmt::format("{}: Unable to convert unicode string", __func__));
+            return std::nullopt;
         }
         auto result = std::make_unique<std::string>(reinterpret_cast<char*>(convertedUnicodeString.contents),
                                                     convertedUnicodeString.length);
