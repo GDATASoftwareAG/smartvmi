@@ -5,6 +5,7 @@
 #include "../types.h"
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -44,6 +45,9 @@ namespace VmiCore
         [[nodiscard]] virtual pid_t convertDtbToPid(addr_t dtb) = 0;
 
         virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
+
+        [[nodiscard]] virtual std::optional<std::unique_ptr<std::string>>
+        tryExtractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3) = 0;
 
         virtual std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) = 0;
 
