@@ -1,3 +1,6 @@
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=gdatasoftwareag_inmemory&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=gdatasoftwareag_inmemory)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=gdatasoftwareag_inmemory&metric=coverage)](https://sonarcloud.io/summary/new_code?id=gdatasoftwareag_inmemory)
+
 # InMemoryScanner Plugin
 
 A plugin for _VMICore_ capable of scanning as well as dumping process memory from live VMs.\

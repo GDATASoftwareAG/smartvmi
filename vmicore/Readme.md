@@ -1,3 +1,6 @@
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=gdatasoftwareag_smartvmi_vmicore&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=gdatasoftwareag_smartvmi_vmicore)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=gdatasoftwareag_smartvmi_vmicore&metric=coverage)](https://sonarcloud.io/summary/new_code?id=gdatasoftwareag_smartvmi_vmicore)
+
 # VMICore
 
 _VMICore_ is a VM Introsepction tool capable of dynamic malware analysis.

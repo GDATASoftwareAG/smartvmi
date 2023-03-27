@@ -35,29 +35,6 @@ jobs:
       - name: Perform C++ format check
         run: find . -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
 
-  test_core:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/gdatasoftwareag/vmi-build
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Test vmicore
-        run: |
-          cmake --preset gcc-debug -D VMICORE_TEST_COVERAGE:BOOL=ON
-          cmake --build --preset gcc-build-debug --target vmicore-test
-          ctest --preset gcc-test
-          cd build-gcc-debug
-          gcovr -r ${GITHUB_WORKSPACE} --json coverage.json
-        working-directory: vmicore
-
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_vmicore
-          path: vmicore/build-gcc-debug/coverage.json
-
   build_core:
     runs-on: ubuntu-latest
     container:
@@ -66,34 +43,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build vmicore
+      - name: Build and test vmicore
         run: |
           cmake --preset clang-debug
           cmake --build --preset clang-build-debug
+          ctest --preset clang-test
         working-directory: vmicore
-
-  test_inmemoryscanner:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/gdatasoftwareag/vmi-build
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Test inmemoryscanner
-        run: |
-          cmake --preset gcc-debug -D INMEMORYSCANNER_TEST_COVERAGE:BOOL=ON
-          cmake --build --preset gcc-build-debug --target inmemoryscanner-test
-          ctest --preset gcc-test
-          cd build-gcc-debug
-          gcovr -r ${GITHUB_WORKSPACE} --json coverage.json
-        working-directory: plugins/inmemoryscanner
-
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_inmemoryscanner
-          path: plugins/inmemoryscanner/build-gcc-debug/coverage.json
 
   build_inmemoryscanner:
     runs-on: ubuntu-latest
@@ -103,36 +58,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build inmemoryscanner
+      - name: Build and test inmemoryscanner
         run: |
           cmake --preset clang-debug
           cmake --build --preset clang-build-debug
+          ctest --preset clang-test
         working-directory: plugins/inmemoryscanner
-
-  consolidate_coverage_reports:
-    needs: [test_core, test_inmemoryscanner]
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/gdatasoftwareag/vmi-build
-
-    steps:
-      - name: Download vmicore coverage artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage_vmicore
-          path: vmicore
-
-      - name: Download inmemoryscanner coverage artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage_inmemoryscanner
-          path: plugins/inmemoryscanner
-
-      - name: Generate combined cobertura.xml
-        run: gcovr -a vmicore/coverage.json -a plugins/inmemoryscanner/coverage.json --xml cobertura.xml
-
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_all
-          path: cobertura.xml

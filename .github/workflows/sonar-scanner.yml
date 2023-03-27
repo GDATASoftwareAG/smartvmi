@@ -1,0 +1,91 @@
+---
+name: Sonar Scanner
+
+on:
+  workflow_run:
+    workflows: [CPP CI]
+    types:
+      - in_progress
+
+jobs:
+  vmicore_sonar_scanner:
+    runs-on: ubuntu-latest
+    # Replicate build environment (path sctructure)
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+    env:
+      BUILD_WRAPPER_OUT_DIR: sonar/
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.workflow_run.head_repository.full_name }}
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Install sonar-scanner
+        uses: SonarSource/sonarcloud-github-c-cpp@v1
+
+      - name: Build and test vmicore
+        run: |
+          cmake --preset gcc-debug -D VMICORE_TEST_COVERAGE:BOOL=ON
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build --preset gcc-build-debug
+          ctest --preset gcc-test
+          cd build-gcc-debug
+          gcovr -r .. --sonarqube > ../coverage.xml
+        working-directory: vmicore
+
+      - name: Run sonar-scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -D sonar.cfamily.build-wrapper-output=${{ env.BUILD_WRAPPER_OUT_DIR }} \
+            -D sonar.coverageReportPaths=coverage.xml \
+            -D sonar.scm.revision=${{ github.event.workflow_run.head_sha }} \
+            -D sonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }} \
+            -D sonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }} \
+            -D sonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
+        working-directory: vmicore/
+
+  inmemoryscanner_sonar_scanner:
+    runs-on: ubuntu-latest
+    # Replicate build environment (path sctructure)
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+    env:
+      BUILD_WRAPPER_OUT_DIR: sonar/
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.workflow_run.head_repository.full_name }}
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Install sonar-scanner
+        uses: SonarSource/sonarcloud-github-c-cpp@v1
+
+      - name: Build and test inmemoryscanner
+        run: |
+          cmake --preset gcc-debug -D INMEMORYSCANNER_TEST_COVERAGE:BOOL=ON
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build --preset gcc-build-debug
+          ctest --preset gcc-test
+          cd build-gcc-debug
+          gcovr -r .. --sonarqube > ../coverage.xml
+        working-directory: plugins/inmemoryscanner
+
+      - name: Run sonar-scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -D sonar.cfamily.build-wrapper-output=${{ env.BUILD_WRAPPER_OUT_DIR }} \
+            -D sonar.coverageReportPaths=coverage.xml \
+            -D sonar.scm.revision=${{ github.event.workflow_run.head_sha }} \
+            -D sonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }} \
+            -D sonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }} \
+            -D sonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
+        working-directory: plugins/inmemoryscanner/
