@@ -36,7 +36,7 @@ namespace VmiCore
 
     void LibvmiInterface::initializeVmi()
     {
-        logger->info("Initialize libvmi", {logfield::create("domain", configInterface->getVmName())});
+        logger->info("Initialize libvmi", {{"domain", configInterface->getVmName()}});
 
         auto configString = createConfigString(configInterface->getOffsetsFile());
         auto initData = VmiInitData(configInterface->getSocketPath());
@@ -68,8 +68,8 @@ namespace VmiCore
         {
             libvmiInterfaceInstance->logger->warning(
                 "Failed to clear event",
-                {logfield::create("eventAddress", fmt::format("{:#x}", static_cast<uint64_t>(event->type))),
-                 logfield::create("type", static_cast<uint64_t>(event->type))});
+                {{"eventAddress", fmt::format("{:#x}", static_cast<uint64_t>(event->type))},
+                 {"type", static_cast<uint64_t>(event->type)}});
         }
         free(event);
     }

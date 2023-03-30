@@ -1,6 +1,7 @@
 #ifndef VMICORE_WINDOWS_VADTREEWIN10_H
 #define VMICORE_WINDOWS_VADTREEWIN10_H
 
+#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
 #include "KernelAccess.h"
 #include "Vadt.h"

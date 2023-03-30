@@ -123,9 +123,7 @@ int main(int argc, const char* argv[])
     {
         if (logger)
         {
-            logger->error(
-                "CLI parse error",
-                {VmiCore::logfield::create("ArgID", e.argId()), VmiCore::logfield::create("Exception", e.error())});
+            logger->error("CLI parse error", {{"ArgID", e.argId()}, {"Exception", e.error()}});
         }
         else
         {
@@ -141,7 +139,7 @@ int main(int argc, const char* argv[])
     {
         if (logger)
         {
-            logger->error("Unhandled exception", {VmiCore::logfield::create("Exception", e.what())});
+            logger->error("Unhandled exception", {{"Exception", e.what()}});
         }
         else
         {
@@ -156,7 +154,7 @@ int main(int argc, const char* argv[])
 
     if (logger)
     {
-        logger->info("Done with VMI", {VmiCore::logfield::create("ExitCode", static_cast<int64_t>(exitCode))});
+        logger->info("Done with VMI", {{"ExitCode", static_cast<int64_t>(exitCode)}});
     }
     if (eventStream)
     {

@@ -26,7 +26,7 @@ namespace VmiCore::Linux
         auto taskOffset = vmiInterface->getOffset("linux_tasks");
         auto initTaskVA = vmiInterface->translateKernelSymbolToVA("init_task") + taskOffset;
         auto currentListEntry = initTaskVA;
-        logger->debug("Got VA of initTask", {logfield::create("initTaskVA", fmt::format("{:#x}", currentListEntry))});
+        logger->debug("Got VA of initTask", {{"initTaskVA", fmt::format("{:#x}", currentListEntry)}});
 
         do
         {
@@ -122,12 +122,12 @@ namespace VmiCore::Linux
                                       static_cast<uint32_t>(processInformation->pid),
                                       fmt::format("{:#x}", processInformation->processCR3));
         logger->info("Discovered active process",
-                     {logfield::create("ProcessName", processInformation->name),
-                      logfield::create("ProcessId", static_cast<uint64_t>(processInformation->pid)),
-                      logfield::create("ProcessCr3", fmt::format("{:#x}", processInformation->processCR3)),
-                      logfield::create("ParentProcessName", parentName),
-                      logfield::create("ParentProcessId", parentPid),
-                      logfield::create("ParentProcessCr3", parentCr3)});
+                     {{"ProcessName", processInformation->name},
+                      {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
+                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processCR3)},
+                      {"ParentProcessName", parentName},
+                      {"ParentProcessId", parentPid},
+                      {"ParentProcessCr3", parentCr3}});
         processInformationByPid[processInformation->pid] = processInformation;
         pidsByTaskStruct[processInformation->base] = processInformation->pid;
     }
@@ -141,8 +141,8 @@ namespace VmiCore::Linux
             if (processInformationIterator == processInformationByPid.end())
             {
                 logger->warning("Process information not found for process",
-                                {logfield::create("taskStruct", fmt::format("{:#x}", taskStruct)),
-                                 logfield::create("ProcessId", static_cast<uint64_t>(taskStructIterator->second))});
+                                {{"taskStruct", fmt::format("{:#x}", taskStruct)},
+                                 {"ProcessId", static_cast<uint64_t>(taskStructIterator->second)}});
             }
             else
             {
@@ -164,13 +164,12 @@ namespace VmiCore::Linux
                                               fmt::format("{:#x}", processInformationIterator->second->processCR3));
                 logger->info(
                     "Remove process from actives processes",
-                    {logfield::create("ProcessName", processInformationIterator->second->name),
-                     logfield::create("ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)),
-                     logfield::create("ProcessCr3",
-                                      fmt::format("{:#x}", processInformationIterator->second->processCR3)),
-                     logfield::create("ParentProcessName", parentName),
-                     logfield::create("ParentProcessId", parentPid),
-                     logfield::create("ParentProcessCr3", parentCr3)});
+                    {{"ProcessName", processInformationIterator->second->name},
+                     {"ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)},
+                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->processCR3)),
+                     {"ParentProcessName", parentName},
+                     {"ParentProcessId", parentPid},
+                     {"ParentProcessCr3", parentCr3}});
 
                 processInformationByPid.erase(processInformationIterator);
             }
@@ -179,7 +178,7 @@ namespace VmiCore::Linux
         else
         {
             logger->warning("Process does not seem to be stored as an active process",
-                            {logfield::create("taskStruct", fmt::format("{:#x}", taskStruct))});
+                            {{"taskStruct", fmt::format("{:#x}", taskStruct)}});
         }
     }
 

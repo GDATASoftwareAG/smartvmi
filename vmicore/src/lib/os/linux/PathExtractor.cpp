@@ -73,7 +73,7 @@ namespace VmiCore::Linux
         }
         catch (const std::exception& e)
         {
-            logger->warning("Unable to extract part of a path.", {logfield::create("exception", e.what())});
+            logger->warning("Unable to extract part of a path.", {{"exception", e.what()}});
         }
 
         return path;

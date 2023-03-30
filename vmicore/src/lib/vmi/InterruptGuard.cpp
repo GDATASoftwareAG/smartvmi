@@ -46,8 +46,7 @@ namespace VmiCore
                 "{}: Unable to create Interrupt @ {:#x} in system with cr3 {:#x}", __func__, pageBaseVA, processDtb));
         }
         enableEvent();
-        logger->debug("Interrupt guard: Register RW event on gfn",
-                      {logfield::create("targetGFN", fmt::format("{:#x}", targetGFN))});
+        logger->debug("Interrupt guard: Register RW event on gfn", {{"targetGFN", fmt::format("{:#x}", targetGFN)}});
     }
 
     void InterruptGuard::teardown()
@@ -83,9 +82,7 @@ namespace VmiCore
         catch (const std::exception& e)
         {
             GlobalControl::endVmi = true;
-            GlobalControl::logger()->error(
-                "Unexpected exception",
-                {logfield::create("logger", loggerName), logfield::create("exception", e.what())});
+            GlobalControl::logger()->error("Unexpected exception", {{"logger", loggerName}, {"exception", e.what()}});
             GlobalControl::eventStream()->sendErrorEvent(e.what());
         }
         return eventResponse;
@@ -99,7 +96,7 @@ namespace VmiCore
             logger->warning("Interrupt guard hit, check if patch guard is active");
             interruptGuardHit = true;
         }
-        logger->debug("Interrupt guard hit", {logfield::create("eventPA", fmt::format("{:#x}", eventPA))});
+        logger->debug("Interrupt guard hit", {{"eventPA", fmt::format("{:#x}", eventPA)}});
         event->emul_read = &emulateReadData;
         // we are allowed to provide more data than actually needed but empirically no more than 16 bytes are read at a
         // time
