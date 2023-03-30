@@ -31,11 +31,11 @@ namespace VmiCore
 
         MOCK_METHOD(std::unique_ptr<std::string>, getResultsDir, (), (const override));
 
+        MOCK_METHOD(std::unique_ptr<ILogger>, newNamedLogger, (std::string_view name), (const, override));
+
         MOCK_METHOD(void, writeToFile, (const std::string&, const std::string&), (const override));
 
         MOCK_METHOD(void, writeToFile, (const std::string&, const std::vector<uint8_t>&), (const override));
-
-        MOCK_METHOD(void, logMessage, (Plugin::LogLevel, const std::string&, const std::string&), (const override));
 
         MOCK_METHOD(void, sendErrorEvent, (std::string_view), (const override));
 

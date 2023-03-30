@@ -1,7 +1,6 @@
 #ifndef VMICORE_INTERRUPTGUARD_H
 #define VMICORE_INTERRUPTGUARD_H
 
-#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include "LibvmiInterface.h"
 #include "SingleStepSupervisor.h"
@@ -9,6 +8,7 @@
 #include <libvmi/events.h>
 #include <memory>
 #include <vector>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore
 {

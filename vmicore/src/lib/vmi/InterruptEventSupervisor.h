@@ -2,7 +2,6 @@
 #define VMICORE_INTERRUPTEVENTSUPERVISOR_H
 
 #include "../GlobalControl.h"
-#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include "Breakpoint.h"
 #include "Event.h"
@@ -13,6 +12,7 @@
 #include <mutex>
 #include <optional>
 #include <unordered_map>
+#include <vmicore/io/ILogger.h>
 #include <vmicore/vmi/events/IInterruptEvent.h>
 
 namespace VmiCore

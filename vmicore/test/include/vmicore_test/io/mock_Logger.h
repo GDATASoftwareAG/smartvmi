@@ -1,12 +1,12 @@
-#ifndef VMICORE_MOCK_GRPCLOGGER_H
-#define VMICORE_MOCK_GRPCLOGGER_H
+#ifndef VMICORE_MOCK_LOGGER_H
+#define VMICORE_MOCK_LOGGER_H
 
 #include <gmock/gmock.h>
-#include <io/grpc/GRPCLogger.h>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore
 {
-    class MockGRPCLogger : public ILogger
+    class MockLogger : public ILogger
     {
       public:
         MOCK_METHOD(void, bind, (const std::initializer_list<CxxLogField>&), (override));
@@ -41,4 +41,4 @@ namespace VmiCore
     };
 }
 
-#endif // VMICORE_MOCK_GRPCLOGGER_H
+#endif // VMICORE_MOCK_LOGGER_H

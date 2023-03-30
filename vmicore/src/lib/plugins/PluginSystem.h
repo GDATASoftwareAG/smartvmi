@@ -3,7 +3,6 @@
 
 #include "../config/IConfigParser.h"
 #include "../io/IEventStream.h"
-#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include "../io/file/LegacyLogging.h"
 #include "../os/IActiveProcessesSupervisor.h"
@@ -65,7 +64,7 @@ namespace VmiCore
         std::shared_ptr<ILibvmiInterface> vmiInterface;
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
         std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
-        std::shared_ptr<IFileTransport> legacyLogging;
+        std::shared_ptr<IFileTransport> fileTransport;
         std::vector<Plugin::processStartCallback_f> registeredProcessStartCallbacks;
         std::vector<Plugin::processTerminationCallback_f> registeredProcessTerminationCallbacks;
         std::vector<Plugin::shutdownCallback_f> registeredShutdownCallbacks;
@@ -95,12 +94,11 @@ namespace VmiCore
                          uint64_t processDtb,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction) override;
 
+        [[nodiscard]] std::unique_ptr<ILogger> newNamedLogger(std::string_view name) const override;
+
         void writeToFile(const std::string& filename, const std::string& message) const override;
 
         void writeToFile(const std::string& filename, const std::vector<uint8_t>& data) const override;
-
-        void
-        logMessage(Plugin::LogLevel logLevel, const std::string& filename, const std::string& message) const override;
 
         void sendErrorEvent(std::string_view message) const override;
 

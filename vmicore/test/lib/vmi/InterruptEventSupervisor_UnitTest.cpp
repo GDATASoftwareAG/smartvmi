@@ -1,4 +1,3 @@
-#include "../io/grpc/mock_GRPCLogger.h"
 #include "../io/mock_EventStream.h"
 #include "../io/mock_Logging.h"
 #include "../os/windows/mock_ActiveProcessesSupervisor.h"
@@ -10,6 +9,7 @@
 #include <plugins/PluginSystem.h>
 #include <vmi/VmiException.h>
 #include <vmicore/vmi/IBreakpoint.h>
+#include <vmicore_test/io/mock_Logger.h>
 
 using testing::_;
 using testing::AnyNumber;
@@ -104,7 +104,7 @@ namespace VmiCore
             // Required for InterruptGuard
             ON_CALL(*vmiInterface, readXVA(_, _, _)).WillByDefault(Return(true));
             ON_CALL(*mockLogging, newNamedLogger(_))
-                .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
+                .WillByDefault([](std::string_view) { return std::make_unique<MockLogger>(); });
 
             // Gain access to internal interrupt event within InterruptEventSupervisor
             ON_CALL(*vmiInterface, registerEvent(_))
@@ -120,7 +120,7 @@ namespace VmiCore
                 std::make_shared<InterruptEventSupervisor>(vmiInterface, singleStepSupervisor, mockLogging);
             interruptEventSupervisor->initialize();
 
-            GlobalControl::init(std::make_unique<NiceMock<MockGRPCLogger>>(),
+            GlobalControl::init(std::make_unique<NiceMock<MockLogger>>(),
                                 std::make_shared<NiceMock<MockEventStream>>());
         }
 

@@ -1,4 +1,3 @@
-#include "../io/grpc/mock_GRPCLogger.h"
 #include "../io/mock_EventStream.h"
 #include "../io/mock_Logging.h"
 #include "mock_LibvmiInterface.h"
@@ -6,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <vmi/SingleStepSupervisor.h>
 #include <vmi/VmiException.h>
+#include <vmicore_test/io/mock_Logger.h>
 
 using testing::_;
 using testing::AtLeast;
@@ -18,7 +18,7 @@ namespace VmiCore
     {
         std::shared_ptr<NiceMock<MockLogging>> mockLogging = std::make_shared<NiceMock<MockLogging>>();
         ON_CALL(*mockLogging, newNamedLogger(_))
-            .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
+            .WillByDefault([](std::string_view) { return std::make_unique<MockLogger>(); });
 
         std::shared_ptr<ILibvmiInterface> vmiInterface = std::make_shared<MockLibvmiInterface>();
         SingleStepSupervisor firstInstance(vmiInterface, mockLogging);
@@ -44,13 +44,13 @@ namespace VmiCore
         void SetUp() override
         {
             ON_CALL(*mockLogging, newNamedLogger(_))
-                .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
+                .WillByDefault([](std::string_view) { return std::make_unique<MockLogger>(); });
 
             ON_CALL(*vmiInterface, getNumberOfVCPUs()).WillByDefault(Return(numberOfTestVcpus));
             singleStepSupervisor = std::make_unique<SingleStepSupervisor>(vmiInterface, mockLogging);
             singleStepSupervisor->initializeSingleStepEvents();
 
-            GlobalControl::init(std::make_unique<NiceMock<MockGRPCLogger>>(),
+            GlobalControl::init(std::make_unique<NiceMock<MockLogger>>(),
                                 std::make_shared<NiceMock<MockEventStream>>());
         }
 

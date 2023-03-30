@@ -1,5 +1,4 @@
 #include "../../config/mock_ConfigInterface.h"
-#include "../../io/grpc/mock_GRPCLogger.h"
 #include "../../io/mock_EventStream.h"
 #include "../../io/mock_Logging.h"
 #include "../../plugins/mock_PluginSystem.h"
@@ -9,6 +8,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <os/windows/SystemEventSupervisor.h>
+#include <vmicore_test/io/mock_Logger.h>
 #include <vmicore_test/vmi/mock_Breakpoint.h>
 
 using testing::_;
@@ -34,7 +34,7 @@ namespace VmiCore
         void SetUp() override
         {
             ON_CALL(*logging, newNamedLogger(_))
-                .WillByDefault([](std::string_view) { return std::make_unique<MockGRPCLogger>(); });
+                .WillByDefault([](std::string_view) { return std::make_unique<MockLogger>(); });
             systemEventSupervisor = std::make_shared<Windows::SystemEventSupervisor>(vmiInterface,
                                                                                      pluginSystem,
                                                                                      activeProcessSupervisor,

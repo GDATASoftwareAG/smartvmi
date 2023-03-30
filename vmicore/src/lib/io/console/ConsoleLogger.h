@@ -1,9 +1,9 @@
 #ifndef VMICORE_CONSOLELOGGER_H
 #define VMICORE_CONSOLELOGGER_H
 
-#include "../ILogger.h"
 #include <cxxbridge/rust/cxx.h>
 #include <cxxbridge/rust_grpc_server/src/bridge.rs.h>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore
 {

@@ -6,6 +6,7 @@
 #include "../vmi/IBreakpoint.h"
 #include "../vmi/IIntrospectionAPI.h"
 #include "IPluginConfig.h"
+#include "vmicore/io/ILogger.h"
 #include <functional>
 #include <memory>
 #include <optional>
@@ -20,18 +21,10 @@ namespace VmiCore::Plugin
 
     using shutdownCallback_f = void (*)();
 
-    enum class LogLevel
-    {
-        debug,
-        info,
-        warning,
-        error
-    };
-
     class PluginInterface
     {
       public:
-        constexpr static uint8_t API_VERSION = 13;
+        constexpr static uint8_t API_VERSION = 14;
 
         virtual ~PluginInterface() = default;
 
@@ -54,11 +47,11 @@ namespace VmiCore::Plugin
 
         [[nodiscard]] virtual std::unique_ptr<std::string> getResultsDir() const = 0;
 
+        [[nodiscard]] virtual std::unique_ptr<ILogger> newNamedLogger(std::string_view name) const = 0;
+
         virtual void writeToFile(const std::string& filename, const std::string& message) const = 0;
 
         virtual void writeToFile(const std::string& filename, const std::vector<uint8_t>& data) const = 0;
-
-        virtual void logMessage(LogLevel logLevel, const std::string& filename, const std::string& message) const = 0;
 
         virtual void sendErrorEvent(std::string_view message) const = 0;
 

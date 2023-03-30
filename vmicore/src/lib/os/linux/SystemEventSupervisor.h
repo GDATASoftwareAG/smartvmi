@@ -2,7 +2,6 @@
 #define VMICORE_LINUX_SYSTEMEVENTSUPERVISOR_H
 
 #include "../../io/IEventStream.h"
-#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
 #include "../../plugins/PluginSystem.h"
 #include "../../vmi/InterruptEventSupervisor.h"
@@ -11,6 +10,7 @@
 #include "../IActiveProcessesSupervisor.h"
 #include "../ISystemEventSupervisor.h"
 #include <memory>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore::Linux
 {

@@ -2,13 +2,13 @@
 #define VMICORE_LINUX_ACTIVEPROCESSESSUPERVISOR_H
 
 #include "../../io/IEventStream.h"
-#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
 #include "../../vmi/LibvmiInterface.h"
 #include "../IActiveProcessesSupervisor.h"
 #include "PathExtractor.h"
 #include <map>
 #include <memory>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore::Linux
 {
