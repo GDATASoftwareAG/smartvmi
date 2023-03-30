@@ -1,12 +1,12 @@
 #ifndef VMICORE_LINUX_PATHEXTRACTION_H
 #define VMICORE_LINUX_PATHEXTRACTION_H
 
-#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
 #include "../../vmi/LibvmiInterface.h"
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore::Linux
 {

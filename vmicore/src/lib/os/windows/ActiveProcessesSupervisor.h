@@ -2,7 +2,6 @@
 #define VMICORE_WINDOWS_ACTIVEPROCESSESSUPERVISOR_H
 
 #include "../../io/IEventStream.h"
-#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
 #include "../../vmi/LibvmiInterface.h"
 #include "../IActiveProcessesSupervisor.h"
@@ -10,6 +9,7 @@
 #include "VadTreeWin10.h"
 #include <map>
 #include <memory>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore::Windows
 {

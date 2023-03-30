@@ -11,6 +11,7 @@ endif ()
 
 add_library(vmicore-public-test-headers INTERFACE)
 target_sources(vmicore-public-test-headers INTERFACE
+        vmicore_test/io/mock_Logger.h
         vmicore_test/os/mock_MemoryRegionExtractor.h
         vmicore_test/os/mock_PageProtection.h
         vmicore_test/plugins/mock_PluginInterface.h

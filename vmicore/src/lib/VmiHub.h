@@ -3,12 +3,12 @@
 
 #include "config/IConfigParser.h"
 #include "io/IEventStream.h"
-#include "io/ILogger.h"
 #include "io/ILogging.h"
 #include "os/ISystemEventSupervisor.h"
 #include "plugins/PluginSystem.h"
 #include "vmi/InterruptEventSupervisor.h"
 #include "vmi/LibvmiInterface.h"
+#include "vmicore/io/ILogger.h"
 #include <memory>
 #include <unordered_map>
 

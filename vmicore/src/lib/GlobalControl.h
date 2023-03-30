@@ -2,8 +2,8 @@
 #define VMICORE_GLOBALCONTROL_H
 
 #include "io/IEventStream.h"
-#include "io/ILogger.h"
 #include <memory>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore::GlobalControl
 {

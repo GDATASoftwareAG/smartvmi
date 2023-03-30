@@ -3,7 +3,6 @@
 
 #include "../config/IConfigParser.h"
 #include "../io/IEventStream.h"
-#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include <fmt/core.h>
 #include <libvmi/events.h>
@@ -11,6 +10,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <vmicore/io/ILogger.h>
 #include <vmicore/os/OperatingSystem.h>
 #include <vmicore/types.h>
 #include <vmicore/vmi/IIntrospectionAPI.h>

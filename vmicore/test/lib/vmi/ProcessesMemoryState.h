@@ -3,7 +3,6 @@
 
 #include "../config/mock_ConfigInterface.h"
 #include "../io/file/mock_LegacyLogging.h"
-#include "../io/grpc/mock_GRPCLogger.h"
 #include "../io/mock_EventStream.h"
 #include "../io/mock_Logging.h"
 #include "mock_LibvmiInterface.h"
@@ -17,6 +16,7 @@
 #include <os/windows/KernelOffsets.h>
 #include <os/windows/ProtectionValues.h>
 #include <plugins/PluginSystem.h>
+#include <vmicore_test/io/mock_Logger.h>
 
 namespace VmiCore
 {
@@ -183,7 +183,7 @@ namespace VmiCore
             std::shared_ptr<testing::NiceMock<MockLogging>> ml = std::make_shared<testing::NiceMock<MockLogging>>();
 
             ON_CALL(*ml, newNamedLogger(testing::_))
-                .WillByDefault([](std::string_view) { return std::make_unique<testing::NiceMock<MockGRPCLogger>>(); });
+                .WillByDefault([](std::string_view) { return std::make_unique<testing::NiceMock<MockLogger>>(); });
 
             return ml;
         }();

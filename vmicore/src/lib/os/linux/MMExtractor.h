@@ -1,10 +1,10 @@
 #ifndef VMICORE_LINUX_MEMORYREGIONEXTRACTOR_H
 #define VMICORE_LINUX_MEMORYREGIONEXTRACTOR_H
 
-#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
 #include "../../vmi/LibvmiInterface.h"
 #include "PathExtractor.h"
+#include <vmicore/io/ILogger.h>
 #include <vmicore/os/IMemoryRegionExtractor.h>
 
 namespace VmiCore::Linux

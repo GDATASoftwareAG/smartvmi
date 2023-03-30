@@ -1,7 +1,6 @@
 #include "GRPCServer.h"
 #include "../RustHelper.h"
 #include "GRPCLogger.h"
-#include <cstdint>
 #include <exception>
 #include <iostream>
 #include <memory>

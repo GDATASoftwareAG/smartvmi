@@ -31,7 +31,7 @@ namespace VmiCore
           vmiInterface(std::move(vmiInterface)),
           activeProcessesSupervisor(std::move(activeProcessesSupervisor)),
           interruptEventSupervisor(std::move(interruptEventSupervisor)),
-          legacyLogging(std::move(pluginLogging)),
+          fileTransport(std::move(pluginLogging)),
           loggingLib(std::move(loggingLib)),
           logger(this->loggingLib->newNamedLogger(FILENAME_STEM)),
           eventStream(std::move(eventStream))
@@ -127,11 +127,16 @@ namespace VmiCore
         return interruptEventSupervisor->createBreakpoint(targetVA, processDtb, callbackFunction);
     }
 
+    std::unique_ptr<ILogger> PluginSystem::newNamedLogger(std::string_view name) const
+    {
+        return loggingLib->newNamedLogger(name);
+    }
+
     void PluginSystem::writeToFile(const std::string& filename, const std::string& message) const
     {
         try
         {
-            legacyLogging->saveBinaryToFile(filename, std::vector<uint8_t>(message.begin(), message.end()));
+            fileTransport->saveBinaryToFile(filename, std::vector<uint8_t>(message.begin(), message.end()));
         }
         catch (const std::exception& e)
         {
@@ -145,34 +150,12 @@ namespace VmiCore
     {
         try
         {
-            legacyLogging->saveBinaryToFile(filename, data);
+            fileTransport->saveBinaryToFile(filename, data);
         }
         catch (const std::exception& e)
         {
             logger->error("Failed to write binary to file", {{"filename", filename}, {"exception", e.what()}});
             eventStream->sendErrorEvent(e.what());
-        }
-    }
-
-    void
-    PluginSystem::logMessage(Plugin::LogLevel logLevel, const std::string& filename, const std::string& message) const
-    {
-        switch (logLevel)
-        {
-            case Plugin::LogLevel::debug:
-                logger->debug(message, {logfield::create(WRITE_TO_FILE_TAG, filename)});
-                break;
-            case Plugin::LogLevel::info:
-                logger->info(message, {logfield::create(WRITE_TO_FILE_TAG, filename)});
-                break;
-            case Plugin::LogLevel::warning:
-                logger->warning(message, {logfield::create(WRITE_TO_FILE_TAG, filename)});
-                break;
-            case Plugin::LogLevel::error:
-                logger->error(message, {logfield::create(WRITE_TO_FILE_TAG, filename)});
-                break;
-            default:
-                throw std::invalid_argument("Log level not implemented.");
         }
     }
 

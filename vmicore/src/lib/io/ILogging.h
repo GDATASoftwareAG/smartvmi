@@ -1,10 +1,10 @@
 #ifndef VMICORE_ILOGGING_H
 #define VMICORE_ILOGGING_H
 
-#include "ILogger.h"
 #include <cxxbridge/rust_grpc_server/src/bridge.rs.h>
 #include <memory>
 #include <string_view>
+#include <vmicore/io/ILogger.h>
 
 namespace VmiCore
 {

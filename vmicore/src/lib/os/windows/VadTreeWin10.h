@@ -1,13 +1,13 @@
 #ifndef VMICORE_WINDOWS_VADTREEWIN10_H
 #define VMICORE_WINDOWS_VADTREEWIN10_H
 
-#include "../../io/ILogger.h"
 #include "../../io/ILogging.h"
 #include "KernelAccess.h"
 #include "Vadt.h"
 #include <list>
 #include <memory>
 #include <vector>
+#include <vmicore/io/ILogger.h>
 #include <vmicore/os/IMemoryRegionExtractor.h>
 
 namespace VmiCore::Windows

@@ -3,6 +3,7 @@ project(vmicore)
 
 add_library(vmicore-public-headers INTERFACE)
 target_sources(vmicore-public-headers INTERFACE
+        vmicore/io/ILogger.h
         vmicore/os/ActiveProcessInformation.h
         vmicore/os/IMemoryRegionExtractor.h
         vmicore/os/MemoryRegion.h
