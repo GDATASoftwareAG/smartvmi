@@ -64,3 +64,18 @@ jobs:
           cmake --build --preset clang-build-debug
           ctest --preset clang-test
         working-directory: plugins/inmemoryscanner
+
+  build_apitracing:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and test apitracing
+        run: |
+          cmake --preset clang-debug
+          cmake --build --preset clang-build-debug
+          ctest --preset clang-test
+        working-directory: plugins/apitracing
