@@ -1,44 +1,43 @@
 #include "ConsoleLogger.h"
+#include "../RustHelper.h"
 
 namespace VmiCore
 {
     ConsoleLogger::ConsoleLogger(::rust::Box<::logging::console::ConsoleLogger> logger) : logger(std::move(logger)) {}
 
-    void ConsoleLogger::bind(const std::initializer_list<rust::Box<::logging::LogField>>& fields)
+    void ConsoleLogger::bind(const std::initializer_list<CxxLogField>& fields)
     {
-        logger->bind(rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        ::rust::Vec<::logging::LogField> rustFields;
+        rustFields.reserve(fields.size());
+        appendCxxFieldsToRustFields(rustFields, fields);
+        logger->bind(std::move(rustFields));
     }
 
-    void ConsoleLogger::debug(std::string_view message,
-                              const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
+    void ConsoleLogger::debug(std::string_view message, const std::initializer_list<CxxLogField>& fields) const
     {
-        logger->log(::logging::Level::DEBUG,
-                    toRustStr(message),
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        auto rustFields = logger->clone_base_fields(fields.size());
+        appendCxxFieldsToRustFields(rustFields, fields);
+        logger->log(::logging::Level::DEBUG, toRustStr(message), std::move(rustFields));
     }
 
-    void ConsoleLogger::info(std::string_view message,
-                             const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
+    void ConsoleLogger::info(std::string_view message, const std::initializer_list<CxxLogField>& fields) const
     {
-
-        logger->log(::logging::Level::INFO,
-                    toRustStr(message),
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        auto rustFields = logger->clone_base_fields(fields.size());
+        appendCxxFieldsToRustFields(rustFields, fields);
+        logger->log(::logging::Level::INFO, toRustStr(message), std::move(rustFields));
     }
 
-    void ConsoleLogger::warning(std::string_view message,
-                                const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
+    void ConsoleLogger::warning(std::string_view message, const std::initializer_list<CxxLogField>& fields) const
     {
-        logger->log(::logging::Level::WARN,
-                    toRustStr(message),
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        auto rustFields = logger->clone_base_fields(fields.size());
+        appendCxxFieldsToRustFields(rustFields, fields);
+        logger->log(::logging::Level::WARN, toRustStr(message), std::move(rustFields));
     }
 
-    void ConsoleLogger::error(std::string_view message,
-                              const std::initializer_list<rust::Box<::logging::LogField>>& fields) const
+    void ConsoleLogger::error(std::string_view message, const std::initializer_list<CxxLogField>& fields) const
     {
-        logger->log(::logging::Level::ERROR,
-                    toRustStr(message),
-                    rust::Slice<const ::rust::Box<::logging::LogField>>(std::data(fields), fields.size()));
+        auto rustFields = logger->clone_base_fields(fields.size());
+        appendCxxFieldsToRustFields(rustFields, fields);
+        logger->log(::logging::Level::ERROR, toRustStr(message), std::move(rustFields));
     }
 }

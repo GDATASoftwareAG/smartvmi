@@ -28,19 +28,21 @@ pub mod ffi {
         fn convert_to_log_level(level: &str) -> Result<Level>;
 
         type LogField;
-        fn field_str(name: &str, val: &str) -> Box<LogField>;
-        fn field_i64(name: &str, val: i64) -> Box<LogField>;
-        fn field_float64(name: &str, val: f64) -> Box<LogField>;
-        fn field_uint64(name: &str, val: u64) -> Box<LogField>;
-        fn field_bool(name: &str, val: bool) -> Box<LogField>;
+        fn add_field_str(fields: &mut Vec<LogField>, name: &str, val: &str);
+        fn add_field_i64(fields: &mut Vec<LogField>, name: &str, val: i64);
+        fn add_field_float64(fields: &mut Vec<LogField>, name: &str, val: f64);
+        fn add_field_uint64(fields: &mut Vec<LogField>, name: &str, val: u64);
+        fn add_field_bool(fields: &mut Vec<LogField>, name: &str, val: bool);
     }
 
     #[namespace = "logging::grpc"]
     extern "Rust" {
         type GrpcLogger;
 
-        fn bind(self: &mut GrpcLogger, log_fields: &[Box<LogField>]);
-        fn log(self: &GrpcLogger, level: Level, message: &str, fields: &[Box<LogField>]) -> Result<()>;
+        fn bind(self: &mut GrpcLogger, fields: Vec<LogField>);
+        fn clone_base_fields(&self, capacity: usize) -> Vec<LogField>;
+        fn log(self: &GrpcLogger, level: Level, message: &str, fields: Vec<LogField>) -> Result<()>;
+        fn log_no_base_fields(self: &GrpcLogger, level: Level, message: &str, fields: Vec<LogField>) -> Result<()>;
     }
 
     #[namespace = "logging::console"]
@@ -53,8 +55,10 @@ pub mod ffi {
 
         fn new_logger(self: &ConsoleLoggerBuilder) -> Box<ConsoleLogger>;
         fn new_named_logger(self: &ConsoleLoggerBuilder, name: &str) -> Box<ConsoleLogger>;
-        fn bind(self: &mut ConsoleLogger, log_fields: &[Box<LogField>]);
-        fn log(self: &ConsoleLogger, level: Level, message: &str, fields: &[Box<LogField>]) -> Result<()>;
+        fn bind(self: &mut ConsoleLogger, fields: Vec<LogField>);
+        fn clone_base_fields(self: &ConsoleLogger, capacity: usize) -> Vec<LogField>;
+        fn log(self: &ConsoleLogger, level: Level, message: &str, fields: Vec<LogField>) -> Result<()>;
+        fn log_no_base_fields(self: &ConsoleLogger, level: Level, message: &str, fields: Vec<LogField>) -> Result<()>;
     }
 
     #[namespace = "grpc"]
