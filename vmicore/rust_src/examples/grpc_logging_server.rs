@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     println!("Writing log line");
-    logger.log(Level::INFO, "Hello World", &[])?;
+    logger.log(Level::INFO, "Hello World", Vec::default())?;
 
     println!("Wait for input...");
     std::io::stdin().read_line(&mut String::new())?;

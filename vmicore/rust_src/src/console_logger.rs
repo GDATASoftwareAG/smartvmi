@@ -43,35 +43,47 @@ pub struct ConsoleLogger {
 }
 
 impl ConsoleLogger {
-    pub fn bind(&mut self, log_fields: &[Box<LogField>]) {
-        self.base_fields.extend(log_fields.iter().cloned().map(|v| *v));
+    pub fn bind(&mut self, fields: Vec<LogField>) {
+        self.base_fields.extend(fields.into_iter());
     }
 
-    pub fn log(
-        self: &ConsoleLogger,
-        level: Level,
-        message: &str,
-        fields: &[Box<LogField>],
-    ) -> Result<(), Box<dyn Error>> {
+    pub fn clone_base_fields(&self, capacity: usize) -> Vec<LogField> {
+        let mut cloned_fields = Vec::with_capacity(self.base_fields.len() + capacity);
+        cloned_fields.extend(self.base_fields.iter().cloned());
+        cloned_fields
+    }
+
+    pub fn log(&self, level: Level, message: &str, mut fields: Vec<LogField>) -> Result<(), Box<dyn Error>> {
         if level < self.log_level {
             return Ok(());
         }
 
-        let combined_fields: Vec<LogField> = self
-            .base_fields
-            .iter()
-            .cloned()
-            .chain(fields.iter().cloned().map(|v| *v))
-            .collect();
+        fields.extend(self.base_fields.iter().cloned());
+
+        self._log(level, message, fields);
+
+        Ok(())
+    }
+
+    pub fn log_no_base_fields(&self, level: Level, message: &str, fields: Vec<LogField>) -> Result<(), Box<dyn Error>> {
+        if level < self.log_level {
+            return Ok(());
+        }
+
+        self._log(level, message, fields);
+
+        Ok(())
+    }
+
+    pub fn _log(self: &ConsoleLogger, level: Level, message: &str, fields: Vec<LogField>) {
         println!(
             "{} {} {} {}",
             Utc::now().to_rfc3339(),
             level,
             message,
-            combined_fields
+            fields
                 .iter()
                 .fold(String::new(), |acc, el| acc + "\n\t" + &el.to_string())
         );
-        Ok(())
     }
 }

@@ -30,11 +30,17 @@ impl GrpcLogger {
         }
     }
 
-    pub fn bind(&mut self, log_fields: &[Box<LogField>]) {
-        self.base_fields.extend(log_fields.iter().cloned().map(|v| *v));
+    pub fn bind(&mut self, fields: Vec<LogField>) {
+        self.base_fields.extend(fields.into_iter());
     }
 
-    pub fn log(self: &GrpcLogger, level: Level, message: &str, fields: &[Box<LogField>]) -> Result<(), Box<dyn Error>> {
+    pub fn clone_base_fields(&self, capacity: usize) -> Vec<LogField> {
+        let mut cloned_fields = Vec::with_capacity(self.base_fields.len() + capacity);
+        cloned_fields.extend(self.base_fields.iter().cloned());
+        cloned_fields
+    }
+
+    pub fn log(&self, level: Level, message: &str, mut fields: Vec<LogField>) -> Result<(), Box<dyn Error>> {
         if self.sender.is_closed() {
             return Err(Box::new(LogError::LoggingClosedError));
         }
@@ -42,29 +48,34 @@ impl GrpcLogger {
             return Ok(());
         }
 
-        let combined_fields: Vec<LogField> = self
-            .base_fields
-            .iter()
-            .cloned()
-            .chain(fields.iter().cloned().map(|v| *v))
-            .collect();
+        fields.extend(self.base_fields.iter().cloned());
 
+        self._log(level, message, fields)
+    }
+
+    pub fn log_no_base_fields(&self, level: Level, message: &str, fields: Vec<LogField>) -> Result<(), Box<dyn Error>> {
+        if self.sender.is_closed() {
+            return Err(Box::new(LogError::LoggingClosedError));
+        }
+        if level < self.log_level {
+            return Ok(());
+        }
+
+        self._log(level, message, fields)
+    }
+
+    fn _log(&self, level: Level, message: &str, fields: Vec<LogField>) -> Result<(), Box<dyn Error>> {
         if self.enable_debug {
-            println!(
-                "{} {} {} {:?}",
-                Utc::now().to_rfc3339(),
-                level,
-                message,
-                combined_fields
-            );
+            println!("{} {} {} {:?}", Utc::now().to_rfc3339(), level, message, fields);
         }
 
         task::block_on(self.sender.send(LogMessage {
             time_unix: Utc::now().timestamp() as u64,
-            level: Into::<LogLevel>::into(level) as i32,
+            level: LogLevel::from(level).into(),
             msg: message.to_string(),
-            fields: combined_fields,
+            fields,
         }))?;
+
         Ok(())
     }
 }

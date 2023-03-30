@@ -21,31 +21,39 @@ pub fn convert_to_log_level(level: &str) -> Result<Level, Box<dyn std::error::Er
     }
 }
 
-pub fn field_str(name: &str, val: &str) -> Box<LogField> {
-    new_field(name.to_string(), Field::StrField(val.to_string()))
+pub fn add_field_str(fields: &mut Vec<LogField>, name: &str, val: &str) {
+    fields.push(LogField {
+        name: name.to_string(),
+        field: Some(Field::StrField(val.to_string())),
+    });
 }
 
-pub fn field_i64(name: &str, val: i64) -> Box<LogField> {
-    new_field(name.to_string(), Field::IntField(val))
+pub fn add_field_i64(fields: &mut Vec<LogField>, name: &str, val: i64) {
+    fields.push(LogField {
+        name: name.to_string(),
+        field: Some(Field::IntField(val)),
+    });
 }
 
-pub fn field_float64(name: &str, val: f64) -> Box<LogField> {
-    new_field(name.to_string(), Field::FloatField(val))
+pub fn add_field_float64(fields: &mut Vec<LogField>, name: &str, val: f64) {
+    fields.push(LogField {
+        name: name.to_string(),
+        field: Some(Field::FloatField(val)),
+    });
 }
 
-pub fn field_uint64(name: &str, val: u64) -> Box<LogField> {
-    new_field(name.to_string(), Field::UintField(val))
+pub fn add_field_uint64(fields: &mut Vec<LogField>, name: &str, val: u64) {
+    fields.push(LogField {
+        name: name.to_string(),
+        field: Some(Field::UintField(val)),
+    });
 }
 
-pub fn field_bool(name: &str, val: bool) -> Box<LogField> {
-    new_field(name.to_string(), Field::BoolField(val))
-}
-
-fn new_field(name: String, field: Field) -> Box<LogField> {
-    Box::new(LogField {
-        name,
-        field: Some(field),
-    })
+pub fn add_field_bool(fields: &mut Vec<LogField>, name: &str, val: bool) {
+    fields.push(LogField {
+        name: name.to_string(),
+        field: Some(Field::BoolField(val)),
+    });
 }
 
 impl fmt::Display for Level {

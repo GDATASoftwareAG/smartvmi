@@ -1,4 +1,5 @@
 #include "ConsoleLoggerBuilder.h"
+#include "../RustHelper.h"
 #include "ConsoleLogger.h"
 #include <memory>
 
