@@ -46,11 +46,11 @@ namespace VmiCore::Linux
             auto permissions = std::make_unique<PageProtection>(flags, OperatingSystem::LINUX);
 
             logger->debug("Memory Region",
-                          {logfield::create("start", fmt::format("{:#x}", start)),
-                           logfield::create("end", fmt::format("{:#x}", end)),
-                           logfield::create("size", size),
-                           logfield::create("permissions", permissions->toString()),
-                           logfield::create("filename", fileName)});
+                          {{"start", fmt::format("{:#x}", start)},
+                           {"end", fmt::format("{:#x}", end)},
+                           {"size", size},
+                           {"permissions", permissions->toString()},
+                           {"filename", fileName}});
             regions->emplace_back(start,
                                   size,
                                   fileName,

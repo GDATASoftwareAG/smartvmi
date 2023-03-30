@@ -1,6 +1,7 @@
 #ifndef VMICORE_INTERRUPTGUARD_H
 #define VMICORE_INTERRUPTGUARD_H
 
+#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include "LibvmiInterface.h"
 #include "SingleStepSupervisor.h"

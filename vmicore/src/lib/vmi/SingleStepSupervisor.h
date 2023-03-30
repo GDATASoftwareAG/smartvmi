@@ -1,6 +1,7 @@
 #ifndef VMICORE_SINGLESTEPSUPERVISOR_H
 #define VMICORE_SINGLESTEPSUPERVISOR_H
 
+#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include "LibvmiInterface.h"
 #include <functional>

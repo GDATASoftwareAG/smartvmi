@@ -71,9 +71,9 @@ namespace VmiCore
                 {
                     needsPadding = true;
                     logger->info("First successful page extraction after padding",
-                                 {logfield::create(WRITE_TO_FILE_TAG, paddingLogFile),
-                                  logfield::create("vadIdentifier", vadIdentifier),
-                                  logfield::create("pageAlignedVA", fmt::format("{:#x}", pageAlignedVA))});
+                                 {{WRITE_TO_FILE_TAG, paddingLogFile},
+                                  {"vadIdentifier", vadIdentifier},
+                                  {"pageAlignedVA", fmt::format("{:#x}", pageAlignedVA)}});
                 }
                 memoryRegion->insert(memoryRegion->cend(), memoryPage.cbegin(), memoryPage.cend());
             }
@@ -84,9 +84,9 @@ namespace VmiCore
                     memoryRegion->insert(memoryRegion->cend(), PagingDefinitions::pageSizeInBytes, 0x0);
                     needsPadding = false;
                     logger->info("Start of padding",
-                                 {logfield::create(WRITE_TO_FILE_TAG, paddingLogFile),
-                                  logfield::create("vadIdentifier", vadIdentifier),
-                                  logfield::create("pageAlignedVA", fmt::format("{:#x}", pageAlignedVA))});
+                                 {{WRITE_TO_FILE_TAG, paddingLogFile},
+                                  {"vadIdentifier", vadIdentifier},
+                                  {"pageAlignedVA", fmt::format("{:#x}", pageAlignedVA)}});
                 }
             }
             pageAlignedVA += PagingDefinitions::pageSizeInBytes;
@@ -136,9 +136,7 @@ namespace VmiCore
         catch (const std::exception& e)
         {
             logger->error("Failed to write string to file",
-                          {logfield::create("filename", filename),
-                           logfield::create("message", message),
-                           logfield::create("exception", e.what())});
+                          {{"filename", filename}, {"message", message}, {"exception", e.what()}});
             eventStream->sendErrorEvent(e.what());
         }
     }
@@ -151,8 +149,7 @@ namespace VmiCore
         }
         catch (const std::exception& e)
         {
-            logger->error("Failed to write binary to file",
-                          {logfield::create("filename", filename), logfield::create("exception", e.what())});
+            logger->error("Failed to write binary to file", {{"filename", filename}, {"exception", e.what()}});
             eventStream->sendErrorEvent(e.what());
         }
     }
@@ -212,12 +209,12 @@ namespace VmiCore
         auto pluginDirectory = configInterface->getPluginDirectory();
         logger->debug("Plugin directory",
                       {
-                          logfield::create("dirName", pluginDirectory.string()),
+                          {"dirName", pluginDirectory.string()},
                       });
         auto pluginFilename = pluginDirectory / pluginName;
         logger->debug("Loading plugin",
                       {
-                          logfield::create("fileName", pluginFilename.string()),
+                          {"fileName", pluginFilename.string()},
                       });
 
         void* libraryHandle = dlopen(pluginFilename.c_str(), RTLD_LAZY);
@@ -234,7 +231,7 @@ namespace VmiCore
             throw std::runtime_error("Unable to retrieve extern symbol '_ZN7VmiCore6Plugin11API_VERSIONE': " +
                                      std::string(dlErrorMessage));
         }
-        logger->debug("Plugin information", {logfield::create("API_VERSION", static_cast<int64_t>(*pluginApiVersion))});
+        logger->debug("Plugin information", {{"API_VERSION", static_cast<int64_t>(*pluginApiVersion)}});
 
         if (*pluginApiVersion != Plugin::PluginInterface::API_VERSION)
         {

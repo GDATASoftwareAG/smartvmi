@@ -1,5 +1,4 @@
 #include "SystemEventSupervisor.h"
-#include "../../io/grpc/GRPCLogger.h"
 #include "../../vmi/VmiException.h"
 #include <fmt/core.h>
 #include <utility>
@@ -37,7 +36,7 @@ namespace VmiCore::Windows
     {
         auto processNotifyFunctionVA = vmiInterface->translateKernelSymbolToVA("PspCallProcessNotifyRoutines");
         logger->debug("Obtained starting address of PspCallProcessNotifyRoutines",
-                      {logfield::create("VA", fmt::format("{:#x}", processNotifyFunctionVA))});
+                      {{"VA", fmt::format("{:#x}", processNotifyFunctionVA)}});
         auto notifyProcessCallbackFunction = IBreakpoint::createBreakpointCallback(
             weak_from_this(), &SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback);
 
@@ -48,8 +47,7 @@ namespace VmiCore::Windows
     void SystemEventSupervisor::startKeBugCheck2Monitoring()
     {
         auto bugCheckFunctionVA = vmiInterface->translateKernelSymbolToVA("KeBugCheck2");
-        logger->debug("Obtained starting address of KeBugCheck2",
-                      {logfield::create("VA", fmt::format("{:#x}", bugCheckFunctionVA))});
+        logger->debug("Obtained starting address of KeBugCheck2", {{"VA", fmt::format("{:#x}", bugCheckFunctionVA)}});
         auto bugCheckCallbackFunction =
             IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::keBugCheck2Callback);
 
@@ -63,8 +61,8 @@ namespace VmiCore::Windows
         bool isTerminationEvent = event.getR8() == 0;
         logger->debug(fmt::format("{} called", __func__),
                       {
-                          logfield::create("_EPROCESS_base ", fmt::format("{:#x}", eprocessBase)),
-                          logfield::create("terminationFlag ", isTerminationEvent),
+                          {"_EPROCESS_base ", fmt::format("{:#x}", eprocessBase)},
+                          {"terminationFlag ", isTerminationEvent},
                       });
         if (isTerminationEvent)
         {
@@ -76,7 +74,7 @@ namespace VmiCore::Windows
             }
             catch (const std::invalid_argument& e)
             {
-                logger->warning("InvalidArgumentException", {logfield::create("exception", e.what())});
+                logger->warning("InvalidArgumentException", {{"exception", e.what()}});
             }
         }
         else
@@ -92,7 +90,7 @@ namespace VmiCore::Windows
     {
         auto bugCheckCode = event.getRcx();
         eventStream->sendBSODEvent(static_cast<int64_t>(bugCheckCode));
-        logger->warning("BSOD detected!", {logfield::create("BugCheckCode", fmt::format("{:#x}", bugCheckCode))});
+        logger->warning("BSOD detected!", {{"BugCheckCode", fmt::format("{:#x}", bugCheckCode)}});
         GlobalControl::endVmi = true;
         GlobalControl::postRunPluginAction = false;
         pluginSystem->passShutdownEventToRegisteredPlugins();

@@ -2,6 +2,7 @@
 #define VMICORE_INTERRUPTEVENTSUPERVISOR_H
 
 #include "../GlobalControl.h"
+#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include "Breakpoint.h"
 #include "Event.h"

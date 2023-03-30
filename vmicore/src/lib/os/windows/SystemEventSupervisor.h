@@ -2,6 +2,8 @@
 #define VMICORE_WINDOWS_SYSTEMEVENTSUPERVISOR_H
 
 #include "../../io/IEventStream.h"
+#include "../../io/ILogger.h"
+#include "../../io/ILogging.h"
 #include "../../plugins/PluginSystem.h"
 #include "../../vmi/InterruptEventSupervisor.h"
 #include "../../vmi/LibvmiInterface.h"

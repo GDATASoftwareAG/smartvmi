@@ -1,6 +1,5 @@
 #include "SingleStepSupervisor.h"
 #include "../GlobalControl.h"
-#include "../io/grpc/GRPCLogger.h"
 #include "VmiException.h"
 #include <cmath>
 #include <vmicore/filename.h>
@@ -34,8 +33,7 @@ namespace VmiCore
     void SingleStepSupervisor::initializeSingleStepEvents()
     {
         auto numberOfVCPUs = vmiInterface->getNumberOfVCPUs();
-        SingleStepSupervisor::logger->debug("initialize callbacks",
-                                            {logfield::create("vcpus", static_cast<uint64_t>(numberOfVCPUs))});
+        SingleStepSupervisor::logger->debug("initialize callbacks", {{"vcpus", static_cast<uint64_t>(numberOfVCPUs)}});
         singleStepEvents = std::vector<vmi_event_t>(numberOfVCPUs);
         callbacks = std::vector<std::function<void(vmi_event_t*)>>(numberOfVCPUs);
     }
@@ -56,7 +54,7 @@ namespace VmiCore
                 catch (const VmiException& e)
                 {
                     SingleStepSupervisor::logger->error("Unable to clear single step event during teardown",
-                                                        {logfield::create("exception", e.what())});
+                                                        {{"exception", e.what()}});
                 }
                 event.ss_event.enable = false;
             }
@@ -111,9 +109,7 @@ namespace VmiCore
         catch (const std::exception& e)
         {
             GlobalControl::endVmi = true;
-            GlobalControl::logger()->error(
-                "Unexpected exception",
-                {logfield::create("logger", loggerName), logfield::create("exception", e.what())});
+            GlobalControl::logger()->error("Unexpected exception", {{"logger", loggerName}, {"exception", e.what()}});
         }
         return eventResponse;
     }

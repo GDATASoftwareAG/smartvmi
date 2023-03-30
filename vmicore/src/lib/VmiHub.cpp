@@ -51,16 +51,16 @@ namespace VmiCore
                 auto currentTime = std::chrono::steady_clock::now();
                 auto callDuration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - callStart);
                 auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - loopStart);
-                logger->debug("Event loop call",
-                              {logfield::create("durationMilliseconds", callDuration.count()),
-                               logfield::create("totalElapsedTimeSeconds", elapsedTime.count())});
+                logger->debug(
+                    "Event loop call",
+                    {{"durationMilliseconds", callDuration.count()}, {"totalElapsedTimeSeconds", elapsedTime.count()}});
 #else
                 vmiInterface->eventsListen(500);
 #endif
             }
             catch (const std::exception& e)
             {
-                logger->error("Error while waiting for events", {logfield::create("exception", e.what())});
+                logger->error("Error while waiting for events", {{"exception", e.what()}});
                 eventStream->sendErrorEvent(e.what());
                 logger->info("Trying to get the VM state");
 
@@ -79,19 +79,19 @@ namespace VmiCore
                 case SIGINT:
                 {
                     GlobalControl::logger()->info("externalInterruptHandler: SIGINT received",
-                                                  {logfield::create("logger", loggerName)});
+                                                  {{"logger", loggerName}});
                     break;
                 }
                 case SIGTERM:
                 {
                     GlobalControl::logger()->info("externalInterruptHandler: SIGTERM received",
-                                                  {logfield::create("logger", loggerName)});
+                                                  {{"logger", loggerName}});
                     break;
                 }
                 default:
                 {
                     GlobalControl::logger()->error("Called for unhandled signal. This should never occur",
-                                                   {logfield::create("logger", loggerName)});
+                                                   {{"logger", loggerName}});
                 }
             }
         }

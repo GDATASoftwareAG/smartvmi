@@ -37,7 +37,7 @@ namespace VmiCore::Linux
     {
         auto procForkConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_fork_connector");
         logger->debug("Obtained starting address of proc_fork_connector",
-                      {logfield::create("VA", fmt::format("{:#x}", procForkConnectorVA))});
+                      {{"VA", fmt::format("{:#x}", procForkConnectorVA)}});
         auto procForkConnectorCallback =
             IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procForkConnectorCallback);
         procForkConnectorEvent = interruptEventSupervisor->createBreakpoint(
@@ -48,7 +48,7 @@ namespace VmiCore::Linux
     {
         auto procExecConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_exec_connector");
         logger->debug("Obtained starting address of proc_exec_connector",
-                      {logfield::create("VA", fmt::format("{:#x}", procExecConnectorVA))});
+                      {{"VA", fmt::format("{:#x}", procExecConnectorVA)}});
         auto procExecConnectorCallback =
             IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExecConnectorCallback);
         procExecConnectorEvent = interruptEventSupervisor->createBreakpoint(
@@ -59,7 +59,7 @@ namespace VmiCore::Linux
     {
         auto procExitConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_exit_connector");
         logger->debug("Obtained starting address of proc_exit_connector",
-                      {logfield::create("VA", fmt::format("{:#x}", procExitConnectorVA))});
+                      {{"VA", fmt::format("{:#x}", procExitConnectorVA)}});
         auto procExitConnectorCallback =
             IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExitConnectorCallback);
         procExitConnectorEvent = interruptEventSupervisor->createBreakpoint(

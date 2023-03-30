@@ -38,7 +38,7 @@ namespace VmiCore::Windows
             if (!insertionResult.second)
             {
                 logger->warning("Cycle detected! Vad entry already visited",
-                                {logfield::create("VadEntryBaseVA", fmt::format("{:#x}", currentVadEntryBaseVA))});
+                                {{"VadEntryBaseVA", fmt::format("{:#x}", currentVadEntryBaseVA)}});
                 continue;
             }
 
@@ -52,10 +52,10 @@ namespace VmiCore::Windows
             catch (const std::exception& e)
             {
                 logger->warning("Unable to extract process",
-                                {logfield::create("ProcessName", processName),
-                                 logfield::create("ProcessId", static_cast<int64_t>(pid)),
-                                 logfield::create("_MMVAD_SHORT", fmt::format("{:#x}", currentVadEntryBaseVA)),
-                                 logfield::create("exception", e.what())});
+                                {{"ProcessName", processName},
+                                 {"ProcessId", static_cast<int64_t>(pid)},
+                                 {"_MMVAD_SHORT", fmt::format("{:#x}", currentVadEntryBaseVA)},
+                                 {"exception", e.what()}});
                 continue;
             }
             if (leftChildAddress != 0)
@@ -75,11 +75,11 @@ namespace VmiCore::Windows
                 const auto endAddress = ((currentVad->endingVPN + 1) << PagingDefinitions::numberOfPageIndexBits) - 1;
                 const auto size = endAddress - startAddress + 1;
                 logger->debug("Vadt element",
-                              {logfield::create("startingVPN", fmt::format("{:#x}", currentVad->startingVPN)),
-                               logfield::create("endingVPN", fmt::format("{:#x}", currentVad->endingVPN)),
-                               logfield::create("startAddress", fmt::format("{:#x}", startAddress)),
-                               logfield::create("endAddress", fmt::format("{:#x}", endAddress)),
-                               logfield::create("size", static_cast<uint64_t>(size))});
+                              {{"startingVPN", fmt::format("{:#x}", currentVad->startingVPN)},
+                               {"endingVPN", fmt::format("{:#x}", currentVad->endingVPN)},
+                               {"startAddress", fmt::format("{:#x}", startAddress)},
+                               {"endAddress", fmt::format("{:#x}", endAddress)},
+                               {"size", static_cast<uint64_t>(size)}});
                 regions->emplace_back(startAddress,
                                       size,
                                       currentVad->fileName,
@@ -91,10 +91,9 @@ namespace VmiCore::Windows
             }
             catch (const std::exception& e)
             {
-                logger->warning("Unable to create Vadt object for process",
-                                {logfield::create("ProcessName", processName),
-                                 logfield::create("ProcessId", static_cast<int64_t>(pid)),
-                                 logfield::create("exception", e.what())});
+                logger->warning(
+                    "Unable to create Vadt object for process",
+                    {{"ProcessName", processName}, {"ProcessId", static_cast<int64_t>(pid)}, {"exception", e.what()}});
             }
         }
 
@@ -128,8 +127,8 @@ namespace VmiCore::Windows
             {
                 logger->debug("Is file backed",
                               {
-                                  logfield::create("mmSectionFlags.Image", fmt::format("{:#x}", imageFlag)),
-                                  logfield::create("mmSectionFlags.File", fmt::format("{:#x}", fileFlag)),
+                                  {"mmSectionFlags.Image", fmt::format("{:#x}", imageFlag)},
+                                  {"mmSectionFlags.File", fmt::format("{:#x}", fileFlag)},
                               });
                 vadt->isFileBacked = true;
                 try
@@ -146,10 +145,10 @@ namespace VmiCore::Windows
                     vadt->fileName = "unknownFilename";
                     logger->warning("Unable to extract file name for VAD",
                                     {
-                                        logfield::create("ProcessName", processName),
-                                        logfield::create("ProcessId", static_cast<int64_t>(pid)),
-                                        logfield::create("vadEntryBaseVA", vadEntryBaseVA),
-                                        logfield::create("exception", e.what()),
+                                        {"ProcessName", processName},
+                                        {"ProcessId", static_cast<int64_t>(pid)},
+                                        {"vadEntryBaseVA", vadEntryBaseVA},
+                                        {"exception", e.what()},
                                     });
                 }
             }

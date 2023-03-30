@@ -131,15 +131,13 @@ namespace VmiCore
     void InterruptEventSupervisor::enableEvent(addr_t targetPA)
     {
         vmiInterface->write8PA(targetPA, INT3_BREAKPOINT);
-        GlobalControl::logger()->debug("Enabled interrupt event",
-                                       {logfield::create("targetPA", fmt::format("{:#x}", targetPA))});
+        GlobalControl::logger()->debug("Enabled interrupt event", {{"targetPA", fmt::format("{:#x}", targetPA)}});
     }
 
     void InterruptEventSupervisor::disableEvent(addr_t targetPA)
     {
         vmiInterface->write8PA(targetPA, originalValuesByTargetPA[targetPA]);
-        GlobalControl::logger()->debug("Disabled interrupt event",
-                                       {logfield::create("targetPA", fmt::format("{:#x}", targetPA))});
+        GlobalControl::logger()->debug("Disabled interrupt event", {{"targetPA", fmt::format("{:#x}", targetPA)}});
     }
 
     event_response_t InterruptEventSupervisor::_defaultInterruptCallback([[maybe_unused]] vmi_instance_t vmi,
@@ -155,8 +153,7 @@ namespace VmiCore
         {
             GlobalControl::logger()->error(
                 "Caught interrupt event with destroyed InterruptEventSupervisor",
-                {logfield::create("logger",
-                                  loggerName) /*, logfield::create("eventPA", fmt::format("{:#x}", eventPA))*/});
+                {CxxLogField("logger", loggerName) /*, CxxLogField("eventPA", fmt::format("{:#x}", eventPA))*/});
             return eventResponse;
         }
         auto eventPA =
@@ -174,9 +171,8 @@ namespace VmiCore
         }
         else
         {
-            GlobalControl::logger()->debug(
-                "Reinject interrupt into guest OS",
-                {logfield::create("logger", loggerName), logfield::create("eventPA", fmt::format("{:#x}", eventPA))});
+            GlobalControl::logger()->debug("Reinject interrupt into guest OS",
+                                           {{"logger", loggerName}, {"eventPA", fmt::format("{:#x}", eventPA)}});
             event->interrupt_event.reinject = REINJECT_INTERRUPT;
         }
 
@@ -203,9 +199,8 @@ namespace VmiCore
             }
             catch (const std::exception& e)
             {
-                GlobalControl::logger()->warning(
-                    "Interrupt callback failed",
-                    {logfield::create("logger", loggerName), logfield::create("exception", e.what())});
+                GlobalControl::logger()->warning("Interrupt callback failed",
+                                                 {{"logger", loggerName}, {"exception", e.what()}});
                 GlobalControl::eventStream()->sendErrorEvent(e.what());
             }
         }
@@ -238,9 +233,9 @@ namespace VmiCore
     void InterruptEventSupervisor::storeOriginalValue(addr_t targetPA)
     {
         auto originalValue = vmiInterface->read8PA(targetPA);
-        GlobalControl::logger()->debug("Save original value",
-                                       {logfield::create("targetPA", fmt::format("{:#x}", targetPA)),
-                                        logfield::create("originalValue", fmt::format("{:#x}", originalValue))});
+        GlobalControl::logger()->debug(
+            "Save original value",
+            {{"targetPA", fmt::format("{:#x}", targetPA)}, {"originalValue", fmt::format("{:#x}", originalValue)}});
         if (originalValue == INT3_BREAKPOINT)
         {
             throw VmiException(

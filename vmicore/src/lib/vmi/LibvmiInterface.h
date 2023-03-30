@@ -3,6 +3,7 @@
 
 #include "../config/IConfigParser.h"
 #include "../io/IEventStream.h"
+#include "../io/ILogger.h"
 #include "../io/ILogging.h"
 #include <fmt/core.h>
 #include <libvmi/events.h>

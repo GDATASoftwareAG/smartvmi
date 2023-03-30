@@ -1,7 +1,7 @@
 #ifndef VMICORE_IFILETRANSPORT_H
 #define VMICORE_IFILETRANSPORT_H
 
-#include <memory>
+#include <cstdint>
 #include <string_view>
 #include <vector>
 

@@ -31,7 +31,7 @@ namespace VmiCore::Windows
         auto psActiveProcessListHeadVA = vmiInterface->translateKernelSymbolToVA("PsActiveProcessHead");
         auto currentListEntry = psActiveProcessListHeadVA;
         logger->debug("Got VA of PsActiveProcessHead",
-                      {logfield::create("PsActiveProcessHeadVA", fmt::format("{:#x}", currentListEntry))});
+                      {{"PsActiveProcessHeadVA", fmt::format("{:#x}", currentListEntry)}});
 
         do
         {
@@ -61,9 +61,9 @@ namespace VmiCore::Windows
             processInformation->processPath = std::make_unique<std::string>();
             processInformation->fullName = std::make_unique<std::string>();
             logger->warning("Process",
-                            {logfield::create("ProcessName", processInformation->name),
-                             logfield::create("ProcessId", static_cast<uint64_t>(processInformation->pid)),
-                             logfield::create("Exception", e.what())});
+                            {{"ProcessName", processInformation->name},
+                             {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
+                             {"Exception", e.what()}});
         }
         processInformation->memoryRegionExtractor = std::make_unique<VadTreeWin10>(
             kernelAccess, eprocessBase, processInformation->pid, processInformation->name, logging);
@@ -115,12 +115,12 @@ namespace VmiCore::Windows
                                       static_cast<uint32_t>(processInformation->pid),
                                       fmt::format("{:#x}", processInformation->processCR3));
         logger->info("Discovered active process",
-                     {logfield::create("ProcessName", processInformation->name),
-                      logfield::create("ProcessId", static_cast<uint64_t>(processInformation->pid)),
-                      logfield::create("ProcessCr3", fmt::format("{:#x}", processInformation->processCR3)),
-                      logfield::create("ParentProcessName", parentName),
-                      logfield::create("ParentProcessId", parentPid),
-                      logfield::create("ParentProcessCr3", parentCr3)});
+                     {{"ProcessName", processInformation->name},
+                      {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
+                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processCR3)},
+                      {"ParentProcessName", parentName},
+                      {"ParentProcessId", parentPid},
+                      {"ParentProcessCr3", parentCr3}});
         processInformationByPid[processInformation->pid] = processInformation;
         pidsByEprocessBase[processInformation->base] = processInformation->pid;
     }
@@ -133,9 +133,9 @@ namespace VmiCore::Windows
             return true;
         }
         logger->debug("Encountered a process that has got an exit status other than 'status pending'",
-                      {logfield::create("_EPROCESS_base", fmt::format("{:#x}", eprocessBase)),
-                       logfield::create("ProcessId", static_cast<uint64_t>(kernelAccess->extractPID(eprocessBase))),
-                       logfield::create("ExitStatus", static_cast<uint64_t>(exitStatus))
+                      {{"_EPROCESS_base", fmt::format("{:#x}", eprocessBase)},
+                       {"ProcessId", static_cast<uint64_t>(kernelAccess->extractPID(eprocessBase))},
+                       CxxLogField("ExitStatus", static_cast<uint64_t>(exitStatus))
 
                       });
         return false;
@@ -150,8 +150,8 @@ namespace VmiCore::Windows
             if (processInformationIterator == processInformationByPid.end())
             {
                 logger->warning("Process information not found for process",
-                                {logfield::create("_EPROCESS_base", fmt::format("{:#x}", eprocessBase)),
-                                 logfield::create("ProcessId", static_cast<uint64_t>(eprocessBaseIterator->second))
+                                {{"_EPROCESS_base", fmt::format("{:#x}", eprocessBase)},
+                                 CxxLogField("ProcessId", static_cast<uint64_t>(eprocessBaseIterator->second))
 
                                 });
             }
@@ -175,13 +175,12 @@ namespace VmiCore::Windows
                                               fmt::format("{:#x}", processInformationIterator->second->processCR3));
                 logger->info(
                     "Remove process from actives processes",
-                    {logfield::create("ProcessName", processInformationIterator->second->name),
-                     logfield::create("ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)),
-                     logfield::create("ProcessCr3",
-                                      fmt::format("{:#x}", processInformationIterator->second->processCR3)),
-                     logfield::create("ParentProcessName", parentName),
-                     logfield::create("ParentProcessId", parentPid),
-                     logfield::create("ParentProcessCr3", parentCr3)});
+                    {{"ProcessName", processInformationIterator->second->name},
+                     {"ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)},
+                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->processCR3)),
+                     {"ParentProcessName", parentName},
+                     {"ParentProcessId", parentPid},
+                     {"ParentProcessCr3", parentCr3}});
 
                 processInformationByPid.erase(processInformationIterator);
             }
@@ -190,7 +189,7 @@ namespace VmiCore::Windows
         else
         {
             logger->warning("Process does not seem to be stored as an active process",
-                            {logfield::create("_EPROCESS_base", fmt::format("{:#x}", eprocessBase))});
+                            {{"_EPROCESS_base", fmt::format("{:#x}", eprocessBase)}});
         }
     }
 
