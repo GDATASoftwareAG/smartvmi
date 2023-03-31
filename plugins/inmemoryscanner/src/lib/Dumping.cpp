@@ -3,18 +3,21 @@
 #include "Filenames.h"
 #include "Scanner.h"
 #include <algorithm>
+#include <fmt/core.h>
 #include <iostream>
 
 using VmiCore::MemoryRegion;
-using VmiCore::Plugin::LogLevel;
 using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner
 {
     Dumping::Dumping(const PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration)
-        : pluginInterface(pluginInterface), configuration(std::move(configuration))
+        : pluginInterface(pluginInterface),
+          configuration(std::move(configuration)),
+          logger(this->pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
     {
         dumpingPath = this->configuration->getOutputPath() / "dumpedRegions";
+        logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
     }
 
     void Dumping::dumpMemoryRegion(const std::string& processName,
@@ -26,12 +29,13 @@ namespace InMemoryScanner
             createMemoryRegionInformation(processName, pid, memoryRegionDescriptor, getNextRegionId());
         auto inMemDumpFileName = memoryRegionInformation->getMemFileName();
 
-        pluginInterface->logMessage(LogLevel::info,
-                                    LOG_FILENAME,
-                                    "Dumping Memory region from " + memoryRegionInformation->startAddress +
-                                        " with size " + std::to_string(memoryRegionInformation->scanSize) +
-                                        " from Process: " + processName + " : " + std::to_string(pid) +
-                                        " Module: " + memoryRegionInformation->moduleName + " to " + inMemDumpFileName);
+        logger->info("Dumping Memory region",
+                     {{"VA", memoryRegionInformation->startAddress},
+                      {"Size", memoryRegionInformation->scanSize},
+                      {"Process", processName},
+                      {"Pid", pid},
+                      {"Module", memoryRegionInformation->moduleName},
+                      {"DumpFile", inMemDumpFileName}});
 
         pluginInterface->writeToFile(dumpingPath / inMemDumpFileName, data);
 
@@ -50,8 +54,8 @@ namespace InMemoryScanner
         }
 
         auto flags = memoryRegionDescriptor.protection->toString();
-        auto startAddress = intToHex(memoryRegionDescriptor.base);
-        auto endAddress = intToHex(memoryRegionDescriptor.base + memoryRegionDescriptor.size);
+        auto startAddress = fmt::format("{:x}", memoryRegionDescriptor.base);
+        auto endAddress = fmt::format("{:x}", memoryRegionDescriptor.base + memoryRegionDescriptor.size);
 
         auto memRegionInformation = MemoryRegionInformation{std::to_string(pid),
                                                             memoryRegionDescriptor.size,

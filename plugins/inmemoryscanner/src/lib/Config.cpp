@@ -1,16 +1,20 @@
 #include "Config.h"
+#include "Common.h"
 #include "Filenames.h"
 #include <algorithm>
 
 using VmiCore::Plugin::IPluginConfig;
-using VmiCore::Plugin::LogLevel;
 using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner
 {
     constexpr uint64_t defaultMaxScanSize = 52428800; // 50MB
 
-    Config::Config(const PluginInterface* pluginInterface) : pluginInterface(pluginInterface) {}
+    Config::Config(const PluginInterface* pluginInterface)
+        : pluginInterface(pluginInterface), logger(this->pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
+    {
+        logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
+    }
 
     void Config::parseConfiguration(const IPluginConfig& config)
     {
@@ -28,8 +32,7 @@ namespace InMemoryScanner
                   std::inserter(ignoredProcesses, ignoredProcesses.end()));
         for (auto& element : ignoredProcesses)
         {
-            pluginInterface->logMessage(
-                LogLevel::info, LOG_FILENAME, std::string("Got ignored process \"").append(element).append("\""));
+            logger->info("Got ignored process", {{"Name", element}});
         }
     }
 
