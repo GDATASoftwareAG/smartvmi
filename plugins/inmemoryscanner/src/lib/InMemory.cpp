@@ -6,6 +6,7 @@
 #define BUILD_VERSION "TestBuild"
 #endif
 
+#include "Common.h"
 #include "Config.h"
 #include "Dumping.h"
 #include "Filenames.h"
@@ -20,29 +21,28 @@ VMI_PLUGIN_API_VERSION_INFO
 
 using VmiCore::ActiveProcessInformation;
 using VmiCore::Plugin::IPluginConfig;
-using VmiCore::Plugin::LogLevel;
 using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner
 {
     PluginInterface* pluginInterface;
     std::unique_ptr<Scanner> scanner;
+    std::unique_ptr<VmiCore::ILogger> staticLogger;
 
     void shutdownCallback()
     {
-        pluginInterface->logMessage(LogLevel::info, LOG_FILENAME, "Shutdown initiated");
+        staticLogger->info("Shutdown initiated");
         try
         {
             scanner->scanAllProcesses();
         }
         catch (const std::exception& exc)
         {
-            auto errorMsg = "Error occurred during shutdown scan. Reason: " + std::string(exc.what());
-            pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, errorMsg);
-            pluginInterface->sendErrorEvent(errorMsg);
+            staticLogger->error("Error occurred during shutdown scan", {{"Exception", exc.what()}});
+            pluginInterface->sendErrorEvent(exc.what());
         }
         scanner->saveOutput();
-        pluginInterface->logMessage(LogLevel::info, LOG_FILENAME, "Done scanning all processes");
+        staticLogger->info("Done scanning all processes");
     }
 
     void processTerminationCallback(std::shared_ptr<const ActiveProcessInformation> processInformation)
@@ -61,11 +61,10 @@ namespace InMemoryScanner
 
         cmd.parse(args);
 
-        pluginInterface->logMessage(LogLevel::debug,
-                                    LOG_FILENAME,
-                                    "InMemoryScanner plugin version info: " + std::string(PLUGIN_VERSION) + "-" +
-                                        std::string(BUILD_VERSION));
-
+        staticLogger = communicator->newNamedLogger(INMEMORY_LOGGER_NAME);
+        staticLogger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
+        staticLogger->debug("InMemoryScanner plugin version info",
+                            {{"Version", PLUGIN_VERSION}, {"BuildNumber", BUILD_VERSION}});
         try
         {
             std::shared_ptr<IConfig> configuration = std::make_shared<Config>(pluginInterface);
@@ -80,14 +79,12 @@ namespace InMemoryScanner
         }
         catch (const ConfigException& exc)
         {
-            pluginInterface->logMessage(
-                LogLevel::error, LOG_FILENAME, "Error loading configuration: " + std::string(exc.what()));
+            staticLogger->error("Error loading configuration", {{"Exception", exc.what()}});
             success = false;
         }
         catch (const YaraException& exc)
         {
-            pluginInterface->logMessage(
-                LogLevel::error, LOG_FILENAME, "Error loading yara: " + std::string(exc.what()));
+            staticLogger->error("Error loading yara", {{"Exception", exc.what()}});
             success = false;
         }
 
@@ -97,22 +94,21 @@ namespace InMemoryScanner
             {
                 pluginInterface->registerProcessTerminationEvent(processTerminationCallback);
             }
-            catch (const std::exception&)
+            catch (const std::exception& exc)
             {
-                pluginInterface->logMessage(
-                    LogLevel::error, LOG_FILENAME, "Could not register ProcessTermination Event");
+                staticLogger->error("Could not register ProcessTermination Event", {{"Exception", exc.what()}});
                 success = false;
             }
             try
             {
                 pluginInterface->registerShutdownEvent(shutdownCallback);
             }
-            catch (const std::exception&)
+            catch (const std::exception& exc)
             {
-                pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, "Could not register Shutdown Event");
+                staticLogger->error("Could not register Shutdown Event", {{"Exception", exc.what()}});
                 success = false;
             }
-            pluginInterface->logMessage(LogLevel::info, LOG_FILENAME, "inMemory Plugin: init end");
+            staticLogger->info("InMemory Plugin: init end");
         }
 
         return success;

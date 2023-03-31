@@ -4,16 +4,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <vmicore/filename.h>
+
+#define INMEMORY_LOGGER_NAME std::string("InMemory_").append(FILENAME_STEM)
 
 namespace InMemoryScanner
 {
-    template <typename T> std::string intToHex(T i)
-    {
-        std::stringstream stream;
-        stream << "0x" << std::hex << (uint64_t)i;
-        return stream.str();
-    }
-
     struct Match
     {
         std::string matchName;

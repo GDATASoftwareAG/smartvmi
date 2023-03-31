@@ -147,6 +147,7 @@ namespace InMemoryScanner
       private:
         const VmiCore::Plugin::PluginInterface* pluginInterface;
         std::shared_ptr<IConfig> configuration;
+        std::unique_ptr<VmiCore::ILogger> logger;
 
         std::filesystem::path dumpingPath;
         std::mutex lock{};

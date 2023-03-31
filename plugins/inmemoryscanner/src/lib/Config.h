@@ -64,6 +64,7 @@ namespace InMemoryScanner
 
       private:
         const VmiCore::Plugin::PluginInterface* pluginInterface;
+        std::unique_ptr<VmiCore::ILogger> logger;
         std::filesystem::path outputPath;
         std::filesystem::path signatureFile;
         std::set<std::string> ignoredProcesses;

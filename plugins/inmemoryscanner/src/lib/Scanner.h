@@ -34,7 +34,8 @@ namespace InMemoryScanner
         std::unique_ptr<YaraInterface> yaraEngine;
         OutputXML outputXml{};
         std::unique_ptr<IDumping> dumping;
-        std::filesystem::path inMemoryResultsTextFile;
+        std::unique_ptr<VmiCore::ILogger> logger;
+        std::unique_ptr<VmiCore::ILogger> inMemResultsLogger;
         Semaphore<std::mutex, std::condition_variable> semaphore =
             Semaphore<std::mutex, std::condition_variable>(YR_MAX_THREADS);
 

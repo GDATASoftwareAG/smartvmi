@@ -3,8 +3,10 @@
 #include "mock_Dumping.h"
 #include "mock_Yara.h"
 #include <Scanner.h>
+#include <fmt/core.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vmicore_test/io/mock_Logger.h>
 #include <vmicore_test/os/mock_MemoryRegionExtractor.h>
 #include <vmicore_test/os/mock_PageProtection.h>
 #include <vmicore_test/plugins/mock_PluginInterface.h>
@@ -19,6 +21,7 @@ using testing::Return;
 using testing::Unused;
 using VmiCore::ActiveProcessInformation;
 using VmiCore::MemoryRegion;
+using VmiCore::MockLogger;
 using VmiCore::MockMemoryRegionExtractor;
 using VmiCore::MockPageProtection;
 using VmiCore::Plugin::MockPluginInterface;
@@ -50,6 +53,8 @@ namespace InMemoryScanner
 
         void SetUp() override
         {
+            ON_CALL(*pluginInterface, newNamedLogger(_))
+                .WillByDefault([]() { return std::make_unique<NiceMock<MockLogger>>(); });
             ON_CALL(*pluginInterface, getResultsDir()).WillByDefault([]() { return std::make_unique<std::string>(); });
             ON_CALL(*configuration, getMaximumScanSize()).WillByDefault(Return(maxScanSize));
             // make sure that we return a non-empty memory region or else we might skip important parts
@@ -150,8 +155,13 @@ namespace InMemoryScanner
 
         std::string getMemFileName(std::string& trimmedProcessName, pid_t pid)
         {
-            return trimmedProcessName + "-" + std::to_string(pid) + "-" + protectionAsString + "-" +
-                   intToHex(startAddress) + "-" + intToHex(startAddress + size) + "-" + uidFirstRegion;
+            return fmt::format("{}-{}-{}-{:x}-{:x}-{}",
+                               trimmedProcessName,
+                               pid,
+                               protectionAsString,
+                               startAddress,
+                               startAddress + size,
+                               uidFirstRegion);
         }
     };
 
@@ -232,8 +242,13 @@ namespace InMemoryScanner
                     memoryRegions->push_back(std::move(memoryRegionDescriptor));
                     return memoryRegions;
                 });
-        auto expectedFileNameRegEx = trimmedProcessName + "-" + std::to_string(pid) + "-" + protectionAsString + "-" +
-                                     intToHex(startAddress) + "-" + intToHex(startAddress + size) + "-" + uidRegEx;
+        auto expectedFileNameRegEx = fmt::format("{}-{}-{}-{:x}-{:x}-{}",
+                                                 trimmedProcessName,
+                                                 pid,
+                                                 protectionAsString,
+                                                 startAddress,
+                                                 startAddress + size,
+                                                 uidRegEx);
         auto expectedFileNameWithPathRegEx = "^" + (dumpedRegionsPath / expectedFileNameRegEx).string() + "$";
 
         EXPECT_CALL(*pluginInterface,
@@ -245,9 +260,13 @@ namespace InMemoryScanner
     {
         auto processWithShortName = getProcessInfoFromRunningProcesses(testPid);
         auto expectedProcessName = processWithShortName->name;
-        auto expectedFileNameRegEx = expectedProcessName + "-" + std::to_string(testPid) + "-" + protectionAsString +
-                                     "-" + intToHex(startAddress) + "-" + intToHex(startAddress + size) + "-" +
-                                     uidRegEx;
+        auto expectedFileNameRegEx = fmt::format("{}-{}-{}-{:x}-{:x}-{}",
+                                                 expectedProcessName,
+                                                 testPid,
+                                                 protectionAsString,
+                                                 startAddress,
+                                                 startAddress + size,
+                                                 uidRegEx);
         auto expectedFileNameWithPathRegEx = "^" + (dumpedRegionsPath / expectedFileNameRegEx).string() + "$";
 
         EXPECT_CALL(*pluginInterface,
@@ -317,8 +336,9 @@ namespace InMemoryScanner
         std::string expectedFileContent =
             jsonStart + R"("ProcessName": ")" + fullProcessName + "\", " + "\"ProcessId\": " + std::to_string(pid) +
             ", " + "\"SharedMemory\": " + (memoryRegionDescriptor.isSharedMemory ? "true" : "false") + ", " +
-            R"("AccessRights": ")" + protectionAsString + "\", " + R"("StartAddress": ")" + intToHex(startAddress) +
-            "\", " + R"("EndAddress": ")" + intToHex(startAddress + size) + "\", " +
+            R"("AccessRights": ")" + protectionAsString + "\", " + R"("StartAddress": ")" +
+            fmt::format("{:x}", startAddress) + "\", " + R"("EndAddress": ")" +
+            fmt::format("{:x}", startAddress + size) + "\", " +
             "\"BeingDeleted\": " + (memoryRegionDescriptor.isBeingDeleted ? "true" : "false") + ", " +
             "\"ProcessBaseImage\": " + (memoryRegionDescriptor.isProcessBaseImage ? "true" : "false") + ", " +
             "\"Uid\": " + uidFirstRegion + ", " + R"("DumpFileName": ")" + getMemFileName(trimmedProcessName, pid) +

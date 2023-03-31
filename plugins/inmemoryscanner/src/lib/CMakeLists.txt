@@ -20,6 +20,11 @@ pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
 
 include(FetchContent)
 
+# Add public vmicore headers
+
+add_subdirectory("${VMICORE_DIRECTORY_ROOT}/src/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-headers")
+target_link_libraries(inmemoryscanner-obj PUBLIC vmicore-public-headers)
+
 # Setup yaml-cpp
 
 FetchContent_Declare(
@@ -34,7 +39,12 @@ set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 add_compile_definitions(YAML_CPP_SUPPORT)
 target_link_libraries(inmemoryscanner-obj PUBLIC yaml-cpp)
 
-# Add public vmicore headers
+# Setup fmt library
 
-add_subdirectory("${VMICORE_DIRECTORY_ROOT}/src/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-headers")
-target_link_libraries(inmemoryscanner-obj PUBLIC vmicore-public-headers)
+FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+        GIT_TAG 8.1.1
+)
+FetchContent_MakeAvailable(fmt)
+target_link_libraries(inmemoryscanner-obj PUBLIC fmt-header-only)
