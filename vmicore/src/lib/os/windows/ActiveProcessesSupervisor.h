@@ -23,6 +23,8 @@ namespace VmiCore::Windows
 
         void initialize() override;
 
+        [[nodiscard]] std::shared_ptr<ActiveProcessInformation> getSystemProcessInformation() const override;
+
         [[nodiscard]] std::shared_ptr<ActiveProcessInformation> getProcessInformationByPid(pid_t pid) const override;
 
         [[nodiscard]] std::shared_ptr<ActiveProcessInformation>

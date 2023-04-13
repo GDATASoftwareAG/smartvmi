@@ -115,7 +115,7 @@ namespace VmiCore
     std::shared_ptr<IBreakpoint> PluginSystem::createBreakpoint(
         uint64_t targetVA, uint64_t processDtb, const std::function<BpResponse(IInterruptEvent&)>& callbackFunction)
     {
-        return interruptEventSupervisor->createBreakpoint(targetVA, processDtb, callbackFunction);
+        return interruptEventSupervisor->createBreakpoint(targetVA, processDtb, callbackFunction, false);
     }
 
     std::unique_ptr<ILogger> PluginSystem::newNamedLogger(std::string_view name) const

@@ -78,6 +78,11 @@ namespace VmiCore::Linux
                                                          vmiInterface->convertPidToDtb(SYSTEM_PID)));
     }
 
+    std::shared_ptr<ActiveProcessInformation> ActiveProcessesSupervisor::getSystemProcessInformation() const
+    {
+        return getProcessInformationByPid(SYSTEM_PID);
+    }
+
     std::shared_ptr<ActiveProcessInformation> ActiveProcessesSupervisor::getProcessInformationByPid(pid_t pid) const
     {
         std::shared_ptr<ActiveProcessInformation> processInformation;

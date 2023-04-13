@@ -196,7 +196,7 @@ namespace VmiCore
 
         void setupReturnsForVmiInterface()
         {
-            ON_CALL(*mockVmiInterface, convertPidToDtb(Windows::systemPid)).WillByDefault(testing::Return(systemCR3));
+            ON_CALL(*mockVmiInterface, convertPidToDtb(Windows::SYSTEM_PID)).WillByDefault(testing::Return(systemCR3));
             ON_CALL(*mockVmiInterface, getKernelStructOffset("_KPROCESS", "DirectoryTableBase"))
                 .WillByDefault(testing::Return(_KPROCESS_OFFSETS::DirectoryTableBase));
             ON_CALL(*mockVmiInterface, getKernelStructOffset("_EPROCESS", "InheritedFromUniqueProcessId"))

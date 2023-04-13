@@ -8,6 +8,8 @@ namespace VmiCore
       public:
         MOCK_METHOD(void, initialize, (), (override));
 
+        MOCK_METHOD(std::shared_ptr<ActiveProcessInformation>, getSystemProcessInformation, (), (const override));
+
         MOCK_METHOD(std::shared_ptr<ActiveProcessInformation>, getProcessInformationByPid, (pid_t), (const override));
 
         MOCK_METHOD(std::shared_ptr<ActiveProcessInformation>,

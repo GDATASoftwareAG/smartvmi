@@ -15,6 +15,8 @@ namespace VmiCore
 
         virtual void initialize() = 0;
 
+        [[nodiscard]] virtual std::shared_ptr<ActiveProcessInformation> getSystemProcessInformation() const = 0;
+
         [[nodiscard]] virtual std::shared_ptr<ActiveProcessInformation> getProcessInformationByPid(pid_t pid) const = 0;
 
         [[nodiscard]] virtual std::shared_ptr<ActiveProcessInformation>

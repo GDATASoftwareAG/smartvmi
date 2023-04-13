@@ -3,6 +3,7 @@ add_executable(vmicore-test
         lib/os/windows/KernelAccess_UnitTest.cpp
         lib/os/windows/SystemEventSupervisor_UnitTest.cpp
         lib/plugins/PluginSystem_UnitTest.cpp
+        lib/vmi/ContextSwitchHandler_UnitTest.cpp
         lib/vmi/InterruptEventSupervisor_UnitTest.cpp
         lib/vmi/LibvmiInterface_UnitTest.cpp
         lib/vmi/SingleStepSupervisor_UnitTest.cpp)

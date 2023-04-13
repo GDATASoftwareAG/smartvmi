@@ -41,7 +41,7 @@ namespace VmiCore::Linux
         auto procForkConnectorCallback =
             IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procForkConnectorCallback);
         procForkConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procForkConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procForkConnectorCallback);
+            procForkConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procForkConnectorCallback, false);
     }
 
     void SystemEventSupervisor::startProcExecConnectorMonitoring()
@@ -52,7 +52,7 @@ namespace VmiCore::Linux
         auto procExecConnectorCallback =
             IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExecConnectorCallback);
         procExecConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procExecConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExecConnectorCallback);
+            procExecConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExecConnectorCallback, false);
     }
 
     void SystemEventSupervisor::startProcExitConnectorMonitoring()
@@ -63,7 +63,7 @@ namespace VmiCore::Linux
         auto procExitConnectorCallback =
             IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExitConnectorCallback);
         procExitConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procExitConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExitConnectorCallback);
+            procExitConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExitConnectorCallback, false);
     }
 
     BpResponse SystemEventSupervisor::procForkConnectorCallback(IInterruptEvent& event)

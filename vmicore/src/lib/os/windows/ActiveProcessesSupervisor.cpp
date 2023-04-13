@@ -36,7 +36,7 @@ namespace VmiCore::Windows
         do
         {
             addNewProcess(kernelAccess->getCurrentProcessEprocessBase(currentListEntry));
-            currentListEntry = vmiInterface->read64VA(currentListEntry, vmiInterface->convertPidToDtb(systemPid));
+            currentListEntry = vmiInterface->read64VA(currentListEntry, vmiInterface->convertPidToDtb(SYSTEM_PID));
         } while (currentListEntry != psActiveProcessListHeadVA);
         logger->info("--- End of Initialization ---");
     }
@@ -69,6 +69,11 @@ namespace VmiCore::Windows
             kernelAccess, eprocessBase, processInformation->pid, processInformation->name, logging);
 
         return processInformation;
+    }
+
+    std::shared_ptr<ActiveProcessInformation> ActiveProcessesSupervisor::getSystemProcessInformation() const
+    {
+        return getProcessInformationByPid(SYSTEM_PID);
     }
 
     std::shared_ptr<ActiveProcessInformation> ActiveProcessesSupervisor::getProcessInformationByPid(pid_t pid) const
