@@ -259,11 +259,10 @@ namespace VmiCore
         if (vmi_translate_sym2v(vmiInstance, &ctx, userlandSymbolName.c_str(), &userlandSymbolVA) != VMI_SUCCESS)
         {
             throw VmiException(
-                fmt::format("{}: Unable to get address of userland symbol {} for VA {} with pid {} and dtb {}",
+                fmt::format("{}: Unable to get address of userland symbol {} for VA {:#x} with dtb {:#x}",
                             __func__,
                             userlandSymbolName,
                             moduleBaseAddress,
-                            dtb,
                             dtb));
         }
 
