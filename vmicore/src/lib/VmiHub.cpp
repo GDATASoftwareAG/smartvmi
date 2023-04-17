@@ -175,6 +175,8 @@ namespace VmiCore
             }
         }
 
+        vmiInterface->pauseVm();
+        systemEventSupervisor->initialize();
         for (auto& plugin : configInterface->getPlugins())
         {
             pluginSystem->initializePlugin(plugin.first,
@@ -182,9 +184,6 @@ namespace VmiCore
                                            pluginArgs.contains(plugin.first) ? pluginArgs.at(plugin.first)
                                                                              : std::vector<std::string>{plugin.first});
         }
-
-        vmiInterface->pauseVm();
-        systemEventSupervisor->initialize();
         vmiInterface->resumeVm();
 
         eventStream->sendReadyEvent();
