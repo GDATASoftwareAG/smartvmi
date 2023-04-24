@@ -2,11 +2,9 @@
 #include "Config.h"
 #include "Filenames.h"
 #include <filesystem>
-#include <fmt/core.h>
 #include <vector>
 
 using VmiCore::ActiveProcessInformation;
-using VmiCore::Plugin::LogLevel;
 using VmiCore::Plugin::PluginInterface;
 
 namespace ApiTracing
@@ -20,8 +18,10 @@ namespace ApiTracing
           configuration(std::move(configuration)),
           tracingTargetsInformation(std::move(tracingInformation)),
           functionDefinitions(std::move(functionDefinitions)),
-          library(std::move(library))
+          library(std::move(library)),
+          logger(this->pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
     {
+        logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
     }
 
     void Tracer::initLoadedModules(const ActiveProcessInformation& processInformation)
@@ -63,12 +63,9 @@ namespace ApiTracing
         catch (const std::exception& e)
         {
             tracedProcesses.erase(processInformation.pid);
-            pluginInterface->logMessage(LogLevel::warning,
-                                        LOG_FILENAME,
-                                        fmt::format("Could not trace process {} with pid {} because {}",
-                                                    processInformation.name,
-                                                    processInformation.pid,
-                                                    e.what()));
+            logger->warning(
+                "Could not trace process",
+                {{"Process", processInformation.name}, {"Pid", processInformation.pid}, {"Exception", e.what()}});
         }
     }
 
@@ -99,15 +96,12 @@ namespace ApiTracing
                 }
                 catch (const std::exception& e)
                 {
-                    pluginInterface->logMessage(
-                        LogLevel::warning,
-                        LOG_FILENAME,
-                        fmt::format("Could not trace function {}->{} for process {} with pid {} because {}",
-                                    moduleHookTarget.name,
-                                    functionName,
-                                    processInformation.name,
-                                    processInformation.pid,
-                                    e.what()));
+                    logger->warning("Could not trace function",
+                                    {{"Library", moduleHookTarget.name},
+                                     {"Function", functionName},
+                                     {"Process", processInformation.name},
+                                     {"Pid", processInformation.pid},
+                                     {"Exception", e.what()}});
                 }
             }
         }

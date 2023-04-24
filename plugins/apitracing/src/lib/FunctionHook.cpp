@@ -9,7 +9,6 @@ using VmiCore::BpResponse;
 using VmiCore::IBreakpoint;
 using VmiCore::IInterruptEvent;
 using VmiCore::IIntrospectionAPI;
-using VmiCore::Plugin::LogLevel;
 using VmiCore::Plugin::PluginInterface;
 
 namespace ApiTracing
@@ -18,7 +17,7 @@ namespace ApiTracing
     FunctionHook::FunctionHook(std::string moduleName,
                                std::string functionName,
                                std::shared_ptr<IExtractor> extractor,
-                               std::shared_ptr<IIntrospectionAPI> introspectionAPI,
+                               std::shared_ptr<VmiCore::IIntrospectionAPI> introspectionAPI,
                                std::shared_ptr<std::vector<ParameterInformation>> parameterInformation,
                                PluginInterface* pluginInterface)
         : extractor(std::move(extractor)),
@@ -26,8 +25,10 @@ namespace ApiTracing
           functionName(std::move(functionName)),
           moduleName(std::move(moduleName)),
           parameterInformation(std::move(parameterInformation)),
-          pluginInterface(pluginInterface)
+          pluginInterface(pluginInterface),
+          logger(this->pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
     {
+        logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
     }
 
     void FunctionHook::hookFunction(addr_t moduleBaseAddress, uint64_t processCr3)
@@ -45,10 +46,9 @@ namespace ApiTracing
     {
         if (std::find(hookedProcesses.begin(), hookedProcesses.end(), event.getCr3()) != hookedProcesses.end())
         {
-            pluginInterface->logMessage(
-                LogLevel::info,
-                LOG_FILENAME,
-                fmt::format("hookCallback hit: {}->{} at VA{}", moduleName, functionName, event.getGla()));
+            logger->info(
+                "hookCallback hit",
+                {{"Module", moduleName}, {"Function", functionName}, {"Gla", fmt::format("{:x}", event.getGla())}});
             if (parameterInformation->empty())
             {
                 return BpResponse::Continue;
@@ -62,35 +62,18 @@ namespace ApiTracing
 
     void FunctionHook::logParameterList(const std::vector<ExtractedParameterInformation>& extractedParameters)
     {
-        for (auto const& extractedParameter : extractedParameters)
+        for (const auto& extractedParameter : extractedParameters)
         {
             std::visit(
-                [extractedParameter = extractedParameter, this](auto&& arg)
+                [&extractedParameter = extractedParameter, &logger = logger](auto&& arg)
                 {
-                    using T = std::decay_t<decltype(arg)>;
-                    using forward_type = std::remove_reference_t<decltype(arg)>;
-                    if constexpr (std::is_same_v<T, std::string>)
-                    {
-                        return logParameter(extractedParameter.name, std::forward<forward_type>(arg));
-                    }
-                    else if constexpr (std::is_arithmetic_v<T>)
-                    {
-                        return logParameter(extractedParameter.name, std::to_string(std::forward<forward_type>(arg)));
-                    }
-                    else
-                    {
-                        throw std::runtime_error(
-                            fmt::format("Can't convert extracted parameter {} to string.", extractedParameter.name));
-                    }
+                    logger->info("Parameter",
+                                 {{"Name", extractedParameter.name},
+                                  {"Value", std::forward<std::remove_reference_t<decltype(arg)>>(arg)}});
                 },
                 extractedParameter.data);
             // TODO: Log backing parameters
         }
-    }
-
-    void FunctionHook::logParameter(const std::string& parameterName, const std::string& parameterValue) const
-    {
-        pluginInterface->logMessage(LogLevel::info, LOG_FILENAME, fmt::format("{}: {}", parameterName, parameterValue));
     }
 
     void FunctionHook::teardown() const

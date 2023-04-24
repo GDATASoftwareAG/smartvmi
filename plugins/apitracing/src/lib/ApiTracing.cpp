@@ -11,17 +11,17 @@
 #include "Tracer.h"
 #include "config/TracingTargetsParser.h"
 #include "os/windows/Library.h"
-#include <fmt/core.h>
 #include <tclap/CmdLine.h>
+#include <vmicore/io/ILogger.h>
 #include <vmicore/plugins/PluginInit.h>
 #include <vmicore/plugins/PluginInterface.h>
 
 VMI_PLUGIN_API_VERSION_INFO
 
 using VmiCore::ActiveProcessInformation;
+using VmiCore::ILogger;
 using VmiCore::OperatingSystem;
 using VmiCore::Plugin::IPluginConfig;
-using VmiCore::Plugin::LogLevel;
 using VmiCore::Plugin::PluginInterface;
 
 namespace ApiTracing
@@ -30,14 +30,13 @@ namespace ApiTracing
     {
         PluginInterface* pluginInterface;
         std::shared_ptr<Tracer> tracer;
+        std::unique_ptr<ILogger> logger;
     }
 
     void processStartCallback(std::shared_ptr<const ActiveProcessInformation> processInformation)
     {
-        pluginInterface->logMessage(
-            LogLevel::info,
-            LOG_FILENAME,
-            fmt::format("Starting process: {} with pid: {}", *processInformation->fullName, processInformation->pid));
+        logger->info("Starting monitoring of process",
+                     {{"Process", *processInformation->fullName}, {"Pid", processInformation->pid}});
         tracer->addHooks(*processInformation);
     }
 
@@ -63,10 +62,9 @@ namespace ApiTracing
             cmd};
         cmd.parse(args);
 
-        pluginInterface->logMessage(LogLevel::debug,
-                                    LOG_FILENAME,
-                                    "ApiTracing plugin version info: " + std::string(PLUGIN_VERSION) + "-" +
-                                        std::string(BUILD_VERSION));
+        logger = pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME);
+        logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
+        logger->debug("ApiTracing plugin version info", {{"Version", PLUGIN_VERSION}, {"BuildNumber", BUILD_VERSION}});
 
         auto tracingTargetsParser = std::make_shared<TracingTargetsParser>();
         try
@@ -92,8 +90,7 @@ namespace ApiTracing
         }
         catch (const ConfigException& exc)
         {
-            pluginInterface->logMessage(
-                LogLevel::error, LOG_FILENAME, "Error loading configuration: " + std::string(exc.what()));
+            logger->error("Error loading configuration", {{"Exception", exc.what()}});
             return false;
         }
 
@@ -101,9 +98,9 @@ namespace ApiTracing
         {
             pluginInterface->registerProcessStartEvent(processStartCallback);
         }
-        catch (const std::exception&)
+        catch (const std::exception& exc)
         {
-            pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, "Could not register ProcessStart Event");
+            logger->error("Could not register ProcessStart Event", {{"Exception", exc.what()}});
             return false;
         }
 
@@ -111,13 +108,13 @@ namespace ApiTracing
         {
             pluginInterface->registerShutdownEvent(shutDownCallback);
         }
-        catch (const std::exception&)
+        catch (const std::exception& exc)
         {
-            pluginInterface->logMessage(LogLevel::error, LOG_FILENAME, "Could not register ShutDown Event");
+            logger->error("Could not register ShutDown Event", {{"Exception", exc.what()}});
             return false;
         }
 
-        pluginInterface->logMessage(LogLevel::debug, LOG_FILENAME, "apiTracing Plugin: init end");
+        logger->debug("ApiTracing plugin: init end");
 
         return true;
     }

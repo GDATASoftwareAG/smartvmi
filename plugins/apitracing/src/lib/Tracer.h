@@ -9,6 +9,7 @@
 #include "os/ILibrary.h"
 #include <map>
 #include <memory>
+#include <vmicore/io/ILogger.h>
 #include <vmicore/plugins/PluginInterface.h>
 
 namespace ApiTracing
@@ -17,7 +18,7 @@ namespace ApiTracing
     {
       public:
         Tracer(VmiCore::Plugin::PluginInterface* pluginInterface,
-               std::shared_ptr<ApiTracing::IConfig> configuration,
+               std::shared_ptr<IConfig> configuration,
                std::shared_ptr<std::vector<ProcessInformation>> tracingInformation,
                std::shared_ptr<IFunctionDefinitions> functionDefinitions,
                std::shared_ptr<ILibrary> library);
@@ -40,6 +41,7 @@ namespace ApiTracing
         std::vector<std::shared_ptr<FunctionHook>> hookList;
         std::map<uint64_t, std::map<uint64_t, std::list<ParameterInformation>>> processFunctionDefinitions{};
         std::shared_ptr<ILibrary> library;
+        std::unique_ptr<VmiCore::ILogger> logger;
 
         void injectHooks(const VmiCore::ActiveProcessInformation& processInformation,
                          const std::optional<ProcessInformation>& processTracingInformation);
