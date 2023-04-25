@@ -5,7 +5,7 @@ on:
   workflow_run:
     workflows: [CPP CI]
     types:
-      - in_progress
+      - requested
 
 jobs:
   vmicore_sonar_scanner:
