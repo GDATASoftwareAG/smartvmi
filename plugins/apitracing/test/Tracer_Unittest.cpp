@@ -5,6 +5,7 @@
 #include <gmock/gmock-matchers.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vmicore_test/io/mock_Logger.h>
 #include <vmicore_test/os/mock_MemoryRegionExtractor.h>
 #include <vmicore_test/os/mock_PageProtection.h>
 #include <vmicore_test/plugins/mock_PluginInterface.h>
@@ -26,10 +27,6 @@ namespace ApiTracing
             std::make_unique<NiceMock<VmiCore::Plugin::MockPluginInterface>>();
         std::shared_ptr<NiceMock<VmiCore::MockIntrospectionAPI>> mockIntrospectionAPI =
             std::make_shared<NiceMock<VmiCore::MockIntrospectionAPI>>();
-        std::shared_ptr<MockConfig> configuration = std::make_shared<MockConfig>();
-        std::shared_ptr<MockFunctionDefinitions> functionDefinitions = std::make_shared<MockFunctionDefinitions>();
-        std::shared_ptr<Windows::Library> library = std::make_shared<Windows::Library>();
-
         std::shared_ptr<Tracer> tracer;
 
         static constexpr size_t size = 0x666;
@@ -45,7 +42,6 @@ namespace ApiTracing
 
         std::shared_ptr<const VmiCore::ActiveProcessInformation> tracedProcessInformation;
         std::shared_ptr<const VmiCore::ActiveProcessInformation> untracedProcessInformation;
-        VmiCore::MockMemoryRegionExtractor* targetProcessMemoryRegionExtractorRaw = nullptr;
 
         std::string targetProcessName = "TraceMeNow.exe";
         std::string untracedProcessName = "DefinitelyNot.exe";
@@ -87,35 +83,17 @@ namespace ApiTracing
 
         void SetUp() override
         {
-            tracer = std::make_shared<Tracer>(mockPluginInterface.get(),
-                                              configuration,
-                                              std::make_shared<std::vector<ProcessInformation>>(tracingInformation),
-                                              functionDefinitions,
-                                              library);
+            ON_CALL(*mockPluginInterface, newNamedLogger(_))
+                .WillByDefault([]() { return std::make_unique<NiceMock<VmiCore::MockLogger>>(); });
 
-            auto m1 = std::make_unique<VmiCore::MockMemoryRegionExtractor>();
-            targetProcessMemoryRegionExtractorRaw = m1.get();
-            tracedProcessInformation = std::make_shared<VmiCore::ActiveProcessInformation>(
-                VmiCore::ActiveProcessInformation{0,
-                                                  processCr3,
-                                                  testPid,
-                                                  0,
-                                                  targetProcessName,
-                                                  std::make_unique<std::string>(targetProcessName),
-                                                  std::make_unique<std::string>(""),
-                                                  std::move(m1),
-                                                  true});
-            untracedProcessInformation = std::make_shared<VmiCore::ActiveProcessInformation>(
-                VmiCore::ActiveProcessInformation{0,
-                                                  processCr3,
-                                                  testPid,
-                                                  0,
-                                                  untracedProcessName,
-                                                  std::make_unique<std::string>(untracedProcessName),
-                                                  std::make_unique<std::string>(""),
-                                                  std::move(m1),
-                                                  true});
-            ON_CALL(*targetProcessMemoryRegionExtractorRaw, extractAllMemoryRegions())
+            tracer = std::make_shared<Tracer>(mockPluginInterface.get(),
+                                              std::make_shared<MockConfig>(),
+                                              std::make_shared<std::vector<ProcessInformation>>(tracingInformation),
+                                              std::make_shared<MockFunctionDefinitions>(),
+                                              std::make_shared<Windows::Library>());
+
+            auto targetProcessMemoryRegionExtractor = std::make_unique<VmiCore::MockMemoryRegionExtractor>();
+            ON_CALL(*targetProcessMemoryRegionExtractor, extractAllMemoryRegions())
                 .WillByDefault(
                     [&kerneldllMemoryRegionDescriptor = kernelDLLMemoryRegionDescriptor,
                      &ntdllMemoryRegionDescriptor = ntDLLMemoryRegionDescriptor,
@@ -127,9 +105,27 @@ namespace ApiTracing
                         memoryRegions->push_back(std::move(nondllMemoryRegionDescriptor));
                         return memoryRegions;
                     });
+            tracedProcessInformation = std::make_shared<VmiCore::ActiveProcessInformation>(
+                VmiCore::ActiveProcessInformation{0,
+                                                  processCr3,
+                                                  testPid,
+                                                  0,
+                                                  targetProcessName,
+                                                  std::make_unique<std::string>(targetProcessName),
+                                                  std::make_unique<std::string>(""),
+                                                  std::move(targetProcessMemoryRegionExtractor),
+                                                  true});
+            untracedProcessInformation = std::make_shared<VmiCore::ActiveProcessInformation>(
+                VmiCore::ActiveProcessInformation{0,
+                                                  processCr3,
+                                                  testPid,
+                                                  0,
+                                                  untracedProcessName,
+                                                  std::make_unique<std::string>(untracedProcessName),
+                                                  std::make_unique<std::string>(""),
+                                                  std::make_unique<VmiCore::MockMemoryRegionExtractor>(),
+                                                  true});
 
-            std::map<std::string, std::vector<std::string>> hookingTargets{{kernelDllName, {kernellDllFunctionName}},
-                                                                           {ntdllDllName, {ntdllFunctionName}}};
             ON_CALL(*mockPluginInterface, getIntrospectionAPI()).WillByDefault(Return(mockIntrospectionAPI));
             ON_CALL(
                 *mockIntrospectionAPI,
