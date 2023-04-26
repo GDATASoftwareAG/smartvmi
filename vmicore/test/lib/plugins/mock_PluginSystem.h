@@ -18,11 +18,15 @@ namespace VmiCore
                     (),
                     (const override));
 
-        MOCK_METHOD(void, registerProcessStartEvent, (Plugin::processStartCallback_f), (override));
+        MOCK_METHOD(void,
+                    registerProcessStartEvent,
+                    (const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>&),
+                    (override));
 
-        MOCK_METHOD(void, registerProcessTerminationEvent, (Plugin::processTerminationCallback_f), (override));
-
-        MOCK_METHOD(void, registerShutdownEvent, (Plugin::shutdownCallback_f), (override));
+        MOCK_METHOD(void,
+                    registerProcessTerminationEvent,
+                    (const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>&),
+                    (override));
 
         MOCK_METHOD(std::shared_ptr<IBreakpoint>,
                     createBreakpoint,
@@ -42,8 +46,8 @@ namespace VmiCore
         MOCK_METHOD(void, sendInMemDetectionEvent, (std::string_view), (const override));
 
         MOCK_METHOD(void,
-                    initializePlugin,
-                    (const std::string&, std::shared_ptr<Plugin::IPluginConfig>, const std::vector<std::string>& args),
+                    initializePlugins,
+                    ((const std::map<std::string, std::vector<std::string>, std::equal_to<>>&)),
                     (override));
 
         MOCK_METHOD(void,
@@ -56,7 +60,7 @@ namespace VmiCore
                     (std::shared_ptr<const ActiveProcessInformation>),
                     (override));
 
-        MOCK_METHOD(void, passShutdownEventToRegisteredPlugins, (), (override));
+        MOCK_METHOD(void, unloadPlugins, (), (override));
 
         MOCK_METHOD(std::shared_ptr<IIntrospectionAPI>, getIntrospectionAPI, (), (const override));
     };

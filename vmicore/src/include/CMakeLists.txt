@@ -10,7 +10,7 @@ target_sources(vmicore-public-headers INTERFACE
         vmicore/os/IPageProtection.h
         vmicore/os/OperatingSystem.h
         vmicore/plugins/IPluginConfig.h
-        vmicore/plugins/PluginInit.h
+        vmicore/plugins/IPlugin.h
         vmicore/plugins/PluginInterface.h
         vmicore/vmi/BpResponse.h
         vmicore/vmi/IBreakpoint.h

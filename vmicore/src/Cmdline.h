@@ -2,10 +2,11 @@
 #define VMICORE_CMDLINE_H
 
 #include <filesystem>
+#include <functional> // std::equal_to
 #include <iostream>
+#include <map>
 #include <string>
 #include <tclap/ArgException.h>
-#include <unordered_map>
 #include <vector>
 
 std::istream& operator>>(std::istream& is, std::pair<std::string, std::string>& p);
@@ -44,12 +45,12 @@ class Cmdline
     TCLAP::SwitchArg enableDebugArgument{"", "grpc-debug", "Enable additional console logs for gRPC mode.", cmd};
     TCLAP::MultiArg<std::pair<std::string, std::string>> pluginArguments{
         "p", "plugin", "Plugin command line parameters.", false, "plugin: cmdline args", cmd};
-    std::unordered_map<std::string, std::vector<std::string>> pluginArgs{};
+    std::map<std::string, std::vector<std::string>, std::equal_to<>> pluginArgs{};
 
     void parse(int argc, const char** argv);
 
   private:
-    static std::unordered_map<std::string, std::vector<std::string>>
+    static std::map<std::string, std::vector<std::string>, std::equal_to<>>
     convertPluginArgValuesToArgVectors(const std::vector<std::pair<std::string, std::string>>& pluginArgs);
 
     static std::vector<std::string> splitArgs(const std::string& arg);

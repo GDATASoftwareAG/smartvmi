@@ -93,7 +93,7 @@ namespace VmiCore::Windows
         logger->warning("BSOD detected!", {{"BugCheckCode", fmt::format("{:#x}", bugCheckCode)}});
         GlobalControl::endVmi = true;
         GlobalControl::postRunPluginAction = false;
-        pluginSystem->passShutdownEventToRegisteredPlugins();
+        pluginSystem->unloadPlugins();
         // deactivate the interrupt event because we are terminating immediately (no single stepping)
         return BpResponse::Deactivate;
     }

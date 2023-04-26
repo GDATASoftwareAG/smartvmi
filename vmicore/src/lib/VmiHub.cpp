@@ -4,7 +4,7 @@
 #include "os/linux/SystemEventSupervisor.h"
 #include "os/windows/ActiveProcessesSupervisor.h"
 #include "os/windows/SystemEventSupervisor.h"
-
+#include "plugins/PluginException.h"
 #include <csignal>
 #include <memory>
 #include <utility>
@@ -122,7 +122,7 @@ namespace VmiCore
         }
     }
 
-    uint VmiHub::run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs)
+    uint VmiHub::run(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs)
     {
         vmiInterface->initializeVmi();
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
@@ -177,24 +177,27 @@ namespace VmiCore
 
         vmiInterface->pauseVm();
         systemEventSupervisor->initialize();
-        for (auto& plugin : configInterface->getPlugins())
+        try
         {
-            pluginSystem->initializePlugin(plugin.first,
-                                           plugin.second,
-                                           pluginArgs.contains(plugin.first) ? pluginArgs.at(plugin.first)
-                                                                             : std::vector<std::string>{plugin.first});
+            pluginSystem->initializePlugins(pluginArgs);
+            vmiInterface->resumeVm();
+
+            eventStream->sendReadyEvent();
+
+            setupSignalHandling();
+            waitForEvents();
+
+            vmiInterface->pauseVm();
         }
-        vmiInterface->resumeVm();
+        catch (const PluginException& e)
+        {
+            logger->error("Failed to initialize plugin", {{"Plugin", e.plugin()}, {"Exception", e.what()}});
+            eventStream->sendErrorEvent(e.what());
+        }
 
-        eventStream->sendReadyEvent();
-
-        setupSignalHandling();
-        waitForEvents();
-
-        vmiInterface->pauseVm();
         if (GlobalControl::postRunPluginAction)
         {
-            pluginSystem->passShutdownEventToRegisteredPlugins();
+            pluginSystem->unloadPlugins();
         }
         systemEventSupervisor->teardown();
         vmiInterface->resumeVm();

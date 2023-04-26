@@ -8,7 +8,12 @@
 #include "../os/IActiveProcessesSupervisor.h"
 #include "../vmi/InterruptEventSupervisor.h"
 #include "../vmi/LibvmiInterface.h"
+#include "PluginException.h"
+#include <cstdint>
+#include <functional>
+#include <map>
 #include <vector>
+#include <vmicore/plugins/IPlugin.h>
 #include <vmicore/plugins/PluginInterface.h>
 
 namespace VmiCore
@@ -18,9 +23,8 @@ namespace VmiCore
       public:
         ~IPluginSystem() override = default;
 
-        virtual void initializePlugin(const std::string& pluginName,
-                                      std::shared_ptr<Plugin::IPluginConfig> config,
-                                      const std::vector<std::string>& args) = 0;
+        virtual void
+        initializePlugins(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs) = 0;
 
         virtual void passProcessStartEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) = 0;
@@ -28,7 +32,7 @@ namespace VmiCore
         virtual void passProcessTerminationEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) = 0;
 
-        virtual void passShutdownEventToRegisteredPlugins() = 0;
+        virtual void unloadPlugins() = 0;
 
       protected:
         IPluginSystem() = default;
@@ -47,9 +51,8 @@ namespace VmiCore
 
         ~PluginSystem() override;
 
-        void initializePlugin(const std::string& pluginName,
-                              std::shared_ptr<Plugin::IPluginConfig> config,
-                              const std::vector<std::string>& args) override;
+        void
+        initializePlugins(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs) override;
 
         void passProcessStartEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) override;
@@ -57,7 +60,7 @@ namespace VmiCore
         void passProcessTerminationEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) override;
 
-        void passShutdownEventToRegisteredPlugins() override;
+        void unloadPlugins() override;
 
       private:
         std::shared_ptr<IConfigParser> configInterface;
@@ -65,12 +68,14 @@ namespace VmiCore
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
         std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
         std::shared_ptr<IFileTransport> fileTransport;
-        std::vector<Plugin::processStartCallback_f> registeredProcessStartCallbacks;
-        std::vector<Plugin::processTerminationCallback_f> registeredProcessTerminationCallbacks;
-        std::vector<Plugin::shutdownCallback_f> registeredShutdownCallbacks;
+        std::vector<std::function<void(std::shared_ptr<const ActiveProcessInformation>)>>
+            registeredProcessStartCallbacks;
+        std::vector<std::function<void(std::shared_ptr<const ActiveProcessInformation>)>>
+            registeredProcessTerminationCallbacks;
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;
+        std::vector<std::pair<std::string, std::unique_ptr<Plugin::IPlugin>>> plugins;
 
         [[nodiscard]] std::unique_ptr<std::string> getResultsDir() const override;
 
@@ -83,11 +88,11 @@ namespace VmiCore
         [[nodiscard]] std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
         getRunningProcesses() const override;
 
-        void registerProcessStartEvent(Plugin::processStartCallback_f startCallback) override;
+        void registerProcessStartEvent(
+            const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>& startCallback) override;
 
-        void registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback) override;
-
-        void registerShutdownEvent(Plugin::shutdownCallback_f shutdownCallback) override;
+        void registerProcessTerminationEvent(
+            const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>& terminationCallback) override;
 
         std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
@@ -105,6 +110,10 @@ namespace VmiCore
         void sendInMemDetectionEvent(std::string_view message) const override;
 
         [[nodiscard]] std::shared_ptr<IIntrospectionAPI> getIntrospectionAPI() const override;
+
+        void initializePlugin(const std::string& pluginName,
+                              std::shared_ptr<Plugin::IPluginConfig> config,
+                              const std::vector<std::string>& args);
     };
 }
 

@@ -1,8 +1,7 @@
 #include "PluginSystem.h"
 #include "../os/PagingDefinitions.h"
-#include <cstdint>
+#include <bit>
 #include <dlfcn.h>
-#include <exception>
 #include <fmt/core.h>
 #include <utility>
 #include <vmicore/filename.h>
@@ -14,11 +13,6 @@ namespace VmiCore
         bool isInstanciated = false;
         constexpr char const* paddingLogFile = "memoryExtractionPaddingLog.txt";
     }
-
-    // Must match init function declared in PluginInit.h
-    using init_f = bool (*)(Plugin::PluginInterface* pluginInterface,
-                            std::shared_ptr<Plugin::IPluginConfig> config,
-                            std::vector<std::string> args);
 
     PluginSystem::PluginSystem(std::shared_ptr<IConfigParser> configInterface,
                                std::shared_ptr<ILibvmiInterface> vmiInterface,
@@ -106,19 +100,16 @@ namespace VmiCore
         return readPagesWithUnmappedRegionPadding(address, process->processCR3, numberOfPages);
     }
 
-    void PluginSystem::registerProcessStartEvent(Plugin::processStartCallback_f startCallback)
+    void PluginSystem::registerProcessStartEvent(
+        const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>& startCallback)
     {
         registeredProcessStartCallbacks.push_back(startCallback);
     }
 
-    void PluginSystem::registerProcessTerminationEvent(Plugin::processTerminationCallback_f terminationCallback)
+    void PluginSystem::registerProcessTerminationEvent(
+        const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>& terminationCallback)
     {
         registeredProcessTerminationCallbacks.push_back(terminationCallback);
-    }
-
-    void PluginSystem::registerShutdownEvent(Plugin::shutdownCallback_f shutdownCallback)
-    {
-        registeredShutdownCallbacks.push_back(shutdownCallback);
     }
 
     std::shared_ptr<IBreakpoint> PluginSystem::createBreakpoint(
@@ -190,20 +181,14 @@ namespace VmiCore
                                         const std::vector<std::string>& args)
     {
         auto pluginDirectory = configInterface->getPluginDirectory();
-        logger->debug("Plugin directory",
-                      {
-                          {"dirName", pluginDirectory.string()},
-                      });
+        logger->debug("Plugin directory", {{"dirName", pluginDirectory.string()}});
         auto pluginFilename = pluginDirectory / pluginName;
-        logger->debug("Loading plugin",
-                      {
-                          {"fileName", pluginFilename.string()},
-                      });
+        logger->debug("Loading plugin", {{"fileName", pluginFilename.string()}});
 
         void* libraryHandle = dlopen(pluginFilename.c_str(), RTLD_LAZY);
         if (libraryHandle == nullptr)
         {
-            throw std::runtime_error("Unable to load library: " + std::string(dlerror()));
+            throw PluginException(pluginName, fmt::format("Unable to load library: {}", dlerror()));
         }
         dlerror(); // clear possible remnants of error messages
 
@@ -211,35 +196,48 @@ namespace VmiCore
         auto* dlErrorMessage = dlerror();
         if (dlErrorMessage != nullptr)
         {
-            throw std::runtime_error("Unable to retrieve extern symbol '_ZN7VmiCore6Plugin11API_VERSIONE': " +
-                                     std::string(dlErrorMessage));
+            throw PluginException(
+                pluginName,
+                fmt::format("Unable to retrieve extern symbol '_ZN7VmiCore6Plugin11API_VERSIONE': {}", dlErrorMessage));
         }
-        logger->debug("Plugin information", {{"API_VERSION", static_cast<int64_t>(*pluginApiVersion)}});
 
         if (*pluginApiVersion != Plugin::PluginInterface::API_VERSION)
         {
-            throw std::runtime_error("Plugin API Version " + std::to_string(*pluginApiVersion) +
-                                     " is incompatible with VmiCore API Version " +
-                                     std::to_string(Plugin::PluginInterface::API_VERSION));
+            throw PluginException(pluginName,
+                                  fmt::format("Plugin API Version {} is incompatible with VmiCore API Version {}",
+                                              *pluginApiVersion,
+                                              Plugin::PluginInterface::API_VERSION));
         }
 
-        auto pluginInitFunction = reinterpret_cast<init_f>(dlsym(libraryHandle, "init"));
+        auto pluginInitFunction = std::bit_cast<decltype(Plugin::init)*>(
+            dlsym(libraryHandle,
+                  "_ZN7VmiCore6Plugin4initEPNS0_15PluginInterfaceENSt3__110shared_ptrINS0_13IPluginConfigEEENS3_"
+                  "6vectorINS3_12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENSB_ISD_EEEE"));
         dlErrorMessage = dlerror();
         if (dlErrorMessage != nullptr)
         {
-            throw std::runtime_error("Unable to retrieve function 'init': " + std::string(dlErrorMessage));
+            throw PluginException(pluginName, fmt::format("Unable to retrieve init function: {}", dlErrorMessage));
         }
 
-        if (!pluginInitFunction(dynamic_cast<Plugin::PluginInterface*>(this), std::move(config), args))
+        auto plugin = pluginInitFunction(dynamic_cast<Plugin::PluginInterface*>(this), std::move(config), args);
+
+        plugins.emplace_back(pluginName, std::move(plugin));
+    }
+
+    void
+    PluginSystem::initializePlugins(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs)
+    {
+        for (const auto& [name, config] : configInterface->getPlugins())
         {
-            throw std::runtime_error("Unable to initialize plugin " + pluginName);
+            initializePlugin(
+                name, config, pluginArgs.contains(name) ? pluginArgs.at(name) : std::vector<std::string>{name});
         }
     }
 
     void PluginSystem::passProcessStartEventToRegisteredPlugins(
         std::shared_ptr<const ActiveProcessInformation> processInformation)
     {
-        for (auto& processStartCallback : registeredProcessStartCallbacks)
+        for (const auto& processStartCallback : registeredProcessStartCallbacks)
         {
             processStartCallback(processInformation);
         }
@@ -248,20 +246,32 @@ namespace VmiCore
     void PluginSystem::passProcessTerminationEventToRegisteredPlugins(
         std::shared_ptr<const ActiveProcessInformation> processInformation)
     {
-        for (auto& processTerminationCallback : registeredProcessTerminationCallbacks)
+        for (const auto& processTerminationCallback : registeredProcessTerminationCallbacks)
         {
             processTerminationCallback(processInformation);
         }
     }
 
-    void PluginSystem::passShutdownEventToRegisteredPlugins()
+    void PluginSystem::unloadPlugins()
     {
         vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
         vmiInterface->flushPageCache();
 
-        for (auto& shutdownCallback : registeredShutdownCallbacks)
+        for (auto& [name, plugin] : plugins)
         {
-            shutdownCallback();
+            try
+            {
+                plugin->unload();
+            }
+            catch (const std::exception& e)
+            {
+                logger->error("Error occurred while unloading plugin", {{"Plugin", name}, {"Exception", e.what()}});
+                eventStream->sendErrorEvent(e.what());
+            }
         }
+
+        registeredProcessStartCallbacks.clear();
+        registeredProcessTerminationCallbacks.clear();
+        plugins.clear();
     }
 }

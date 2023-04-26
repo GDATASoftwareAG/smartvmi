@@ -9,8 +9,9 @@
 #include "vmi/InterruptEventSupervisor.h"
 #include "vmi/LibvmiInterface.h"
 #include "vmicore/io/ILogger.h"
+#include <functional> // std::equal_to
+#include <map>
 #include <memory>
-#include <unordered_map>
 
 namespace VmiCore
 {
@@ -24,7 +25,7 @@ namespace VmiCore
                std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
                std::shared_ptr<IFileTransport> pluginTransport);
 
-        uint run(const std::unordered_map<std::string, std::vector<std::string>>& pluginArgs);
+        uint run(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs);
 
       private:
         std::shared_ptr<IConfigParser> configInterface;

@@ -1,12 +1,12 @@
 #ifndef VMICORE_PLUGININTERFACE_H
 #define VMICORE_PLUGININTERFACE_H
 
+#include "../io/ILogger.h"
 #include "../os/ActiveProcessInformation.h"
 #include "../types.h"
 #include "../vmi/IBreakpoint.h"
 #include "../vmi/IIntrospectionAPI.h"
 #include "IPluginConfig.h"
-#include "vmicore/io/ILogger.h"
 #include <functional>
 #include <memory>
 #include <optional>
@@ -16,15 +16,10 @@
 
 namespace VmiCore::Plugin
 {
-    using processStartCallback_f = void (*)(std::shared_ptr<const ActiveProcessInformation>);
-    using processTerminationCallback_f = void (*)(std::shared_ptr<const ActiveProcessInformation>);
-
-    using shutdownCallback_f = void (*)();
-
     class PluginInterface
     {
       public:
-        constexpr static uint8_t API_VERSION = 14;
+        constexpr static uint8_t API_VERSION = 15;
 
         virtual ~PluginInterface() = default;
 
@@ -34,11 +29,11 @@ namespace VmiCore::Plugin
         [[nodiscard]] virtual std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>
         getRunningProcesses() const = 0;
 
-        virtual void registerProcessStartEvent(processStartCallback_f startCallback) = 0;
+        virtual void registerProcessStartEvent(
+            const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>& startCallback) = 0;
 
-        virtual void registerProcessTerminationEvent(processTerminationCallback_f terminationCallback) = 0;
-
-        virtual void registerShutdownEvent(shutdownCallback_f shutdownCallback) = 0;
+        virtual void registerProcessTerminationEvent(
+            const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>& terminationCallback) = 0;
 
         [[nodiscard]] virtual std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
