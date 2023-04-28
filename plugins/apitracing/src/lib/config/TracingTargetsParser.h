@@ -12,8 +12,9 @@ namespace ApiTracing
       public:
         virtual ~ITracingTargetsParser() = default;
 
-        [[nodiscard]] virtual std::shared_ptr<std::vector<ProcessInformation>>
-        getTracingTargets(const std::filesystem::path& tracingTargetsPath) = 0;
+        [[nodiscard]] virtual std::vector<ProcessTracingConfig> getTracingTargets() const = 0;
+
+        virtual void addTracingTarget(const std::string& name) = 0;
 
       protected:
         ITracingTargetsParser() = default;
@@ -22,18 +23,24 @@ namespace ApiTracing
     class TracingTargetsParser : public ITracingTargetsParser
     {
       public:
+        explicit TracingTargetsParser(const std::filesystem::path& tracingTargetsPath);
+
         ~TracingTargetsParser() override = default;
 
-        [[nodiscard]] std::shared_ptr<std::vector<ProcessInformation>>
-        getTracingTargets(const std::filesystem::path& tracingTargetsPath) override;
+        [[nodiscard]] std::vector<ProcessTracingConfig> getTracingTargets() const override;
+
+        void addTracingTarget(const std::string& name) override;
 
       private:
-        using vmiConfiguration = struct configuration_t
-        {
-            std::filesystem::path resultsDirectory;
-        };
-        vmiConfiguration configuration;
         YAML::Node configRootNode;
+        std::map<std::string, TracingProfile, std::less<>> profiles;
+        std::vector<ProcessTracingConfig> processTracingConfigs;
+
+        TracingProfile parseProfile(const YAML::Node& profileNode, const std::string& name) const;
+
+        void parseProfiles();
+
+        void parseTracingTargets();
     };
 }
 #endif // APITRACING_TRACINGTARGETSPARSER_H

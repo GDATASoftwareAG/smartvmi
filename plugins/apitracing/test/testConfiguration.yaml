@@ -1,6 +1,11 @@
 ---
-traced_processes:
-  calc.exe:
+profiles:
+  default:
+    trace_children: true
+    traced_modules:
+      ntdll.dll:
+        - function1
+  calc:
     trace_children: true
     traced_modules:
       ntdll.dll:
@@ -9,3 +14,7 @@ traced_processes:
       kernel32.dll:
         - kernelfunction1
         - kernelfunction2
+traced_processes:
+  calc.exe:
+    profile: calc
+  notepad.exe:

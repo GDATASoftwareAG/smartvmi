@@ -1,5 +1,4 @@
 #include "Tracer.h"
-#include "Config.h"
 #include "Filenames.h"
 #include <filesystem>
 #include <vector>
@@ -9,14 +8,12 @@ using VmiCore::Plugin::PluginInterface;
 
 namespace ApiTracing
 {
-    Tracer::Tracer(PluginInterface* pluginInterface,
-                   std::shared_ptr<IConfig> configuration,
-                   std::shared_ptr<std::vector<ProcessInformation>> tracingInformation,
+    Tracer::Tracer(VmiCore::Plugin::PluginInterface* pluginInterface,
+                   const ITracingTargetsParser& tracingTargetsParser,
                    std::shared_ptr<IFunctionDefinitions> functionDefinitions,
                    std::shared_ptr<ILibrary> library)
         : pluginInterface(pluginInterface),
-          configuration(std::move(configuration)),
-          tracingTargetsInformation(std::move(tracingInformation)),
+          tracingTargetConfigs(tracingTargetsParser.getTracingTargets()),
           functionDefinitions(std::move(functionDefinitions)),
           library(std::move(library)),
           logger(this->pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
@@ -47,9 +44,9 @@ namespace ApiTracing
 
     void Tracer::addHooks(const ActiveProcessInformation& processInformation)
     {
-        auto processTracingInformation = getProcessTracingInformation(processInformation);
+        auto processTracingConfig = getProcessTracingConfig(processInformation);
 
-        if (!shouldProcessBeMonitored(processInformation, processTracingInformation))
+        if (!shouldProcessBeMonitored(processInformation, processTracingConfig))
         {
             return;
         }
@@ -58,7 +55,7 @@ namespace ApiTracing
         initLoadedModules(processInformation);
         try
         {
-            injectHooks(processInformation, processTracingInformation);
+            injectHooks(processInformation, processTracingConfig);
         }
         catch (const std::exception& e)
         {
@@ -70,10 +67,10 @@ namespace ApiTracing
     }
 
     void Tracer::injectHooks(const ActiveProcessInformation& processInformation,
-                             const std::optional<ProcessInformation>& processTracingInformation)
+                             const std::optional<ProcessTracingConfig>& processTracingConfig)
     {
         auto introspectionAPI = pluginInterface->getIntrospectionAPI();
-        for (const auto& moduleHookTarget : processTracingInformation->modules)
+        for (const auto& moduleHookTarget : processTracingConfig->profile.modules)
         {
             auto moduleBaseAddress = loadedModules[moduleHookTarget.name];
             if (moduleBaseAddress == 0)
@@ -115,23 +112,23 @@ namespace ApiTracing
         }
     }
 
-    std::optional<ProcessInformation>
-    Tracer::getProcessTracingInformation(const ActiveProcessInformation& processInformation) const
+    std::optional<ProcessTracingConfig>
+    Tracer::getProcessTracingConfig(const ActiveProcessInformation& processInformation) const
     {
-        for (auto processTracingInformation : *tracingTargetsInformation)
+        for (const auto& tracingTargetConfig : tracingTargetConfigs)
         {
-            if (processTracingInformation.name == *processInformation.fullName)
+            if (tracingTargetConfig.name == *processInformation.fullName)
             {
-                return processTracingInformation;
+                return tracingTargetConfig;
             }
         }
         return std::nullopt;
     }
 
-    bool Tracer::shouldProcessBeMonitored(const ActiveProcessInformation& processInformation,
-                                          const std::optional<ProcessInformation>& processTracingInformation) const
+    bool Tracer::shouldProcessBeMonitored(const VmiCore::ActiveProcessInformation& processInformation,
+                                          const std::optional<ProcessTracingConfig>& processTracingConfig) const
     {
-        if (processTracingInformation)
+        if (processTracingConfig)
         {
             return true;
         }
