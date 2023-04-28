@@ -6,7 +6,6 @@
 #define BUILD_VERSION "TestBuild"
 #endif
 
-#include "Config.h"
 #include "Filenames.h"
 #include "Tracer.h"
 #include "config/TracingTargetsParser.h"
@@ -52,46 +51,44 @@ namespace ApiTracing
         pluginInterface = communicator;
 
         TCLAP::CmdLine cmd("ApiTracing plugin for VMICore.", ' ', PLUGIN_VERSION);
-        TCLAP::ValueArg<std::filesystem::path> functionDefinitionsPath{
+        TCLAP::ValueArg functionDefinitionsPath{
             "f",
             "functionDefinitions",
             "Path to the file containing the required definitions for traced functions",
             false,
-            "",
+            std::filesystem::path(CONFIG_DIR) / "functiondefinitions" / "functionDefinitions.yaml",
             "/path/to/functionDefinitions.yaml",
             cmd};
+        TCLAP::ValueArg traceProcessName{
+            "n", "process", "Process name to trace", false, std::string(""), "process name", cmd};
         cmd.parse(args);
 
         logger = pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME);
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
         logger->debug("ApiTracing plugin version info", {{"Version", PLUGIN_VERSION}, {"BuildNumber", BUILD_VERSION}});
 
-        auto tracingTargetsParser = std::make_shared<TracingTargetsParser>();
-        try
+        auto configPath = config->configFilePath().value_or(std::filesystem::path(CONFIG_DIR) / "configuration.yml");
+        TracingTargetsParser tracingTargetsParser(configPath);
+
+        if (traceProcessName.isSet())
         {
-            auto configuration = std::make_shared<Config>(config->configFilePath().value());
-            auto tracingInformation = tracingTargetsParser->getTracingTargets(configuration->getTracingTargetsPath());
-            auto functionDefinitions = std::make_shared<FunctionDefinitions>(functionDefinitionsPath);
-            functionDefinitions->init();
-            switch (pluginInterface->getIntrospectionAPI()->getOsType())
-            {
-                case OperatingSystem::WINDOWS:
-                {
-                    auto library = std::make_shared<Windows::Library>();
-                    tracer = std::make_shared<Tracer>(
-                        pluginInterface, configuration, tracingInformation, functionDefinitions, library);
-                    break;
-                }
-                default:
-                {
-                    throw std::runtime_error("Unknown operating system.");
-                }
-            }
+            tracingTargetsParser.addTracingTarget(traceProcessName);
         }
-        catch (const ConfigException& exc)
+
+        auto functionDefinitions = std::make_shared<FunctionDefinitions>(functionDefinitionsPath);
+        functionDefinitions->init();
+        switch (pluginInterface->getIntrospectionAPI()->getOsType())
         {
-            logger->error("Error loading configuration", {{"Exception", exc.what()}});
-            return false;
+            case OperatingSystem::WINDOWS:
+            {
+                auto library = std::make_shared<Windows::Library>();
+                tracer = std::make_shared<Tracer>(pluginInterface, tracingTargetsParser, functionDefinitions, library);
+                break;
+            }
+            default:
+            {
+                throw std::runtime_error("Unknown operating system.");
+            }
         }
 
         try

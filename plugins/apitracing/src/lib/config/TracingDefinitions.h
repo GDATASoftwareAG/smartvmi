@@ -14,13 +14,21 @@ namespace ApiTracing
         bool operator==(const ModuleInformation& rhs) const = default;
     };
 
-    struct ProcessInformation
+    struct TracingProfile
     {
-        bool traceChilds;
         std::string name;
+        bool traceChilds;
         std::vector<ModuleInformation> modules;
 
-        bool operator==(const ProcessInformation& rhs) const = default;
+        bool operator==(const TracingProfile& rhs) const = default;
+    };
+
+    struct ProcessTracingConfig
+    {
+        std::string name;
+        TracingProfile profile;
+
+        bool operator==(const ProcessTracingConfig& rhs) const = default;
     };
 }
 #endif // APITRACING_TRACINGDEFINITIONS_H

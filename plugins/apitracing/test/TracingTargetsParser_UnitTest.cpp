@@ -3,22 +3,37 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-using testing::UnorderedElementsAre;
+using testing::Contains;
 
 namespace ApiTracing
 {
-    TEST(TracingTargetsParserTests, getTracingTargets_validYaml_correctTargets)
+    TEST(TracingTargetsParserTests, getTracingTargets_calcProcess_correctProfile)
     {
-        auto tracingTargetsParser = std::make_unique<TracingTargetsParser>();
-        ProcessInformation tracingInformation{
-            .traceChilds = true,
+        auto tracingTargetsParser = std::make_unique<TracingTargetsParser>("testConfiguration.yaml");
+        ProcessTracingConfig tracingConfig{
             .name = "calc.exe",
-            .modules = {
-                ModuleInformation{.name = "ntdll.dll", .functions = {{"function1"}, {"function2"}}},
-                ModuleInformation{.name = "kernel32.dll", .functions = {{"kernelfunction1"}, {"kernelfunction2"}}}}};
+            .profile = {
+                .name = "calc",
+                .traceChilds = true,
+                .modules = {{.name = "ntdll.dll", .functions = {{"function1"}, {"function2"}}},
+                            {.name = "kernel32.dll", .functions = {{"kernelfunction1"}, {"kernelfunction2"}}}}}};
 
-        auto tracingTargets = tracingTargetsParser->getTracingTargets("testConfiguration.yaml");
+        auto tracingTargets = tracingTargetsParser->getTracingTargets();
 
-        EXPECT_THAT(*tracingTargets, UnorderedElementsAre(tracingInformation));
+        EXPECT_THAT(tracingTargets, Contains(tracingConfig));
+    }
+
+    TEST(TracingTargetsParserTests, getTracingTargets_processWithoutProfile_defaultProfile)
+    {
+        auto tracingTargetsParser = std::make_unique<TracingTargetsParser>("testConfiguration.yaml");
+        ProcessTracingConfig tracingConfig{
+            .name = "notepad.exe",
+            .profile = {.name = "default",
+                        .traceChilds = true,
+                        .modules = {{.name = "ntdll.dll", .functions = {{"function1"}}}}}};
+
+        auto tracingTargets = tracingTargetsParser->getTracingTargets();
+
+        EXPECT_THAT(tracingTargets, Contains(tracingConfig));
     }
 }

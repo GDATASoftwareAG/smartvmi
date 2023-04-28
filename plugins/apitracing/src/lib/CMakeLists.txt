@@ -3,7 +3,6 @@ check_pie_supported()
 
 add_library(apitracing-obj OBJECT
         ApiTracing.cpp
-        Config.cpp
         Tracer.cpp
         config/FunctionDefinitions.cpp
         config/TracingTargetsParser.cpp

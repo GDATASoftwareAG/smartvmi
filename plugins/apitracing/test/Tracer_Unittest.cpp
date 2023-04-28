@@ -1,7 +1,7 @@
 #include "../src/lib/Tracer.h"
 #include "../src/lib/os/windows/Library.h"
-#include "mock_Config.h"
 #include "mock_FunctionDefinitions.h"
+#include "mock_TracingTargetsParser.h"
 #include <gmock/gmock-matchers.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -76,19 +76,22 @@ namespace ApiTracing
         std::pair<std::string, addr_t> unexpectedModule =
             std::make_pair(nonDLLMemoryRegionDescriptor.moduleName, nonDLLMemoryRegionDescriptor.base);
 
-        std::vector<ProcessInformation> tracingInformation = {
-            {false,
-             targetProcessName,
-             {{kernelDllName, {{kernellDllFunctionName}}}, {ntdllDllName, {{ntdllFunctionName}}}}}};
+        std::vector<ProcessTracingConfig> processTracingConfig = {
+            {targetProcessName,
+             {targetProcessName,
+              false,
+              {{kernelDllName, {{kernellDllFunctionName}}}, {ntdllDllName, {{ntdllFunctionName}}}}}}};
 
         void SetUp() override
         {
+            MockTracingTargetsParser mockTracingTargetsParser;
+
             ON_CALL(*mockPluginInterface, newNamedLogger(_))
                 .WillByDefault([]() { return std::make_unique<NiceMock<VmiCore::MockLogger>>(); });
+            ON_CALL(mockTracingTargetsParser, getTracingTargets()).WillByDefault(Return(processTracingConfig));
 
             tracer = std::make_shared<Tracer>(mockPluginInterface.get(),
-                                              std::make_shared<MockConfig>(),
-                                              std::make_shared<std::vector<ProcessInformation>>(tracingInformation),
+                                              mockTracingTargetsParser,
                                               std::make_shared<MockFunctionDefinitions>(),
                                               std::make_shared<Windows::Library>());
 

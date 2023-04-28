@@ -1,11 +1,11 @@
 #ifndef APITRACING_TRACER_H
 #define APITRACING_TRACER_H
 
-#include "Config.h"
 #include "ConstantDefinitions.h"
 #include "FunctionHook.h"
 #include "config/FunctionDefinitions.h"
 #include "config/TracingDefinitions.h"
+#include "config/TracingTargetsParser.h"
 #include "os/ILibrary.h"
 #include <map>
 #include <memory>
@@ -18,8 +18,7 @@ namespace ApiTracing
     {
       public:
         Tracer(VmiCore::Plugin::PluginInterface* pluginInterface,
-               std::shared_ptr<IConfig> configuration,
-               std::shared_ptr<std::vector<ProcessInformation>> tracingInformation,
+               const ITracingTargetsParser& tracingTargetsParser,
                std::shared_ptr<IFunctionDefinitions> functionDefinitions,
                std::shared_ptr<ILibrary> library);
 
@@ -33,10 +32,9 @@ namespace ApiTracing
 
       private:
         VmiCore::Plugin::PluginInterface* pluginInterface;
-        std::shared_ptr<ApiTracing::IConfig> configuration;
         std::map<std::string, uint64_t, std::less<>> loadedModules;
         std::map<pid_t, std::string> tracedProcesses;
-        std::shared_ptr<std::vector<ProcessInformation>> tracingTargetsInformation;
+        std::vector<ProcessTracingConfig> tracingTargetConfigs;
         std::shared_ptr<IFunctionDefinitions> functionDefinitions;
         std::vector<std::shared_ptr<FunctionHook>> hookList;
         std::map<uint64_t, std::map<uint64_t, std::list<ParameterInformation>>> processFunctionDefinitions{};
@@ -44,13 +42,13 @@ namespace ApiTracing
         std::unique_ptr<VmiCore::ILogger> logger;
 
         void injectHooks(const VmiCore::ActiveProcessInformation& processInformation,
-                         const std::optional<ProcessInformation>& processTracingInformation);
+                         const std::optional<ProcessTracingConfig>& processTracingConfig);
 
-        std::optional<ProcessInformation>
-        getProcessTracingInformation(const VmiCore::ActiveProcessInformation& processInformation) const;
+        std::optional<ProcessTracingConfig>
+        getProcessTracingConfig(const VmiCore::ActiveProcessInformation& processInformation) const;
 
         bool shouldProcessBeMonitored(const VmiCore::ActiveProcessInformation& processInformation,
-                                      const std::optional<ProcessInformation>& processTracingInformation) const;
+                                      const std::optional<ProcessTracingConfig>& processTracingConfig) const;
     };
 }
 #endif // APITRACING_TRACER_H
