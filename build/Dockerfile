@@ -1,9 +1,9 @@
-FROM ubuntu:jammy
+FROM ubuntu:lunar
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     bison \
-    clang \
-    clang-tidy \
+    clang-16 \
+    clang-tidy-16 \
     cmake \
     curl \
     flex \
