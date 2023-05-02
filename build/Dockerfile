@@ -3,7 +3,6 @@ FROM ubuntu:lunar
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     bison \
     clang-16 \
-    clang-tidy-16 \
     cmake \
     curl \
     flex \
@@ -25,6 +24,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     unzip \
     wget \
     && rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100 \
+    && update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-16 100
 
 RUN git clone https://github.com/bitdefender/libkvmi.git \
     && cd libkvmi \
