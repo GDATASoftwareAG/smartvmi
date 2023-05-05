@@ -19,7 +19,7 @@ namespace VmiCore
 
         MOCK_METHOD(uint64_t, read64VA, (uint64_t, uint64_t), (override));
 
-        MOCK_METHOD(bool, readXVA, (uint64_t, uint64_t, std::vector<uint8_t>&), (override));
+        MOCK_METHOD(bool, readXVA, (uint64_t, uint64_t, std::vector<uint8_t>&, std::size_t size), (override));
 
         MOCK_METHOD(uint64_t, getCurrentVmId, (), (override));
 

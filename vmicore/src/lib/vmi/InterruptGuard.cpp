@@ -39,12 +39,32 @@ namespace VmiCore
         emulateReadData.size = 16;
 
         auto pageBaseVA = targetVA & PagingDefinitions::stripPageOffsetMask;
-        // we need a small buffer of data from the subsequent page because memory reads may be overlapping
-        if (!vmiInterface->readXVA(pageBaseVA, processDtb, shadowPage))
+        if (!vmiInterface->readXVA(pageBaseVA, processDtb, shadowPage, PagingDefinitions::pageSizeInBytes))
         {
-            throw VmiException(fmt::format(
-                "{}: Unable to create Interrupt @ {:#x} in system with cr3 {:#x}", __func__, pageBaseVA, processDtb));
+            throw VmiException(fmt::format("{}: Unable to create Interrupt @ {:#x} in system with cr3 {:#x}",
+                                           std::experimental::source_location::current().function_name(),
+                                           pageBaseVA,
+                                           processDtb));
         }
+        // we need a small buffer of data from the subsequent page because memory reads may be overlapping
+        auto bytesFromNextPage = std::vector<uint8_t>(16);
+        if (vmiInterface->readXVA(pageBaseVA + PagingDefinitions::pageSizeInBytes,
+                                  processDtb,
+                                  bytesFromNextPage,
+                                  bytesFromNextPage.size()))
+        {
+            std::copy(bytesFromNextPage.begin(),
+                      bytesFromNextPage.end(),
+                      shadowPage.begin() + PagingDefinitions::pageSizeInBytes);
+        }
+        else
+        {
+            logger->warning(fmt::format("{}: Unable to read over page bounds from page: {} with dtb: {}",
+                                        std::experimental::source_location::current().function_name(),
+                                        pageBaseVA,
+                                        processDtb));
+        }
+
         enableEvent();
         logger->debug("Interrupt guard: Register RW event on gfn", {{"targetGFN", fmt::format("{:#x}", targetGFN)}});
     }

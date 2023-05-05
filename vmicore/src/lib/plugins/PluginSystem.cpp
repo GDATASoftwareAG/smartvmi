@@ -65,7 +65,7 @@ namespace VmiCore
         for (uint64_t currentPageIndex = 0; currentPageIndex < numberOfPages; currentPageIndex++)
         {
             auto memoryPage = std::vector<uint8_t>(PagingDefinitions::pageSizeInBytes);
-            if (vmiInterface->readXVA(pageAlignedVA, cr3, memoryPage))
+            if (vmiInterface->readXVA(pageAlignedVA, cr3, memoryPage, memoryPage.size()))
             {
                 if (!needsPadding)
                 {

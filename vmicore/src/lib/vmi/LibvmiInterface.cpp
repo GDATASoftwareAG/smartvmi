@@ -143,11 +143,20 @@ namespace VmiCore
         return extractedValue;
     }
 
-    bool LibvmiInterface::readXVA(const addr_t virtualAddress, const addr_t cr3, std::vector<uint8_t>& content)
+    bool LibvmiInterface::readXVA(const addr_t virtualAddress,
+                                  const addr_t cr3,
+                                  std::vector<uint8_t>& content,
+                                  std::size_t size)
     {
+        if (size > content.size())
+        {
+            throw VmiException(fmt::format("{}: Size parameter is bigger than buffer size",
+                                           std::experimental::source_location::current().function_name()));
+        }
+
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
         std::lock_guard<std::mutex> lock(libvmiLock);
-        if (vmi_read(vmiInstance, &accessContext, content.size(), content.data(), nullptr) != VMI_SUCCESS)
+        if (vmi_read(vmiInstance, &accessContext, size, content.data(), nullptr) != VMI_SUCCESS)
         {
             return false;
         }

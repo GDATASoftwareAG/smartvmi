@@ -278,12 +278,13 @@ namespace VmiCore
         {
             if (!memoryRegionInfo.memoryPageContent.empty())
             {
-                ON_CALL(*mockVmiInterface, readXVA(memoryRegionInfo.virtualAddress, memoryRegionInfo.cr3, _))
+                ON_CALL(*mockVmiInterface, readXVA(memoryRegionInfo.virtualAddress, memoryRegionInfo.cr3, _, _))
                     .WillByDefault(
                         [memoryPageContent =
                              memoryRegionInfo.memoryPageContent]([[maybe_unused]] uint64_t virtualAddress,
                                                                  [[maybe_unused]] uint64_t cr3,
-                                                                 std::vector<uint8_t>& buffer)
+                                                                 std::vector<uint8_t>& buffer,
+                                                                 [[maybe_unused]] std::size_t size)
                         {
                             buffer = memoryPageContent;
                             return true;
@@ -291,7 +292,7 @@ namespace VmiCore
             }
             else
             {
-                ON_CALL(*mockVmiInterface, readXVA(memoryRegionInfo.virtualAddress, memoryRegionInfo.cr3, _))
+                ON_CALL(*mockVmiInterface, readXVA(memoryRegionInfo.virtualAddress, memoryRegionInfo.cr3, _, _))
                     .WillByDefault(Return(false));
             }
         }

@@ -74,7 +74,10 @@ namespace VmiCore
 
         uint64_t read64VA(addr_t virtualAddress, addr_t cr3) override;
 
-        bool readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content) override;
+        bool readXVA(const addr_t virtualAddress,
+                     const addr_t cr3,
+                     std::vector<uint8_t>& content,
+                     std::size_t size) override;
 
         void write8PA(addr_t physicalAddress, uint8_t value) override;
 
