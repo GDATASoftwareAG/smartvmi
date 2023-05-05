@@ -102,7 +102,7 @@ namespace VmiCore
         void SetUp() override
         {
             // Required for InterruptGuard
-            ON_CALL(*vmiInterface, readXVA(_, _, _)).WillByDefault(Return(true));
+            ON_CALL(*vmiInterface, readXVA(_, _, _, _)).WillByDefault(Return(true));
             ON_CALL(*mockLogging, newNamedLogger(_))
                 .WillByDefault([](std::string_view) { return std::make_unique<MockLogger>(); });
 
@@ -152,7 +152,14 @@ namespace VmiCore
     {
         testing::Sequence s1;
         setupBreakpoint(testVA, testPA, testSystemCr3);
-        EXPECT_CALL(*vmiInterface, readXVA(testVA, testSystemCr3, _)).Times(1).InSequence(s1).RetiresOnSaturation();
+        EXPECT_CALL(*vmiInterface, readXVA(testVA, testSystemCr3, _, PagingDefinitions::pageSizeInBytes))
+            .Times(1)
+            .InSequence(s1)
+            .RetiresOnSaturation();
+        EXPECT_CALL(*vmiInterface, readXVA(testVA + PagingDefinitions::pageSizeInBytes, testSystemCr3, _, 16))
+            .Times(1)
+            .InSequence(s1)
+            .RetiresOnSaturation();
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface, write8PA(testPA, INT3_BREAKPOINT)).Times(1).InSequence(s1).RetiresOnSaturation();
 
