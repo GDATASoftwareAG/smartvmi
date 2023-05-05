@@ -109,6 +109,8 @@ namespace VmiCore
 
         [[nodiscard]] std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
 
+        [[nodiscard]] std::optional<std::string> extractWStringAtVA(const addr_t stringVA, const addr_t cr3) override;
+
         [[nodiscard]] std::optional<std::unique_ptr<std::string>>
         tryExtractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3) override;
 

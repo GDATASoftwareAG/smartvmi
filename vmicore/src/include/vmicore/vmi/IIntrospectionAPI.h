@@ -45,6 +45,8 @@ namespace VmiCore
 
         [[nodiscard]] virtual pid_t convertDtbToPid(addr_t dtb) = 0;
 
+        [[nodiscard]] virtual std::optional<std::string> extractWStringAtVA(addr_t stringVA, addr_t cr3) = 0;
+
         virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
 
         [[nodiscard]] virtual std::optional<std::unique_ptr<std::string>>

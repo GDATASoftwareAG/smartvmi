@@ -76,7 +76,7 @@ namespace VmiCore
 
     void LibvmiInterface::clearEvent(vmi_event_t& event, bool deallocate)
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_clear_event(vmiInstance, &event, deallocate ? &LibvmiInterface::freeEvent : nullptr) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to clear event.", __func__));
@@ -87,7 +87,7 @@ namespace VmiCore
     {
         uint8_t extractedValue = 0;
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_read_8(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
         {
             throw VmiException(fmt::format("{}: Unable to read one byte from PA: {:#x}", __func__, physicalAddress));
@@ -99,7 +99,7 @@ namespace VmiCore
     {
         uint64_t extractedValue = 0;
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_read_64(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
         {
             throw VmiException(fmt::format("{}: Unable to read 8 bytes from PA: {:#x}", __func__, physicalAddress));
@@ -111,7 +111,7 @@ namespace VmiCore
     {
         uint8_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_read_8(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
         {
             throw VmiException(fmt::format("{}: Unable to read one byte from VA: {:#x}", __func__, virtualAddress));
@@ -123,7 +123,7 @@ namespace VmiCore
     {
         uint32_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_read_32(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
         {
             throw VmiException(fmt::format("{}: Unable to read 4 bytes from VA {:#x}", __func__, virtualAddress));
@@ -135,7 +135,7 @@ namespace VmiCore
     {
         uint64_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_read_64(vmiInstance, &accessContext, &extractedValue) == VMI_FAILURE)
         {
             throw VmiException(fmt::format("{}: Unable to read 8 bytes from VA {:#x}", __func__, virtualAddress));
@@ -155,7 +155,7 @@ namespace VmiCore
         }
 
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_read(vmiInstance, &accessContext, size, content.data(), nullptr) != VMI_SUCCESS)
         {
             return false;
@@ -166,7 +166,7 @@ namespace VmiCore
     void LibvmiInterface::write8PA(const addr_t physicalAddress, uint8_t value)
     {
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_write_8(vmiInstance, &accessContext, &value) == VMI_FAILURE)
         {
             throw VmiException(fmt::format("{}: Unable to write {:#x} to PA {:#x}", __func__, value, physicalAddress));
@@ -194,7 +194,7 @@ namespace VmiCore
 
     void LibvmiInterface::eventsListen(uint32_t timeout)
     {
-        std::lock_guard<std::mutex> lock(eventsListenLock);
+        std::scoped_lock<std::mutex> lock(eventsListenLock);
         auto status = vmi_events_listen(vmiInstance, timeout);
         if (status != VMI_SUCCESS)
         {
@@ -228,7 +228,7 @@ namespace VmiCore
 
     void LibvmiInterface::registerEvent(vmi_event_t& event)
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_register_event(vmiInstance, &event) == VMI_FAILURE)
         {
             throw VmiException(
@@ -238,7 +238,7 @@ namespace VmiCore
 
     uint64_t LibvmiInterface::getCurrentVmId()
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         return vmi_get_vmid(vmiInstance);
     }
 
@@ -250,7 +250,7 @@ namespace VmiCore
     addr_t LibvmiInterface::translateKernelSymbolToVA(const std::string& kernelSymbolName)
     {
         addr_t kernelSymbolAddress = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_translate_ksym2v(vmiInstance, kernelSymbolName.c_str(), &kernelSymbolAddress) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to find kernel symbol {}", __func__, kernelSymbolName));
@@ -264,7 +264,7 @@ namespace VmiCore
     {
         auto ctx = createVirtualAddressAccessContext(moduleBaseAddress, dtb);
         addr_t userlandSymbolVA = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_translate_sym2v(vmiInstance, &ctx, userlandSymbolName.c_str(), &userlandSymbolVA) != VMI_SUCCESS)
         {
             throw VmiException(
@@ -281,7 +281,7 @@ namespace VmiCore
     addr_t LibvmiInterface::convertVAToPA(addr_t virtualAddress, addr_t processCr3)
     {
         addr_t physicalAddress = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_pagetable_lookup(vmiInstance, processCr3, virtualAddress, &physicalAddress) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format(
@@ -293,7 +293,7 @@ namespace VmiCore
     addr_t LibvmiInterface::convertPidToDtb(pid_t processID)
     {
         addr_t dtb = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_pid_to_dtb(vmiInstance, processID, &dtb) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("Unable to obtain the dtb for pid {}", processID));
@@ -304,7 +304,7 @@ namespace VmiCore
     pid_t LibvmiInterface::convertDtbToPid(addr_t dtb)
     {
         vmi_pid_t pid = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_dtb_to_pid(vmiInstance, dtb, &pid) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("Unable obtain the pid for dtb {:#x}", dtb));
@@ -314,7 +314,7 @@ namespace VmiCore
 
     void LibvmiInterface::pauseVm()
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         auto status = vmi_pause_vm(vmiInstance);
         if (status != VMI_SUCCESS)
         {
@@ -324,7 +324,7 @@ namespace VmiCore
 
     void LibvmiInterface::resumeVm()
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         auto status = vmi_resume_vm(vmiInstance);
         if (status != VMI_SUCCESS)
         {
@@ -335,7 +335,7 @@ namespace VmiCore
     bool LibvmiInterface::areEventsPending()
     {
         bool pending = false;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         auto areEventsPendingReturn = vmi_are_events_pending(vmiInstance);
         if (areEventsPendingReturn == -1)
         {
@@ -360,11 +360,28 @@ namespace VmiCore
         return std::move(extractedString.value());
     }
 
+    std::optional<std::string> LibvmiInterface::extractWStringAtVA(const addr_t stringVA, const addr_t cr3)
+    {
+        auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
+        auto* extractedWString = vmi_read_w_str(vmiInstance, &accessContext);
+        auto convertedUnicodeString = unicode_string_t{};
+        auto success = vmi_convert_str_encoding(extractedWString, &convertedUnicodeString, "UTF-8");
+        vmi_free_unicode_str(extractedWString);
+        if (success != VMI_SUCCESS)
+        {
+            return std::nullopt;
+        }
+        auto* result = std::bit_cast<char*>(convertedUnicodeString.contents);
+        free(convertedUnicodeString.contents); // NOLINT(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
+        return result;
+    }
+
     std::optional<std::unique_ptr<std::string>> LibvmiInterface::tryExtractUnicodeStringAtVA(const addr_t stringVA,
                                                                                              const addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         auto* extractedUnicodeString = vmi_read_unicode_str(vmiInstance, &accessContext);
         auto convertedUnicodeString = unicode_string_t{};
         auto success = vmi_convert_str_encoding(extractedUnicodeString, &convertedUnicodeString, "UTF-8");
@@ -373,7 +390,7 @@ namespace VmiCore
         {
             return std::nullopt;
         }
-        auto result = std::make_unique<std::string>(reinterpret_cast<char*>(convertedUnicodeString.contents),
+        auto result = std::make_unique<std::string>(std::bit_cast<char*>(convertedUnicodeString.contents),
                                                     convertedUnicodeString.length);
         free(convertedUnicodeString.contents); // NOLINT(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
         return result;
@@ -382,7 +399,7 @@ namespace VmiCore
     std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(const addr_t virtualAddress, const addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         auto* rawString = vmi_read_str(vmiInstance, &accessContext);
         if (rawString == nullptr)
         {
@@ -395,7 +412,7 @@ namespace VmiCore
 
     void LibvmiInterface::stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId)
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_stop_single_step_vcpu(vmiInstance, event, vcpuId) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("Failed to stop single stepping for vcpu {}", vcpuId));
@@ -404,7 +421,7 @@ namespace VmiCore
 
     OperatingSystem LibvmiInterface::getOsType()
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         switch (vmi_get_ostype(vmiInstance))
         {
             case VMI_OS_LINUX:
@@ -419,7 +436,7 @@ namespace VmiCore
     addr_t LibvmiInterface::getOffset(const std::string& name)
     {
         addr_t offset = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_get_offset(vmiInstance, name.c_str(), &offset) != VMI_SUCCESS)
         {
             throw VmiException(fmt::format("{}: Unable to find offset {}", __func__, name));
@@ -430,7 +447,7 @@ namespace VmiCore
     addr_t LibvmiInterface::getKernelStructOffset(const std::string& structName, const std::string& member)
     {
         addr_t memberAddress = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_get_kernel_struct_offset(vmiInstance, structName.c_str(), member.c_str(), &memberAddress) !=
             VMI_SUCCESS)
         {
@@ -443,7 +460,7 @@ namespace VmiCore
     size_t LibvmiInterface::getStructSizeFromJson(const std::string& struct_name)
     {
         size_t size = 0;
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         if (vmi_get_struct_size_from_json(vmiInstance, vmi_get_kernel_json(vmiInstance), struct_name.c_str(), &size) !=
             VMI_SUCCESS)
         {
@@ -464,7 +481,7 @@ namespace VmiCore
         size_t startBit{};
         size_t endBit{};
 
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         auto ret = vmi_get_bitfield_offset_and_size_from_json(vmiInstance,
                                                               vmi_get_kernel_json(vmiInstance),
                                                               structName.c_str(),
@@ -484,13 +501,13 @@ namespace VmiCore
 
     void LibvmiInterface::flushV2PCache(addr_t pt)
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         vmi_v2pcache_flush(vmiInstance, pt);
     }
 
     void LibvmiInterface::flushPageCache()
     {
-        std::lock_guard<std::mutex> lock(libvmiLock);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
         vmi_pagecache_flush(vmiInstance);
     }
 }
