@@ -20,12 +20,11 @@
 #include "lib/vmi/LibvmiInterface.h"
 #include "lib/vmi/VmiException.h"
 #include <boost/di.hpp>
-#include <cxxbridge/rust/cxx.h>
-#include <cxxbridge/rust_grpc_server/src/bridge.rs.h>
+#include <cxx_rust_part/bridge.h>
 #include <iostream>
 #include <memory>
 #include <ostream>
-#include <thread>
+#include <rust/cxx.h>
 
 int main(int argc, const char* argv[])
 {

@@ -38,7 +38,7 @@ target_include_directories(vmicore-lib INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRE
 # Rust grpc server
 
 add_subdirectory(../../rust_src rust_src)
-target_link_libraries(vmicore-lib PUBLIC rust_grpc_server)
+target_link_libraries(vmicore-lib PUBLIC cxx_rust_part)
 
 include(FetchContent)
 

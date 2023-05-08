@@ -1,4 +1,5 @@
 #include "VmiInitError.h"
+#include <string>
 
 namespace VmiCore
 {

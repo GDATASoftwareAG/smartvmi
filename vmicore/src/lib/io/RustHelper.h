@@ -2,10 +2,10 @@
 #define VMICORE_RUSTHELPER_H
 
 #include <cstdint>
-#include <cxxbridge/rust/cxx.h>
-#include <cxxbridge/rust_grpc_server/src/bridge.rs.h>
+#include <cxx_rust_part/bridge.h>
 #include <fmt/core.h>
 #include <initializer_list>
+#include <rust/cxx.h>
 #include <string_view>
 #include <type_traits>
 

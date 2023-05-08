@@ -1,7 +1,7 @@
 #ifndef VMICORE_ILOGGING_H
 #define VMICORE_ILOGGING_H
 
-#include <cxxbridge/rust_grpc_server/src/bridge.rs.h>
+#include <cxx_rust_part/bridge.h>
 #include <memory>
 #include <string_view>
 #include <vmicore/io/ILogger.h>

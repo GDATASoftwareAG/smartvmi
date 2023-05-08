@@ -2,7 +2,7 @@
 #define VMICORE_FILENAME_H
 
 // Source location still prefixed with experimental when using Clang
-#include <experimental/source_location>
+#include <source_location>
 #include <string_view>
 
 // Unix paths only
@@ -33,12 +33,12 @@ constexpr size_t lastDotAt(const char* string)
     return last_dot_index ? last_dot_index : i;
 }
 
-constexpr ::std::string_view filenameStem(const ::std::experimental::source_location& sourceLocation)
+constexpr ::std::string_view filenameStem(const ::std::source_location& sourceLocation)
 {
     auto* fileName = stripPath(sourceLocation.file_name());
     return {fileName, lastDotAt(fileName)};
 }
 
-#define FILENAME_STEM filenameStem(::std::experimental::source_location::current())
+#define FILENAME_STEM filenameStem(::std::source_location::current())
 
 #endif // VMICORE_FILENAME_H
