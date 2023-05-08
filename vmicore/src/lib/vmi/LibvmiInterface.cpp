@@ -151,7 +151,7 @@ namespace VmiCore
         if (size > content.size())
         {
             throw VmiException(fmt::format("{}: Size parameter is bigger than buffer size",
-                                           std::experimental::source_location::current().function_name()));
+                                           std::source_location::current().function_name()));
         }
 
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);

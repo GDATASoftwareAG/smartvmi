@@ -22,4 +22,3 @@ futures = { version = "0.3", default-features = false, features = ["alloc"] }
 
 [build-dependencies]
 tonic-build = "0.8.2"
-cxx-build = "1.0"

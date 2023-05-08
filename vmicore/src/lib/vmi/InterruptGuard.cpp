@@ -42,7 +42,7 @@ namespace VmiCore
         if (!vmiInterface->readXVA(pageBaseVA, processDtb, shadowPage, PagingDefinitions::pageSizeInBytes))
         {
             throw VmiException(fmt::format("{}: Unable to create Interrupt @ {:#x} in system with cr3 {:#x}",
-                                           std::experimental::source_location::current().function_name(),
+                                           std::source_location::current().function_name(),
                                            pageBaseVA,
                                            processDtb));
         }
@@ -60,7 +60,7 @@ namespace VmiCore
         else
         {
             logger->warning(fmt::format("{}: Unable to read over page bounds from page: {} with dtb: {}",
-                                        std::experimental::source_location::current().function_name(),
+                                        std::source_location::current().function_name(),
                                         pageBaseVA,
                                         processDtb));
         }

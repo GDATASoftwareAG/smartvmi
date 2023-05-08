@@ -8,8 +8,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?;
     println!("cargo:rerun-if-changed=protos/");
 
-    let _build = cxx_build::bridge("src/bridge.rs");
-    println!("cargo:rerun-if-changed=src/bridge.rs");
-
     Ok(())
 }

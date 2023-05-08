@@ -1,32 +1,14 @@
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CARGO_CMD cargo build)
-    set(TARGET_DIR "debug")
-else ()
-    set(CARGO_CMD cargo build --release)
-    set(TARGET_DIR "release")
-endif ()
-
-set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${TARGET_DIR};cxxbridge")
-
-set(RUST_TARGET_NAME rust_grpc_server)
-set(RUST_LIB "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_DIR}/lib${RUST_TARGET_NAME}.a")
-set(RUST_BRIDGE_CXX "${CMAKE_CURRENT_BINARY_DIR}/cxxbridge/${RUST_TARGET_NAME}/src/bridge.rs.cc")
-set(RUST_BRIDGE_H "${CMAKE_CURRENT_BINARY_DIR}/cxxbridge/${RUST_TARGET_NAME}/src/bridge.rs.h")
-
-file(GLOB_RECURSE RUST_SOURCE_FILES
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.rs")
-
-add_custom_command(
-        OUTPUT ${RUST_BRIDGE_CXX} ${RUST_BRIDGE_H} ${RUST_LIB}
-        COMMAND CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} RUSTFLAGS="${RUST_FLAGS}" ${CARGO_CMD}
-        DEPENDS ${RUST_SOURCE_FILES}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+include(FetchContent)
+FetchContent_Declare(
+        Corrosion
+        GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
+        GIT_TAG master
 )
+FetchContent_MakeAvailable(Corrosion)
 
-
-add_library(${RUST_TARGET_NAME} STATIC ${RUST_BRIDGE_CXX})
-set_property(TARGET ${RUST_TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
-target_include_directories(${RUST_TARGET_NAME} INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(${RUST_TARGET_NAME} pthread dl ${RUST_LIB})
+corrosion_import_crate(MANIFEST_PATH Cargo.toml)
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+    corrosion_set_env_vars(rust_grpc_server CXXFLAGS=-stdlib=libc++)
+endif ()
+corrosion_add_cxxbridge(cxx_rust_part CRATE rust_grpc_server FILES bridge.rs)
+set_property(TARGET cxx_rust_part PROPERTY POSITION_INDEPENDENT_CODE TRUE)
