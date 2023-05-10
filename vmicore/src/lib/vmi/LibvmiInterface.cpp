@@ -372,7 +372,7 @@ namespace VmiCore
         {
             return std::nullopt;
         }
-        auto* result = std::bit_cast<char*>(convertedUnicodeString.contents);
+        auto* result = reinterpret_cast<char*>(convertedUnicodeString.contents);
         free(convertedUnicodeString.contents); // NOLINT(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
         return result;
     }
@@ -390,7 +390,7 @@ namespace VmiCore
         {
             return std::nullopt;
         }
-        auto result = std::make_unique<std::string>(std::bit_cast<char*>(convertedUnicodeString.contents),
+        auto result = std::make_unique<std::string>(reinterpret_cast<char*>(convertedUnicodeString.contents),
                                                     convertedUnicodeString.length);
         free(convertedUnicodeString.contents); // NOLINT(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
         return result;
