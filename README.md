@@ -12,10 +12,12 @@ See [VmiCore Readme](vmicore/Readme.md) for additional information as well as ho
 
 ## Plugins
 
-To allow for easy extension SmartVMI provides a plugin interface. You can find already implemented plugins which also
-serve as examples for how to use this project in the plugins folder.
+To allow for easy extension SmartVMI provides a plugin interface. For information about writing your own plugin see
+the [Plugins Readme](plugins/Readme.md).
+You can find already implemented plugins which also serve as examples for how to use this project in the plugins folder.
 For additional information see the corresponding plugin readme:
 
+* [Template](plugins/template/Readme.md) Stripped down plugin to take your first steps with plugin development.
 * [InMemoryScanner](plugins/inmemoryscanner/Readme.md)
 * [ApiTracing](plugins/apitracing/Readme.md)
 
