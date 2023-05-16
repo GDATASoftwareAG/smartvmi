@@ -79,3 +79,18 @@ jobs:
           cmake --build --preset clang-build-debug
           ctest --preset clang-test
         working-directory: plugins/apitracing
+
+  build_template:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and test template
+        run: |
+          cmake --preset clang-debug
+          cmake --build --preset clang-build-debug
+          ctest --preset clang-test
+        working-directory: plugins/template
