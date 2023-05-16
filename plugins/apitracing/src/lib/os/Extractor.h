@@ -141,6 +141,8 @@ namespace ApiTracing
 
         [[nodiscard]] std::string extractString(VmiCore::addr_t stringPointer, uint64_t cr3) const;
 
+        [[nodiscard]] std::string extractWString(VmiCore::addr_t stringPointer, uint64_t cr3) const;
+
         [[nodiscard]] std::string extractUnicodeString(VmiCore::addr_t stringPointer, uint64_t cr3) const;
 
         [[nodiscard]] VmiCore::addr_t dereferencePointer(uint64_t addr, uint64_t cr3) const;
