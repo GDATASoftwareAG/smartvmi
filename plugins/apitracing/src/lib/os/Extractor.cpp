@@ -110,10 +110,14 @@ namespace ApiTracing
 
             case LPSTR_32:
             case LPSTR_64:
+            {
+                result.data = extractString(shallowParameter, cr3);
+                break;
+            }
             case LPWSTR_32:
             case LPWSTR_64:
             {
-                result.data = extractString(shallowParameter, cr3);
+                result.data = extractWString(shallowParameter, cr3);
                 break;
             }
             case UNICODE_WSTR_32:
@@ -234,6 +238,12 @@ namespace ApiTracing
     std::string Extractor::extractString(addr_t stringPointer, uint64_t cr3) const
     {
         auto string = introspectionAPI->extractStringAtVA(stringPointer, cr3);
+        return {*string};
+    }
+
+    std::string Extractor::extractWString(addr_t stringPointer, uint64_t cr3) const
+    {
+        auto string = introspectionAPI->extractWStringAtVA(stringPointer, cr3);
         return {*string};
     }
 
