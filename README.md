@@ -34,6 +34,17 @@ In the German economy alone, computer crime causes damage of more than 10 billio
 
 * Sentanoe, S., Dangl, T. and Reiser, H.P., 2022. KVMIveggur: Flexible, secure, and efficient support for self-service virtual machine introspection. Forensic Science International: Digital Investigation
 * Dangl, T., Sentanoe, S. and Reiser, H.P., 2022, August. VMIFresh: Efficient and Fresh Caches for Virtual Machine Introspection. In The 17th International Conference on Availability, Reliability and Security
+* Sentanoe, S., Fellicious, C., Reiser, H.P. and Granitzer, M., 2022, December. “The Need for Speed”: Extracting Session Keys From the Main Memory Using Brute-force and Machine Learning. In 2022 IEEE International Conference on Trust, Security and Privacy in Computing and Communications (TrustCom) (pp. 1028-1035). IEEE.
+* Fellicious, C., Wendlinger, L. and Granitzer, M., 2023, March. Neural Network Based Drift Detection. In Machine Learning, Optimization, and Data Science: 8th International Workshop, LOD 2022, Certosa di Pontignano, Italy, September 19–22, 2022, Revised Selected Papers, Part I (pp. 370-383). Cham: Springer Nature Switzerland.
+
+### Accepted Poster
+
+* Sentanoe, S., Reiser, H.P., Fellicious, C., Granitzer, M., Dangl, T., Beierl, N., Hausotte, S., Bischof, M., Eikenberg, D., Mayer, K., Pavic, A. and Dambeck, S., 2022. SmartVMI: Reconstructing meaningful kernel-level and application-level information about a target system using machine learning. NordSec 2022, Iceland.
+
+### Data Sets
+
+* Fellicious, C., Sentanoe, S., Granitzer, M. and Reiser, H.P., 2022. Machine Learning Assisted SSH Keys Extraction From The Heap Dump (V0.1) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.6537904
+* Sentanoe, S., Fellicious, C., Reiser, H.P. and Michael, G., 2022. Extracting Session Keys From the Main Memory Using Brute-force and Machine Learning (V0.1) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7014775
 
 
 ___
