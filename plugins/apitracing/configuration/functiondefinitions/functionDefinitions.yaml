@@ -3681,6 +3681,13 @@ Modules:
         ModuleFileName: PUNICODE_STRING
         pHModule: PHANDLE
       ReturnValue: NTSTATUS
+    LdrGetProcedureAddress:
+        Parameters:
+            ModuleHandle: HANDLE
+            FunctionName: PANSI_STRING
+            Ordinal: ULONG
+            FunctionAddress: PVOID
+        ReturnValue: NTSTATUS
     NtDuplicateObject:
       Parameters:
         SourceProcessHandle: HANDLE
@@ -4782,9 +4789,6 @@ Modules:
       Parameters:
         pszPath: LPCTSTR
       ReturnValue: BOOL
-Enums:
-  SHUTDOWN_ACTION: unsigned short
-  KEY_INFORMATION_CLASS: unsigned short
 Structures:
   LPDWORD:
     DWORD: DWORD
@@ -4885,6 +4889,7 @@ HighLevelParameterTypes:
     LPDWORD : unsigned int
     LPVOID : unsigned int
     NTSTATUS: unsigned __int32
+    PANSI_STRING: PVOID
     PCLIENT_ID : PVOID
     PCONTEXT: PVOID
     PHANDLE: HANDLE
@@ -4946,24 +4951,25 @@ HighLevelParameterTypes:
     LPTHREAD_START_ROUTINE : PVOID
     LPWSTR : LPWSTR_64
     LPBYTE : unsigned __int64
-    LPCONTEXT : PVOID
+    LPCONTEXT : PVOID # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
     LPCVOID : unsigned __int64
     LPDWORD : unsigned __int64
     LPVOID : unsigned __int64
     NTSTATUS: unsigned __int32
+    PANSI_STRING: PVOID # TODO find definition
     PCLIENT_ID : PVOID # TODO Add definition https://www.nirsoft.net/kernel_struct/vista/CLIENT_ID.html
     PCONTEXT: PVOID # TODO Add Context struct definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
     PHANDLE: HANDLE
     PIO_APC_ROUTINE: PVOID
     PIO_STATUS_BLOCK : PVOID # TODO add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
-    PINITIAL_TEB : PVOID
+    PINITIAL_TEB : PVOID # TODO add struct definition from http://undocumented.ntinternals.net/
     PKEY_VALUE_ENTRY : PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_key_value_entry
-    PLARGE_INTEGER : PVOID
+    PLARGE_INTEGER : PVOID # TODO Add union https://learn.microsoft.com/de-de/windows/win32/api/winnt/ns-winnt-large_integer-r1
     PPS_ATTRIBUTE_LIST: PVOID # TODO add struct https://securitytimes.medium.com/path-to-process-injection-bypass-userland-api-hooking-a8a49ae5def6
     PS_CREATE_STATE: unsigned short
     PRTL_USER_PROCESS_PARAMETERS : PVOID # TODO Add struct definition https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-rtl_user_process_parameters
-    PRTL_USER_PROCESS_INFORMATION : PVOID
-    PSECURITY_DESCRIPTOR : PVOID
+    PRTL_USER_PROCESS_INFORMATION : PVOID # TODO Add struct definition from http://undocumented.ntinternals.net/
+    PSECURITY_DESCRIPTOR : PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-security_descriptor
     PUCHAR: PUNICODE_STRING
     PULONG : ULONG_PTR
     PUNICODE_STRING: UNICODE_WSTR_64
