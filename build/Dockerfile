@@ -1,14 +1,18 @@
 FROM ubuntu:lunar
 
+ARG LLVM_MAJOR=16
+ENV LLVM_MAJOR=${LLVM_MAJOR}
+
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     bison \
-    clang-16 \
+    clang-${LLVM_MAJOR} \
     cmake \
     curl \
     flex \
     gcovr \
     git \
     g++ \
+    libc++-${LLVM_MAJOR}-dev \
     libglib2.0-dev \
     libjson-c-dev \
     libtclap-dev \
@@ -16,6 +20,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     libvirt-dev \
     libyara-dev \
     libxen-dev \
+    lldb-${LLVM_MAJOR} \
     make \
     ninja-build \
     pkg-config \
@@ -25,9 +30,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
-    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100 \
-    && update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-16 100
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_MAJOR} 100 \
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_MAJOR} 100 \
+    && update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-${LLVM_MAJOR} 100 \
+    && update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-${LLVM_MAJOR} 100
 
 RUN git clone https://github.com/bitdefender/libkvmi.git \
     && cd libkvmi \
