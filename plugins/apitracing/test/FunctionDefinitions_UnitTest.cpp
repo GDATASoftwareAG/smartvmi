@@ -25,12 +25,12 @@ namespace ApiTracing
         static std::vector<ParameterInformation> create64BitNtCreateFileFunctionDefinitions()
         {
             auto objectAttributesBackingParameters = std::vector<ParameterInformation>{
-                {{.basicType = "unsigned long", .name = "Length", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                 {.basicType = "unsigned __int64", .name = "RootDirectory", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                 {.basicType = "UNICODE_WSTR_64", .name = "ObjectName", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                 {.basicType = "unsigned long", .name = "Attributes", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                 {.basicType = "unsigned __int64", .name = "SecurityDescriptor", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                 {.basicType = "unsigned __int64", .name = "SecurityQualityOfService", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}}}
+                {.basicType = "unsigned long", .name = "Length", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "RootDirectory", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
+                {.basicType = "UNICODE_WSTR_64", .name = "ObjectName", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "Attributes", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "SecurityDescriptor", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "SecurityQualityOfService", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}}
             };
             return std::vector<ParameterInformation>{
                 {.basicType = "unsigned __int64", .name = "FileHandle", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
@@ -43,7 +43,8 @@ namespace ApiTracing
                 {.basicType = "unsigned long", .name = "CreateDisposition", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
                 {.basicType = "unsigned long", .name = "CreateOptions", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
                 {.basicType = "unsigned __int64", .name = "EaBuffer", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "EaLength", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}}};
+                {.basicType = "unsigned long", .name = "EaLength", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}}
+            };
         }
         // @formatter:on
         // clang-format on
