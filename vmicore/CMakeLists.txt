@@ -12,7 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(src)
 target_compile_definitions(vmicore PRIVATE PROGRAM_VERSION="${VMICORE_PROGRAM_VERSION}" BUILD_VERSION="${VMICORE_PROGRAM_BUILD_NUMBER}")
-target_compile_options(vmicore-lib PUBLIC -Wall -Wunused -Wunreachable-code -Wextra -Wpedantic -Wno-dollar-in-identifier-extension)
+target_compile_options(vmicore-lib PUBLIC -Wall -Wunused -Wunreachable-code -Wextra)
 
 if (VMICORE_TRACE_MODE)
     target_compile_definitions(vmicore-lib PRIVATE TRACE_MODE)
