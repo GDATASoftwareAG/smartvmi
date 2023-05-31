@@ -11,7 +11,7 @@ namespace InMemoryScanner
     constexpr uint64_t defaultMaxScanSize = 52428800; // 50MB
 
     Config::Config(const PluginInterface* pluginInterface)
-        : pluginInterface(pluginInterface), logger(this->pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
+        : logger(pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
     {
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
     }

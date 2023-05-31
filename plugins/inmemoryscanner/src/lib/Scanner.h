@@ -15,7 +15,7 @@ namespace InMemoryScanner
     class Scanner
     {
       public:
-        Scanner(const VmiCore::Plugin::PluginInterface* pluginInterface,
+        Scanner(VmiCore::Plugin::PluginInterface* pluginInterface,
                 std::shared_ptr<IConfig> configuration,
                 std::unique_ptr<YaraInterface> yaraEngine,
                 std::unique_ptr<IDumping> dumping);
@@ -29,7 +29,7 @@ namespace InMemoryScanner
         void saveOutput();
 
       private:
-        const VmiCore::Plugin::PluginInterface* pluginInterface;
+        VmiCore::Plugin::PluginInterface* pluginInterface;
         std::shared_ptr<IConfig> configuration;
         std::unique_ptr<YaraInterface> yaraEngine;
         OutputXML outputXml{};

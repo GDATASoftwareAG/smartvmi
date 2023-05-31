@@ -4,17 +4,16 @@
 #include "Scanner.h"
 #include <algorithm>
 #include <fmt/core.h>
-#include <iostream>
 
 using VmiCore::MemoryRegion;
 using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner
 {
-    Dumping::Dumping(const PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration)
+    Dumping::Dumping(PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration)
         : pluginInterface(pluginInterface),
           configuration(std::move(configuration)),
-          logger(this->pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
+          logger(pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
     {
         dumpingPath = this->configuration->getOutputPath() / "dumpedRegions";
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
