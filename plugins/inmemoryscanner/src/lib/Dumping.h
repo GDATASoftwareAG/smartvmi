@@ -133,7 +133,7 @@ namespace InMemoryScanner
     {
 
       public:
-        Dumping(const VmiCore::Plugin::PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration);
+        Dumping(VmiCore::Plugin::PluginInterface* pluginInterface, std::shared_ptr<IConfig> configuration);
 
         ~Dumping() override = default;
 
@@ -145,7 +145,7 @@ namespace InMemoryScanner
         std::vector<std::string> getAllMemoryRegionInformation() override;
 
       private:
-        const VmiCore::Plugin::PluginInterface* pluginInterface;
+        VmiCore::Plugin::PluginInterface* pluginInterface;
         std::shared_ptr<IConfig> configuration;
         std::unique_ptr<VmiCore::ILogger> logger;
 

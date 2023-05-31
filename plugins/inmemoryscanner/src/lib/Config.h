@@ -63,7 +63,6 @@ namespace InMemoryScanner
         void overrideDumpMemoryFlag(bool value) override;
 
       private:
-        const VmiCore::Plugin::PluginInterface* pluginInterface;
         std::unique_ptr<VmiCore::ILogger> logger;
         std::filesystem::path outputPath;
         std::filesystem::path signatureFile;

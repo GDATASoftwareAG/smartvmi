@@ -13,7 +13,7 @@ using VmiCore::Plugin::PluginInterface;
 
 namespace InMemoryScanner
 {
-    Scanner::Scanner(const PluginInterface* pluginInterface,
+    Scanner::Scanner(PluginInterface* pluginInterface,
                      std::shared_ptr<IConfig> configuration,
                      std::unique_ptr<YaraInterface> yaraEngine,
                      std::unique_ptr<IDumping> dumping)
@@ -21,12 +21,15 @@ namespace InMemoryScanner
           configuration(std::move(configuration)),
           yaraEngine(std::move(yaraEngine)),
           dumping(std::move(dumping)),
-          logger(this->pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME)),
-          inMemResultsLogger(this->pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
+          logger(pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME)),
+          inMemResultsLogger(pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
     {
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
         inMemResultsLogger->bind(
             {{VmiCore::WRITE_TO_FILE_TAG, (this->configuration->getOutputPath() / TEXT_RESULT_FILENAME).string()}});
+
+        pluginInterface->registerProcessTerminationEvent([this]<typename T>(T&& a)
+                                                         { scanProcess(std::forward<T>(a)); });
     }
 
     std::unique_ptr<std::string> Scanner::getFilenameFromPath(const std::string& path)

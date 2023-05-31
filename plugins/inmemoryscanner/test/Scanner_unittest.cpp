@@ -76,7 +76,8 @@ namespace InMemoryScanner
                                          "System.exe",
                                          std::make_unique<std::string>("System.exe"),
                                          std::make_unique<std::string>(""),
-                                         std::move(m1)}));
+                                         std::move(m1),
+                                         false}));
             auto m2 = std::make_unique<MockMemoryRegionExtractor>();
             sharedBaseImageMemoryRegionExtractorRaw = m2.get();
             runningProcesses->push_back(std::make_shared<ActiveProcessInformation>(
@@ -87,7 +88,8 @@ namespace InMemoryScanner
                                          "SomeProcess.exe",
                                          std::make_unique<std::string>("SomeProcess.exe"),
                                          std::make_unique<std::string>(""),
-                                         std::move(m2)}));
+                                         std::move(m2),
+                                         false}));
         };
 
         std::shared_ptr<const ActiveProcessInformation> getProcessInfoFromRunningProcesses(pid_t pid)
@@ -232,7 +234,8 @@ namespace InMemoryScanner
                                      trimmedProcessName,
                                      std::make_unique<std::string>(fullProcessName),
                                      std::make_unique<std::string>(),
-                                     std::move(memoryRegionExtractor)});
+                                     std::move(memoryRegionExtractor),
+                                     false});
         // Redefine default mock return because a new MemoryRegionExtractor mock has been created
         ON_CALL(*memoryRegionExtractorRaw, extractAllMemoryRegions())
             .WillByDefault(
@@ -291,7 +294,8 @@ namespace InMemoryScanner
                                      "System.exe",
                                      std::make_unique<std::string>("System.exe"),
                                      std::make_unique<std::string>(""),
-                                     std::move(memoryRegionExtractor)});
+                                     std::move(memoryRegionExtractor),
+                                     false});
         ON_CALL(*pluginInterface, getRunningProcesses())
             .WillByDefault(
                 [&processInfo]()
@@ -330,7 +334,8 @@ namespace InMemoryScanner
                                      "",
                                      std::make_unique<std::string>(fullProcessName),
                                      std::make_unique<std::string>(""),
-                                     std::move(memoryRegionExtractor)});
+                                     std::move(memoryRegionExtractor),
+                                     false});
         auto expectedFileName = inMemoryDumpsPath / "MemoryRegionInformation.json";
         std::string jsonStart = "{";
         std::string expectedFileContent =
