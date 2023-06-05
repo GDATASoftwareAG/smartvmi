@@ -19,6 +19,8 @@ namespace ApiTracing
           logger(this->pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
     {
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
+
+        pluginInterface->registerProcessStartEvent([this]<typename T>(T&& a) { addHooks(std::forward<T>(a)); });
     }
 
     void Tracer::initLoadedModules(const ActiveProcessInformation& processInformation)
@@ -42,27 +44,27 @@ namespace ApiTracing
         return loadedModules;
     }
 
-    void Tracer::addHooks(const ActiveProcessInformation& processInformation)
+    void Tracer::addHooks(std::shared_ptr<const ActiveProcessInformation> processInformation)
     {
-        auto processTracingConfig = getProcessTracingConfig(processInformation);
+        auto processTracingConfig = getProcessTracingConfig(*processInformation);
 
-        if (!shouldProcessBeMonitored(processInformation, processTracingConfig))
+        if (!shouldProcessBeMonitored(*processInformation, processTracingConfig))
         {
             return;
         }
 
-        tracedProcesses.try_emplace(processInformation.pid, processInformation.name);
-        initLoadedModules(processInformation);
+        tracedProcesses.try_emplace(processInformation->pid, processInformation->name);
+        initLoadedModules(*processInformation);
         try
         {
-            injectHooks(processInformation, processTracingConfig);
+            injectHooks(*processInformation, processTracingConfig);
         }
         catch (const std::exception& e)
         {
-            tracedProcesses.erase(processInformation.pid);
+            tracedProcesses.erase(processInformation->pid);
             logger->warning(
                 "Could not trace process",
-                {{"Process", processInformation.name}, {"Pid", processInformation.pid}, {"Exception", e.what()}});
+                {{"Process", processInformation->name}, {"Pid", processInformation->pid}, {"Exception", e.what()}});
         }
     }
 
