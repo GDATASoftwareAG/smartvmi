@@ -26,7 +26,7 @@ namespace ApiTracing
 
         std::map<std::string, uint64_t, std::less<>> getLoadedModules() const;
 
-        void addHooks(const VmiCore::ActiveProcessInformation& processInformation);
+        void addHooks(std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
 
         void removeHooks() const;
 

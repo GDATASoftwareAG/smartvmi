@@ -6,49 +6,30 @@
 #define BUILD_VERSION "TestBuild"
 #endif
 
+#include "ApiTracing.h"
 #include "Filenames.h"
-#include "Tracer.h"
 #include "config/TracingTargetsParser.h"
 #include "os/windows/Library.h"
 #include <tclap/CmdLine.h>
 #include <vmicore/io/ILogger.h>
-#include <vmicore/plugins/PluginInit.h>
 #include <vmicore/plugins/PluginInterface.h>
 
 VMI_PLUGIN_API_VERSION_INFO
 
 using VmiCore::ActiveProcessInformation;
-using VmiCore::ILogger;
 using VmiCore::OperatingSystem;
+using VmiCore::Plugin::IPlugin;
 using VmiCore::Plugin::IPluginConfig;
 using VmiCore::Plugin::PluginInterface;
 
 namespace ApiTracing
 {
-    namespace
+    ApiTracing::ApiTracing(VmiCore::Plugin::PluginInterface* pluginInterface,
+                           const VmiCore::Plugin::IPluginConfig& config,
+                           std::vector<std::string>& args)
+        : logger(pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
     {
-        PluginInterface* pluginInterface;
-        std::shared_ptr<Tracer> tracer;
-        std::unique_ptr<ILogger> logger;
-    }
-
-    void processStartCallback(std::shared_ptr<const ActiveProcessInformation> processInformation)
-    {
-        logger->info("Starting monitoring of process",
-                     {{"Process", *processInformation->fullName}, {"Pid", processInformation->pid}});
-        tracer->addHooks(*processInformation);
-    }
-
-    void shutDownCallback()
-    {
-        tracer->removeHooks();
-    }
-
-    extern "C" bool init(PluginInterface* communicator,
-                         std::shared_ptr<IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
-                         std::vector<std::string> args)
-    {
-        pluginInterface = communicator;
+        logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
 
         TCLAP::CmdLine cmd("ApiTracing plugin for VMICore.", ' ', PLUGIN_VERSION);
         TCLAP::ValueArg functionDefinitionsPath{
@@ -63,11 +44,9 @@ namespace ApiTracing
             "n", "process", "Process name to trace", false, std::string(""), "process name", cmd};
         cmd.parse(args);
 
-        logger = pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME);
-        logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
         logger->debug("ApiTracing plugin version info", {{"Version", PLUGIN_VERSION}, {"BuildNumber", BUILD_VERSION}});
 
-        auto configPath = config->configFilePath().value_or(std::filesystem::path(CONFIG_DIR) / "configuration.yml");
+        auto configPath = config.configFilePath().value_or(std::filesystem::path(CONFIG_DIR) / "configuration.yml");
         TracingTargetsParser tracingTargetsParser(configPath);
 
         if (traceProcessName.isSet())
@@ -90,29 +69,18 @@ namespace ApiTracing
                 throw std::runtime_error("Unknown operating system.");
             }
         }
-
-        try
-        {
-            pluginInterface->registerProcessStartEvent(processStartCallback);
-        }
-        catch (const std::exception& exc)
-        {
-            logger->error("Could not register ProcessStart Event", {{"Exception", exc.what()}});
-            return false;
-        }
-
-        try
-        {
-            pluginInterface->registerShutdownEvent(shutDownCallback);
-        }
-        catch (const std::exception& exc)
-        {
-            logger->error("Could not register ShutDown Event", {{"Exception", exc.what()}});
-            return false;
-        }
-
-        logger->debug("ApiTracing plugin: init end");
-
-        return true;
     }
+
+    void ApiTracing::unload()
+    {
+        tracer->removeHooks();
+    }
+}
+
+std::unique_ptr<IPlugin>
+VmiCore::Plugin::init(PluginInterface* pluginInterface,
+                      std::shared_ptr<IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
+                      std::vector<std::string> args)
+{
+    return std::make_unique<ApiTracing::ApiTracing>(pluginInterface, *config, args);
 }

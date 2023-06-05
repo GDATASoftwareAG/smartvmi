@@ -153,12 +153,12 @@ namespace ApiTracing
     {
         EXPECT_CALL(*mockPluginInterface, createBreakpoint(function1Address, processCr3, _));
         EXPECT_CALL(*mockPluginInterface, createBreakpoint(ntdllFunctionAddress, processCr3, _));
-        ASSERT_NO_THROW(tracer->addHooks(*tracedProcessInformation));
+        ASSERT_NO_THROW(tracer->addHooks(tracedProcessInformation));
     }
 
     TEST_F(TracerTestFixture, addHooks_untracedProcess_noInterruptRegistered)
     {
         EXPECT_CALL(*mockPluginInterface, createBreakpoint(_, _, _)).Times(0);
-        ASSERT_NO_THROW(tracer->addHooks(*untracedProcessInformation));
+        ASSERT_NO_THROW(tracer->addHooks(untracedProcessInformation));
     }
 }
