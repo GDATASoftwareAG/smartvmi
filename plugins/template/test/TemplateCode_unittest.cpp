@@ -18,7 +18,8 @@ namespace Template
     {
         // Test setup
         uint64_t processDtb = 0x1337;
-        auto processInformation = ActiveProcessInformation{.processCR3 = processDtb};
+        auto processInformation =
+            std::make_shared<ActiveProcessInformation>(ActiveProcessInformation{.processCR3 = processDtb});
         std::shared_ptr<MockIntrospectionAPI> introspectionApi = std::make_shared<MockIntrospectionAPI>();
         std::unique_ptr<NiceMock<MockPluginInterface>> pluginInterface =
             std::make_unique<NiceMock<MockPluginInterface>>();

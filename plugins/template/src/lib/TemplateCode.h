@@ -11,7 +11,8 @@ namespace Template
       public:
         TemplateCode(VmiCore::Plugin::PluginInterface* pluginInterface,
                      std::shared_ptr<VmiCore::IIntrospectionAPI> lowLevelIntrospectionApi);
-        void doStuffWithProcessStart(const VmiCore::ActiveProcessInformation& processInformation);
+
+        void doStuffWithProcessStart(std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
 
       private:
         VmiCore::Plugin::PluginInterface* pluginInterface;
