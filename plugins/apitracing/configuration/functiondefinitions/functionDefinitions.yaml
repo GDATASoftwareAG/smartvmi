@@ -3363,12 +3363,12 @@ Modules:
     NtQueryAttributesFile:
       Parameters:
         ObjectAttributes: POBJECT_ATTRIBUTES
-        FileInformation: void
+        FileInformation: PFILE_BASIC_INFORMATION
       ReturnValue: NTSTATUS
     NtQueryFullAttributesFile:
       Parameters:
         ObjectAttributes: POBJECT_ATTRIBUTES
-        FileInformation: void
+        FileInformation: PFILE_NETWORK_OPEN_INFORMATION
       ReturnValue: NTSTATUS
     NtCreateProcess:
       Parameters:
@@ -3682,12 +3682,12 @@ Modules:
         pHModule: PHANDLE
       ReturnValue: NTSTATUS
     LdrGetProcedureAddress:
-        Parameters:
-            ModuleHandle: HANDLE
-            FunctionName: PANSI_STRING
-            Ordinal: ULONG
-            FunctionAddress: PVOID
-        ReturnValue: NTSTATUS
+      Parameters:
+        ModuleHandle: HANDLE
+        FunctionName: PANSI_STRING
+        Ordinal: ULONG
+        FunctionAddress: PVOID
+      ReturnValue: NTSTATUS
     NtDuplicateObject:
       Parameters:
         SourceProcessHandle: HANDLE
@@ -3752,7 +3752,7 @@ Modules:
       Parameters:
         Action: SHUTDOWN_ACTION
       ReturnValue: NTSTATUS
-    NtCreateThread:
+    NtCreateThread: # TODO Verify this function
       Parameters:
         ThreadHandle: PHANDLE
         DesiredAccess: ACCESS_MASK
@@ -4017,7 +4017,7 @@ Modules:
       Parameters:
         hwndOwner: HWND
         nFolder: int
-        ppidl: void
+        ppidl: PIDLIST_ABSOLUTE
       ReturnValue: HRESULT
     SHGetFolderPathW:
       Parameters:
@@ -4790,14 +4790,41 @@ Modules:
         pszPath: LPCTSTR
       ReturnValue: BOOL
 Structures:
+  PCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
+   CONTEXT: PVOID
   LPDWORD:
     DWORD: DWORD
+  PCLIENT_ID:
+    UniqueProcess: HANDLE
+    UniqueThread: HANDLE
+  PFILE_BASIC_INFORMATION:
+    CreationTime: LARGE_INTEGER
+    LastAccessTime: LARGE_INTEGER
+    LastWriteTime: LARGE_INTEGER
+    ChangeTime: LARGE_INTEGER
+    FileAttributes: ULONG
+  PFILE_NETWORK_OPEN_INFORMATION:
+    CreationTime: LARGE_INTEGER
+    LastAccessTime: LARGE_INTEGER
+    LastWriteTime: LARGE_INTEGER
+    ChangeTime: LARGE_INTEGER
+    AllocationSize: LARGE_INTEGER
+    EndOfFile: LARGE_INTEGER
+    FileAttributes: ULONG
   PHANDLE:
     HANDLE: HANDLE
   PHARDERROR_RESPONSE:
     HARDERROR_RESPONSE: HARDERROR_RESPONSE
   PHKEY:
     HKEY: HKEY
+  PIDLIST_ABSOLUTE:
+    ITEMIDLIST: void  # TODO define this struct https://learn.microsoft.com/en-us/windows/win32/api/shtypes/ns-shtypes-itemidlist
+  PSIZE_T:
+    SIZE_T: SIZE_T
+  PUSHORT:
+    USHORT: USHORT
+  PWORD:
+    WORD: WORD
   LPPROCESS_INFORMATION:
     hProcess: HANDLE
     hThread: HANDLE
@@ -4858,152 +4885,144 @@ Structures:
     union: UINT
 HighLevelParameterTypes:
   AddressWidth32Bit:
-    ACCESS_MASK : DWORD
-    BOOLEAN : BOOL
-    BOOL : int
-    CONTEXT : LPCONTEXT
-    DEFAULT : unsigned int
-    DWORD : unsigned long
-    EXCEPTION_RECORD : PVOID
-    FARPROC : unsigned int
-    FILE_INFORMATION_CLASS : unsigned short
-    HANDLE : unsigned int
-    HARDERROR_RESPONSE : unsigned int
-    HARDERROR_RESPONSE_OPTION : unsigned int
-    HFILE : unsigned int
-    HINSTANCE : unsigned int
-    HKEY : HANDLE
-    HMODULE : unsigned int
-    KEY_INFORMATION_CLASS: unsigned short
-    KEY_VALUE_INFORMATION_CLASS : unsigned short
+    ACCESS_MASK: DWORD
+    BOOLEAN: BOOL
+    BOOL: int
+    DEFAULT: unsigned int
+    DWORD: unsigned long
+    ENUM: unsigned short
+    EXCEPTION_RECORD: PVOID
+    FARPROC: unsigned int
+    FILE_INFORMATION_CLASS: ENUM
+    HANDLE: unsigned int
+    HARDERROR_RESPONSE: unsigned int
+    HARDERROR_RESPONSE_OPTION: unsigned int
+    HFILE: unsigned int
+    HINSTANCE: unsigned int
+    HKEY: HANDLE
+    HMODULE: unsigned int
+    KEY_INFORMATION_CLASS: ENUM
+    KEY_VALUE_INFORMATION_CLASS: ENUM
     LONG: long
-    LPCSTR : LPSTR_32
-    LPCWSTR : LPWSTR_32
-    LPSTR : LPSTR_32
-    LPSECURITY_ATTRIBUTES : unsigned int
+    LPCSTR: LPSTR_32
+    LPCWSTR: LPWSTR_32
+    LPSTR: LPSTR_32
+    LPSECURITY_ATTRIBUTES: unsigned int
     LPTHREAD_START_ROUTINE: PVOID
-    LPWSTR : LPWSTR_32
+    LPWSTR: LPWSTR_32
     LPBYTE: unsigned int
-    LPCONTEXT: PVOID
-    LPCVOID : unsigned int
-    LPDWORD : unsigned int
-    LPVOID : unsigned int
+    LPCONTEXT: PCONTEXT
+    LPCVOID: unsigned int
+    LPDWORD: unsigned int
+    LPVOID: unsigned int
     NTSTATUS: unsigned __int32
     PANSI_STRING: PVOID
-    PCLIENT_ID : PVOID
     PCONTEXT: PVOID
     PHANDLE: HANDLE
     PIO_APC_ROUTINE: PVOID
-    PIO_STATUS_BLOCK : PVOID
-    PINITIAL_TEB : PVOID
-    PKEY_VALUE_ENTRY : PVOID
-    PLARGE_INTEGER : PVOID
+    PIO_STATUS_BLOCK: PVOID
+    PINITIAL_TEB: PVOID
+    PKEY_VALUE_ENTRY: PVOID
+    LARGE_INTEGER: PVOID
     PPS_ATTRIBUTE_LIST: PVOID
     PS_CREATE_STATE: unsigned short
     PRTL_USER_PROCESS_PARAMETERS: PVOID
     PRTL_USER_PROCESS_INFORMATION: PVOID
-    PSECURITY_DESCRIPTOR : PVOID
-    PSIZE_T : PVOID
+    PSECURITY_DESCRIPTOR: PVOID
     PUCHAR: PUNICODE_STRING
     PULONG: ULONG_PTR
     PUNICODE_STRING: UNICODE_WSTR_32
-    PUSHORT: unsigned int
-    PVECTORED_EXCEPTION_HANDLER : PVOID
+    PVECTORED_EXCEPTION_HANDLER: PVOID
     PWCHAR: PUNICODE_STRING
     PWSTR: LPWSTR_32
-    PWORD : PVOID
-    PVOID : unsigned int
+    PVOID: unsigned int
     SHUTDOWN_ACTION: unsigned short
-    size_t : ULONG_PTR
-    SIZE_T : size_t
-    SYSTEM_INFORMATION_CLASS : unsigned short
-    UINT : unsigned int
-    UINT_PTR : unsigned int
-    ULONG_PTR : unsigned long
-    ULONG : unsigned long
-    USHORT : unsigned short
-    void : PVOID
-    WORD : unsigned short
+    size_t: ULONG_PTR
+    SIZE_T: size_t
+    SYSTEM_INFORMATION_CLASS: unsigned short
+    UINT: unsigned int
+    UINT_PTR: unsigned int
+    ULONG_PTR: unsigned long
+    ULONG: unsigned long
+    USHORT: unsigned short
+    void: PVOID
+    WORD: unsigned short
   AddressWidth64Bit:
-    ACCESS_MASK : DWORD
-    BOOLEAN : BOOL
-    BOOL : __int64
-    CONTEXT : LPCONTEXT
-    DEFAULT : unsigned __int64
-    DWORD : unsigned long
-    EXCEPTION_RECORD : PVOID # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_record
-    FARPROC : unsigned __int64
-    FILE_INFORMATION_CLASS : unsigned short
-    HANDLE : unsigned __int64
+    ACCESS_MASK: DWORD
+    BOOLEAN: BOOL
+    BOOL: __int64
+    DEFAULT: unsigned __int64
+    DWORD: unsigned long
+    ENUM: unsigned short
+    EXCEPTION_RECORD: PVOID # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_record
+    FARPROC: unsigned __int64
+    FILE_INFORMATION_CLASS: ENUM
+    HANDLE: unsigned __int64
     HARDERROR_RESPONSE: unsigned int
     HARDERROR_RESPONSE_OPTION: unsigned int
-    HFILE : unsigned __int64
+    HFILE: unsigned __int64
     HINSTANCE: unsigned __int64
-    HKEY : HANDLE
-    HMODULE : unsigned __int64
-    KEY_INFORMATION_CLASS: unsigned short
-    KEY_VALUE_INFORMATION_CLASS: unsigned short
-    LONG : long
-    LPCSTR : LPSTR_64
-    LPCWSTR : LPWSTR_64
-    LPSTR : LPSTR_64
-    LPSECURITY_ATTRIBUTES : unsigned __int64
-    LPTHREAD_START_ROUTINE : PVOID
-    LPWSTR : LPWSTR_64
-    LPBYTE : unsigned __int64
-    LPCONTEXT : PVOID # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-    LPCVOID : unsigned __int64
-    LPDWORD : unsigned __int64
-    LPVOID : unsigned __int64
+    HKEY: HANDLE
+    HMODULE: unsigned __int64
+    KEY_INFORMATION_CLASS: ENUM
+    KEY_VALUE_INFORMATION_CLASS: ENUM
+    LONG: long
+    LPCSTR: LPSTR_64
+    LPCWSTR: LPWSTR_64
+    LPSTR: LPSTR_64
+    LPSECURITY_ATTRIBUTES: unsigned __int64
+    LPTHREAD_START_ROUTINE: PVOID # Pointer to the starting address of a thread. E.g. https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createremotethreadex
+    LPWSTR: LPWSTR_64
+    LPBYTE: unsigned __int64
+    LPCONTEXT: CONTEXT
+    LPCVOID: unsigned __int64
+    LPDWORD: unsigned __int64
+    LPVOID: unsigned __int64
     NTSTATUS: unsigned __int32
     PANSI_STRING: PVOID # TODO find definition
-    PCLIENT_ID : PVOID # TODO Add definition https://www.nirsoft.net/kernel_struct/vista/CLIENT_ID.html
     PCONTEXT: PVOID # TODO Add Context struct definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
     PHANDLE: HANDLE
-    PIO_APC_ROUTINE: PVOID
-    PIO_STATUS_BLOCK : PVOID # TODO add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
-    PINITIAL_TEB : PVOID # TODO add struct definition from http://undocumented.ntinternals.net/
-    PKEY_VALUE_ENTRY : PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_key_value_entry
-    PLARGE_INTEGER : PVOID # TODO Add union https://learn.microsoft.com/de-de/windows/win32/api/winnt/ns-winnt-large_integer-r1
+    PIO_APC_ROUTINE: PVOID # TODO find definition
+    PIO_STATUS_BLOCK: PVOID # TODO add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
+    PINITIAL_TEB: PVOID # TODO add struct definition from http://undocumented.ntinternals.net/
+    PKEY_VALUE_ENTRY: PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_key_value_entry
+    LARGE_INTEGER: PVOID # TODO Add union https://learn.microsoft.com/de-de/windows/win32/api/winnt/ns-winnt-large_integer-r1
     PPS_ATTRIBUTE_LIST: PVOID # TODO add struct https://securitytimes.medium.com/path-to-process-injection-bypass-userland-api-hooking-a8a49ae5def6
     PS_CREATE_STATE: unsigned short
-    PRTL_USER_PROCESS_PARAMETERS : PVOID # TODO Add struct definition https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-rtl_user_process_parameters
-    PRTL_USER_PROCESS_INFORMATION : PVOID # TODO Add struct definition from http://undocumented.ntinternals.net/
-    PSECURITY_DESCRIPTOR : PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-security_descriptor
+    PRTL_USER_PROCESS_PARAMETERS: PVOID # TODO Add struct definition https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-rtl_user_process_parameters
+    PRTL_USER_PROCESS_INFORMATION: PVOID # TODO Add struct definition from http://undocumented.ntinternals.net/
+    PSECURITY_DESCRIPTOR: PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-security_descriptor
     PUCHAR: PUNICODE_STRING
-    PULONG : ULONG_PTR
+    PULONG: ULONG_PTR
     PUNICODE_STRING: UNICODE_WSTR_64
-    PVECTORED_EXCEPTION_HANDLER : PVOID
+    PVECTORED_EXCEPTION_HANDLER: PVOID  # Pointer to a handler to be called https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredexceptionhandler
     PWCHAR: PUNICODE_STRING
-    PWORD : PVOID
-    PSIZE_T : PVOID
-    PUSHORT: unsigned __int64
     PWSTR: LPWSTR_64
-    PVOID : unsigned __int64
+    PVOID: unsigned __int64
     SHUTDOWN_ACTION: unsigned short
-    size_t : ULONG_PTR
-    SIZE_T : size_t
-    SYSTEM_INFORMATION_CLASS : unsigned short
-    UINT : unsigned __int64
-    UINT_PTR : unsigned __int64
-    ULONG_PTR : unsigned __int64
-    ULONG : unsigned long
-    USHORT : unsigned short
-    void : PVOID
-    WORD : unsigned short
+    size_t: ULONG_PTR
+    SIZE_T: size_t
+    SYSTEM_INFORMATION_CLASS: unsigned short
+    UINT: unsigned __int64
+    UINT_PTR: unsigned __int64
+    ULONG_PTR: unsigned __int64
+    ULONG: unsigned long
+    USHORT: unsigned short
+    void: PVOID # TODO this is inverted. PVOID is defined as a void "typedef void *PVOID;"
+    WORD: unsigned short
 BackingParameterTypes:
-  __ptr32 : 4
-  __ptr64 : 8
-  int : 4
-  long : 4
-  LPSTR_32 : 4
-  LPSTR_64 : 8
-  __int64 : 8
-  LPWSTR_32 : 4
-  LPWSTR_64 : 8
-  UNICODE_WSTR_32 : 4
-  UNICODE_WSTR_64 : 8
-  unsigned __int64 : 8
-  unsigned long : 4
-  unsigned int : 4
-  unsigned short : 2
+  __ptr32: 4
+  __ptr64: 8
+  int: 4
+  long: 4
+  LPSTR_32: 4
+  LPSTR_64: 8
+  __int64: 8
+  LPWSTR_32: 4
+  LPWSTR_64: 8
+  UNICODE_WSTR_32: 4
+  UNICODE_WSTR_64: 8
+  unsigned __int64: 8
+  unsigned long: 4
+  unsigned int: 4
+  unsigned short: 2
