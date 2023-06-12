@@ -17,27 +17,27 @@ namespace VmiCore
     {
         auto rustFields = logger->clone_base_fields(fields.size());
         appendCxxFieldsToRustFields(rustFields, fields);
-        logger->log(::logging::Level::DEBUG, toRustStr(message), std::move(rustFields));
+        logger->log_no_base_fields(::logging::Level::DEBUG, toRustStr(message), std::move(rustFields));
     }
 
     void ConsoleLogger::info(std::string_view message, const std::initializer_list<CxxLogField>& fields) const
     {
         auto rustFields = logger->clone_base_fields(fields.size());
         appendCxxFieldsToRustFields(rustFields, fields);
-        logger->log(::logging::Level::INFO, toRustStr(message), std::move(rustFields));
+        logger->log_no_base_fields(::logging::Level::INFO, toRustStr(message), std::move(rustFields));
     }
 
     void ConsoleLogger::warning(std::string_view message, const std::initializer_list<CxxLogField>& fields) const
     {
         auto rustFields = logger->clone_base_fields(fields.size());
         appendCxxFieldsToRustFields(rustFields, fields);
-        logger->log(::logging::Level::WARN, toRustStr(message), std::move(rustFields));
+        logger->log_no_base_fields(::logging::Level::WARN, toRustStr(message), std::move(rustFields));
     }
 
     void ConsoleLogger::error(std::string_view message, const std::initializer_list<CxxLogField>& fields) const
     {
         auto rustFields = logger->clone_base_fields(fields.size());
         appendCxxFieldsToRustFields(rustFields, fields);
-        logger->log(::logging::Level::ERROR, toRustStr(message), std::move(rustFields));
+        logger->log_no_base_fields(::logging::Level::ERROR, toRustStr(message), std::move(rustFields));
     }
 }
