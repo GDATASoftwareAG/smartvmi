@@ -1,26 +1,28 @@
 #pragma once
 
 #include "Common.h"
+#include "IYaraInterface.h"
 #include <memory>
-#include <vmicore/vmi/IMemoryMapping.h>
+#include <string>
+#include <vector>
+#include <yara.h>
 
 namespace InMemoryScanner
 {
-    class YaraException : public std::runtime_error
+    class YaraInterface : public IYaraInterface
     {
       public:
-        explicit YaraException(const std::string& Message) : std::runtime_error(Message.c_str()){};
-    };
+        explicit YaraInterface(const std::string& rulesFile);
 
-    class YaraInterface
-    {
-      public:
-        virtual ~YaraInterface() = default;
+        ~YaraInterface() override;
 
-        virtual std::unique_ptr<std::vector<Rule>>
-        scanMemory(const std::vector<VmiCore::MappedRegion>& mappedRegions) = 0;
+        std::unique_ptr<std::vector<Rule>> scanMemory(const std::vector<VmiCore::MappedRegion>& mappedRegions) override;
 
-      protected:
-        YaraInterface() = default;
+      private:
+        YR_RULES* rules = nullptr;
+
+        static int yaraCallback(YR_SCAN_CONTEXT* context, int message, void* message_data, void* user_data);
+
+        static int handleRuleMatch(YR_SCAN_CONTEXT* context, YR_RULE* rule, std::vector<Rule>* results);
     };
 }

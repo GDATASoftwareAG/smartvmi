@@ -1,11 +1,11 @@
-#include "FakeYara.h"
+#include "FakeYaraInterface.h"
 #include <thread>
 #include <yara/limits.h> // NOLINT(modernize-deprecated-headers)
 
 namespace InMemoryScanner
 {
     std::unique_ptr<std::vector<Rule>>
-    FakeYara::scanMemory([[maybe_unused]] const std::vector<VmiCore::MappedRegion>& mappedRegions)
+    FakeYaraInterface::scanMemory([[maybe_unused]] const std::vector<VmiCore::MappedRegion>& mappedRegions)
     {
         concurrentThreads++;
         if (concurrentThreads > YR_MAX_THREADS)

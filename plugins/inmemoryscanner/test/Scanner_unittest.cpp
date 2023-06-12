@@ -1,7 +1,7 @@
-#include "FakeYara.h"
+#include "FakeYaraInterface.h"
 #include "mock_Config.h"
 #include "mock_Dumping.h"
-#include "mock_Yara.h"
+#include "mock_YaraInterface.h"
 #include <Scanner.h>
 #include <fmt/core.h>
 #include <gmock/gmock.h>
@@ -137,7 +137,7 @@ namespace InMemoryScanner
             ON_CALL(*configuration, isDumpingMemoryActivated()).WillByDefault(Return(false));
             auto dumping = std::make_unique<NiceMock<MockDumping>>();
             dumpingRawPointer = dumping.get();
-            auto yara = std::make_unique<NiceMock<MockYara>>();
+            auto yara = std::make_unique<NiceMock<MockYaraInterface>>();
             ON_CALL(*yara, scanMemory(_)).WillByDefault([]() { return std::make_unique<std::vector<Rule>>(); });
             scanner.emplace(pluginInterface.get(), configuration, std::move(yara), std::move(dumping));
         };
@@ -176,7 +176,7 @@ namespace InMemoryScanner
                         return memoryRegions;
                     });
             auto dumping = std::make_unique<Dumping>(pluginInterface.get(), configuration);
-            auto yara = std::make_unique<NiceMock<MockYara>>();
+            auto yara = std::make_unique<NiceMock<MockYaraInterface>>();
             ON_CALL(*yara, scanMemory(_)).WillByDefault([]() { return std::make_unique<std::vector<Rule>>(); });
             scanner.emplace(pluginInterface.get(), configuration, std::move(yara), std::move(dumping));
         };
@@ -312,7 +312,7 @@ namespace InMemoryScanner
     TEST_F(ScannerTestFixtureDumpingDisabled,
            scanAllProcesses_MoreScanningThreadThanAllowedByYara_ThreadLimitNotExceeded)
     {
-        auto yaraFake = std::make_unique<FakeYara>();
+        auto yaraFake = std::make_unique<FakeYaraInterface>();
         auto* yaraFakeRaw = yaraFake.get();
         scanner.emplace(
             pluginInterface.get(), configuration, std::move(yaraFake), std::make_unique<NiceMock<MockDumping>>());

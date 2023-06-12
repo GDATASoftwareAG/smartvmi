@@ -1,11 +1,11 @@
 #pragma once
 
-#include <YaraInterface.h>
+#include <IYaraInterface.h>
 #include <gmock/gmock.h>
 
 namespace InMemoryScanner
 {
-    class MockYara : public YaraInterface
+    class MockYaraInterface : public IYaraInterface
     {
       public:
         MOCK_METHOD(std::unique_ptr<std::vector<Rule>>,

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <YaraInterface.h>
+#include <IYaraInterface.h>
 
 namespace InMemoryScanner
 {
-    class FakeYara : public YaraInterface
+    class FakeYaraInterface : public IYaraInterface
     {
       public:
         std::unique_ptr<std::vector<Rule>> scanMemory(const std::vector<VmiCore::MappedRegion>& mappedRegions) override;

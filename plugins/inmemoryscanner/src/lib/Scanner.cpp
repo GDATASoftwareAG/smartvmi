@@ -20,11 +20,11 @@ namespace InMemoryScanner
 {
     Scanner::Scanner(PluginInterface* pluginInterface,
                      std::shared_ptr<IConfig> configuration,
-                     std::unique_ptr<YaraInterface> yaraEngine,
+                     std::unique_ptr<IYaraInterface> yaraInterface,
                      std::unique_ptr<IDumping> dumping)
         : pluginInterface(pluginInterface),
           configuration(std::move(configuration)),
-          yaraEngine(std::move(yaraEngine)),
+          yaraInterface(std::move(yaraInterface)),
           dumping(std::move(dumping)),
           logger(pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME)),
           inMemResultsLogger(pluginInterface->newNamedLogger(INMEMORY_LOGGER_NAME))
@@ -131,7 +131,7 @@ namespace InMemoryScanner
                 // The semaphore protects the yara rules from being accessed more than YR_MAX_THREADS (32 atm.) times in
                 // parallel.
                 semaphore.wait();
-                auto results = yaraEngine->scanMemory(*mappedRegions);
+                auto results = yaraInterface->scanMemory(*mappedRegions);
                 semaphore.notify();
 
                 logger->debug("End scanMemory");
