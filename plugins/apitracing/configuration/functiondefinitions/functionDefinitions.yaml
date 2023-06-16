@@ -4797,6 +4797,8 @@ Modules:
 Structures:
   PCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
    CONTEXT: PVOID
+  LPCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
+   CONTEXT: PVOID
   LPDWORD:
     DWORD: DWORD
   PCLIENT_ID:
@@ -4916,13 +4918,11 @@ HighLevelParameterTypes:
     LPTHREAD_START_ROUTINE: PVOID
     LPWSTR: LPWSTR_32
     LPBYTE: unsigned int
-    LPCONTEXT: PCONTEXT
     LPCVOID: unsigned int
     LPDWORD: unsigned int
     LPVOID: unsigned int
     NTSTATUS: unsigned __int32
     PANSI_STRING: PVOID
-    PCONTEXT: PVOID
     PHANDLE: HANDLE
     PIO_APC_ROUTINE: PVOID
     PIO_STATUS_BLOCK: PVOID
