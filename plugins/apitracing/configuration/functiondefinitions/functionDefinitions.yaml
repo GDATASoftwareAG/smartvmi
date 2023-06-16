@@ -3789,6 +3789,11 @@ Modules:
         ThreadHandle: HANDLE
         Context: LPCONTEXT
       ReturnValue: NTSTATUS
+    NtSetContextThread:
+      Parameters:
+        ThreadHandle: HANDLE
+        Context: CONTEXT
+      ReturnValue: NTSTATUS
     NtSuspendThread:
       Parameters:
         ThreadHandle: HANDLE
