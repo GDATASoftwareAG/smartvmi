@@ -4832,6 +4832,8 @@ Structures:
     USHORT: USHORT
   PWORD:
     WORD: WORD
+  PLARGE_INTEGER:
+    LARGE_INTEGER: __int64
   LPPROCESS_INFORMATION:
     hProcess: HANDLE
     hThread: HANDLE
@@ -4910,6 +4912,7 @@ HighLevelParameterTypes:
     HMODULE: unsigned int
     KEY_INFORMATION_CLASS: ENUM
     KEY_VALUE_INFORMATION_CLASS: ENUM
+    LARGE_INTEGER: __int64
     LONG: long
     LPCSTR: LPSTR_32
     LPCWSTR: LPWSTR_32
@@ -4928,7 +4931,6 @@ HighLevelParameterTypes:
     PIO_STATUS_BLOCK: PVOID
     PINITIAL_TEB: PVOID
     PKEY_VALUE_ENTRY: PVOID
-    LARGE_INTEGER: PVOID
     PPS_ATTRIBUTE_LIST: PVOID
     PS_CREATE_STATE: unsigned short
     PRTL_USER_PROCESS_PARAMETERS: PVOID
@@ -4971,6 +4973,7 @@ HighLevelParameterTypes:
     HMODULE: unsigned __int64
     KEY_INFORMATION_CLASS: ENUM
     KEY_VALUE_INFORMATION_CLASS: ENUM
+    LARGE_INTEGER: __int64
     LONG: long
     LPCSTR: LPSTR_64
     LPCWSTR: LPWSTR_64
@@ -4991,7 +4994,6 @@ HighLevelParameterTypes:
     PIO_STATUS_BLOCK: PVOID # TODO add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
     PINITIAL_TEB: PVOID # TODO add struct definition from http://undocumented.ntinternals.net/
     PKEY_VALUE_ENTRY: PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_key_value_entry
-    LARGE_INTEGER: PVOID # TODO Add union https://learn.microsoft.com/de-de/windows/win32/api/winnt/ns-winnt-large_integer-r1
     PPS_ATTRIBUTE_LIST: PVOID # TODO add struct https://securitytimes.medium.com/path-to-process-injection-bypass-userland-api-hooking-a8a49ae5def6
     PS_CREATE_STATE: unsigned short
     PRTL_USER_PROCESS_PARAMETERS: PVOID # TODO Add struct definition https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-rtl_user_process_parameters
