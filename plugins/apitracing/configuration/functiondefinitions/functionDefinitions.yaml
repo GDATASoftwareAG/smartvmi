@@ -4623,84 +4623,6 @@ Modules:
         lpProviderName: LPWSTR
         lpBufferSize: LPDWORD
       ReturnValue: DWORD
-  vbe6.dll:
-    vbe6_StringConcat:
-      Parameters:
-        this: void
-        dst: VARIANT
-        src2: VARIANT
-        src1: VARIANT
-      ReturnValue: void
-    vbe6_CreateObject:
-      Parameters:
-        this: void
-        object_name: BSTR
-        unk1: void
-      ReturnValue: void
-    vbe6_GetObject:
-      Parameters:
-        this: void
-        object_name: VARIANT
-        unk1: void
-      ReturnValue: void
-    vbe6_GetIDFromName:
-      Parameters:
-        funcname: wchar_t
-        this: void
-      ReturnValue: void
-    vbe6_CallByName:
-      Parameters:
-        result: void
-        this: void
-        funcname: wchar_t
-        unk1: void
-        args: SAFEARRAY
-        unk3: void
-      ReturnValue: void
-    vbe6_Invoke:
-      Parameters:
-        this: void
-        funcidx: int
-        unk1: void
-        unk2: void
-        unk3: void
-        args: uint8_t
-        result: VARIANT
-        unk8: void
-        unk9: void
-      ReturnValue: void
-    vbe6_Shell:
-      Parameters:
-        command_line: VARIANT
-        show_type: int
-      ReturnValue: void
-    vbe6_Import:
-      Parameters:
-        args: void
-        unk1: void
-        unk2: void
-        unk3: void
-        unk4: void
-      ReturnValue: void
-    vbe6_Open:
-      Parameters:
-        mode: int
-        unk1: void
-        fd: int
-        wchar_t: const wchar_t
-      ReturnValue: void
-    vbe6_Print:
-      Parameters:
-        unk1: void
-        unk2: void
-        buf: VARIANT
-        unk4: void
-      ReturnValue: void
-    vbe6_Close:
-      Parameters:
-        this: void
-        fd: int
-      ReturnValue: void
   ole32.dll:
     CoCreateInstance:
       Parameters:
@@ -4736,23 +4658,6 @@ Modules:
         riid: REFIID
         ppv: LPVOID
       ReturnValue: HRESULT
-  escript.api.dll:
-    pdf_eval:
-      Parameters:
-        unk1: void
-        unk2: void
-        unk3: void
-        args: void
-        unk4: void
-      ReturnValue: void
-    pdf_unescape:
-      Parameters:
-        unk1: void
-        unk2: void
-        unk3: void
-        args: void
-        unk4: void
-      ReturnValue: void
   msvcrt.dll:
     system:
       Parameters:
