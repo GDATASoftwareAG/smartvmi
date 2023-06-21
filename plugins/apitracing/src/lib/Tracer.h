@@ -9,6 +9,7 @@
 #include "os/ILibrary.h"
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include <vmicore/io/ILogger.h>
 #include <vmicore/plugins/PluginInterface.h>
 
@@ -18,7 +19,7 @@ namespace ApiTracing
     {
       public:
         Tracer(VmiCore::Plugin::PluginInterface* pluginInterface,
-               const ITracingTargetsParser& tracingTargetsParser,
+               std::unique_ptr<ITracingTargetsParser> tracingTargetsParser,
                std::shared_ptr<IFunctionDefinitions> functionDefinitions,
                std::shared_ptr<ILibrary> library);
 
@@ -32,9 +33,9 @@ namespace ApiTracing
 
       private:
         VmiCore::Plugin::PluginInterface* pluginInterface;
+        std::unique_ptr<ITracingTargetsParser> tracingTargetsParser;
         std::map<std::string, uint64_t, std::less<>> loadedModules;
-        std::map<pid_t, std::string> tracedProcesses;
-        std::vector<ProcessTracingConfig> tracingTargetConfigs;
+        std::map<pid_t, TracingProfile> tracedProcesses;
         std::shared_ptr<IFunctionDefinitions> functionDefinitions;
         std::vector<std::shared_ptr<FunctionHook>> hookList;
         std::map<uint64_t, std::map<uint64_t, std::list<ParameterInformation>>> processFunctionDefinitions{};
@@ -42,13 +43,10 @@ namespace ApiTracing
         std::unique_ptr<VmiCore::ILogger> logger;
 
         void injectHooks(const VmiCore::ActiveProcessInformation& processInformation,
-                         const std::optional<ProcessTracingConfig>& processTracingConfig);
+                         const TracingProfile& processTracingProfile);
 
-        std::optional<ProcessTracingConfig>
-        getProcessTracingConfig(const VmiCore::ActiveProcessInformation& processInformation) const;
-
-        bool shouldProcessBeMonitored(const VmiCore::ActiveProcessInformation& processInformation,
-                                      const std::optional<ProcessTracingConfig>& processTracingConfig) const;
+        std::optional<TracingProfile>
+        getProcessTracingProfile(const VmiCore::ActiveProcessInformation& processInformation) const;
     };
 }
 #endif // APITRACING_TRACER_H

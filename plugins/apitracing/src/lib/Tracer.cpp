@@ -10,11 +10,11 @@ using VmiCore::Plugin::PluginInterface;
 namespace ApiTracing
 {
     Tracer::Tracer(VmiCore::Plugin::PluginInterface* pluginInterface,
-                   const ITracingTargetsParser& tracingTargetsParser,
+                   std::unique_ptr<ITracingTargetsParser> tracingTargetsParser,
                    std::shared_ptr<IFunctionDefinitions> functionDefinitions,
                    std::shared_ptr<ILibrary> library)
         : pluginInterface(pluginInterface),
-          tracingTargetConfigs(tracingTargetsParser.getTracingTargets()),
+          tracingTargetsParser(std::move(tracingTargetsParser)),
           functionDefinitions(std::move(functionDefinitions)),
           library(std::move(library)),
           logger(this->pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
@@ -47,18 +47,17 @@ namespace ApiTracing
 
     void Tracer::addHooks(std::shared_ptr<const ActiveProcessInformation> processInformation)
     {
-        auto processTracingConfig = getProcessTracingConfig(*processInformation);
-
-        if (!shouldProcessBeMonitored(*processInformation, processTracingConfig))
+        auto processTracingProfile = getProcessTracingProfile(*processInformation);
+        if (!processTracingProfile)
         {
             return;
         }
 
-        tracedProcesses.try_emplace(processInformation->pid, processInformation->name);
+        tracedProcesses.emplace(processInformation->pid, processTracingProfile.value());
         initLoadedModules(*processInformation);
         try
         {
-            injectHooks(*processInformation, processTracingConfig);
+            injectHooks(*processInformation, processTracingProfile.value());
         }
         catch (const std::exception& e)
         {
@@ -70,10 +69,10 @@ namespace ApiTracing
     }
 
     void Tracer::injectHooks(const ActiveProcessInformation& processInformation,
-                             const std::optional<ProcessTracingConfig>& processTracingConfig)
+                             const TracingProfile& processTracingProfile)
     {
         auto introspectionAPI = pluginInterface->getIntrospectionAPI();
-        for (const auto& moduleHookTarget : processTracingConfig->profile.modules)
+        for (const auto& moduleHookTarget : processTracingProfile.modules)
         {
             auto moduleBaseAddress = loadedModules[moduleHookTarget.name];
             if (moduleBaseAddress == 0)
@@ -115,31 +114,21 @@ namespace ApiTracing
         }
     }
 
-    std::optional<ProcessTracingConfig>
-    Tracer::getProcessTracingConfig(const ActiveProcessInformation& processInformation) const
+    std::optional<TracingProfile>
+    Tracer::getProcessTracingProfile(const ActiveProcessInformation& processInformation) const
     {
-        for (const auto& tracingTargetConfig : tracingTargetConfigs)
+        auto parentProcess = tracedProcesses.find(processInformation.parentPid);
+        if (parentProcess == tracedProcesses.end())
         {
-            if (tracingTargetConfig.name == *processInformation.fullName)
-            {
-                return tracingTargetConfig;
-            }
-        }
-        return std::nullopt;
-    }
-
-    bool Tracer::shouldProcessBeMonitored(const VmiCore::ActiveProcessInformation& processInformation,
-                                          const std::optional<ProcessTracingConfig>& processTracingConfig) const
-    {
-        if (processTracingConfig)
-        {
-            return true;
-        }
-        if (tracedProcesses.contains(processInformation.parentPid))
-        {
-            return true;
+            return tracingTargetsParser->getTracingProfile(*processInformation.fullName);
         }
 
-        return false;
+        if (!parentProcess->second.traceChilds)
+        {
+            return std::nullopt;
+        }
+
+        // use the same config as the traced parent
+        return parentProcess->second;
     }
 }
