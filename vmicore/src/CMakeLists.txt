@@ -20,7 +20,7 @@ target_link_libraries(vmicore vmicore-lib)
 FetchContent_Declare(
         boost-di
         GIT_REPOSITORY https://github.com/boost-ext/di.git
-        GIT_TAG v1.2.0
+        GIT_TAG cpp14
 )
 FetchContent_MakeAvailable(boost-di)
 target_link_libraries(vmicore Boost.DI)
