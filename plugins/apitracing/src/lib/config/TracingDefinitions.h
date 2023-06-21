@@ -22,13 +22,5 @@ namespace ApiTracing
 
         bool operator==(const TracingProfile& rhs) const = default;
     };
-
-    struct ProcessTracingConfig
-    {
-        std::string name;
-        TracingProfile profile;
-
-        bool operator==(const ProcessTracingConfig& rhs) const = default;
-    };
 }
 #endif // APITRACING_TRACINGDEFINITIONS_H

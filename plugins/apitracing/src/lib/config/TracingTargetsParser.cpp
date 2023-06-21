@@ -47,23 +47,29 @@ namespace ApiTracing
         {
             if (process.second["profile"])
             {
-                processTracingConfigs.emplace_back(process.first.as<std::string>(),
-                                                   profiles[process.second["profile"].as<std::string>()]);
+                processTracingProfiles.emplace(process.first.as<std::string>(),
+                                               profiles[process.second["profile"].as<std::string>()]);
             }
             else
             {
-                processTracingConfigs.emplace_back(process.first.as<std::string>(), profiles["default"]);
+                processTracingProfiles.emplace(process.first.as<std::string>(), profiles["default"]);
             }
         }
     }
 
-    std::vector<ProcessTracingConfig> TracingTargetsParser::getTracingTargets() const
+    std::optional<TracingProfile> TracingTargetsParser::getTracingProfile(std::string_view processName) const
     {
-        return processTracingConfigs;
+        auto tracingProfile = processTracingProfiles.find(processName);
+        if (tracingProfile == processTracingProfiles.end())
+        {
+            return std::nullopt;
+        }
+
+        return tracingProfile->second;
     }
 
     void TracingTargetsParser::addTracingTarget(const std::string& name)
     {
-        processTracingConfigs.emplace_back(name, profiles["default"]);
+        processTracingProfiles.emplace(name, profiles["default"]);
     }
 }

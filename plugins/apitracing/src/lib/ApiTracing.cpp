@@ -47,11 +47,11 @@ namespace ApiTracing
         logger->debug("ApiTracing plugin version info", {{"Version", PLUGIN_VERSION}, {"BuildNumber", BUILD_VERSION}});
 
         auto configPath = config.configFilePath().value_or(std::filesystem::path(CONFIG_DIR) / "configuration.yml");
-        TracingTargetsParser tracingTargetsParser(configPath);
+        auto tracingTargetsParser = std::make_unique<TracingTargetsParser>(configPath);
 
         if (traceProcessName.isSet())
         {
-            tracingTargetsParser.addTracingTarget(traceProcessName);
+            tracingTargetsParser->addTracingTarget(traceProcessName);
         }
 
         auto functionDefinitions = std::make_shared<FunctionDefinitions>(functionDefinitionsPath);
@@ -61,7 +61,8 @@ namespace ApiTracing
             case OperatingSystem::WINDOWS:
             {
                 auto library = std::make_shared<Windows::Library>();
-                tracer = std::make_shared<Tracer>(pluginInterface, tracingTargetsParser, functionDefinitions, library);
+                tracer = std::make_shared<Tracer>(
+                    pluginInterface, std::move(tracingTargetsParser), functionDefinitions, library);
                 break;
             }
             default:

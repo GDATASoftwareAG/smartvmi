@@ -3,6 +3,9 @@
 
 #include "TracingDefinitions.h"
 #include <filesystem>
+#include <map>
+#include <optional>
+#include <string_view>
 #include <yaml-cpp/yaml.h>
 
 namespace ApiTracing
@@ -12,7 +15,7 @@ namespace ApiTracing
       public:
         virtual ~ITracingTargetsParser() = default;
 
-        [[nodiscard]] virtual std::vector<ProcessTracingConfig> getTracingTargets() const = 0;
+        [[nodiscard]] virtual std::optional<TracingProfile> getTracingProfile(std::string_view processName) const = 0;
 
         virtual void addTracingTarget(const std::string& name) = 0;
 
@@ -27,14 +30,14 @@ namespace ApiTracing
 
         ~TracingTargetsParser() override = default;
 
-        [[nodiscard]] std::vector<ProcessTracingConfig> getTracingTargets() const override;
+        [[nodiscard]] std::optional<TracingProfile> getTracingProfile(std::string_view processName) const override;
 
         void addTracingTarget(const std::string& name) override;
 
       private:
         YAML::Node configRootNode;
         std::map<std::string, TracingProfile, std::less<>> profiles;
-        std::vector<ProcessTracingConfig> processTracingConfigs;
+        std::map<std::string, TracingProfile, std::less<>> processTracingProfiles;
 
         TracingProfile parseProfile(const YAML::Node& profileNode, const std::string& name) const;
 
