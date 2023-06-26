@@ -3,12 +3,14 @@ check_pie_supported()
 
 add_library(apitracing-obj OBJECT
         ApiTracing.cpp
-        Tracer.cpp
         config/Config.cpp
         config/FunctionDefinitions.cpp
         os/windows/Library.cpp
+        os/Extractor.cpp
         FunctionHook.cpp
-        os/Extractor.cpp)
+        TracedProcess.cpp
+        TracedProcessFactory.cpp
+        Tracer.cpp)
 target_compile_features(apitracing-obj PUBLIC cxx_std_20)
 set_target_properties(apitracing-obj PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_include_directories(apitracing-obj INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)

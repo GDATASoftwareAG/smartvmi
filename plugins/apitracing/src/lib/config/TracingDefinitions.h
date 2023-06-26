@@ -17,7 +17,7 @@ namespace ApiTracing
     struct TracingProfile
     {
         std::string name;
-        bool traceChilds;
+        bool traceChildren;
         std::vector<ModuleInformation> modules;
 
         bool operator==(const TracingProfile& rhs) const = default;

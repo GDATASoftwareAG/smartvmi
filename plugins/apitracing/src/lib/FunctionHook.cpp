@@ -37,8 +37,8 @@ namespace ApiTracing
         auto functionEntrypoint =
             introspectionAPI->translateUserlandSymbolToVA(moduleBaseAddress, processCr3, functionName);
 
-        auto breakpointCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(hookCallback);
-        interruptEvent = pluginInterface->createBreakpoint(functionEntrypoint, processCr3, breakpointCallback);
+        interruptEvent = pluginInterface->createBreakpoint(
+            functionEntrypoint, processCr3, VMICORE_SETUP_SAFE_MEMBER_CALLBACK(hookCallback));
 
         hookedProcesses.emplace_back(processCr3);
     }
