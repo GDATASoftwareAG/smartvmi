@@ -48,28 +48,33 @@ target_link_libraries(myplugin vmicore-public-headers)
 
 ## Plugin Initialization
 
-It is strongly encouraged (albeit not strictly necessary) to include `PluginInit.h` in order to get started with
-developing a new plugin. This header defines functionality which is required for loading the plugin. If something
-changes in future versions the compiler will throw errors for mismatches between declarations and definitions.
-Regardless, everything that is declared in this header will have to be implemented in the main plugin compilation unit.
+In order to get started with developing a new plugin, the plugin init function has to be implemented. It is declared
+in `IPlugin.h` and returns the main plugin object. The plugin object has to inherit from `IPlugin`. Furthermore,
+the `VMI_PLUGIN_API_VERSION_INFO` macro has to be used in one of the compilation units. For more information,
+have a look at the [VMI_PLUGIN_API_VERSION_INFO Macro](#vmipluginapiversioninfo-macro) subsection below.
 
 ```c++
-#include <vmicore/plugins/PluginInit.h>
+#include <vmicore/plugins/IPlugin.h>
 
 VMI_PLUGIN_API_VERSION_INFO
 
-extern "C" bool init(PluginInterface* communicator,
-                     std::shared_ptr<IPluginConfig> config,
-                     std::vector<std::string> args)
+std::unique_ptr<IPlugin>
+VmiCore::Plugin::init(PluginInterface* pluginInterface,
+                      std::shared_ptr<IPluginConfig> config,
+                      std::vector<std::string> args)
 {
-    return true;
+    return std::make_unique<SomePlugin>(pluginInterface, config, args);
 }
 ```
 
 ### Init Function
 
-This function will be called by *VMICore* during plugin initialization. The plugin should indicate via the return value
-whether initialization has been successful or not.
+This function will be called by *VMICore* during plugin initialization. Returns the main plugin object.
+
+### IPlugin
+
+An interface from which all plugins must inherit. Offers an `unload()` function which is called right before the plugin
+is destructed.
 
 ### PluginInterface
 
@@ -106,17 +111,18 @@ add_compile_definitions(YAML_CPP_SUPPORT)
 ```
 
 ```c++
-#include <vmicore/plugins/PluginInit.h>
+#include <vmicore/plugins/IPlugin.h>
 
 VMI_PLUGIN_API_VERSION_INFO
 
-extern "C" bool init(PluginInterface* communicator,
-                     std::shared_ptr<IPluginConfig> config,
-                     std::vector<std::string> args)
+std::unique_ptr<IPlugin>
+VmiCore::Plugin::init(PluginInterface* pluginInterface,
+                      std::shared_ptr<IPluginConfig> config,
+                      std::vector<std::string> args)
 {
     auto pluginRootNode = config.rootNode();
     auto someValue = pluginRootNode["some_key"].as<std::string>();
-    return true;
+    return std::make_unique<SomePlugin>(pluginInterface, config, args);
 }
 ```
 
