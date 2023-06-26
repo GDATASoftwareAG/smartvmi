@@ -22,15 +22,17 @@ namespace VmiCore
                    std::shared_ptr<ILibvmiInterface> vmiInterface,
                    std::shared_ptr<ILogging> loggingLib,
                    std::shared_ptr<IEventStream> eventStream,
-                   std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
-                   std::shared_ptr<IFileTransport> pluginTransport)
+                   std::shared_ptr<IFileTransport> pluginTransport,
+                   std::shared_ptr<ISingleStepSupervisor> singleStepSupervisor,
+                   std::shared_ptr<IRegisterEventSupervisor> contextSwitchHandler)
         : configInterface(std::move(configInterface)),
           vmiInterface(std::move(vmiInterface)),
           loggingLib(std::move(loggingLib)),
           logger(this->loggingLib->newNamedLogger(loggerName)),
           eventStream(std::move(eventStream)),
-          interruptEventSupervisor(std::move(interruptEventSupervisor)),
-          pluginTransport(std::move(pluginTransport))
+          pluginTransport(std::move(pluginTransport)),
+          singleStepSupervisor(std::move(singleStepSupervisor)),
+          contextSwitchHandler(std::move(contextSwitchHandler))
     {
     }
 
@@ -126,12 +128,16 @@ namespace VmiCore
     {
         vmiInterface->initializeVmi();
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
+        std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
         switch (vmiInterface->getOsType())
         {
             case OperatingSystem::LINUX:
             {
                 activeProcessesSupervisor =
                     std::make_shared<Linux::ActiveProcessesSupervisor>(vmiInterface, loggingLib, eventStream);
+                interruptEventSupervisor = std::make_shared<InterruptEventSupervisor>(
+                    vmiInterface, singleStepSupervisor, activeProcessesSupervisor, contextSwitchHandler, loggingLib);
+
                 pluginSystem = std::make_shared<PluginSystem>(configInterface,
                                                               vmiInterface,
                                                               activeProcessesSupervisor,
@@ -146,6 +152,7 @@ namespace VmiCore
                                                                                        interruptEventSupervisor,
                                                                                        loggingLib,
                                                                                        eventStream);
+
                 break;
             }
             case OperatingSystem::WINDOWS:
@@ -153,6 +160,8 @@ namespace VmiCore
                 auto kernelObjectExtractor = std::make_shared<Windows::KernelAccess>(vmiInterface);
                 activeProcessesSupervisor = std::make_shared<Windows::ActiveProcessesSupervisor>(
                     vmiInterface, kernelObjectExtractor, loggingLib, eventStream);
+                interruptEventSupervisor = std::make_shared<InterruptEventSupervisor>(
+                    vmiInterface, singleStepSupervisor, activeProcessesSupervisor, contextSwitchHandler, loggingLib);
                 pluginSystem = std::make_shared<PluginSystem>(configInterface,
                                                               vmiInterface,
                                                               activeProcessesSupervisor,

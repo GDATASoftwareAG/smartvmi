@@ -3,7 +3,7 @@
 
 namespace VmiCore::Windows
 {
-    constexpr auto systemPid = 4;
+    constexpr pid_t SYSTEM_PID = 4;
 }
 
 #endif // VMICORE_WINDOWS_CONSTANTS_H

@@ -46,7 +46,7 @@ int main(int argc, const char* argv[])
             boost::di::bind<VmiCore::IConfigParser>().to<VmiCore::ConfigYAMLParser>(),
             boost::di::bind<VmiCore::ILibvmiInterface>().to<VmiCore::LibvmiInterface>(),
             boost::di::bind<VmiCore::ISingleStepSupervisor>().to<VmiCore::SingleStepSupervisor>(),
-            boost::di::bind<VmiCore::IInterruptEventSupervisor>().to<VmiCore::InterruptEventSupervisor>(),
+            boost::di::bind<VmiCore::IRegisterEventSupervisor>().to<VmiCore::RegisterEventSupervisor>(),
             boost::di::bind<VmiCore::ILogging>().to(
                 [&enableGRPCServer](const auto& injector) -> std::shared_ptr<VmiCore::ILogging>
                 {

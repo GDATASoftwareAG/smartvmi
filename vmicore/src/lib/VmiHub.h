@@ -8,6 +8,7 @@
 #include "plugins/PluginSystem.h"
 #include "vmi/InterruptEventSupervisor.h"
 #include "vmi/LibvmiInterface.h"
+#include "vmi/RegisterEventSupervisor.h"
 #include "vmicore/io/ILogger.h"
 #include <functional> // std::equal_to
 #include <map>
@@ -22,8 +23,9 @@ namespace VmiCore
                std::shared_ptr<ILibvmiInterface> vmiInterface,
                std::shared_ptr<ILogging> loggingLib,
                std::shared_ptr<IEventStream> eventStream,
-               std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor,
-               std::shared_ptr<IFileTransport> pluginTransport);
+               std::shared_ptr<IFileTransport> pluginTransport,
+               std::shared_ptr<ISingleStepSupervisor> singleStepSupervisor,
+               std::shared_ptr<IRegisterEventSupervisor> contextSwitchHandler);
 
         uint run(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs);
 
@@ -35,8 +37,9 @@ namespace VmiCore
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;
-        std::shared_ptr<IInterruptEventSupervisor> interruptEventSupervisor;
         std::shared_ptr<IFileTransport> pluginTransport;
+        std::shared_ptr<ISingleStepSupervisor> singleStepSupervisor;
+        std::shared_ptr<IRegisterEventSupervisor> contextSwitchHandler;
 
         void waitForEvents() const;
     };

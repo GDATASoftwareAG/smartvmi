@@ -23,6 +23,7 @@ add_library(vmicore-lib OBJECT
         os/linux/SystemEventSupervisor.cpp
         plugins/PluginSystem.cpp
         vmi/Breakpoint.cpp
+        vmi/RegisterEventSupervisor.cpp
         vmi/Event.cpp
         vmi/InterruptEventSupervisor.cpp
         vmi/InterruptGuard.cpp

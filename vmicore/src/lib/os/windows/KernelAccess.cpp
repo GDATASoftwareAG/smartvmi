@@ -23,14 +23,14 @@ namespace VmiCore::Windows
     addr_t KernelAccess::extractVadTreeRootAddress(addr_t eprocessBase) const
     {
         auto vadRoot = vmiInterface->read64VA(eprocessBase + kernelOffsets.eprocess.VadRoot,
-                                              vmiInterface->convertPidToDtb(systemPid));
+                                              vmiInterface->convertPidToDtb(SYSTEM_PID));
         return vadRoot;
     }
 
     addr_t KernelAccess::extractImageFilePointer(addr_t eprocessBase) const
     {
         auto imageFilePointer = vmiInterface->read64VA(eprocessBase + kernelOffsets.eprocess.ImageFilePointer,
-                                                       vmiInterface->convertPidToDtb(systemPid));
+                                                       vmiInterface->convertPidToDtb(SYSTEM_PID));
         return imageFilePointer;
     }
 
@@ -38,16 +38,16 @@ namespace VmiCore::Windows
     {
         expectSaneKernelAddress(fileObjectBaseAddress, static_cast<const char*>(__func__));
         return vmiInterface->extractUnicodeStringAtVA(fileObjectBaseAddress + kernelOffsets.fileObject.FileName,
-                                                      vmiInterface->convertPidToDtb(systemPid));
+                                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     addr_t KernelAccess::extractControlAreaBasePointer(addr_t vadEntryBaseVA) const
     {
         expectSaneKernelAddress(vadEntryBaseVA, static_cast<const char*>(__func__));
         auto subSectionBaseAddress = vmiInterface->read64VA(vadEntryBaseVA + kernelOffsets.mmVad.Subsection,
-                                                            vmiInterface->convertPidToDtb(systemPid));
+                                                            vmiInterface->convertPidToDtb(SYSTEM_PID));
         auto controlAreaBaseAddress = vmiInterface->read64VA(
-            subSectionBaseAddress + kernelOffsets.subSection.ControlArea, vmiInterface->convertPidToDtb(systemPid));
+            subSectionBaseAddress + kernelOffsets.subSection.ControlArea, vmiInterface->convertPidToDtb(SYSTEM_PID));
         return controlAreaBaseAddress;
     }
 
@@ -64,7 +64,7 @@ namespace VmiCore::Windows
         expectSaneKernelAddress(controlAreaBaseVA, static_cast<const char*>(__func__));
         auto filePointerObjectExFastRef = vmiInterface->read64VA(
             controlAreaBaseVA + kernelOffsets.controlArea.FilePointer + kernelOffsets.exFastRef.Object,
-            vmiInterface->convertPidToDtb(systemPid));
+            vmiInterface->convertPidToDtb(SYSTEM_PID));
         auto filePointerObjectAddress = removeReferenceCountFromExFastRef(filePointerObjectExFastRef);
         return filePointerObjectAddress;
     }
@@ -78,9 +78,9 @@ namespace VmiCore::Windows
     {
         expectSaneKernelAddress(currentVadEntryBaseVA, static_cast<const char*>(__func__));
         auto leftChildAddress = vmiInterface->read64VA(currentVadEntryBaseVA + getVadNodeLeftChildOffset(),
-                                                       vmiInterface->convertPidToDtb(systemPid));
+                                                       vmiInterface->convertPidToDtb(SYSTEM_PID));
         auto rightChildAddress = vmiInterface->read64VA(currentVadEntryBaseVA + getVadNodeRightChildOffset(),
-                                                        vmiInterface->convertPidToDtb(systemPid));
+                                                        vmiInterface->convertPidToDtb(SYSTEM_PID));
         return {leftChildAddress, rightChildAddress};
     }
 
@@ -88,13 +88,13 @@ namespace VmiCore::Windows
     {
         expectSaneKernelAddress(currentVadShortBaseVA, static_cast<const char*>(__func__));
         auto startingVpnHigh = vmiInterface->read8VA(currentVadShortBaseVA + kernelOffsets.mmVadShort.StartingVpnHigh,
-                                                     vmiInterface->convertPidToDtb(systemPid));
+                                                     vmiInterface->convertPidToDtb(SYSTEM_PID));
         auto endingVpnHigh = vmiInterface->read8VA(currentVadShortBaseVA + kernelOffsets.mmVadShort.EndingVpnHigh,
-                                                   vmiInterface->convertPidToDtb(systemPid));
+                                                   vmiInterface->convertPidToDtb(SYSTEM_PID));
         auto startingVpn = vmiInterface->read32VA(currentVadShortBaseVA + kernelOffsets.mmVadShort.StartingVpn,
-                                                  vmiInterface->convertPidToDtb(systemPid));
+                                                  vmiInterface->convertPidToDtb(SYSTEM_PID));
         auto endingVpn = vmiInterface->read32VA(currentVadShortBaseVA + kernelOffsets.mmVadShort.EndingVpn,
-                                                vmiInterface->convertPidToDtb(systemPid));
+                                                vmiInterface->convertPidToDtb(SYSTEM_PID));
         // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
         uint64_t vadShortEndingVpn = (static_cast<uint64_t>(endingVpnHigh) << sizeof(endingVpn) * 8) + endingVpn;
         uint64_t vadShortStartingVpn =
@@ -117,59 +117,59 @@ namespace VmiCore::Windows
     addr_t KernelAccess::extractDirectoryTableBase(addr_t eprocessBase) const
     {
         return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.DirectoryTableBase,
-                                      vmiInterface->convertPidToDtb(systemPid));
+                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     pid_t KernelAccess::extractParentID(addr_t eprocessBase) const
     {
         return static_cast<pid_t>(
             vmiInterface->read64VA(eprocessBase + kernelOffsets.eprocess.InheritedFromUniqueProcessId,
-                                   vmiInterface->convertPidToDtb(systemPid)));
+                                   vmiInterface->convertPidToDtb(SYSTEM_PID)));
     }
 
     std::string KernelAccess::extractImageFileName(addr_t eprocessBase) const
     {
         return *vmiInterface->extractStringAtVA(eprocessBase + kernelOffsets.eprocess.ImageFileName,
-                                                vmiInterface->convertPidToDtb(systemPid));
+                                                vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     pid_t KernelAccess::extractPID(addr_t eprocessBase) const
     {
         return static_cast<pid_t>(vmiInterface->read32VA(eprocessBase + kernelOffsets.eprocess.UniqueProcessId,
-                                                         vmiInterface->convertPidToDtb(systemPid)));
+                                                         vmiInterface->convertPidToDtb(SYSTEM_PID)));
     }
 
     uint32_t KernelAccess::extractExitStatus(addr_t eprocessBase) const
     {
         return vmiInterface->read32VA(eprocessBase + kernelOffsets.eprocess.ExitStatus,
-                                      vmiInterface->convertPidToDtb(systemPid));
+                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     addr_t KernelAccess::extractSectionAddress(addr_t eprocessBase) const
     {
         return vmiInterface->read64VA(eprocessBase + kernelOffsets.eprocess.SectionObject,
-                                      vmiInterface->convertPidToDtb(systemPid));
+                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     addr_t KernelAccess::extractControlAreaAddress(addr_t sectionAddress) const
     {
         expectSaneKernelAddress(sectionAddress, static_cast<const char*>(__func__));
         return vmiInterface->read64VA(sectionAddress + kernelOffsets.section.controlArea,
-                                      vmiInterface->convertPidToDtb(systemPid));
+                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     addr_t KernelAccess::extractControlAreaFilePointer(addr_t controlAreaAddress) const
     {
         expectSaneKernelAddress(controlAreaAddress, static_cast<const char*>(__func__));
         return vmiInterface->read64VA(controlAreaAddress + kernelOffsets.controlArea.FilePointer,
-                                      vmiInterface->convertPidToDtb(systemPid));
+                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     std::unique_ptr<std::string> KernelAccess::extractProcessPath(addr_t filePointerAddress) const
     {
         expectSaneKernelAddress(filePointerAddress, static_cast<const char*>(__func__));
         return vmiInterface->extractUnicodeStringAtVA(filePointerAddress + kernelOffsets.fileObject.FileName,
-                                                      vmiInterface->convertPidToDtb(systemPid));
+                                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 
     addr_t KernelAccess::getMmVadShortFlagsAddr(addr_t vadShortBaseVA) const
@@ -253,10 +253,10 @@ namespace VmiCore::Windows
         switch (size)
         {
             case sizeof(uint32_t):
-                flagValue = vmiInterface->read32VA(flagBaseVA, vmiInterface->convertPidToDtb(systemPid));
+                flagValue = vmiInterface->read32VA(flagBaseVA, vmiInterface->convertPidToDtb(SYSTEM_PID));
                 break;
             case sizeof(uint64_t):
-                flagValue = vmiInterface->read64VA(flagBaseVA, vmiInterface->convertPidToDtb(systemPid));
+                flagValue = vmiInterface->read64VA(flagBaseVA, vmiInterface->convertPidToDtb(SYSTEM_PID));
                 break;
             default:
                 throw VmiException(fmt::format(
@@ -269,7 +269,7 @@ namespace VmiCore::Windows
     bool KernelAccess::extractIsWow64Process(uint64_t eprocessBase) const
     {
         auto wow64ProcessAddress = eprocessBase + kernelOffsets.eprocess.WoW64Process;
-        auto wow64Process = vmiInterface->read64VA(wow64ProcessAddress, vmiInterface->convertPidToDtb(systemPid));
+        auto wow64Process = vmiInterface->read64VA(wow64ProcessAddress, vmiInterface->convertPidToDtb(SYSTEM_PID));
 
         return wow64Process != 0;
     }
@@ -289,7 +289,7 @@ namespace VmiCore::Windows
         for (std::size_t i = 0; i < mmProtectToValueLength; i++)
         {
             mmProtectToValue.value().push_back(vmiInterface->read32VA(mmProtectToValueAddress + i * sizeof(uint32_t),
-                                                                      vmiInterface->convertPidToDtb(systemPid)));
+                                                                      vmiInterface->convertPidToDtb(SYSTEM_PID)));
         }
 
         return mmProtectToValue.value();

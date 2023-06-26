@@ -3,7 +3,7 @@
 
 namespace VmiCore::Linux
 {
-    constexpr auto SYSTEM_PID = 0;
+    constexpr pid_t SYSTEM_PID = 0;
 }
 
 #endif // VMICORE_LINUX_CONSTANTS_H

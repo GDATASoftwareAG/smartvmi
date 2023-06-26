@@ -1,5 +1,4 @@
 #include "Breakpoint.h"
-#include "../os/PagingDefinitions.h"
 #include "VmiException.h"
 #include <fmt/core.h>
 #include <utility>
@@ -8,8 +7,14 @@ namespace VmiCore
 {
     Breakpoint::Breakpoint(uint64_t targetPA,
                            std::function<void(Breakpoint*)> notifyDelete,
-                           std::function<BpResponse(IInterruptEvent&)> callback)
-        : targetPA(targetPA), notifyFunction(std::move(notifyDelete)), callbackFunction(std::move(callback))
+                           std::function<BpResponse(IInterruptEvent&)> callback,
+                           uint64_t processDtb,
+                           bool global)
+        : targetPA(targetPA),
+          notifyFunction(std::move(notifyDelete)),
+          callbackFunction(std::move(callback)),
+          dtb(processDtb),
+          global(global)
     {
     }
 
@@ -29,6 +34,10 @@ namespace VmiCore
 
     BpResponse Breakpoint::callback(IInterruptEvent& event)
     {
+        if (!global && event.getCr3() != dtb)
+        {
+            return BpResponse::Continue;
+        }
         try
         {
             return callbackFunction(event);
@@ -38,5 +47,21 @@ namespace VmiCore
             throw std::runtime_error(
                 fmt::format("{}: {} Target physical address = {:#x}", __func__, e.what(), targetPA));
         }
+    }
+    BPStateResponse Breakpoint::getNewBreakpointState(uint64_t newDtb) const
+    {
+        using enum VmiCore::BPStateResponse;
+
+        if (global) // Breakpoint always present e.g. in specific kernel functions
+        {
+            return Enable;
+        }
+
+        if (dtb == newDtb)
+        {
+            return Enable;
+        }
+        // Process is not hooked
+        return Disable;
     }
 }
