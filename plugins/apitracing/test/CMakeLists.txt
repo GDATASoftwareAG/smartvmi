@@ -1,9 +1,10 @@
 add_executable(apitracing-test
         Config_UnitTest.cpp
+        Extractor_Unittest.cpp
         FunctionDefinitions_UnitTest.cpp
-        FunctionHook_Unittest.cpp
-        Tracer_Unittest.cpp
-        Extractor_Unittest.cpp)
+        FunctionHook_UnitTest.cpp
+        TracedProcess_UnitTest.cpp
+        Tracer_UnitTest.cpp)
 target_link_libraries(apitracing-test apitracing-obj pthread)
 
 # Setup bundled google test framework

@@ -25,7 +25,7 @@ namespace ApiTracing
     TracingProfile Config::parseProfile(const YAML::Node& profileNode, const std::string& name)
     {
         TracingProfile profile{.name = name,
-                               .traceChilds = profileNode["trace_children"].as<bool>(),
+                               .traceChildren = profileNode["trace_children"].as<bool>(),
                                .modules = std::vector<ModuleInformation>()};
 
         for (const auto& tracedModule : profileNode["traced_modules"])

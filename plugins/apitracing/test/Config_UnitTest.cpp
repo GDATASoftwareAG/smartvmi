@@ -39,13 +39,13 @@ namespace ApiTracing
         EXPECT_ANY_THROW(std::make_unique<Config>(*createMockPluginConfig(emptyConfigRootNode)));
     }
 
-    TEST(ConfigTests, getTracingTargets_calcProcess_correctProfile)
+    TEST(ConfigTests, getTracingProfile_calcProcess_correctProfile)
     {
 
         auto config = std::make_unique<Config>(*createMockPluginConfig("testConfiguration.yaml"));
         TracingProfile expectedTracingProfile{
             .name = "calc",
-            .traceChilds = true,
+            .traceChildren = true,
             .modules = {{.name = "ntdll.dll", .functions = {{"function1"}, {"function2"}}},
                         {.name = "kernel32.dll", .functions = {{"kernelfunction1"}, {"kernelfunction2"}}}}};
 
@@ -54,22 +54,22 @@ namespace ApiTracing
         EXPECT_EQ(tracingProfile, expectedTracingProfile);
     }
 
-    TEST(ConfigTests, getTracingTargets_processWithoutProfile_defaultProfile)
+    TEST(ConfigTests, getTracingProfile_processWithoutProfile_defaultProfile)
     {
-        auto tracingTargetsParser = std::make_unique<Config>(*createMockPluginConfig("testConfiguration.yaml"));
+        auto config = std::make_unique<Config>(*createMockPluginConfig("testConfiguration.yaml"));
         TracingProfile expectedTracingProfile{
-            .name = "default", .traceChilds = true, .modules = {{.name = "ntdll.dll", .functions = {{"function1"}}}}};
+            .name = "default", .traceChildren = true, .modules = {{.name = "ntdll.dll", .functions = {{"function1"}}}}};
 
-        auto tracingProfile = tracingTargetsParser->getTracingProfile("notepad.exe");
+        auto tracingProfile = config->getTracingProfile("notepad.exe");
 
         EXPECT_EQ(tracingProfile, expectedTracingProfile);
     }
 
-    TEST(ConfigTests, getTracingTargets_unknownProcessName_nullopt)
+    TEST(ConfigTests, getTracingProfile_unknownProcessName_nullopt)
     {
-        auto tracingTargetsParser = std::make_unique<Config>(*createMockPluginConfig("testConfiguration.yaml"));
+        auto config = std::make_unique<Config>(*createMockPluginConfig("testConfiguration.yaml"));
 
-        auto tracingProfile = tracingTargetsParser->getTracingProfile("unknown.exe");
+        auto tracingProfile = config->getTracingProfile("unknown.exe");
 
         EXPECT_FALSE(tracingProfile);
     }

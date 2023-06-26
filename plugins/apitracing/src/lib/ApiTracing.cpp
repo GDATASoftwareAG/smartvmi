@@ -60,13 +60,15 @@ namespace ApiTracing
         auto functionDefinitions =
             std::make_shared<FunctionDefinitions>(apiTracingConfig->getFunctionDefinitionsPath());
         functionDefinitions->init();
+
         switch (pluginInterface->getIntrospectionAPI()->getOsType())
         {
             case OperatingSystem::WINDOWS:
             {
                 auto library = std::make_shared<Windows::Library>();
-                tracer = std::make_shared<Tracer>(
-                    pluginInterface, std::move(apiTracingConfig), functionDefinitions, library);
+                auto tracedProcessFactory =
+                    std::make_shared<TracedProcessFactory>(pluginInterface, functionDefinitions, library);
+                tracer = std::make_shared<Tracer>(pluginInterface, std::move(apiTracingConfig), tracedProcessFactory);
                 break;
             }
             default:
@@ -78,7 +80,7 @@ namespace ApiTracing
 
     void ApiTracing::unload()
     {
-        tracer->removeHooks();
+        tracer->teardown();
     }
 }
 
