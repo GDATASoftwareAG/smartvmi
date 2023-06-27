@@ -4,6 +4,7 @@
 #include <fmt/core.h>
 #include <future>
 #include <iterator>
+#include <vmicore/callback.h>
 
 using VmiCore::ActiveProcessInformation;
 using VmiCore::addr_t;
@@ -28,8 +29,7 @@ namespace InMemoryScanner
         inMemResultsLogger->bind(
             {{VmiCore::WRITE_TO_FILE_TAG, (this->configuration->getOutputPath() / TEXT_RESULT_FILENAME).string()}});
 
-        pluginInterface->registerProcessTerminationEvent([this]<typename T>(T&& a)
-                                                         { scanProcess(std::forward<T>(a)); });
+        pluginInterface->registerProcessTerminationEvent(VMICORE_SETUP_MEMBER_CALLBACK(scanProcess));
     }
 
     std::unique_ptr<std::string> Scanner::getFilenameFromPath(const std::string& path)
