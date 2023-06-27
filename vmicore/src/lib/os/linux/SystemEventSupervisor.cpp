@@ -2,6 +2,7 @@
 #include "Constants.h"
 #include <fmt/core.h>
 #include <utility>
+#include <vmicore/callback.h>
 #include <vmicore/filename.h>
 
 namespace VmiCore::Linux
@@ -38,8 +39,7 @@ namespace VmiCore::Linux
         auto procForkConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_fork_connector");
         logger->debug("Obtained starting address of proc_fork_connector",
                       {{"VA", fmt::format("{:#x}", procForkConnectorVA)}});
-        auto procForkConnectorCallback =
-            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procForkConnectorCallback);
+        auto procForkConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procForkConnectorCallback);
         procForkConnectorEvent = interruptEventSupervisor->createBreakpoint(
             procForkConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procForkConnectorCallback, false);
     }
@@ -49,8 +49,7 @@ namespace VmiCore::Linux
         auto procExecConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_exec_connector");
         logger->debug("Obtained starting address of proc_exec_connector",
                       {{"VA", fmt::format("{:#x}", procExecConnectorVA)}});
-        auto procExecConnectorCallback =
-            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExecConnectorCallback);
+        auto procExecConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procExecConnectorCallback);
         procExecConnectorEvent = interruptEventSupervisor->createBreakpoint(
             procExecConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExecConnectorCallback, false);
     }
@@ -60,8 +59,7 @@ namespace VmiCore::Linux
         auto procExitConnectorVA = vmiInterface->translateKernelSymbolToVA("proc_exit_connector");
         logger->debug("Obtained starting address of proc_exit_connector",
                       {{"VA", fmt::format("{:#x}", procExitConnectorVA)}});
-        auto procExitConnectorCallback =
-            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::procExitConnectorCallback);
+        auto procExitConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procExitConnectorCallback);
         procExitConnectorEvent = interruptEventSupervisor->createBreakpoint(
             procExitConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExitConnectorCallback, false);
     }

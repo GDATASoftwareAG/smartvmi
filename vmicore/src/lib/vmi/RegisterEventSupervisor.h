@@ -6,7 +6,6 @@
 #include "LibvmiInterface.h"
 #include <functional>
 #include <memory>
-#include <stdexcept>
 
 namespace VmiCore
 {
@@ -20,24 +19,6 @@ namespace VmiCore
         virtual void initializeDtbMonitoring() = 0;
 
         virtual void setContextSwitchCallback(const std::function<void(vmi_event_t*)>& eventCallback) = 0;
-
-        template <class T>
-        static std::function<void(vmi_event_t*)> createContextSwitchCallback(std::shared_ptr<T> callbackObjectShared,
-                                                                             void (T::*callbackFunction)(vmi_event_t*))
-        {
-            return [callbackObject = std::weak_ptr<T>(callbackObjectShared),
-                    callbackFunction](vmi_event_t* contextSwitchEvent)
-            {
-                if (auto targetShared = callbackObject.lock())
-                {
-                    ((*targetShared).*callbackFunction)(contextSwitchEvent);
-                }
-                else
-                {
-                    throw std::runtime_error("Callback target does not exist anymore.");
-                }
-            };
-        }
 
       protected:
         IRegisterEventSupervisor() = default;

@@ -18,22 +18,6 @@ namespace VmiCore
 
         virtual void remove() = 0;
 
-        template <class T>
-        static std::function<BpResponse(IInterruptEvent&)>
-        createBreakpointCallback(const std::weak_ptr<T>& callbackObject,
-                                 BpResponse (T::*callbackFunction)(IInterruptEvent&))
-        {
-            return [callbackObject = callbackObject, callbackFunction = callbackFunction](IInterruptEvent& event)
-            {
-                if (auto targetShared = callbackObject.lock())
-                {
-                    return ((*targetShared).*callbackFunction)(event);
-                }
-
-                throw std::runtime_error("Callback target does not exist anymore.");
-            };
-        }
-
       protected:
         IBreakpoint() = default;
     };
