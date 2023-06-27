@@ -1,6 +1,7 @@
 #include "TemplateCode.h"
 #include "Filenames.h"
 #include <utility>
+#include <vmicore/callback.h>
 
 namespace Template
 {
@@ -14,8 +15,7 @@ namespace Template
           lowLevelIntrospectionApi(std::move(lowLevelIntrospectionApi))
     {
         // Register required events
-        pluginInterface->registerProcessStartEvent([this](auto&& a)
-                                                   { doStuffWithProcessStart(std::forward<decltype(a)>(a)); });
+        pluginInterface->registerProcessStartEvent(VMICORE_SETUP_MEMBER_CALLBACK(doStuffWithProcessStart));
     }
 
     // As an example when a new process is started this callback is called. Check the PluginInterface.h for additional
