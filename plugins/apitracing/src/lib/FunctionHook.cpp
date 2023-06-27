@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fmt/core.h>
 #include <utility>
+#include <vmicore/callback.h>
 
 using VmiCore::addr_t;
 using VmiCore::BpResponse;
@@ -36,7 +37,7 @@ namespace ApiTracing
         auto functionEntrypoint =
             introspectionAPI->translateUserlandSymbolToVA(moduleBaseAddress, processCr3, functionName);
 
-        auto breakpointCallback = IBreakpoint::createBreakpointCallback(weak_from_this(), &FunctionHook::hookCallback);
+        auto breakpointCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(hookCallback);
         interruptEvent = pluginInterface->createBreakpoint(functionEntrypoint, processCr3, breakpointCallback);
 
         hookedProcesses.emplace_back(processCr3);
