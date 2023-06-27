@@ -2,6 +2,7 @@
 #include "../../vmi/VmiException.h"
 #include <fmt/core.h>
 #include <utility>
+#include <vmicore/callback.h>
 #include <vmicore/filename.h>
 
 namespace VmiCore::Windows
@@ -37,8 +38,7 @@ namespace VmiCore::Windows
         auto processNotifyFunctionVA = vmiInterface->translateKernelSymbolToVA("PspCallProcessNotifyRoutines");
         logger->debug("Obtained starting address of PspCallProcessNotifyRoutines",
                       {{"VA", fmt::format("{:#x}", processNotifyFunctionVA)}});
-        auto notifyProcessCallbackFunction = IBreakpoint::createBreakpointCallback(
-            weak_from_this(), &SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback);
+        auto notifyProcessCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(pspCallProcessNotifyRoutinesCallback);
 
         notifyProcessInterruptEvent = interruptEventSupervisor->createBreakpoint(
             processNotifyFunctionVA, vmiInterface->convertPidToDtb(SYSTEM_PID), notifyProcessCallbackFunction, true);
@@ -48,8 +48,7 @@ namespace VmiCore::Windows
     {
         auto bugCheckFunctionVA = vmiInterface->translateKernelSymbolToVA("KeBugCheck2");
         logger->debug("Obtained starting address of KeBugCheck2", {{"VA", fmt::format("{:#x}", bugCheckFunctionVA)}});
-        auto bugCheckCallbackFunction =
-            IBreakpoint::createBreakpointCallback(weak_from_this(), &SystemEventSupervisor::keBugCheck2Callback);
+        auto bugCheckCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(keBugCheck2Callback);
 
         bugCheckInterruptEvent = interruptEventSupervisor->createBreakpoint(
             bugCheckFunctionVA, vmiInterface->convertPidToDtb(SYSTEM_PID), bugCheckCallbackFunction, true);

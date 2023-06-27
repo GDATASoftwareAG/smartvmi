@@ -13,6 +13,7 @@ target_sources(vmicore-public-headers INTERFACE
         vmicore/plugins/IPlugin.h
         vmicore/plugins/PluginInterface.h
         vmicore/vmi/BpResponse.h
+        vmicore/callback.h
         vmicore/vmi/IBreakpoint.h
         vmicore/vmi/IIntrospectionAPI.h
         vmicore/vmi/events/IInterruptEvent.h

@@ -43,24 +43,6 @@ namespace VmiCore
                                    const std::function<void(vmi_event_t*)>& eventCallback,
                                    uint64_t data) override;
 
-        template <class T>
-        static std::function<void(vmi_event_t*)> createSingleStepCallback(std::shared_ptr<T> callbackObjectShared,
-                                                                          void (T::*callbackFunction)(vmi_event_t*))
-        {
-            return [callbackObject = std::weak_ptr<T>(callbackObjectShared),
-                    callbackFunction](vmi_event_t* singlestepEvent)
-            {
-                if (auto targetShared = callbackObject.lock())
-                {
-                    ((*targetShared).*callbackFunction)(singlestepEvent);
-                }
-                else
-                {
-                    throw std::runtime_error("Callback target does not exist anymore.");
-                }
-            };
-        }
-
       private:
         std::shared_ptr<ILibvmiInterface> vmiInterface;
         std::unique_ptr<ILogger> logger;

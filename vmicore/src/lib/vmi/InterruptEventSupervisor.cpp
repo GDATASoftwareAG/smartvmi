@@ -4,6 +4,7 @@
 #include "InterruptGuard.h"
 #include "VmiException.h"
 #include <memory>
+#include <vmicore/callback.h>
 #include <vmicore/filename.h>
 
 namespace VmiCore
@@ -44,10 +45,8 @@ namespace VmiCore
         vmiInterface->registerEvent(*event);
         singleStepSupervisor->initializeSingleStepEvents();
         registerSupervisor->initializeDtbMonitoring();
-        singleStepCallbackFunction = SingleStepSupervisor::createSingleStepCallback(
-            shared_from_this(), &InterruptEventSupervisor::singleStepCallback);
-        contextSwitchCallbackFunction = RegisterEventSupervisor::createContextSwitchCallback(
-            shared_from_this(), &InterruptEventSupervisor::contextSwitchCallback);
+        singleStepCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(singleStepCallback);
+        contextSwitchCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(contextSwitchCallback);
         registerSupervisor->setContextSwitchCallback(contextSwitchCallbackFunction);
     }
 

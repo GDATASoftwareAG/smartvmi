@@ -66,10 +66,8 @@ namespace VmiCore
       protected:
         std::shared_ptr<MockLibvmiInterface> vmiInterface = std::make_shared<MockLibvmiInterface>();
         std::shared_ptr<MockSingleStepSupervisor> singleStepSupervisor = std::make_shared<MockSingleStepSupervisor>();
-        std::shared_ptr<testing::internal::MockFunction<BpResponse(IInterruptEvent&)>> mockFunction =
+        std::shared_ptr<testing::internal::MockFunction<BpResponse(IInterruptEvent&)>> mockBreakpointCallback =
             std::make_shared<testing::MockFunction<BpResponse(IInterruptEvent&)>>();
-        breakpointCallbackFunction_t breakpointCallback = Breakpoint::createBreakpointCallback(
-            std::weak_ptr(mockFunction), &testing::MockFunction<BpResponse(IInterruptEvent&)>::Call);
         std::shared_ptr<NiceMock<MockLogging>> mockLogging = std::make_shared<NiceMock<MockLogging>>();
         std::shared_ptr<InterruptEventSupervisor> interruptEventSupervisor;
         std::shared_ptr<MockActiveProcessesSupervisor> activeProcessesSupervisor =
@@ -79,16 +77,6 @@ namespace VmiCore
             std::make_shared<ActiveProcessInformation>(ActiveProcessInformation{.processCR3 = testSystemCr3});
         std::shared_ptr<RegisterEventSupervisor> contextSwitchHandler =
             std::make_shared<RegisterEventSupervisor>(vmiInterface, mockLogging);
-
-        std::shared_ptr<IBreakpoint>
-        createBreakpointFromMockFunction(const std::shared_ptr<testing::MockFunction<BpResponse(IInterruptEvent&)>>& mf)
-        {
-            auto occupantCallback = Breakpoint::createBreakpointCallback(
-                std::weak_ptr(
-                    static_cast<std::shared_ptr<testing::internal::MockFunction<BpResponse(IInterruptEvent&)>>>(mf)),
-                &testing::MockFunction<BpResponse(IInterruptEvent&)>::Call);
-            return interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, occupantCallback, false);
-        }
 
         void setupBreakpoint(addr_t eventVA, addr_t eventPA, addr_t eventCr3, uint8_t memoryContent = 0xFE)
         {
@@ -157,7 +145,8 @@ namespace VmiCore
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, INT3_BREAKPOINT)).Times(1).RetiresOnSaturation();
 
-        EXPECT_NO_THROW(interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true));
+        EXPECT_NO_THROW(interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true));
     }
 
     TEST_F(InterruptEventFixture, createBreakpoint_newInt3OnNewPage_guardCreatedBeforeInt3Write)
@@ -175,16 +164,19 @@ namespace VmiCore
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, INT3_BREAKPOINT)).Times(1).InSequence(s1).RetiresOnSaturation();
 
-        EXPECT_NO_THROW(interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true));
+        EXPECT_NO_THROW(interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true));
     }
 
     TEST_F(InterruptEventFixture, _defaultInterruptCallback_twoEventsRegistered_bothCallbacksCalled)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3);
         auto occupantMockFunction = std::make_shared<testing::MockFunction<BpResponse(IInterruptEvent&)>>();
-        auto _occupant = createBreakpointFromMockFunction(occupantMockFunction);
+        auto _occupant = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, occupantMockFunction->AsStdFunction(), false);
         auto conflictingInterruptMockFunction = std::make_shared<testing::MockFunction<BpResponse(IInterruptEvent&)>>();
-        auto _conflictingInterrupt = createBreakpointFromMockFunction(conflictingInterruptMockFunction);
+        auto _conflictingInterrupt = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, conflictingInterruptMockFunction->AsStdFunction(), false);
 
         EXPECT_CALL(*occupantMockFunction, Call(_)).Times(1);
         EXPECT_CALL(*conflictingInterruptMockFunction, Call(_)).Times(1);
@@ -222,25 +214,13 @@ namespace VmiCore
         EXPECT_EQ(expectedR8, result);
     }
 
-    TEST_F(InterruptEventFixture, _defaultInterruptCallback_interruptTriggeredButCallbackExpired_doesNotThrow)
-    {
-        setupBreakpoint(testVA1, testPA1, testSystemCr3);
-        auto _interruptEvent =
-            interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
-        auto* interruptEvent = setupInterruptEvent(testVA1, testPA1, x86Regs);
-
-        mockFunction.reset();
-
-        EXPECT_NO_THROW(InterruptEventSupervisor::_defaultInterruptCallback(vmiInstanceStub, interruptEvent));
-    }
-
     TEST_F(InterruptEventFixture, _defaultInterruptCallback_nonRegisteredPA_reinjectsEvent)
     {
         uint64_t unknownVA = 0;
         uint64_t unknownPA = 0;
         setupBreakpoint(testVA1, testPA1, testSystemCr3);
-        auto _interruptEvent =
-            interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto _interruptEvent = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         auto* interruptEvent = setupInterruptEvent(unknownVA, unknownPA, x86Regs);
 
         EXPECT_NO_THROW(InterruptEventSupervisor::_defaultInterruptCallback(vmiInstanceStub, interruptEvent));
@@ -251,7 +231,8 @@ namespace VmiCore
     TEST_F(InterruptEventFixture, _defaultInterruptCallback_interruptEventTriggered_disablesEvent)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto _breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto _breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(1).RetiresOnSaturation();
         auto* interruptEvent = setupInterruptEvent(testVA1, testPA1, x86Regs);
@@ -266,7 +247,8 @@ namespace VmiCore
             .vcpu_id = testVcpuId,
         };
         setupBreakpoint(testVA1, testPA1, testSystemCr3);
-        auto _breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto _breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         singleStepCallbackFunction_t singleStepCallback;
         auto* interruptEvent = setupInterruptEvent(testVA1, testPA1, x86Regs, testVcpuId);
         EXPECT_CALL(*singleStepSupervisor, setSingleStepCallback(testVcpuId, _, _))
@@ -282,7 +264,8 @@ namespace VmiCore
     TEST_F(InterruptEventFixture, _defaultInterruptCallback_interruptEventTriggered_returnsEventResponseNone)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3);
-        auto _breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto _breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         auto* interruptEvent = setupInterruptEvent(testVA1, testPA1, x86Regs);
 
         EXPECT_EQ(InterruptEventSupervisor::_defaultInterruptCallback(vmiInstanceStub, interruptEvent),
@@ -300,7 +283,8 @@ namespace VmiCore
     TEST_F(InterruptEventFixtureWithoutInterruptEventSupervisorTeardown, teardown_singleRemovedInterrupt_noThrow)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
 
         ASSERT_NO_THROW(breakpoint->remove());
 
@@ -310,7 +294,8 @@ namespace VmiCore
     TEST_F(InterruptEventFixtureWithoutInterruptEventSupervisorTeardown, teardown_activeInterrupt_vmPausedAndResumed)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto _breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto _breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         testing::Sequence s1;
         EXPECT_CALL(*vmiInterface, pauseVm()).Times(1).InSequence(s1);
@@ -325,10 +310,10 @@ namespace VmiCore
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
         setupBreakpoint(testVA2, testPA2, testSystemCr3, testOriginalMemoryContent2);
-        auto _breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
-        auto _breakpoint2 =
-            interruptEventSupervisor->createBreakpoint(testVA2, testSystemCr3, breakpointCallback, true);
+        auto _breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
+        auto _breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA2, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(1);
         EXPECT_CALL(*vmiInterface, write8PA(testPA2, testOriginalMemoryContent2)).Times(1);
@@ -341,10 +326,10 @@ namespace VmiCore
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3);
         setupBreakpoint(testVA2, testPA2, testSystemCr3);
-        auto _breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
-        auto _breakpoint2 =
-            interruptEventSupervisor->createBreakpoint(testVA2, testSystemCr3, breakpointCallback, true);
+        auto _breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
+        auto _breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA2, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         EXPECT_CALL(*vmiInterface, clearEvent(_, _)).Times(AnyNumber());
         EXPECT_CALL(*vmiInterface,
                     clearEvent(IsCorrectMemEvent(testPA1 >> PagingDefinitions::numberOfPageIndexBits), false))
@@ -360,7 +345,8 @@ namespace VmiCore
            deleteBreakpoint_breakpointRemovedTwoTimes_noThrow)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         breakpoint->remove();
 
         EXPECT_NO_THROW(breakpoint->remove());
@@ -370,7 +356,8 @@ namespace VmiCore
            deleteBreakpoint_singleBreakpoint_vmPausedAndResumed)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         testing::Sequence s1;
         EXPECT_CALL(*vmiInterface, pauseVm()).Times(1).InSequence(s1);
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(1).InSequence(s1);
@@ -383,7 +370,8 @@ namespace VmiCore
            deleteBreakpoint_noPendingEvents_eventsListenNotCalled)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         ON_CALL(*vmiInterface, areEventsPending()).WillByDefault(Return(0));
         EXPECT_CALL(*vmiInterface, eventsListen(_)).Times(0);
 
@@ -394,7 +382,8 @@ namespace VmiCore
            deleteBreakpoint_pendingEventsPresent_eventsListenCalled)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto breakpoint = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         ON_CALL(*vmiInterface, areEventsPending()).WillByDefault(Return(1));
         EXPECT_CALL(*vmiInterface, eventsListen(_)).Times(1);
 
@@ -406,9 +395,10 @@ namespace VmiCore
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
-        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
-        auto _breakpoint2 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
+        auto _breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(0);
 
         interruptEventSupervisor->deleteBreakpoint(breakpoint1.get());
@@ -418,9 +408,10 @@ namespace VmiCore
            deleteBreakpoint_twoBreakpointsOnSameAddress_VmNotPaused)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
-        auto _breakpoint2 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
+        auto _breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         EXPECT_CALL(*vmiInterface, pauseVm()).Times(0);
         EXPECT_CALL(*vmiInterface, resumeVm()).Times(0);
 
@@ -432,8 +423,10 @@ namespace VmiCore
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3);
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(AnyNumber());
-        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
-        auto breakpoint2 = interruptEventSupervisor->createBreakpoint(testVA1, testSystemCr3, breakpointCallback, true);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
+        auto breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(1);
 
         interruptEventSupervisor->deleteBreakpoint(breakpoint1.get());
@@ -444,8 +437,8 @@ namespace VmiCore
            _defaultContextSwitchCallback_processExclusiveBpInSystemContextSwitch_bPDisabled)
     {
         setupBreakpoint(testVA1, testPA1, testTracedProcessCr3);
-        auto breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testTracedProcessCr3, breakpointCallback, false);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testTracedProcessCr3, mockBreakpointCallback->AsStdFunction(), false);
         interruptSupervisorInternalEvent->reg_event.value = testTracedProcessCr3;
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(0);
 
@@ -456,8 +449,8 @@ namespace VmiCore
            _defaultContextSwitchCallback_globalBpInSystemContextSwitch_bpUnchanged)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3);
-        auto breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testTracedProcessCr3, breakpointCallback, true);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testTracedProcessCr3, mockBreakpointCallback->AsStdFunction(), true);
         interruptSupervisorInternalEvent->reg_event.value = testSystemCr3;
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(0);
 
@@ -469,10 +462,10 @@ namespace VmiCore
     {
         setupBreakpoint(testVA1, testPA1, testTracedProcessCr3);
         setupBreakpoint(testVA2, testPA2, testTracedProcess2Cr3);
-        auto breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testTracedProcessCr3, breakpointCallback, true);
-        auto breakpoint2 =
-            interruptEventSupervisor->createBreakpoint(testVA2, testTracedProcess2Cr3, breakpointCallback, true);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testTracedProcessCr3, mockBreakpointCallback->AsStdFunction(), true);
+        auto breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA2, testTracedProcess2Cr3, mockBreakpointCallback->AsStdFunction(), true);
         interruptSupervisorInternalEvent->reg_event.value = testSystemCr3;
         EXPECT_CALL(*vmiInterface, write8PA(_, _)).Times(0);
 
@@ -485,10 +478,10 @@ namespace VmiCore
 
         setupBreakpoint(testVA1, testPA1, testTracedProcessCr3);
         setupBreakpoint(testVA2, testPA2, testTracedProcess2Cr3);
-        auto breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testTracedProcessCr3, breakpointCallback, true);
-        auto breakpoint2 =
-            interruptEventSupervisor->createBreakpoint(testVA2, testTracedProcess2Cr3, breakpointCallback, false);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testTracedProcessCr3, mockBreakpointCallback->AsStdFunction(), true);
+        auto breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA2, testTracedProcess2Cr3, mockBreakpointCallback->AsStdFunction(), false);
         interruptSupervisorInternalEvent->reg_event.value = testSystemCr3;
         EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(0);
         EXPECT_CALL(*vmiInterface, write8PA(testPA2, testOriginalMemoryContent)).Times(1);
@@ -500,8 +493,8 @@ namespace VmiCore
            _defaultContextSwitchCallback_OneProcessExclusiveBpInTargetProcessContextSwitch_BpEnabled)
     {
         setupBreakpoint(testVA1, testPA1, testTracedProcessCr3);
-        auto breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testTracedProcessCr3, breakpointCallback, false);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testTracedProcessCr3, mockBreakpointCallback->AsStdFunction(), false);
         // Simulating being in another context
         interruptSupervisorInternalEvent->reg_event.value = testSystemCr3;
         interruptEventSupervisor->contextSwitchCallback(interruptSupervisorInternalEvent);
@@ -517,10 +510,10 @@ namespace VmiCore
     {
         setupBreakpoint(testVA1, testPA1, testTracedProcessCr3);
         setupBreakpoint(testVA2, testPA2, testTracedProcessCr3);
-        auto breakpoint1 =
-            interruptEventSupervisor->createBreakpoint(testVA1, testTracedProcessCr3, breakpointCallback, false);
-        auto breakpoint2 =
-            interruptEventSupervisor->createBreakpoint(testVA2, testTracedProcess2Cr3, breakpointCallback, true);
+        auto breakpoint1 = interruptEventSupervisor->createBreakpoint(
+            testVA1, testTracedProcessCr3, mockBreakpointCallback->AsStdFunction(), false);
+        auto breakpoint2 = interruptEventSupervisor->createBreakpoint(
+            testVA2, testTracedProcess2Cr3, mockBreakpointCallback->AsStdFunction(), true);
         // Simulating being in another context
         interruptSupervisorInternalEvent->reg_event.value = testSystemCr3;
         interruptEventSupervisor->contextSwitchCallback(interruptSupervisorInternalEvent);
