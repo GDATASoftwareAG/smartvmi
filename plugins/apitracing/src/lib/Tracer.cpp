@@ -2,6 +2,7 @@
 #include "Filenames.h"
 #include <filesystem>
 #include <vector>
+#include <vmicore/callback.h>
 
 using VmiCore::ActiveProcessInformation;
 using VmiCore::Plugin::PluginInterface;
@@ -20,7 +21,7 @@ namespace ApiTracing
     {
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
 
-        pluginInterface->registerProcessStartEvent([this]<typename T>(T&& a) { addHooks(std::forward<T>(a)); });
+        pluginInterface->registerProcessStartEvent(VMICORE_SETUP_MEMBER_CALLBACK(addHooks));
     }
 
     void Tracer::initLoadedModules(const ActiveProcessInformation& processInformation)
