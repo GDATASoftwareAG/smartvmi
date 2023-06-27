@@ -1,14 +1,7 @@
 #include "../io/mock_Logging.h"
-#include "../os/windows/mock_ActiveProcessesSupervisor.h"
-#include "mock_InterruptEventSupervisor.h"
 #include "mock_LibvmiInterface.h"
-#include "mock_SingleStepSupervisor.h"
 #include "vmi/RegisterEventSupervisor.h"
 #include <gtest/gtest.h>
-#include <map>
-#include <os/PagingDefinitions.h>
-#include <vmi/VmiException.h>
-#include <vmicore/vmi/IBreakpoint.h>
 #include <vmicore_test/io/mock_Logger.h>
 
 using testing::_;
@@ -23,16 +16,6 @@ namespace VmiCore
 {
     namespace
     {
-        constexpr uint64_t testVA1 = 0x4321 * PagingDefinitions::pageSizeInBytes,
-                           testVA2 = 0x8765 * PagingDefinitions::pageSizeInBytes;
-        constexpr uint64_t testPA1 = 0x1234 * PagingDefinitions::pageSizeInBytes,
-                           testPA2 = 0x5678 * PagingDefinitions::pageSizeInBytes;
-        constexpr uint64_t testSystemCr3 = 0xaaa;
-        constexpr uint64_t testTracedProcessCr3 = 0xbbb;
-        constexpr uint64_t testOriginalMemoryContent = 0xFE, testOriginalMemoryContent2 = 0xFF;
-        constexpr uint8_t INT3_BREAKPOINT = 0xCC;
-        constexpr uint64_t expectedR8 = 0x123;
-
         constexpr vmi_instance* vmiInstanceStub = nullptr;
     }
 
