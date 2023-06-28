@@ -4700,10 +4700,28 @@ Modules:
         pszPath: LPCTSTR
       ReturnValue: BOOL
 Structures:
+  CONTEXT:
+    CONTEXT: PVOID
+  EXCEPTION_RECORD:
+    ExceptionCode: DWORD
+    ExceptionFlags: DWORD
+    ExceptionRecord: EXCEPTION_RECORD
+    ExceptionAddress: PVOID
+    NumberParameters: DWORD
+    ExceptionInformation: ULONG_PTR
+  ITEMIDLIST:
+    mkid: SHITEMID
   PCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-   CONTEXT: PVOID
+   CONTEXT: CONTEXT
+  PKEY_VALUE_ENTRY:
+    KEY_VALUE_ENTRY: KEY_VALUE_ENTRY
+  KEY_VALUE_ENTRY:
+    ValueName: PUNICODE_STRING
+    DataLength: ULONG
+    DataOffnset: ULONG
+    Type: ULONG
   LPCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-   CONTEXT: PVOID
+   CONTEXT: CONTEXT
   LPDWORD:
     DWORD: DWORD
   PCLIENT_ID:
@@ -4730,7 +4748,7 @@ Structures:
   PHKEY:
     HKEY: HKEY
   PIDLIST_ABSOLUTE:
-    ITEMIDLIST: void  # TODO define this struct https://learn.microsoft.com/en-us/windows/win32/api/shtypes/ns-shtypes-itemidlist
+    ITEMIDLIST: ITEMIDLIST
   PSIZE_T:
     SIZE_T: SIZE_T
   PUSHORT:
@@ -4751,6 +4769,9 @@ Structures:
     Attributes: DWORD
     SecurityDescriptor: PVOID
     SecurityQualityOfService: PVOID
+  SHITEMID:
+    cb: USHORT
+    abID: BYTE
   LPSTARTUPINFOA:
     cb: DWORD
     lpReserved: LPSTR
@@ -4805,7 +4826,6 @@ HighLevelParameterTypes:
     DEFAULT: unsigned int
     DWORD: unsigned long
     ENUM: unsigned short
-    EXCEPTION_RECORD: PVOID
     FARPROC: unsigned int
     FILE_INFORMATION_CLASS: ENUM
     HANDLE: unsigned int
@@ -4826,6 +4846,7 @@ HighLevelParameterTypes:
     LPTHREAD_START_ROUTINE: PVOID
     LPWSTR: LPWSTR_32
     LPBYTE: unsigned int
+    LPCONTEXT: CONTEXT
     LPCVOID: unsigned int
     LPDWORD: unsigned int
     LPVOID: unsigned int
@@ -4835,7 +4856,6 @@ HighLevelParameterTypes:
     PIO_APC_ROUTINE: PVOID
     PIO_STATUS_BLOCK: PVOID
     PINITIAL_TEB: PVOID
-    PKEY_VALUE_ENTRY: PVOID
     PPS_ATTRIBUTE_LIST: PVOID
     PS_CREATE_STATE: unsigned short
     PRTL_USER_PROCESS_PARAMETERS: PVOID
@@ -4866,7 +4886,6 @@ HighLevelParameterTypes:
     DEFAULT: unsigned __int64
     DWORD: unsigned long
     ENUM: unsigned short
-    EXCEPTION_RECORD: PVOID # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_record
     FARPROC: unsigned __int64
     FILE_INFORMATION_CLASS: ENUM
     HANDLE: unsigned __int64
@@ -4898,7 +4917,6 @@ HighLevelParameterTypes:
     PIO_APC_ROUTINE: PVOID # TODO find definition
     PIO_STATUS_BLOCK: PVOID # TODO add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
     PINITIAL_TEB: PVOID # TODO add struct definition from http://undocumented.ntinternals.net/
-    PKEY_VALUE_ENTRY: PVOID # TODO Add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_key_value_entry
     PPS_ATTRIBUTE_LIST: PVOID # TODO add struct https://securitytimes.medium.com/path-to-process-injection-bypass-userland-api-hooking-a8a49ae5def6
     PS_CREATE_STATE: unsigned short
     PRTL_USER_PROCESS_PARAMETERS: PVOID # TODO Add struct definition https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-rtl_user_process_parameters
