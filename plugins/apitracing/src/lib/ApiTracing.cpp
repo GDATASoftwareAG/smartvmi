@@ -8,7 +8,7 @@
 
 #include "ApiTracing.h"
 #include "Filenames.h"
-#include "config/TracingTargetsParser.h"
+#include "config/Config.h"
 #include "os/windows/Library.h"
 #include <tclap/CmdLine.h>
 #include <vmicore/io/ILogger.h>
@@ -37,7 +37,7 @@ namespace ApiTracing
             "functionDefinitions",
             "Path to the file containing the required definitions for traced functions",
             false,
-            std::filesystem::path(CONFIG_DIR) / "functiondefinitions" / "functionDefinitions.yaml",
+            std::filesystem::path("."),
             "/path/to/functionDefinitions.yaml",
             cmd};
         TCLAP::ValueArg traceProcessName{
@@ -46,15 +46,19 @@ namespace ApiTracing
 
         logger->debug("ApiTracing plugin version info", {{"Version", PLUGIN_VERSION}, {"BuildNumber", BUILD_VERSION}});
 
-        auto configPath = config.configFilePath().value_or(std::filesystem::path(CONFIG_DIR) / "configuration.yml");
-        auto tracingTargetsParser = std::make_unique<TracingTargetsParser>(configPath);
+        auto apiTracingConfig = std::make_unique<Config>(config);
 
+        if (functionDefinitionsPath.isSet())
+        {
+            apiTracingConfig->setFunctionDefinitionsPath(functionDefinitionsPath);
+        }
         if (traceProcessName.isSet())
         {
-            tracingTargetsParser->addTracingTarget(traceProcessName);
+            apiTracingConfig->addTracingTarget(traceProcessName);
         }
 
-        auto functionDefinitions = std::make_shared<FunctionDefinitions>(functionDefinitionsPath);
+        auto functionDefinitions =
+            std::make_shared<FunctionDefinitions>(apiTracingConfig->getFunctionDefinitionsPath());
         functionDefinitions->init();
         switch (pluginInterface->getIntrospectionAPI()->getOsType())
         {
@@ -62,7 +66,7 @@ namespace ApiTracing
             {
                 auto library = std::make_shared<Windows::Library>();
                 tracer = std::make_shared<Tracer>(
-                    pluginInterface, std::move(tracingTargetsParser), functionDefinitions, library);
+                    pluginInterface, std::move(apiTracingConfig), functionDefinitions, library);
                 break;
             }
             default:

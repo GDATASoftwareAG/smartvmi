@@ -1,7 +1,7 @@
 #include "../src/lib/Tracer.h"
 #include "../src/lib/os/windows/Library.h"
+#include "mock_Config.h"
 #include "mock_FunctionDefinitions.h"
-#include "mock_TracingTargetsParser.h"
 #include <gmock/gmock-matchers.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -84,8 +84,7 @@ namespace ApiTracing
             ON_CALL(*mockPluginInterface, newNamedLogger(_))
                 .WillByDefault([]() { return std::make_unique<NiceMock<VmiCore::MockLogger>>(); });
 
-            std::unique_ptr<MockTracingTargetsParser> mockTracingTargetsParser =
-                std::make_unique<MockTracingTargetsParser>();
+            std::unique_ptr<MockConfig> mockTracingTargetsParser = std::make_unique<MockConfig>();
             setupTracingTargetsParser(*mockTracingTargetsParser,
                                       {{targetProcessName, true, moduleTracingInformation},
                                        {emptyConfigProcessName, false, {}},
@@ -181,7 +180,7 @@ namespace ApiTracing
                                                   true});
         }
 
-        static void setupTracingTargetsParser(const MockTracingTargetsParser& tracingTargetsParser,
+        static void setupTracingTargetsParser(const MockConfig& tracingTargetsParser,
                                               const std::vector<TracingProfile>& tracingProfiles)
         {
             for (const auto& profile : tracingProfiles)

@@ -1,8 +1,8 @@
 add_executable(apitracing-test
+        Config_UnitTest.cpp
         FunctionDefinitions_UnitTest.cpp
         FunctionHook_Unittest.cpp
         Tracer_Unittest.cpp
-        TracingTargetsParser_UnitTest.cpp
         Extractor_Unittest.cpp)
 target_link_libraries(apitracing-test apitracing-obj pthread)
 
@@ -41,5 +41,3 @@ add_custom_command(
 
 include(GoogleTest)
 gtest_discover_tests(apitracing-test)
-
-

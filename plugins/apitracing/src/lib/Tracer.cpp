@@ -10,7 +10,7 @@ using VmiCore::Plugin::PluginInterface;
 namespace ApiTracing
 {
     Tracer::Tracer(VmiCore::Plugin::PluginInterface* pluginInterface,
-                   std::unique_ptr<ITracingTargetsParser> tracingTargetsParser,
+                   std::unique_ptr<IConfig> tracingTargetsParser,
                    std::shared_ptr<IFunctionDefinitions> functionDefinitions,
                    std::shared_ptr<ILibrary> library)
         : pluginInterface(pluginInterface),
