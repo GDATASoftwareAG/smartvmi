@@ -4,8 +4,8 @@ check_pie_supported()
 add_library(apitracing-obj OBJECT
         ApiTracing.cpp
         Tracer.cpp
+        config/Config.cpp
         config/FunctionDefinitions.cpp
-        config/TracingTargetsParser.cpp
         os/windows/Library.cpp
         FunctionHook.cpp
         os/Extractor.cpp)
@@ -39,6 +39,7 @@ option(YAML_BUILD_SHARED_LIBS "" OFF)
 option(YAML_CPP_BUILD_TOOLS "" OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+target_compile_definitions(apitracing-obj PUBLIC YAML_CPP_SUPPORT)
 target_link_libraries(apitracing-obj PUBLIC yaml-cpp)
 
 # Add public vmicore headers

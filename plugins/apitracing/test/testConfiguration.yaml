@@ -1,4 +1,5 @@
 ---
+function_definitions: testFunctionDefinitions.yaml
 profiles:
   default:
     trace_children: true

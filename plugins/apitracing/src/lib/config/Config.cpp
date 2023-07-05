@@ -1,16 +1,28 @@
-#include "TracingTargetsParser.h"
+#include "Config.h"
 #include "TracingDefinitions.h"
+#include <vmicore/plugins/IPluginConfig.h>
 
 namespace ApiTracing
 {
-    TracingTargetsParser::TracingTargetsParser(const std::filesystem::path& tracingTargetsPath)
-        : configRootNode(YAML::LoadFile(tracingTargetsPath))
+    Config::Config(const VmiCore::Plugin::IPluginConfig& pluginConfig)
     {
-        parseProfiles();
-        parseTracingTargets();
+        auto configRootNode = pluginConfig.rootNode();
+        if (auto configFilePath = pluginConfig.configFilePath())
+        {
+            configFileDir = configFilePath.value().parent_path();
+            configRootNode = YAML::LoadFile(configFilePath.value());
+        }
+        else
+        {
+            configFileDir = pluginConfig.mainConfigFileLocation();
+        }
+
+        parseFunctionDefinitionsPath(configRootNode);
+        parseProfiles(configRootNode);
+        parseTracingTargets(configRootNode);
     }
 
-    TracingProfile TracingTargetsParser::parseProfile(const YAML::Node& profileNode, const std::string& name) const
+    TracingProfile Config::parseProfile(const YAML::Node& profileNode, const std::string& name)
     {
         TracingProfile profile{.name = name,
                                .traceChilds = profileNode["trace_children"].as<bool>(),
@@ -31,19 +43,19 @@ namespace ApiTracing
         return profile;
     }
 
-    void TracingTargetsParser::parseProfiles()
+    void Config::parseProfiles(const YAML::Node& rootNode)
     {
-        for (const auto& profileNode : configRootNode["profiles"])
+        for (const auto& profileNode : rootNode["profiles"])
         {
             auto profile = parseProfile(profileNode.second, profileNode.first.as<std::string>());
             profiles[profile.name] = profile;
         }
     }
 
-    void TracingTargetsParser::parseTracingTargets()
+    void Config::parseTracingTargets(const YAML::Node& rootNode)
     {
 
-        for (const auto& process : configRootNode["traced_processes"])
+        for (const auto& process : rootNode["traced_processes"])
         {
             if (process.second["profile"])
             {
@@ -57,7 +69,16 @@ namespace ApiTracing
         }
     }
 
-    std::optional<TracingProfile> TracingTargetsParser::getTracingProfile(std::string_view processName) const
+    void Config::parseFunctionDefinitionsPath(const YAML::Node& rootNode)
+    {
+        functionDefinitions = std::filesystem::path(rootNode["function_definitions"].as<std::string>());
+        if (functionDefinitions.is_relative())
+        {
+            functionDefinitions = configFileDir / functionDefinitions;
+        }
+    }
+
+    std::optional<TracingProfile> Config::getTracingProfile(std::string_view processName) const
     {
         auto tracingProfile = processTracingProfiles.find(processName);
         if (tracingProfile == processTracingProfiles.end())
@@ -68,8 +89,18 @@ namespace ApiTracing
         return tracingProfile->second;
     }
 
-    void TracingTargetsParser::addTracingTarget(const std::string& name)
+    std::filesystem::path Config::getFunctionDefinitionsPath() const
+    {
+        return functionDefinitions;
+    }
+
+    void Config::addTracingTarget(const std::string& name)
     {
         processTracingProfiles.emplace(name, profiles["default"]);
+    }
+
+    void Config::setFunctionDefinitionsPath(const std::filesystem::path& path)
+    {
+        functionDefinitions = path;
     }
 }

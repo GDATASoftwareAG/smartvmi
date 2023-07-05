@@ -3,9 +3,9 @@
 
 #include "ConstantDefinitions.h"
 #include "FunctionHook.h"
+#include "config/Config.h"
 #include "config/FunctionDefinitions.h"
 #include "config/TracingDefinitions.h"
-#include "config/TracingTargetsParser.h"
 #include "os/ILibrary.h"
 #include <map>
 #include <memory>
@@ -19,7 +19,7 @@ namespace ApiTracing
     {
       public:
         Tracer(VmiCore::Plugin::PluginInterface* pluginInterface,
-               std::unique_ptr<ITracingTargetsParser> tracingTargetsParser,
+               std::unique_ptr<IConfig> tracingTargetsParser,
                std::shared_ptr<IFunctionDefinitions> functionDefinitions,
                std::shared_ptr<ILibrary> library);
 
@@ -33,7 +33,7 @@ namespace ApiTracing
 
       private:
         VmiCore::Plugin::PluginInterface* pluginInterface;
-        std::unique_ptr<ITracingTargetsParser> tracingTargetsParser;
+        std::unique_ptr<IConfig> tracingTargetsParser;
         std::map<std::string, uint64_t, std::less<>> loadedModules;
         std::map<pid_t, TracingProfile> tracedProcesses;
         std::shared_ptr<IFunctionDefinitions> functionDefinitions;
