@@ -14,6 +14,7 @@ target_sources(vmicore-public-test-headers INTERFACE
         vmicore_test/io/mock_Logger.h
         vmicore_test/os/mock_MemoryRegionExtractor.h
         vmicore_test/os/mock_PageProtection.h
+        vmicore_test/plugins/mock_PluginConfig.h
         vmicore_test/plugins/mock_PluginInterface.h
         vmicore_test/vmi/mock_Breakpoint.h
         vmicore_test/vmi/mock_InterruptEvent.h
