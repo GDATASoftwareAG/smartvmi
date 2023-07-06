@@ -20,7 +20,8 @@ namespace VmiCore
         for (const auto& node : configRootNode["plugin_system"]["plugins"])
         {
             configuration.plugins.insert(
-                std::make_pair(node.first.as<std::string>(), std::make_shared<PluginConfig>(node.second)));
+                std::make_pair(node.first.as<std::string>(),
+                               std::make_shared<PluginConfig>(node.second, absolute(configurationPath).parent_path())));
         }
     }
 

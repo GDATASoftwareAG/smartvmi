@@ -8,7 +8,7 @@ namespace VmiCore
     class PluginConfig : public Plugin::IPluginConfig
     {
       public:
-        explicit PluginConfig(const YAML::Node& pluginNode);
+        PluginConfig(const YAML::Node& pluginNode, std::filesystem::path mainConfigFileDir);
 
         ~PluginConfig() override = default;
 
@@ -20,6 +20,7 @@ namespace VmiCore
 
       private:
         YAML::Node pluginRootNode;
+        std::filesystem::path mainConfigFileDir;
     };
 }
 
