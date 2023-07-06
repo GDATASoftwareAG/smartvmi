@@ -18,6 +18,11 @@ namespace VmiCore
         return pluginRootNode;
     }
 
+    std::filesystem::path PluginConfig::mainConfigFileLocation() const
+    {
+        return mainConfigFileDir;
+    }
+
     std::optional<std::filesystem::path> PluginConfig::configFilePath() const
     {
         try

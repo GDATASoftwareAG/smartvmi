@@ -16,6 +16,8 @@ namespace VmiCore
 
         [[nodiscard]] const YAML::Node& rootNode() const override;
 
+        [[nodiscard]] std::filesystem::path mainConfigFileLocation() const override;
+
         [[nodiscard]] std::optional<std::filesystem::path> configFilePath() const override;
 
       private:

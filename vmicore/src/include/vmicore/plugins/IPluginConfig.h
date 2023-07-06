@@ -30,6 +30,8 @@ namespace VmiCore::Plugin
         }
 #endif
 
+        [[nodiscard]] virtual std::filesystem::path mainConfigFileLocation() const = 0;
+
         [[nodiscard]] virtual std::optional<std::filesystem::path> configFilePath() const = 0;
 
       protected:
