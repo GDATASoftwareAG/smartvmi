@@ -36,7 +36,7 @@ option(YAML_BUILD_SHARED_LIBS "" OFF)
 option(YAML_CPP_BUILD_TOOLS "" OFF)
 FetchContent_MakeAvailable(yaml-cpp)
 set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
-add_compile_definitions(YAML_CPP_SUPPORT)
+target_compile_definitions(inmemoryscanner-obj PUBLIC YAML_CPP_SUPPORT)
 target_link_libraries(inmemoryscanner-obj PUBLIC yaml-cpp)
 
 # Setup fmt library
