@@ -3752,7 +3752,7 @@ Modules:
       Parameters:
         Action: SHUTDOWN_ACTION
       ReturnValue: NTSTATUS
-    NtCreateThread: # TODO Verify this function
+    NtCreateThread:
       Parameters:
         ThreadHandle: PHANDLE
         DesiredAccess: ACCESS_MASK
