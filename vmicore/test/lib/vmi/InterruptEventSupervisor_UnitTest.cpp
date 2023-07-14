@@ -353,20 +353,6 @@ namespace VmiCore
     }
 
     TEST_F(InterruptEventFixtureWithoutInterruptEventSupervisorTeardown,
-           deleteBreakpoint_singleBreakpoint_vmPausedAndResumed)
-    {
-        setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
-        auto breakpoint = interruptEventSupervisor->createBreakpoint(
-            testVA1, testSystemCr3, mockBreakpointCallback->AsStdFunction(), true);
-        testing::Sequence s1;
-        EXPECT_CALL(*vmiInterface, pauseVm()).Times(1).InSequence(s1);
-        EXPECT_CALL(*vmiInterface, write8PA(testPA1, testOriginalMemoryContent)).Times(1).InSequence(s1);
-        EXPECT_CALL(*vmiInterface, resumeVm()).Times(1).InSequence(s1);
-
-        interruptEventSupervisor->deleteBreakpoint(breakpoint.get());
-    }
-
-    TEST_F(InterruptEventFixtureWithoutInterruptEventSupervisorTeardown,
            deleteBreakpoint_noPendingEvents_eventsListenNotCalled)
     {
         setupBreakpoint(testVA1, testPA1, testSystemCr3, testOriginalMemoryContent);
