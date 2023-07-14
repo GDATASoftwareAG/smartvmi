@@ -7,6 +7,7 @@ add_executable(vmicore-test
         lib/vmi/InterruptEventSupervisor_UnitTest.cpp
         lib/vmi/LibvmiInterface_UnitTest.cpp
         lib/vmi/SingleStepSupervisor_UnitTest.cpp)
+target_compile_options(vmicore-test PRIVATE -Wno-missing-field-initializers)
 target_link_libraries(vmicore-test vmicore-lib pthread)
 
 # Setup bundled google test framework
