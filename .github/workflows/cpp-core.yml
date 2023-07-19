@@ -1,0 +1,56 @@
+---
+name: CPP CI VMICore
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - 'vmicore/**.h'
+      - 'vmicore/**.cpp'
+      - 'vmicore/**/CMakeLists.txt'
+      - 'vmicore/CMakePresets.json'
+      - 'vmicore/.clang-tidy'
+      - 'vmicore/.clang-format'
+      - 'vmicore/sonar-project.properties'
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - 'vmicore/**.h'
+      - 'vmicore/**.cpp'
+      - 'vmicore/**/CMakeLists.txt'
+      - 'vmicore/CMakePresets.json'
+      - 'vmicore/.clang-tidy'
+      - 'vmicore/.clang-format'
+      - 'vmicore/sonar-project.properties'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    container:
+      image: gdatacyberdefense/clang-format:16
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Perform C++ format check
+        run: find vmicore/ -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
+
+  build_core:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+    strategy:
+        matrix:
+          compiler: [clang, gcc]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and test vmicore
+        run: |
+          cmake --preset ${{ matrix.compiler }}-debug
+          cmake --build --preset ${{ matrix.compiler }}-build-debug
+          ctest --preset ${{ matrix.compiler }}-test
+        working-directory: vmicore
