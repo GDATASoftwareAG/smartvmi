@@ -1,0 +1,56 @@
+---
+name: CPP CI InMemory
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - 'plugins/inmemoryscanner/**.h'
+      - 'plugins/inmemoryscanner/**.cpp'
+      - 'plugins/inmemoryscanner/**/CMakeLists.txt'
+      - 'plugins/inmemoryscanner/CMakePresets.json'
+      - 'plugins/inmemoryscanner/.clang-tidy'
+      - 'plugins/inmemoryscanner/.clang-format'
+      - 'plugins/inmemoryscanner/sonar-project.properties'
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - 'plugins/inmemoryscanner/**.h'
+      - 'plugins/inmemoryscanner/**.cpp'
+      - 'plugins/inmemoryscanner/**/CMakeLists.txt'
+      - 'plugins/inmemoryscanner/CMakePresets.json'
+      - 'plugins/inmemoryscanner/.clang-tidy'
+      - 'plugins/inmemoryscanner/.clang-format'
+      - 'plugins/inmemoryscanner/sonar-project.properties'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    container:
+      image: gdatacyberdefense/clang-format:16
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Perform C++ format check
+        run: find plugins/inmemoryscanner/ -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
+
+  build_inmemoryscanner:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+    strategy:
+      matrix:
+        compiler: [ clang, gcc ]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and test inmemoryscanner
+        run: |
+          cmake --preset ${{ matrix.compiler }}-debug
+          cmake --build --preset ${{ matrix.compiler }}-build-debug
+          ctest --preset ${{ matrix.compiler }}-test
+        working-directory: plugins/inmemoryscanner

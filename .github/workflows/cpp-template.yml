@@ -1,0 +1,56 @@
+---
+name: CPP CI Template
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - 'plugins/template/**.h'
+      - 'plugins/template/**.cpp'
+      - 'plugins/template/**/CMakeLists.txt'
+      - 'plugins/template/CMakePresets.json'
+      - 'plugins/template/.clang-tidy'
+      - 'plugins/template/.clang-format'
+      - 'plugins/template/sonar-project.properties'
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - 'plugins/template/**.h'
+      - 'plugins/template/**.cpp'
+      - 'plugins/template/**/CMakeLists.txt'
+      - 'plugins/template/CMakePresets.json'
+      - 'plugins/template/.clang-tidy'
+      - 'plugins/template/.clang-format'
+      - 'plugins/template/sonar-project.properties'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    container:
+      image: gdatacyberdefense/clang-format:16
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Perform C++ format check
+        run: find plugins/template/ -iname *.h -o -iname *.cpp | xargs clang-format --style=file --dry-run --Werror
+
+  build_template:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gdatasoftwareag/vmi-build
+    strategy:
+      matrix:
+        compiler: [ clang, gcc ]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and test template
+        run: |
+          cmake --preset ${{ matrix.compiler }}-debug
+          cmake --build --preset ${{ matrix.compiler }}-build-debug
+          ctest --preset ${{ matrix.compiler }}-test
+        working-directory: plugins/template
