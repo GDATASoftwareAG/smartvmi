@@ -30,6 +30,8 @@ namespace VmiCore
 
         [[nodiscard]] virtual uint64_t getCr3() const = 0;
 
+        [[nodiscard]] virtual uint64_t getGs() const = 0;
+
       protected:
         IRegisterReadable() = default;
     };

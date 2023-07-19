@@ -56,6 +56,11 @@ namespace VmiCore
         return libvmiEvent->x86_regs->cr3;
     }
 
+    uint64_t Event::getGs() const
+    {
+        return libvmiEvent->x86_regs->gs_base;
+    }
+
     addr_t Event::getGla() const
     {
         switch (libvmiEvent->type)

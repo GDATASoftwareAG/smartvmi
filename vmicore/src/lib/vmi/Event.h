@@ -34,6 +34,8 @@ namespace VmiCore
 
         [[nodiscard]] uint64_t getCr3() const override;
 
+        [[nodiscard]] uint64_t getGs() const override;
+
         [[nodiscard]] addr_t getGla() const override;
 
         [[nodiscard]] addr_t getGfn() const override;
