@@ -43,10 +43,10 @@ void Cmdline::parse(int argc, const char** argv)
     pluginArgs = convertPluginArgValuesToArgVectors(pluginArguments.getValue());
 }
 
-std::map<std::string, std::vector<std::string>, std::equal_to<>>
+std::map<std::string, std::vector<std::string>, std::less<>>
 Cmdline::convertPluginArgValuesToArgVectors(const std::vector<std::pair<std::string, std::string>>& pluginArgs)
 {
-    std::map<std::string, std::vector<std::string>, std::equal_to<>> pluginArgsMap{};
+    std::map<std::string, std::vector<std::string>, std::less<>> pluginArgsMap{};
     for (const auto& el : pluginArgs)
     {
         auto pluginFileName = fmt::format("lib{}.so", el.first);

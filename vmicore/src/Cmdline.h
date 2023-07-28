@@ -45,12 +45,12 @@ class Cmdline
     TCLAP::SwitchArg enableDebugArgument{"", "grpc-debug", "Enable additional console logs for gRPC mode.", cmd};
     TCLAP::MultiArg<std::pair<std::string, std::string>> pluginArguments{
         "p", "plugin", "Plugin command line parameters.", false, "plugin: cmdline args", cmd};
-    std::map<std::string, std::vector<std::string>, std::equal_to<>> pluginArgs{};
+    std::map<std::string, std::vector<std::string>, std::less<>> pluginArgs{};
 
     void parse(int argc, const char** argv);
 
   private:
-    static std::map<std::string, std::vector<std::string>, std::equal_to<>>
+    static std::map<std::string, std::vector<std::string>, std::less<>>
     convertPluginArgValuesToArgVectors(const std::vector<std::pair<std::string, std::string>>& pluginArgs);
 
     static std::vector<std::string> splitArgs(const std::string& arg);
