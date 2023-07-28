@@ -27,7 +27,7 @@ namespace VmiCore
                std::shared_ptr<ISingleStepSupervisor> singleStepSupervisor,
                std::shared_ptr<IRegisterEventSupervisor> contextSwitchHandler);
 
-        uint run(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs);
+        uint run(const std::map<std::string, std::vector<std::string>, std::less<>>& pluginArgs);
 
       private:
         std::shared_ptr<IConfigParser> configInterface;

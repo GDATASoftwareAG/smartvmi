@@ -47,7 +47,7 @@ namespace VmiCore
 
         MOCK_METHOD(void,
                     initializePlugins,
-                    ((const std::map<std::string, std::vector<std::string>, std::equal_to<>>&)),
+                    ((const std::map<std::string, std::vector<std::string>, std::less<>>&)),
                     (override));
 
         MOCK_METHOD(void,

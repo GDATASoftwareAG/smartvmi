@@ -124,7 +124,7 @@ namespace VmiCore
         }
     }
 
-    uint VmiHub::run(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs)
+    uint VmiHub::run(const std::map<std::string, std::vector<std::string>, std::less<>>& pluginArgs)
     {
         vmiInterface->initializeVmi();
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;

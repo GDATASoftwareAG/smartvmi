@@ -224,8 +224,7 @@ namespace VmiCore
         plugins.emplace_back(pluginName, std::move(plugin));
     }
 
-    void
-    PluginSystem::initializePlugins(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs)
+    void PluginSystem::initializePlugins(const std::map<std::string, std::vector<std::string>, std::less<>>& pluginArgs)
     {
         for (const auto& [name, config] : configInterface->getPlugins())
         {

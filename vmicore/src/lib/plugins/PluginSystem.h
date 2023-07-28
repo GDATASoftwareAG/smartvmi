@@ -24,7 +24,7 @@ namespace VmiCore
         ~IPluginSystem() override = default;
 
         virtual void
-        initializePlugins(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs) = 0;
+        initializePlugins(const std::map<std::string, std::vector<std::string>, std::less<>>& pluginArgs) = 0;
 
         virtual void passProcessStartEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) = 0;
@@ -51,8 +51,7 @@ namespace VmiCore
 
         ~PluginSystem() override;
 
-        void
-        initializePlugins(const std::map<std::string, std::vector<std::string>, std::equal_to<>>& pluginArgs) override;
+        void initializePlugins(const std::map<std::string, std::vector<std::string>, std::less<>>& pluginArgs) override;
 
         void passProcessStartEventToRegisteredPlugins(
             std::shared_ptr<const ActiveProcessInformation> processInformation) override;
