@@ -15,6 +15,7 @@ use async_std::task;
 use cxx::CxxVector;
 use futures::TryFutureExt;
 use std::error::Error;
+use std::fmt::Debug;
 use std::pin::Pin;
 use std::result;
 use std::time::SystemTime;
@@ -227,11 +228,17 @@ impl GRPCServer {
         Ok(())
     }
 
-    pub async fn wait_for_termination<T>(stream: &mut Streaming<T>) {
-        if let Ok(msg) = stream.message().await {
-            match msg {
-                Some(_) => println!("Received log request"),
-                None => println!("Connection closed"),
+    pub async fn wait_for_termination<T: Debug>(stream: &mut Streaming<T>) {
+        loop {
+            match stream.message().await {
+                Ok(msg) => match msg {
+                    Some(request) => println!("Received client request: {request:#?}"),
+                    None => {
+                        println!("Connection closed");
+                        break;
+                    }
+                },
+                Err(e) => println!("Error in client channel: {e}"),
             }
         }
     }
