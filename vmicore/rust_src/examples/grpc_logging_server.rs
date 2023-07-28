@@ -19,8 +19,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Writing log line");
     logger.log(Level::INFO, "Hello World", Vec::default())?;
 
-    println!("Wait for input...");
-    std::io::stdin().read_line(&mut String::new())?;
+    let (trigger, listener) = triggered::trigger();
+    ctrlc::set_handler(move || trigger.trigger()).unwrap();
+
+    println!("Press Ctrl-C to terminate...");
+    listener.wait();
     println!("Stopping server...");
     srv_handle.stop_server(2000);
     println!("Server stopped");
