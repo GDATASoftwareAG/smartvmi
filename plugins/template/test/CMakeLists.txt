@@ -1,5 +1,6 @@
 add_executable(template-test
         TemplateCode_unittest.cpp)
+target_compile_options(template-test PRIVATE -Wno-missing-field-initializers)
 target_link_libraries(template-test template-obj pthread)
 
 # Setup bundled google test framework
