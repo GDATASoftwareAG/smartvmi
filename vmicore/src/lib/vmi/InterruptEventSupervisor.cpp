@@ -85,7 +85,8 @@ namespace VmiCore
             bpPage =
                 breakpointsByGFN
                     .insert({targetGFN,
-                             BpPage{// One PageGuard guards a whole memory page on which several interrupts may reside
+                             BpPage{.Breakpoints = {},
+                                    // One PageGuard guards a whole memory page on which several interrupts may reside
                                     .PageGuard = createPageGuard(targetVA, processDtb, targetGFN)}})
                     .first;
         }
