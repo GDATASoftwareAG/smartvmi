@@ -54,6 +54,7 @@ namespace VmiCore
     {
         clearInterruptEventHandling();
         singleStepSupervisor->teardown();
+        registerSupervisor->teardown();
     }
 
     std::shared_ptr<IBreakpoint>
