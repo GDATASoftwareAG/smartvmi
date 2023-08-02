@@ -16,8 +16,6 @@ namespace VmiCore
 
         virtual void teardown() = 0;
 
-        virtual void initializeDtbMonitoring() = 0;
-
         virtual void setContextSwitchCallback(const std::function<void(vmi_event_t*)>& eventCallback) = 0;
 
       protected:
@@ -36,21 +34,19 @@ namespace VmiCore
 
         void teardown() override;
 
-        void initializeDtbMonitoring() override;
-
         void setContextSwitchCallback(const std::function<void(vmi_event_t*)>& eventCallback) override;
 
         static event_response_t _defaultRegisterCallback([[maybe_unused]] vmi_instance_t vmi, vmi_event_t* event);
 
       private:
         std::shared_ptr<ILibvmiInterface> vmiInterface;
-        std::unique_ptr<vmi_event_t> contextSwitchEvent = std::make_unique<vmi_event_t>();
+        std::unique_ptr<vmi_event_t> contextSwitchEvent;
         std::function<void(vmi_event_t*)> callback{};
         std::unique_ptr<ILogger> logger;
 
         event_response_t registerCallback(vmi_event_t* event) const;
 
-        void clearDtbEventHandling();
+        void initializeRegisterEvent();
     };
 }
 
