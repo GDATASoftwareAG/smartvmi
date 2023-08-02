@@ -47,7 +47,7 @@ namespace VmiCore
         explicit InterruptEventSupervisor(std::shared_ptr<ILibvmiInterface> vmiInterface,
                                           std::shared_ptr<ISingleStepSupervisor> singleStepSupervisor,
                                           std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
-                                          std::shared_ptr<IRegisterEventSupervisor> registerSupervisor,
+                                          std::shared_ptr<IRegisterEventSupervisor> registerEventSupervisor,
                                           std::shared_ptr<ILogging> loggingLib);
 
         ~InterruptEventSupervisor() noexcept override;
@@ -88,7 +88,7 @@ namespace VmiCore
         std::shared_ptr<ILibvmiInterface> vmiInterface;
         std::shared_ptr<ISingleStepSupervisor> singleStepSupervisor;
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor;
-        std::shared_ptr<IRegisterEventSupervisor> registerSupervisor;
+        std::shared_ptr<IRegisterEventSupervisor> registerEventSupervisor;
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
 

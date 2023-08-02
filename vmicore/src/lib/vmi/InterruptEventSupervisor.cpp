@@ -20,12 +20,12 @@ namespace VmiCore
         std::shared_ptr<ILibvmiInterface> vmiInterface,
         std::shared_ptr<ISingleStepSupervisor> singleStepSupervisor,
         std::shared_ptr<IActiveProcessesSupervisor> activeProcessesSupervisor,
-        std::shared_ptr<IRegisterEventSupervisor> registerSupervisor,
+        std::shared_ptr<IRegisterEventSupervisor> registerEventSupervisor,
         std::shared_ptr<ILogging> loggingLib)
         : vmiInterface(std::move(vmiInterface)),
           singleStepSupervisor(std::move(singleStepSupervisor)),
           activeProcessesSupervisor(std::move(activeProcessesSupervisor)),
-          registerSupervisor(std::move(registerSupervisor)),
+          registerEventSupervisor(std::move(registerEventSupervisor)),
           loggingLib(std::move(loggingLib)),
           logger(this->loggingLib->newNamedLogger(loggerName))
     {
@@ -44,17 +44,16 @@ namespace VmiCore
         event->interrupt_event.insn_length = 1;
         vmiInterface->registerEvent(*event);
         singleStepSupervisor->initializeSingleStepEvents();
-        registerSupervisor->initializeDtbMonitoring();
         singleStepCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(singleStepCallback);
         contextSwitchCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(contextSwitchCallback);
-        registerSupervisor->setContextSwitchCallback(contextSwitchCallbackFunction);
+        registerEventSupervisor->setContextSwitchCallback(contextSwitchCallbackFunction);
     }
 
     void InterruptEventSupervisor::teardown()
     {
         clearInterruptEventHandling();
         singleStepSupervisor->teardown();
-        registerSupervisor->teardown();
+        registerEventSupervisor->teardown();
     }
 
     std::shared_ptr<IBreakpoint>

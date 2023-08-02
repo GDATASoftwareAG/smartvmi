@@ -42,7 +42,6 @@ namespace VmiCore
                     });
 
             contextSwitchHandler = std::make_shared<RegisterEventSupervisor>(vmiInterface, mockLogging);
-            contextSwitchHandler->initializeDtbMonitoring();
         }
     };
 

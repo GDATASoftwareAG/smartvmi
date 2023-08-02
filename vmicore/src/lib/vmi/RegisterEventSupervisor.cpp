@@ -14,15 +14,10 @@ namespace VmiCore
 
     void RegisterEventSupervisor::teardown()
     {
-        clearDtbEventHandling();
-    }
-
-    void RegisterEventSupervisor::initializeDtbMonitoring()
-    {
-        SETUP_REG_EVENT(contextSwitchEvent, CR3, VMI_REGACCESS_W, 0, RegisterEventSupervisor::_defaultRegisterCallback);
-        contextSwitchEvent->reg_event.onchange = true;
-        contextSwitchEvent->reg_event.async = 0;
-        contextSwitchEvent->data = this;
+        if (contextSwitchEvent)
+        {
+            vmiInterface->clearEvent(*contextSwitchEvent, false);
+        }
     }
 
     void RegisterEventSupervisor::setContextSwitchCallback(const std::function<void(vmi_event_t*)>& eventCallback)
@@ -33,6 +28,7 @@ namespace VmiCore
                                            std::source_location::current().function_name()));
         }
         callback = eventCallback;
+        initializeRegisterEvent();
         vmiInterface->registerEvent(*contextSwitchEvent);
     }
 
@@ -56,8 +52,12 @@ namespace VmiCore
         return VMI_EVENT_RESPONSE_NONE;
     }
 
-    void RegisterEventSupervisor::clearDtbEventHandling()
+    void RegisterEventSupervisor::initializeRegisterEvent()
     {
-        vmiInterface->clearEvent(*contextSwitchEvent, false);
+        contextSwitchEvent = std::make_unique<vmi_event_t>();
+        SETUP_REG_EVENT(contextSwitchEvent, CR3, VMI_REGACCESS_W, 0, RegisterEventSupervisor::_defaultRegisterCallback);
+        contextSwitchEvent->reg_event.onchange = true;
+        contextSwitchEvent->reg_event.async = 0;
+        contextSwitchEvent->data = this;
     }
 }
