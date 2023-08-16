@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <os/windows/SystemEventSupervisor.h>
 #include <vmicore_test/io/mock_Logger.h>
+#include <vmicore_test/os/mock_MemoryRegionExtractor.h>
 #include <vmicore_test/vmi/mock_Breakpoint.h>
 
 using testing::_;
@@ -42,14 +43,30 @@ namespace VmiCore
                                                                                      interruptEventSupervisor,
                                                                                      logging,
                                                                                      eventStream);
+            ON_CALL(*activeProcessSupervisor, getSystemProcessInformation())
+                .WillByDefault(
+                    []()
+                    {
+                        return std::make_shared<ActiveProcessInformation>(
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            "",
+                            std::make_unique<std::string>(""),
+                            std::make_unique<std::string>(""),
+                            std::make_unique<NiceMock<MockMemoryRegionExtractor>>());
+                    });
         }
     };
 
     TEST_F(SystemEventSupervisorFixture, teardown_validState_interruptEventSupervisorTeardownCalled)
     {
         ON_CALL(*interruptEventSupervisor, createBreakpoint(_, _, _, true))
-            .WillByDefault([](uint64_t, uint64_t, const std::function<BpResponse(IInterruptEvent&)>&, bool)
-                           { return std::make_shared<NiceMock<MockBreakpoint>>(); });
+            .WillByDefault(
+                [](uint64_t, const ActiveProcessInformation&, const std::function<BpResponse(IInterruptEvent&)>&, bool)
+                { return std::make_shared<NiceMock<MockBreakpoint>>(); });
         systemEventSupervisor->initialize();
 
         EXPECT_CALL(*interruptEventSupervisor, teardown()).Times(1);

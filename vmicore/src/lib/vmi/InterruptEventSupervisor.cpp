@@ -1,11 +1,11 @@
 #include "InterruptEventSupervisor.h"
-#include "../os/PagingDefinitions.h"
 #include "Event.h"
 #include "InterruptGuard.h"
 #include "VmiException.h"
 #include <memory>
 #include <vmicore/callback.h>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {
@@ -58,10 +58,12 @@ namespace VmiCore
 
     std::shared_ptr<IBreakpoint>
     InterruptEventSupervisor::createBreakpoint(uint64_t targetVA,
-                                               uint64_t processDtb,
+                                               const ActiveProcessInformation& processInformation,
                                                const std::function<BpResponse(IInterruptEvent&)>& callbackFunction,
                                                bool global)
     {
+        auto processDtb = targetVA >= PagingDefinitions::kernelspaceLowerBoundary ? processInformation.processDtb
+                                                                                  : processInformation.processUserDtb;
         auto targetPA = vmiInterface->convertVAToPA(targetVA, processDtb);
         auto targetGFN = targetPA >> PagingDefinitions::numberOfPageIndexBits;
         auto breakpoint = std::make_shared<Breakpoint>(
@@ -201,7 +203,6 @@ namespace VmiCore
         {
             GlobalControl::logger()->debug("Reinject interrupt into guest OS",
                                            {{"logger", loggerName}, {"eventPA", fmt::format("{:#x}", eventPA)}});
-            event->interrupt_event.reinject = REINJECT_INTERRUPT;
         }
 
         return eventResponse;

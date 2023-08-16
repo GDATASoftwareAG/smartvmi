@@ -1,8 +1,8 @@
 #include "KernelAccess.h"
 #include "../../vmi/VmiException.h"
-#include "../PagingDefinitions.h"
 #include "Constants.h"
 #include <fmt/core.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace
 {
@@ -116,7 +116,13 @@ namespace VmiCore::Windows
 
     addr_t KernelAccess::extractDirectoryTableBase(addr_t eprocessBase) const
     {
-        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.DirectoryTableBase,
+        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.directoryTableBase,
+                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
+    }
+
+    addr_t KernelAccess::extractUserDirectoryTableBase(addr_t eprocessBase) const
+    {
+        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.userDirectoryTableBase,
                                       vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 

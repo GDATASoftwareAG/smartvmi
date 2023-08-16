@@ -1,10 +1,10 @@
 #include "PluginSystem.h"
-#include "../os/PagingDefinitions.h"
 #include <bit>
 #include <dlfcn.h>
 #include <fmt/core.h>
 #include <utility>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {
@@ -97,7 +97,7 @@ namespace VmiCore
         }
         auto numberOfPages = count >> PagingDefinitions::numberOfPageIndexBits;
         auto process = activeProcessesSupervisor->getProcessInformationByPid(pid);
-        return readPagesWithUnmappedRegionPadding(address, process->processCR3, numberOfPages);
+        return readPagesWithUnmappedRegionPadding(address, process->processDtb, numberOfPages);
     }
 
     void PluginSystem::registerProcessStartEvent(
@@ -112,10 +112,12 @@ namespace VmiCore
         registeredProcessTerminationCallbacks.push_back(terminationCallback);
     }
 
-    std::shared_ptr<IBreakpoint> PluginSystem::createBreakpoint(
-        uint64_t targetVA, uint64_t processDtb, const std::function<BpResponse(IInterruptEvent&)>& callbackFunction)
+    std::shared_ptr<IBreakpoint>
+    PluginSystem::createBreakpoint(uint64_t targetVA,
+                                   const ActiveProcessInformation& processInformation,
+                                   const std::function<BpResponse(IInterruptEvent&)>& callbackFunction)
     {
-        return interruptEventSupervisor->createBreakpoint(targetVA, processDtb, callbackFunction, false);
+        return interruptEventSupervisor->createBreakpoint(targetVA, processInformation, callbackFunction, false);
     }
 
     std::unique_ptr<ILogger> PluginSystem::newNamedLogger(std::string_view name) const

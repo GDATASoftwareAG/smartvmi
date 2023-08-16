@@ -30,7 +30,7 @@ namespace VmiCore
 
         virtual std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
-                         uint64_t processDtb,
+                         const ActiveProcessInformation& processInformation,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction,
                          bool global) = 0;
 
@@ -58,7 +58,7 @@ namespace VmiCore
 
         std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
-                         uint64_t processDtb,
+                         const ActiveProcessInformation& processInformation,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction,
                          bool global) override;
 

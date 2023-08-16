@@ -11,11 +11,11 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include <os/PageProtection.h>
-#include <os/PagingDefinitions.h>
 #include <os/windows/ActiveProcessesSupervisor.h>
 #include <os/windows/KernelOffsets.h>
 #include <os/windows/ProtectionValues.h>
 #include <plugins/PluginSystem.h>
+#include <vmicore/os/PagingDefinitions.h>
 #include <vmicore_test/io/mock_Logger.h>
 
 namespace VmiCore

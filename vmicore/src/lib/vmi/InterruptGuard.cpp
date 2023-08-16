@@ -1,11 +1,11 @@
 #include "InterruptGuard.h"
 #include "../GlobalControl.h"
-#include "../os/PagingDefinitions.h"
 #include "VmiException.h"
 #include <fmt/core.h>
 #include <memory>
 #include <utility>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {

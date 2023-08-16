@@ -31,7 +31,7 @@ namespace VmiCore::Plugin
 
         MOCK_METHOD(std::shared_ptr<IBreakpoint>,
                     createBreakpoint,
-                    (uint64_t, uint64_t, const std::function<BpResponse(IInterruptEvent&)>&),
+                    (uint64_t, const ActiveProcessInformation&, const std::function<BpResponse(IInterruptEvent&)>&),
                     (override));
 
         MOCK_METHOD(std::unique_ptr<std::string>, getResultsDir, (), (const, override));

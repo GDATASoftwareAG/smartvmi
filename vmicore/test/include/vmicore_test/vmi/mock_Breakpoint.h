@@ -11,6 +11,8 @@ namespace VmiCore
       public:
         MOCK_METHOD(addr_t, getTargetPA, (), (const override));
 
+        MOCK_METHOD(addr_t, getTargetDtb, (), (const override));
+
         MOCK_METHOD(void, remove, (), (override));
     };
 }

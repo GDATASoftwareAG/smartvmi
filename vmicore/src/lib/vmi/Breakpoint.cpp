@@ -2,6 +2,7 @@
 #include "VmiException.h"
 #include <fmt/core.h>
 #include <utility>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore
 {
