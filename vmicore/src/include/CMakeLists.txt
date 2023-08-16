@@ -6,9 +6,10 @@ target_sources(vmicore-public-headers INTERFACE
         vmicore/io/ILogger.h
         vmicore/os/ActiveProcessInformation.h
         vmicore/os/IMemoryRegionExtractor.h
-        vmicore/os/MemoryRegion.h
         vmicore/os/IPageProtection.h
+        vmicore/os/MemoryRegion.h
         vmicore/os/OperatingSystem.h
+        vmicore/os/PagingDefinitions.h
         vmicore/plugins/IPluginConfig.h
         vmicore/plugins/IPlugin.h
         vmicore/plugins/PluginInterface.h

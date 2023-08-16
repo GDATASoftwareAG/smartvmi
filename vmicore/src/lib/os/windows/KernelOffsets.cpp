@@ -1,5 +1,7 @@
 #include "KernelOffsets.h"
+#include "Constants.h"
 #include <fmt/core.h>
+#include <source_location>
 
 namespace VmiCore::Windows
 {
@@ -7,7 +9,8 @@ namespace VmiCore::Windows
     {
         if (!vmiInterface->isInitialized())
         {
-            throw std::invalid_argument(fmt::format("{}: Aborting, vmiInterface not initialized yet.", __func__));
+            throw std::invalid_argument(fmt::format("{}: Aborting, vmiInterface not initialized yet.",
+                                                    std::source_location::current().function_name()));
         }
 
         KernelOffsets kernelOffsets{
@@ -45,7 +48,11 @@ namespace VmiCore::Windows
                                 .Right = vmiInterface->getKernelStructOffset("_RTL_BALANCED_NODE", "Right")},
             .fileObject = {.FileName = vmiInterface->getKernelStructOffset("_FILE_OBJECT", "FileName")},
             .section = {.controlArea = vmiInterface->getKernelStructOffset("_SECTION", "u1")},
-            .kprocess = {.DirectoryTableBase = vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase")},
+            .kprocess = {.directoryTableBase = vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase"),
+                         .userDirectoryTableBase =
+                             vmiInterface->getWindowsBuild() >= winBuildRedstone4
+                                 ? vmiInterface->getKernelStructOffset("_KPROCESS", "UserDirectoryTableBase")
+                                 : vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase")},
             .subSection = {.ControlArea = vmiInterface->getKernelStructOffset("_SUBSECTION", "ControlArea")},
             .exFastRef = {.Object = vmiInterface->getKernelStructOffset("_EX_FAST_REF", "Object")}};
 

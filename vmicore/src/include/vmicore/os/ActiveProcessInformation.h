@@ -12,7 +12,8 @@ namespace VmiCore
     struct ActiveProcessInformation
     {
         uint64_t base;
-        uint64_t processCR3;
+        uint64_t processDtb;
+        uint64_t processUserDtb;
         pid_t pid;
         pid_t parentPid;
         std::string name;

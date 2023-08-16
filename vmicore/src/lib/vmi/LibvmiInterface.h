@@ -120,6 +120,8 @@ namespace VmiCore
 
         [[nodiscard]] OperatingSystem getOsType() override;
 
+        [[nodiscard]] uint16_t getWindowsBuild() override;
+
         template <typename T> std::unique_ptr<T> readVa(const addr_t virtualAddress, const addr_t cr3)
         {
             auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);

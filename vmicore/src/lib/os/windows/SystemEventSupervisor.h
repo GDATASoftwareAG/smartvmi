@@ -47,6 +47,7 @@ namespace VmiCore::Windows
         std::shared_ptr<ILogging> loggingLib;
         std::unique_ptr<ILogger> logger;
         std::shared_ptr<IEventStream> eventStream;
+        std::shared_ptr<ActiveProcessInformation> systemProcess;
 
         void startPspCallProcessNotifyRoutinesMonitoring();
 

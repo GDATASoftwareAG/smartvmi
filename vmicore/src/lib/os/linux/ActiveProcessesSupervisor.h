@@ -8,6 +8,7 @@
 #include "PathExtractor.h"
 #include <map>
 #include <memory>
+#include <regex>
 #include <vmicore/io/ILogger.h>
 
 namespace VmiCore::Linux
@@ -43,12 +44,16 @@ namespace VmiCore::Linux
         PathExtractor pathExtractor;
         std::map<pid_t, std::shared_ptr<ActiveProcessInformation>> processInformationByPid;
         std::map<uint64_t, pid_t> pidsByTaskStruct;
+        std::regex kernelBannerVersionMatcher{R"(Linux version ([0-9]+)\.([0-9]+)\.([0-9]+))"};
+        bool pti = false;
 
         [[nodiscard]] std::unique_ptr<ActiveProcessInformation> extractProcessInformation(uint64_t taskStruct);
 
         [[nodiscard]] pid_t extractPid(uint64_t taskStruct) const;
 
         [[nodiscard]] std::unique_ptr<std::string> splitProcessFileNameFromPath(const std::string& path) const;
+
+        [[nodiscard]] std::tuple<int, int, int> extractKernelVersion() const;
     };
 }
 

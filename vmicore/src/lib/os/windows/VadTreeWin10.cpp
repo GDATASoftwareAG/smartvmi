@@ -1,10 +1,10 @@
 #include "VadTreeWin10.h"
 #include "../../vmi/VmiException.h"
 #include "../PageProtection.h"
-#include "../PagingDefinitions.h"
 #include <fmt/core.h>
 #include <unordered_set>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore::Windows
 {

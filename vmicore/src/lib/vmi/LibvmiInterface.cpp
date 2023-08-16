@@ -469,6 +469,11 @@ namespace VmiCore
         return size;
     }
 
+    uint16_t LibvmiInterface::getWindowsBuild()
+    {
+        return vmi_get_win_buildnumber(vmiInstance);
+    }
+
     bool LibvmiInterface::isInitialized() const
     {
         return vmiInstance != nullptr;

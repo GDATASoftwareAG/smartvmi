@@ -39,6 +39,8 @@ namespace VmiCore::Windows
 
         [[nodiscard]] virtual addr_t extractDirectoryTableBase(addr_t eprocessBase) const = 0;
 
+        [[nodiscard]] virtual addr_t extractUserDirectoryTableBase(addr_t eprocessBase) const = 0;
+
         [[nodiscard]] virtual pid_t extractParentID(addr_t eprocessBase) const = 0;
 
         [[nodiscard]] virtual std::string extractImageFileName(addr_t eprocessBase) const = 0;
@@ -108,6 +110,8 @@ namespace VmiCore::Windows
         [[nodiscard]] addr_t getCurrentProcessEprocessBase(addr_t currentListEntry) const override;
 
         [[nodiscard]] addr_t extractDirectoryTableBase(addr_t eprocessBase) const override;
+
+        [[nodiscard]] addr_t extractUserDirectoryTableBase(addr_t eprocessBase) const override;
 
         [[nodiscard]] pid_t extractParentID(addr_t eprocessBase) const override;
 

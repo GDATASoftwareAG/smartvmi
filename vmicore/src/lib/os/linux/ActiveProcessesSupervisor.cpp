@@ -22,6 +22,18 @@ namespace VmiCore::Linux
 
     void ActiveProcessesSupervisor::initialize()
     {
+        // Check if kernel is recent enough to have PTI support (backports for LTS releases are currently ignored)
+        if (auto [major, minor, _patch] = extractKernelVersion(); major > 4 || (major == 4 && minor >= 15))
+        {
+            // Check if kernel page table isolation is enabled
+            auto x86CapabilityOffset = vmiInterface->getKernelStructOffset("cpuinfo_x86", "x86_capability");
+            // X86_FEATURE_PTI is defined as 7*32+11
+            auto x86CapabilityEntry = vmiInterface->read32VA(vmiInterface->translateKernelSymbolToVA("boot_cpu_data") +
+                                                                 x86CapabilityOffset + PTI_FEATURE_ARRAY_ENTRY_OFFSET,
+                                                             vmiInterface->convertPidToDtb(SYSTEM_PID));
+            pti = x86CapabilityEntry & PTI_FEATURE_MASK;
+        }
+
         logger->info("--- Initialization ---");
         auto taskOffset = vmiInterface->getOffset("linux_tasks");
         auto initTaskVA = vmiInterface->translateKernelSymbolToVA("init_task") + taskOffset;
@@ -46,10 +58,12 @@ namespace VmiCore::Linux
                                          vmiInterface->convertPidToDtb(SYSTEM_PID));
         if (mm != 0)
         {
-            processInformation->processCR3 =
+            processInformation->processDtb =
                 vmiInterface->convertVAToPA(vmiInterface->read64VA(mm + vmiInterface->getOffset("linux_pgd"),
                                                                    vmiInterface->convertPidToDtb(SYSTEM_PID)),
                                             vmiInterface->convertPidToDtb(SYSTEM_PID));
+            processInformation->processUserDtb =
+                pti ? processInformation->processDtb + USER_DTB_OFFSET : processInformation->processDtb;
             processInformation->processPath = std::make_unique<std::string>(pathExtractor.extractDPath(
                 vmiInterface->read64VA(mm + vmiInterface->getKernelStructOffset("mm_struct", "exe_file"),
                                        vmiInterface->convertPidToDtb(SYSTEM_PID)) +
@@ -68,6 +82,14 @@ namespace VmiCore::Linux
             vmiInterface->convertPidToDtb(SYSTEM_PID));
         processInformation->name = *vmiInterface->extractStringAtVA(taskStruct + vmiInterface->getOffset("linux_name"),
                                                                     vmiInterface->convertPidToDtb(SYSTEM_PID));
+
+        // Special case: The process with pid 0 only consists of idle threads and therefore has got no mm_struct. In
+        // this case we simply use the kpgd that's already stored in libvmi.
+        if (processInformation->pid == SYSTEM_PID)
+        {
+            processInformation->processDtb = vmiInterface->convertPidToDtb(SYSTEM_PID);
+            processInformation->processUserDtb = processInformation->processDtb;
+        }
 
         return processInformation;
     }
@@ -120,16 +142,16 @@ namespace VmiCore::Linux
         {
             parentPid = std::to_string(parentProcessInformation->second->pid);
             parentName = parentProcessInformation->second->name;
-            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processCR3);
+            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
         }
         eventStream->sendProcessEvent(::grpc::ProcessState::Started,
                                       processInformation->name,
                                       static_cast<uint32_t>(processInformation->pid),
-                                      fmt::format("{:#x}", processInformation->processCR3));
+                                      fmt::format("{:#x}", processInformation->processDtb));
         logger->info("Discovered active process",
                      {{"ProcessName", processInformation->name},
                       {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
-                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processCR3)},
+                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processDtb)},
                       {"ParentProcessName", parentName},
                       {"ParentProcessId", parentPid},
                       {"ParentProcessCr3", parentCr3}});
@@ -160,18 +182,18 @@ namespace VmiCore::Linux
                 {
                     parentPid = std::to_string(parentProcessInformation->second->pid);
                     parentName = parentProcessInformation->second->name;
-                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processCR3);
+                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
                 }
 
                 eventStream->sendProcessEvent(::grpc::ProcessState::Terminated,
                                               processInformationIterator->second->name,
                                               static_cast<uint32_t>(processInformationIterator->second->pid),
-                                              fmt::format("{:#x}", processInformationIterator->second->processCR3));
+                                              fmt::format("{:#x}", processInformationIterator->second->processDtb));
                 logger->info(
                     "Remove process from actives processes",
                     {{"ProcessName", processInformationIterator->second->name},
                      {"ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)},
-                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->processCR3)),
+                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->processDtb)),
                      {"ParentProcessName", parentName},
                      {"ParentProcessId", parentPid},
                      {"ParentProcessCr3", parentCr3}});
@@ -207,5 +229,24 @@ namespace VmiCore::Linux
             throw VmiException(fmt::format("{}: Unable to find any path separators at all", __func__));
         }
         return std::make_unique<std::string>(substringStartIterator, path.cend());
+    }
+
+    std::tuple<int, int, int> ActiveProcessesSupervisor::extractKernelVersion() const
+    {
+        auto banner = vmiInterface->extractStringAtVA(vmiInterface->translateKernelSymbolToVA("linux_banner"),
+                                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
+        logger->debug("Banner extracted", {{"Banner", *banner}});
+
+        std::smatch matches;
+        if (!std::regex_search(*banner, matches, kernelBannerVersionMatcher))
+        {
+            throw std::runtime_error("Unexpected content in kernel banner");
+        }
+        if (matches.size() < 4)
+        {
+            throw std::runtime_error("Unable to retrieve version from kernel banner");
+        }
+
+        return {std::stoi(matches[1].str()), std::stoi(matches[2].str()), std::stoi(matches[3].str())};
     }
 }

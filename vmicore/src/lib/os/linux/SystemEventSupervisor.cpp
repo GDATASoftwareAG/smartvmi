@@ -28,6 +28,7 @@ namespace VmiCore::Linux
     void SystemEventSupervisor::initialize()
     {
         activeProcessesSupervisor->initialize();
+        systemProcess = activeProcessesSupervisor->getSystemProcessInformation();
         interruptEventSupervisor->initialize();
         startProcForkConnectorMonitoring();
         startProcExecConnectorMonitoring();
@@ -41,7 +42,7 @@ namespace VmiCore::Linux
                       {{"VA", fmt::format("{:#x}", procForkConnectorVA)}});
         auto procForkConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procForkConnectorCallback);
         procForkConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procForkConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procForkConnectorCallback, false);
+            procForkConnectorVA, *systemProcess, procForkConnectorCallback, false);
     }
 
     void SystemEventSupervisor::startProcExecConnectorMonitoring()
@@ -51,7 +52,7 @@ namespace VmiCore::Linux
                       {{"VA", fmt::format("{:#x}", procExecConnectorVA)}});
         auto procExecConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procExecConnectorCallback);
         procExecConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procExecConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExecConnectorCallback, false);
+            procExecConnectorVA, *systemProcess, procExecConnectorCallback, false);
     }
 
     void SystemEventSupervisor::startProcExitConnectorMonitoring()
@@ -61,7 +62,7 @@ namespace VmiCore::Linux
                       {{"VA", fmt::format("{:#x}", procExitConnectorVA)}});
         auto procExitConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procExitConnectorCallback);
         procExitConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procExitConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExitConnectorCallback, false);
+            procExitConnectorVA, *systemProcess, procExitConnectorCallback, false);
     }
 
     BpResponse SystemEventSupervisor::procForkConnectorCallback(IInterruptEvent& event)

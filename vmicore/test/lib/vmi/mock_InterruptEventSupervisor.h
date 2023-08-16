@@ -13,10 +13,11 @@ namespace VmiCore
 
         MOCK_METHOD(void, teardown, (), (override));
 
-        MOCK_METHOD(std::shared_ptr<IBreakpoint>,
-                    createBreakpoint,
-                    (uint64_t, uint64_t, const std::function<BpResponse(IInterruptEvent&)>&, bool),
-                    (override));
+        MOCK_METHOD(
+            std::shared_ptr<IBreakpoint>,
+            createBreakpoint,
+            (uint64_t, const ActiveProcessInformation&, const std::function<BpResponse(IInterruptEvent&)>&, bool),
+            (override));
 
         MOCK_METHOD(void, deleteBreakpoint, (IBreakpoint*), (override));
     };
