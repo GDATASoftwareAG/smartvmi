@@ -46,7 +46,7 @@ namespace VmiCore::Linux
                                          vmiInterface->convertPidToDtb(SYSTEM_PID));
         if (mm != 0)
         {
-            processInformation->processCR3 =
+            processInformation->kernelProcessDTB =
                 vmiInterface->convertVAToPA(vmiInterface->read64VA(mm + vmiInterface->getOffset("linux_pgd"),
                                                                    vmiInterface->convertPidToDtb(SYSTEM_PID)),
                                             vmiInterface->convertPidToDtb(SYSTEM_PID));
@@ -120,16 +120,16 @@ namespace VmiCore::Linux
         {
             parentPid = std::to_string(parentProcessInformation->second->pid);
             parentName = parentProcessInformation->second->name;
-            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processCR3);
+            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->kernelProcessDTB);
         }
         eventStream->sendProcessEvent(::grpc::ProcessState::Started,
                                       processInformation->name,
                                       static_cast<uint32_t>(processInformation->pid),
-                                      fmt::format("{:#x}", processInformation->processCR3));
+                                      fmt::format("{:#x}", processInformation->kernelProcessDTB));
         logger->info("Discovered active process",
                      {{"ProcessName", processInformation->name},
                       {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
-                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processCR3)},
+                      {"ProcessCr3", fmt::format("{:#x}", processInformation->kernelProcessDTB)},
                       {"ParentProcessName", parentName},
                       {"ParentProcessId", parentPid},
                       {"ParentProcessCr3", parentCr3}});
@@ -160,18 +160,18 @@ namespace VmiCore::Linux
                 {
                     parentPid = std::to_string(parentProcessInformation->second->pid);
                     parentName = parentProcessInformation->second->name;
-                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processCR3);
+                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->kernelProcessDTB);
                 }
 
                 eventStream->sendProcessEvent(::grpc::ProcessState::Terminated,
                                               processInformationIterator->second->name,
                                               static_cast<uint32_t>(processInformationIterator->second->pid),
-                                              fmt::format("{:#x}", processInformationIterator->second->processCR3));
+                                              fmt::format("{:#x}", processInformationIterator->second->kernelProcessDTB));
                 logger->info(
                     "Remove process from actives processes",
                     {{"ProcessName", processInformationIterator->second->name},
                      {"ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)},
-                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->processCR3)),
+                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->kernelProcessDTB)),
                      {"ParentProcessName", parentName},
                      {"ParentProcessId", parentPid},
                      {"ParentProcessCr3", parentCr3}});

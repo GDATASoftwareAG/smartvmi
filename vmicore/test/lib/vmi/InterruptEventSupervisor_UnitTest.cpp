@@ -74,7 +74,7 @@ namespace VmiCore
             std::make_shared<MockActiveProcessesSupervisor>();
         vmi_event_t* interruptSupervisorInternalEvent = nullptr;
         std::shared_ptr<ActiveProcessInformation> systemProcessInformation =
-            std::make_shared<ActiveProcessInformation>(ActiveProcessInformation{.processCR3 = testSystemCr3});
+            std::make_shared<ActiveProcessInformation>(ActiveProcessInformation{.kernelProcessDTB = testSystemCr3});
         std::shared_ptr<RegisterEventSupervisor> contextSwitchHandler =
             std::make_shared<RegisterEventSupervisor>(vmiInterface, mockLogging);
 

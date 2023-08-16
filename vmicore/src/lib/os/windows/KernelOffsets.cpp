@@ -45,7 +45,10 @@ namespace VmiCore::Windows
                                 .Right = vmiInterface->getKernelStructOffset("_RTL_BALANCED_NODE", "Right")},
             .fileObject = {.FileName = vmiInterface->getKernelStructOffset("_FILE_OBJECT", "FileName")},
             .section = {.controlArea = vmiInterface->getKernelStructOffset("_SECTION", "u1")},
-            .kprocess = {.DirectoryTableBase = vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase")},
+            .kprocess = {.kernelDirectoryTableBase =
+                             vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase"),
+                         .userDirectoryTableBase =
+                             vmiInterface->getKernelStructOffset("_KPROCESS", "UserDirectoryTableBase")},
             .subSection = {.ControlArea = vmiInterface->getKernelStructOffset("_SUBSECTION", "ControlArea")},
             .exFastRef = {.Object = vmiInterface->getKernelStructOffset("_EX_FAST_REF", "Object")}};
 

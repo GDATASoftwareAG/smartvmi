@@ -114,9 +114,15 @@ namespace VmiCore::Windows
         return currentListEntry - kernelOffsets.eprocess.ActiveProcessLinks;
     }
 
-    addr_t KernelAccess::extractDirectoryTableBase(addr_t eprocessBase) const
+    addr_t KernelAccess::extractKernelDirectoryTableBase(addr_t eprocessBase) const
     {
-        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.DirectoryTableBase,
+        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.kernelDirectoryTableBase,
+                                      vmiInterface->convertPidToDtb(SYSTEM_PID));
+    }
+
+    addr_t KernelAccess::extractUserDirectoryTableBase(addr_t eprocessBase) const
+    {
+        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.userDirectoryTableBase,
                                       vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 

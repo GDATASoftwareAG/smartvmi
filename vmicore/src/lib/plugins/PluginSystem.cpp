@@ -97,7 +97,7 @@ namespace VmiCore
         }
         auto numberOfPages = count >> PagingDefinitions::numberOfPageIndexBits;
         auto process = activeProcessesSupervisor->getProcessInformationByPid(pid);
-        return readPagesWithUnmappedRegionPadding(address, process->processCR3, numberOfPages);
+        return readPagesWithUnmappedRegionPadding(address, process->kernelProcessDTB, numberOfPages);
     }
 
     void PluginSystem::registerProcessStartEvent(
