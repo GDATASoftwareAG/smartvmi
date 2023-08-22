@@ -96,6 +96,7 @@ namespace ApiTracing
             return std::make_shared<VmiCore::ActiveProcessInformation>(
                 0,
                 0,
+                0,
                 processPid,
                 parentPid,
                 std::string(processName),

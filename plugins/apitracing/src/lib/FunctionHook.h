@@ -20,7 +20,8 @@ namespace ApiTracing
                      std::shared_ptr<std::vector<ParameterInformation>> parameterInformation,
                      VmiCore::Plugin::PluginInterface* pluginInterface);
 
-        void hookFunction(VmiCore::addr_t moduleBaseAddress, uint64_t processCr3);
+        void hookFunction(VmiCore::addr_t moduleBaseAddress,
+                          std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
 
         VmiCore::BpResponse hookCallback(VmiCore::IInterruptEvent& event);
 
@@ -28,10 +29,9 @@ namespace ApiTracing
 
       private:
         std::shared_ptr<IExtractor> extractor;
-        std::shared_ptr<VmiCore::IBreakpoint> interruptEvent;
+        std::shared_ptr<VmiCore::IBreakpoint> breakpoint;
         std::shared_ptr<VmiCore::IIntrospectionAPI> introspectionAPI;
         std::string functionName;
-        std::vector<uint64_t> hookedProcesses;
         std::string moduleName;
         std::shared_ptr<std::vector<ParameterInformation>> parameterInformation;
         VmiCore::Plugin::PluginInterface* pluginInterface;

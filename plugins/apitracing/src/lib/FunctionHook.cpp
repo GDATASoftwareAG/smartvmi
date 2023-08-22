@@ -1,6 +1,5 @@
 #include "FunctionHook.h"
 #include "Filenames.h"
-#include <algorithm>
 #include <fmt/core.h>
 #include <utility>
 #include <vmicore/callback.h>
@@ -32,32 +31,29 @@ namespace ApiTracing
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
     }
 
-    void FunctionHook::hookFunction(addr_t moduleBaseAddress, uint64_t processCr3)
+    void FunctionHook::hookFunction(VmiCore::addr_t moduleBaseAddress,
+                                    std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation)
     {
-        auto functionEntrypoint =
-            introspectionAPI->translateUserlandSymbolToVA(moduleBaseAddress, processCr3, functionName);
+        auto functionEntrypoint = introspectionAPI->translateUserlandSymbolToVA(
+            moduleBaseAddress, processInformation->processUserDtb, functionName);
 
-        interruptEvent = pluginInterface->createBreakpoint(
-            functionEntrypoint, processCr3, VMICORE_SETUP_SAFE_MEMBER_CALLBACK(hookCallback));
-
-        hookedProcesses.emplace_back(processCr3);
+        breakpoint = pluginInterface->createBreakpoint(
+            functionEntrypoint, *processInformation, VMICORE_SETUP_SAFE_MEMBER_CALLBACK(hookCallback));
     }
 
     BpResponse FunctionHook::hookCallback(IInterruptEvent& event)
     {
-        if (std::find(hookedProcesses.begin(), hookedProcesses.end(), event.getCr3()) != hookedProcesses.end())
+        logger->info(
+            "hookCallback hit",
+            {{"Module", moduleName}, {"Function", functionName}, {"Gla", fmt::format("{:x}", event.getGla())}});
+        if (parameterInformation->empty())
         {
-            logger->info(
-                "hookCallback hit",
-                {{"Module", moduleName}, {"Function", functionName}, {"Gla", fmt::format("{:x}", event.getGla())}});
-            if (parameterInformation->empty())
-            {
-                return BpResponse::Continue;
-            }
-
-            auto extractedParameters = extractor->extractParameters(event, parameterInformation);
-            logParameterList(extractedParameters);
+            return BpResponse::Continue;
         }
+
+        auto extractedParameters = extractor->extractParameters(event, parameterInformation);
+        logParameterList(extractedParameters);
+
         return BpResponse::Continue;
     }
 
@@ -79,6 +75,6 @@ namespace ApiTracing
 
     void FunctionHook::teardown() const
     {
-        interruptEvent->remove();
+        breakpoint->remove();
     }
 }
