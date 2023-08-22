@@ -94,7 +94,7 @@ namespace ApiTracing
                     auto extractor = std::make_shared<Extractor>(introspectionAPI, addressWidth);
                     auto functionHook = std::make_shared<FunctionHook>(
                         moduleHookTarget.name, functionName, extractor, introspectionAPI, definitions, pluginInterface);
-                    functionHook->hookFunction(moduleBaseAddress, processInformation->processCR3);
+                    functionHook->hookFunction(moduleBaseAddress, processInformation);
                     hookList.push_back(functionHook);
                 }
                 catch (const std::exception& e)

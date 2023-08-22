@@ -32,15 +32,19 @@ namespace ApiTracing
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
     }
 
-    void FunctionHook::hookFunction(addr_t moduleBaseAddress, uint64_t processCr3)
+    void FunctionHook::hookFunction(VmiCore::addr_t moduleBaseAddress,
+                                    std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation)
     {
+        auto processDtb = moduleBaseAddress >= 0xFFFF800000000000 ? processInformation->processKernelDTB
+                                                                  : processInformation->processUserDTB;
+
         auto functionEntrypoint =
-            introspectionAPI->translateUserlandSymbolToVA(moduleBaseAddress, processCr3, functionName);
+            introspectionAPI->translateUserlandSymbolToVA(moduleBaseAddress, processDtb, functionName);
 
-        interruptEvent = pluginInterface->createBreakpoint(
-            functionEntrypoint, processCr3, VMICORE_SETUP_SAFE_MEMBER_CALLBACK(hookCallback));
+        breakpoint = pluginInterface->createBreakpoint(
+            functionEntrypoint, processInformation, VMICORE_SETUP_SAFE_MEMBER_CALLBACK(hookCallback));
 
-        hookedProcesses.emplace_back(processCr3);
+        hookedProcesses.emplace_back(processDtb);
     }
 
     BpResponse FunctionHook::hookCallback(IInterruptEvent& event)
@@ -79,6 +83,6 @@ namespace ApiTracing
 
     void FunctionHook::teardown() const
     {
-        interruptEvent->remove();
+        breakpoint->remove();
     }
 }
