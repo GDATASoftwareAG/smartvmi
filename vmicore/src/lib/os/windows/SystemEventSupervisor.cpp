@@ -28,6 +28,7 @@ namespace VmiCore::Windows
     void SystemEventSupervisor::initialize()
     {
         activeProcessesSupervisor->initialize();
+        systemProcess = activeProcessesSupervisor->getProcessInformationByPid(SYSTEM_PID);
         interruptEventSupervisor->initialize();
         startPspCallProcessNotifyRoutinesMonitoring();
         startKeBugCheck2Monitoring();
@@ -41,7 +42,7 @@ namespace VmiCore::Windows
         auto notifyProcessCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(pspCallProcessNotifyRoutinesCallback);
 
         notifyProcessInterruptEvent = interruptEventSupervisor->createBreakpoint(
-            processNotifyFunctionVA, vmiInterface->convertPidToDtb(SYSTEM_PID), notifyProcessCallbackFunction, true);
+            processNotifyFunctionVA, systemProcess, notifyProcessCallbackFunction, true);
     }
 
     void SystemEventSupervisor::startKeBugCheck2Monitoring()
@@ -51,7 +52,7 @@ namespace VmiCore::Windows
         auto bugCheckCallbackFunction = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(keBugCheck2Callback);
 
         bugCheckInterruptEvent = interruptEventSupervisor->createBreakpoint(
-            bugCheckFunctionVA, vmiInterface->convertPidToDtb(SYSTEM_PID), bugCheckCallbackFunction, true);
+            bugCheckFunctionVA, systemProcess, bugCheckCallbackFunction, true);
     }
 
     BpResponse SystemEventSupervisor::pspCallProcessNotifyRoutinesCallback(IInterruptEvent& event)

@@ -46,8 +46,13 @@ namespace VmiCore::Windows
     {
         auto processInformation = std::make_unique<ActiveProcessInformation>();
         processInformation->base = eprocessBase;
-        processInformation->kernelProcessDTB = kernelAccess->extractKernelDirectoryTableBase(eprocessBase);
-        processInformation->userProcessDTB = kernelAccess->extractUserDirectoryTableBase(eprocessBase);
+        processInformation->processKernelDTB = kernelAccess->extractKernelDirectoryTableBase(eprocessBase);
+        processInformation->processUserDTB = kernelAccess->extractUserDirectoryTableBase(eprocessBase);
+        // KPTI implemented but inactive
+        if (processInformation->processUserDTB == 0)
+        {
+            processInformation->processUserDTB = kernelAccess->extractKernelDirectoryTableBase(eprocessBase);
+        }
         processInformation->pid = kernelAccess->extractPID(eprocessBase);
         processInformation->parentPid = kernelAccess->extractParentID(eprocessBase);
         processInformation->name = kernelAccess->extractImageFileName(eprocessBase);
@@ -114,16 +119,16 @@ namespace VmiCore::Windows
         {
             parentPid = std::to_string(parentProcessInformation->second->pid);
             parentName = parentProcessInformation->second->name;
-            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->kernelProcessDTB);
+            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processKernelDTB);
         }
         eventStream->sendProcessEvent(::grpc::ProcessState::Started,
                                       processInformation->name,
                                       static_cast<uint32_t>(processInformation->pid),
-                                      fmt::format("{:#x}", processInformation->kernelProcessDTB));
+                                      fmt::format("{:#x}", processInformation->processKernelDTB));
         logger->info("Discovered active process",
                      {{"ProcessName", processInformation->name},
                       {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
-                      {"ProcessCr3", fmt::format("{:#x}", processInformation->kernelProcessDTB)},
+                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processKernelDTB)},
                       {"ParentProcessName", parentName},
                       {"ParentProcessId", parentPid},
                       {"ParentProcessCr3", parentCr3}});
@@ -172,19 +177,19 @@ namespace VmiCore::Windows
                 {
                     parentPid = std::to_string(parentProcessInformation->second->pid);
                     parentName = parentProcessInformation->second->name;
-                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->kernelProcessDTB);
+                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processKernelDTB);
                 }
 
                 eventStream->sendProcessEvent(
                     ::grpc::ProcessState::Terminated,
                     processInformationIterator->second->name,
                     static_cast<uint32_t>(processInformationIterator->second->pid),
-                    fmt::format("{:#x}", processInformationIterator->second->kernelProcessDTB));
+                    fmt::format("{:#x}", processInformationIterator->second->processKernelDTB));
                 logger->info("Remove process from actives processes",
                              {{"ProcessName", processInformationIterator->second->name},
                               {"ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)},
                               CxxLogField("ProcessCr3",
-                                          fmt::format("{:#x}", processInformationIterator->second->kernelProcessDTB)),
+                                          fmt::format("{:#x}", processInformationIterator->second->processKernelDTB)),
                               {"ParentProcessName", parentName},
                               {"ParentProcessId", parentPid},
                               {"ParentProcessCr3", parentCr3}});

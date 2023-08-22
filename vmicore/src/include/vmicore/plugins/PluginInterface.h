@@ -37,7 +37,7 @@ namespace VmiCore::Plugin
 
         [[nodiscard]] virtual std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
-                         uint64_t processDtb,
+                         std::shared_ptr<const ActiveProcessInformation> processInformation,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction) = 0;
 
         [[nodiscard]] virtual std::unique_ptr<std::string> getResultsDir() const = 0;

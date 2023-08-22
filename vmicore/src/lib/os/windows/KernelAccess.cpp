@@ -116,7 +116,7 @@ namespace VmiCore::Windows
 
     addr_t KernelAccess::extractKernelDirectoryTableBase(addr_t eprocessBase) const
     {
-        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.kernelDirectoryTableBase,
+        return vmiInterface->read64VA(eprocessBase + kernelOffsets.kprocess.directoryTableBase,
                                       vmiInterface->convertPidToDtb(SYSTEM_PID));
     }
 

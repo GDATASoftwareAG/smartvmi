@@ -97,7 +97,7 @@ namespace VmiCore
         }
         auto numberOfPages = count >> PagingDefinitions::numberOfPageIndexBits;
         auto process = activeProcessesSupervisor->getProcessInformationByPid(pid);
-        return readPagesWithUnmappedRegionPadding(address, process->kernelProcessDTB, numberOfPages);
+        return readPagesWithUnmappedRegionPadding(address, process->processKernelDTB, numberOfPages);
     }
 
     void PluginSystem::registerProcessStartEvent(
@@ -112,10 +112,12 @@ namespace VmiCore
         registeredProcessTerminationCallbacks.push_back(terminationCallback);
     }
 
-    std::shared_ptr<IBreakpoint> PluginSystem::createBreakpoint(
-        uint64_t targetVA, uint64_t processDtb, const std::function<BpResponse(IInterruptEvent&)>& callbackFunction)
+    std::shared_ptr<IBreakpoint>
+    PluginSystem::createBreakpoint(uint64_t targetVA,
+                                   std::shared_ptr<const ActiveProcessInformation> processInformation,
+                                   const std::function<BpResponse(IInterruptEvent&)>& callbackFunction)
     {
-        return interruptEventSupervisor->createBreakpoint(targetVA, processDtb, callbackFunction, false);
+        return interruptEventSupervisor->createBreakpoint(targetVA, processInformation, callbackFunction, false);
     }
 
     std::unique_ptr<ILogger> PluginSystem::newNamedLogger(std::string_view name) const

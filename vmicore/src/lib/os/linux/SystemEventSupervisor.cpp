@@ -28,6 +28,7 @@ namespace VmiCore::Linux
     void SystemEventSupervisor::initialize()
     {
         activeProcessesSupervisor->initialize();
+        systemProcess = activeProcessesSupervisor->getProcessInformationByPid(SYSTEM_PID);
         interruptEventSupervisor->initialize();
         startProcForkConnectorMonitoring();
         startProcExecConnectorMonitoring();
@@ -40,8 +41,9 @@ namespace VmiCore::Linux
         logger->debug("Obtained starting address of proc_fork_connector",
                       {{"VA", fmt::format("{:#x}", procForkConnectorVA)}});
         auto procForkConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procForkConnectorCallback);
+        systemProcess = activeProcessesSupervisor->getProcessInformationByPid(SYSTEM_PID);
         procForkConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procForkConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procForkConnectorCallback, false);
+            procForkConnectorVA, systemProcess, procForkConnectorCallback, false);
     }
 
     void SystemEventSupervisor::startProcExecConnectorMonitoring()
@@ -50,8 +52,9 @@ namespace VmiCore::Linux
         logger->debug("Obtained starting address of proc_exec_connector",
                       {{"VA", fmt::format("{:#x}", procExecConnectorVA)}});
         auto procExecConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procExecConnectorCallback);
+        systemProcess = activeProcessesSupervisor->getProcessInformationByPid(SYSTEM_PID);
         procExecConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procExecConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExecConnectorCallback, false);
+            procExecConnectorVA, systemProcess, procExecConnectorCallback, false);
     }
 
     void SystemEventSupervisor::startProcExitConnectorMonitoring()
@@ -60,8 +63,9 @@ namespace VmiCore::Linux
         logger->debug("Obtained starting address of proc_exit_connector",
                       {{"VA", fmt::format("{:#x}", procExitConnectorVA)}});
         auto procExitConnectorCallback = VMICORE_SETUP_SAFE_MEMBER_CALLBACK(procExitConnectorCallback);
+        systemProcess = activeProcessesSupervisor->getProcessInformationByPid(SYSTEM_PID);
         procExitConnectorEvent = interruptEventSupervisor->createBreakpoint(
-            procExitConnectorVA, vmiInterface->convertPidToDtb(SYSTEM_PID), procExitConnectorCallback, false);
+            procExitConnectorVA, systemProcess, procExitConnectorCallback, false);
     }
 
     BpResponse SystemEventSupervisor::procForkConnectorCallback(IInterruptEvent& event)

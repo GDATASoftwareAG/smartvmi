@@ -95,7 +95,7 @@ namespace VmiCore
 
         std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
-                         uint64_t processDtb,
+                         std::shared_ptr<const ActiveProcessInformation> processInformation,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction) override;
 
         [[nodiscard]] std::unique_ptr<ILogger> newNamedLogger(std::string_view name) const override;

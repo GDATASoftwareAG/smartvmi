@@ -40,9 +40,10 @@ namespace VmiCore
         std::unordered_set<uint64_t> hookedProcesses;
         std::function<void(Breakpoint*)> notifyFunction;
         std::function<BpResponse(IInterruptEvent&)> callbackFunction;
-        bool deleted = false;
+        uint64_t pcidMask = ~0xFFF;
         uint64_t dtb;
         bool global = false;
+        bool deleted = false;
     };
 }
 

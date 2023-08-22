@@ -58,10 +58,12 @@ namespace VmiCore
 
     std::shared_ptr<IBreakpoint>
     InterruptEventSupervisor::createBreakpoint(uint64_t targetVA,
-                                               uint64_t processDtb,
+                                               std::shared_ptr<const ActiveProcessInformation> processInformation,
                                                const std::function<BpResponse(IInterruptEvent&)>& callbackFunction,
                                                bool global)
     {
+        auto processDtb = targetVA >= PagingDefinitions::kernelspaceLowerBoundary ? processInformation->processKernelDTB
+                                                                                  : processInformation->processUserDTB;
         auto targetPA = vmiInterface->convertVAToPA(targetVA, processDtb);
         auto targetGFN = targetPA >> PagingDefinitions::numberOfPageIndexBits;
         auto breakpoint = std::make_shared<Breakpoint>(

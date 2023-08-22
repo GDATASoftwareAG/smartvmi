@@ -1,4 +1,5 @@
 #include "KernelOffsets.h"
+#include "Constants.h"
 #include <fmt/core.h>
 
 namespace VmiCore::Windows
@@ -45,12 +46,18 @@ namespace VmiCore::Windows
                                 .Right = vmiInterface->getKernelStructOffset("_RTL_BALANCED_NODE", "Right")},
             .fileObject = {.FileName = vmiInterface->getKernelStructOffset("_FILE_OBJECT", "FileName")},
             .section = {.controlArea = vmiInterface->getKernelStructOffset("_SECTION", "u1")},
-            .kprocess = {.kernelDirectoryTableBase =
-                             vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase"),
+            .kprocess = {.directoryTableBase = vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase"),
                          .userDirectoryTableBase =
-                             vmiInterface->getKernelStructOffset("_KPROCESS", "UserDirectoryTableBase")},
+                             vmiInterface->getKernelStructOffset("_KPROCESS", "DirectoryTableBase")},
             .subSection = {.ControlArea = vmiInterface->getKernelStructOffset("_SUBSECTION", "ControlArea")},
             .exFastRef = {.Object = vmiInterface->getKernelStructOffset("_EX_FAST_REF", "Object")}};
+
+        if (vmiInterface->getWindowsBuild() >= winBuildRedstone4)
+        {
+            // Will fail for Windows 10 versions below "Win 10 1803 Redstone 4"
+            kernelOffsets.kprocess.userDirectoryTableBase =
+                vmiInterface->getKernelStructOffset("_KPROCESS", "UserDirectoryTableBase");
+        }
 
         return kernelOffsets;
     }

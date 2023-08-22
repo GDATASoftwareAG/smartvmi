@@ -48,8 +48,10 @@ namespace VmiCore
     TEST_F(SystemEventSupervisorFixture, teardown_validState_interruptEventSupervisorTeardownCalled)
     {
         ON_CALL(*interruptEventSupervisor, createBreakpoint(_, _, _, true))
-            .WillByDefault([](uint64_t, uint64_t, const std::function<BpResponse(IInterruptEvent&)>&, bool)
-                           { return std::make_shared<NiceMock<MockBreakpoint>>(); });
+            .WillByDefault([](uint64_t,
+                              std::shared_ptr<const ActiveProcessInformation>,
+                              const std::function<BpResponse(IInterruptEvent&)>&,
+                              bool) { return std::make_shared<NiceMock<MockBreakpoint>>(); });
         systemEventSupervisor->initialize();
 
         EXPECT_CALL(*interruptEventSupervisor, teardown()).Times(1);

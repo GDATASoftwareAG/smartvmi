@@ -34,7 +34,7 @@ namespace VmiCore
 
     BpResponse Breakpoint::callback(IInterruptEvent& event)
     {
-        if (!global && event.getCr3() != dtb)
+        if (!global && (event.getCr3() & pcidMask) != (dtb & pcidMask))
         {
             return BpResponse::Continue;
         }

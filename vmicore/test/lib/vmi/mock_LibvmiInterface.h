@@ -69,6 +69,8 @@ namespace VmiCore
 
         MOCK_METHOD(OperatingSystem, getOsType, (), (override));
 
+        MOCK_METHOD(uint16_t, getWindowsBuild, (), (override));
+
         MOCK_METHOD(uint64_t, getOffset, (const std::string&), (override));
 
         MOCK_METHOD(addr_t, getKernelStructOffset, (const std::string&, const std::string&), (override));

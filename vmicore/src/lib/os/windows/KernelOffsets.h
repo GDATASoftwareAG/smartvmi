@@ -27,7 +27,7 @@ namespace VmiCore::Windows
 
         using _kprocess = struct _kprocess
         {
-            addr_t kernelDirectoryTableBase;
+            addr_t directoryTableBase;
             addr_t userDirectoryTableBase;
         };
 

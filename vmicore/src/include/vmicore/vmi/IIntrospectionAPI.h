@@ -56,6 +56,8 @@ namespace VmiCore
 
         [[nodiscard]] virtual OperatingSystem getOsType() = 0;
 
+        [[nodiscard]] virtual uint16_t getWindowsBuild() = 0;
+
         [[nodiscard]] virtual addr_t getOffset(const std::string& name) = 0;
 
         [[nodiscard]] virtual addr_t getKernelStructOffset(const std::string& structName,
