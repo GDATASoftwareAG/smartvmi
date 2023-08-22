@@ -13,6 +13,7 @@
 
 using testing::_;
 using testing::NiceMock;
+using testing::Ref;
 using testing::Return;
 using VmiCore::ActiveProcessInformation;
 using VmiCore::addr_t;
@@ -27,9 +28,10 @@ namespace ApiTracing
     {
         constexpr std::string_view targetProcessName = "TraceMeNow.exe";
         constexpr pid_t tracedProcessPid = 420;
-        constexpr addr_t tracedProcessCr3 = 0x1337;
+        constexpr addr_t tracedProcessDtb = 0x1337;
+        constexpr addr_t tracedProcessUserDtb = 0x23456;
 
-        constexpr size_t size = 0x666;
+        constexpr size_t defaultDllSize = 0x666;
         constexpr addr_t kernelDllBase = 0x1234000;
         constexpr addr_t ntdllBase = 0x1235000;
         constexpr addr_t NonDllBase = 0x1236000;
@@ -41,6 +43,40 @@ namespace ApiTracing
         constexpr std::string_view ntdllDllName = "ntdll.dll";
         constexpr std::string_view ntdllFunctionName = "ntdllFunction";
         constexpr std::string_view nonDllName = "KernelBase";
+    }
+
+    MemoryRegion createMemoryRegionDescriptor(addr_t startAddr, size_t size, std::string_view name)
+    {
+        return MemoryRegion{
+            startAddr, size, std::string(name), std::make_unique<VmiCore::MockPageProtection>(), false, false, false};
+    }
+
+    std::shared_ptr<const ActiveProcessInformation>
+    createProcessInformationWithDefaultMemoryRegions(addr_t dtb, addr_t userDtb, pid_t pid, std::string_view name)
+    {
+        auto mockMemoryRegionExtractor = std::make_unique<VmiCore::MockMemoryRegionExtractor>();
+        ON_CALL(*mockMemoryRegionExtractor, extractAllMemoryRegions())
+            .WillByDefault(
+                []()
+                {
+                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    memoryRegions->push_back(
+                        createMemoryRegionDescriptor(kernelDllBase, defaultDllSize, kernelDllName));
+                    memoryRegions->push_back(createMemoryRegionDescriptor(ntdllBase, defaultDllSize, ntdllDllName));
+                    memoryRegions->push_back(createMemoryRegionDescriptor(NonDllBase, defaultDllSize, nonDllName));
+                    return memoryRegions;
+                });
+
+        return std::make_shared<const ActiveProcessInformation>(0,
+                                                                dtb,
+                                                                userDtb,
+                                                                pid,
+                                                                0,
+                                                                std::string(name),
+                                                                std::make_unique<std::string>(name),
+                                                                std::make_unique<std::string>(""),
+                                                                std::move(mockMemoryRegionExtractor),
+                                                                true);
     }
 
     class TracedProcessTestFixture : public testing::Test
@@ -56,46 +92,15 @@ namespace ApiTracing
             ON_CALL(*mockPluginInterface, getIntrospectionAPI()).WillByDefault(Return(mockIntrospectionAPI));
         }
 
-        static MemoryRegion createMemoryRegionDescriptor(addr_t startAddr, size_t size, std::string_view name)
+        TracedProcess
+        createTracedProcessWithDefaultDlls(std::shared_ptr<const ActiveProcessInformation> processInformation)
         {
-            return MemoryRegion{startAddr,
-                                size,
-                                std::string(name),
-                                std::make_unique<VmiCore::MockPageProtection>(),
-                                false,
-                                false,
-                                false};
-        }
-
-        TracedProcess createDefaultTracedProcess()
-        {
-            auto mockMemoryRegionExtractor = std::make_unique<VmiCore::MockMemoryRegionExtractor>();
-            ON_CALL(*mockMemoryRegionExtractor, extractAllMemoryRegions())
-                .WillByDefault(
-                    []()
-                    {
-                        auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
-                        memoryRegions->push_back(createMemoryRegionDescriptor(kernelDllBase, size, kernelDllName));
-                        memoryRegions->push_back(createMemoryRegionDescriptor(ntdllBase, size, ntdllDllName));
-                        memoryRegions->push_back(createMemoryRegionDescriptor(NonDllBase, size, nonDllName));
-                        return memoryRegions;
-                    });
             ON_CALL(*mockIntrospectionAPI,
                     translateUserlandSymbolToVA(kernelDllBase, _, std::string(kernellDllFunctionName)))
                 .WillByDefault(Return(kernelDllFunctionAddress));
             ON_CALL(*mockIntrospectionAPI, translateUserlandSymbolToVA(ntdllBase, _, std::string(ntdllFunctionName)))
                 .WillByDefault(Return(ntdllFunctionAddress));
 
-            auto tracedProcessInformation =
-                std::make_shared<ActiveProcessInformation>(0,
-                                                           tracedProcessCr3,
-                                                           tracedProcessPid,
-                                                           0,
-                                                           std::string(targetProcessName),
-                                                           std::make_unique<std::string>(targetProcessName),
-                                                           std::make_unique<std::string>(""),
-                                                           std::move(mockMemoryRegionExtractor),
-                                                           true);
             std::vector<ModuleInformation> defaultModuleTracingInformation = {
                 {std::string(kernelDllName), {{std::string(kernellDllFunctionName)}}},
                 {std::string(ntdllDllName), {{std::string(ntdllFunctionName)}}}};
@@ -103,34 +108,38 @@ namespace ApiTracing
             return {mockPluginInterface.get(),
                     std::make_shared<NiceMock<MockFunctionDefinitions>>(),
                     std::make_shared<Windows::Library>(),
-                    tracedProcessInformation,
+                    std::move(processInformation),
                     {std::string(targetProcessName), true, defaultModuleTracingInformation}};
         }
     };
 
     TEST_F(TracedProcessTestFixture, constructor_defaultTracedProcess_correctBreakpointsInjected)
     {
-        EXPECT_CALL(*mockPluginInterface, createBreakpoint(kernelDllFunctionAddress, tracedProcessCr3, _))
+        auto processInformation = createProcessInformationWithDefaultMemoryRegions(
+            tracedProcessDtb, tracedProcessUserDtb, tracedProcessPid, targetProcessName);
+        EXPECT_CALL(*mockPluginInterface, createBreakpoint(kernelDllFunctionAddress, Ref(*processInformation), _))
             .WillOnce(Return(std::make_shared<NiceMock<MockBreakpoint>>()));
-        EXPECT_CALL(*mockPluginInterface, createBreakpoint(ntdllFunctionAddress, tracedProcessCr3, _))
+        EXPECT_CALL(*mockPluginInterface, createBreakpoint(ntdllFunctionAddress, Ref(*processInformation), _))
             .WillOnce(Return(std::make_shared<NiceMock<MockBreakpoint>>()));
 
-        EXPECT_NO_THROW(createDefaultTracedProcess());
+        EXPECT_NO_THROW(createTracedProcessWithDefaultDlls(processInformation));
     }
 
     TEST_F(TracedProcessTestFixture, destructor_defaultTracedProcess_breakpointsRemoved)
     {
+        auto processInformation = createProcessInformationWithDefaultMemoryRegions(
+            tracedProcessDtb, tracedProcessUserDtb, tracedProcessPid, targetProcessName);
         auto kernelDllFunctionBreakpoint = std::make_shared<MockBreakpoint>();
-        EXPECT_CALL(*mockPluginInterface, createBreakpoint(kernelDllFunctionAddress, tracedProcessCr3, _))
+        EXPECT_CALL(*mockPluginInterface, createBreakpoint(kernelDllFunctionAddress, Ref(*processInformation), _))
             .WillOnce(Return(kernelDllFunctionBreakpoint));
         auto ntdllFunctionBreakpoint = std::make_shared<MockBreakpoint>();
-        EXPECT_CALL(*mockPluginInterface, createBreakpoint(ntdllFunctionAddress, tracedProcessCr3, _))
+        EXPECT_CALL(*mockPluginInterface, createBreakpoint(ntdllFunctionAddress, Ref(*processInformation), _))
             .WillOnce(Return(ntdllFunctionBreakpoint));
 
         EXPECT_CALL(*kernelDllFunctionBreakpoint, remove());
         EXPECT_CALL(*ntdllFunctionBreakpoint, remove());
 
-        auto tracedProcess = createDefaultTracedProcess();
+        auto tracedProcess = createTracedProcessWithDefaultDlls(processInformation);
         tracedProcess.removeHooks();
     }
 }
