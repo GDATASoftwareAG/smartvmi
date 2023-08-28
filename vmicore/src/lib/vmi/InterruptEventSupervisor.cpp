@@ -169,6 +169,7 @@ namespace VmiCore
                                                                          vmi_event_t* event)
     {
         auto eventResponse = VMI_EVENT_RESPONSE_NONE;
+        event->interrupt_event.reinject = REINJECT_INTERRUPT;
 
         // TODO: fix event gfn in kvmi
         //        auto eventPA =
@@ -181,6 +182,7 @@ namespace VmiCore
                 {CxxLogField("logger", loggerName) /*, CxxLogField("eventPA", fmt::format("{:#x}", eventPA))*/});
             return eventResponse;
         }
+        interruptEventSupervisor->vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
         auto eventPA =
             interruptEventSupervisor->vmiInterface->convertVAToPA(event->interrupt_event.gla, event->x86_regs->cr3);
         auto breakpointsAtEventGFN =
@@ -194,7 +196,8 @@ namespace VmiCore
                 interruptEventSupervisor->interruptCallback(eventPA, event->vcpu_id, breakpointsAtEventPA->second);
             }
         }
-        else
+
+        if (event->interrupt_event.reinject == REINJECT_INTERRUPT)
         {
             GlobalControl::logger()->debug("Reinject interrupt into guest OS",
                                            {{"logger", loggerName}, {"eventPA", fmt::format("{:#x}", eventPA)}});
