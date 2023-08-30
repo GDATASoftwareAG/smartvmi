@@ -185,8 +185,7 @@ namespace ApiTracing
         for (uint64_t i = 0; i < stackParameterInformation.size(); i++)
         {
             const auto& parameterType = stackParameterInformation.at(i);
-            auto parameterLength =
-                (parameterType.backingParameters.empty()) ? parameterType.parameterSize : addressWidth;
+            auto parameterLength = (parameterType.backingParameters.empty()) ? parameterType.size : addressWidth;
             auto parameter = readParameter(
                 stackPointerVA + i * (addressWidth / ConstantDefinitions::byteSize), parameterLength, cr3);
             stackParams[i] = parameter;
@@ -205,14 +204,14 @@ namespace ApiTracing
         {
             if (parameter.backingParameters.empty())
             {
-                extractedBackingParameters.emplace_back(extractSingleParameter(address, cr3, parameter));
-                address += parameter.parameterSize; // emulate pointer arithmetic
+                auto parameterValue = introspectionAPI->readVA(address + parameter.offset, cr3, parameter.size);
+                extractedBackingParameters.emplace_back(extractSingleParameter(parameterValue, cr3, parameter));
             }
             else
             {
                 // Extract shallow parameters (based on size) from shallowParameters.at(parameterIndex). Then pass those
                 // to the nexţ iteration
-                addr_t structPointer = dereferencePointer(address, cr3);
+                addr_t structPointer = dereferencePointer(address + parameter.offset, cr3);
                 ExtractedParameterInformation extraction{.name = parameter.name, .data = {}, .backingParameters = {}};
                 extraction.backingParameters =
                     extractBackingParameters(parameter.backingParameters, structPointer, cr3);

@@ -39,12 +39,24 @@ Modules:
         - IoStatusBlock
 Structures:
   POBJECT_ATTRIBUTES:
-    Length: ULONG
-    RootDirectory: HANDLE
-    ObjectName: PUNICODE_STRING
-    Attributes: DWORD
-    SecurityDescriptor: PVOID
-    SecurityQualityOfService: PVOID
+    Length:
+      Type: ULONG
+      Offset: 0
+    RootDirectory:
+      Type: HANDLE
+      Offset: 8
+    ObjectName:
+      Type: PUNICODE_STRING
+      Offset: 16
+    Attributes:
+      Type: DWORD
+      Offset: 24
+    SecurityDescriptor:
+      Type: PVOID
+      Offset: 32
+    SecurityQualityOfService:
+      Type: PVOID
+      Offset: 40
 HighLevelParameterTypes:
   AddressWidth32Bit:
     ACCESS_MASK: DWORD

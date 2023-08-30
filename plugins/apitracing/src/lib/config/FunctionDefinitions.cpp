@@ -95,17 +95,41 @@ namespace ApiTracing
             std::vector<ParameterInformation> backingParameters{};
             if (structuresNode[backingParameterType].IsDefined())
             {
-                backingParameters = getParameterInformation(structuresNode[backingParameterType], addressWidth);
+                backingParameters = getStructParameterInformation(structuresNode[backingParameterType], addressWidth);
             }
             auto highLevelParameterNode = getHighLevelParameterTypesNode(addressWidth);
             auto backingBasicParameterType = getBasicParameterType(backingParameterType, highLevelParameterNode);
 
-            parameterInformationList.push_back({
-                .basicType = backingBasicParameterType,
-                .name = backingParameterName,
-                .parameterSize = backingParameterSize,
-                .backingParameters = backingParameters,
-            });
+            parameterInformationList.emplace_back(
+                backingBasicParameterType, backingParameterName, backingParameterSize, 0, backingParameters);
+        }
+        return parameterInformationList;
+    }
+
+    std::vector<ParameterInformation>
+    FunctionDefinitions::getStructParameterInformation(const YAML::Node& parameters, // NOLINT(*-no-recursion)
+                                                       uint16_t addressWidth)
+    {
+        std::vector<ParameterInformation> parameterInformationList;
+
+        for (const auto parameter : parameters)
+        {
+            auto backingParameterName = parameter.first.as<std::string>();
+            auto backingParameterType = parameter.second["Type"].as<std::string>();
+            auto backingParameterSize = getParameterSize(backingParameterType, addressWidth);
+            auto backingParameterOffset = parameter.second["Offset"].as<std::size_t>();
+            auto backingParameters =
+                structuresNode[backingParameterType].IsDefined()
+                    ? getStructParameterInformation(structuresNode[backingParameterType], addressWidth)
+                    : std::vector<ParameterInformation>{};
+            auto highLevelParameterNode = getHighLevelParameterTypesNode(addressWidth);
+            auto backingBasicParameterType = getBasicParameterType(backingParameterType, highLevelParameterNode);
+
+            parameterInformationList.emplace_back(backingBasicParameterType,
+                                                  backingParameterName,
+                                                  backingParameterSize,
+                                                  backingParameterOffset,
+                                                  backingParameters);
         }
         return parameterInformationList;
     }

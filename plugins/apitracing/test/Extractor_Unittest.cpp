@@ -29,21 +29,30 @@ namespace ApiTracing
         constexpr uint64_t param6Value = 0x0123456789101112;
         constexpr VmiCore::addr_t testDtb = 0x1337;
         constexpr VmiCore::addr_t testRsp = 0x420;
+        constexpr uint64_t ObjectAttributesOneValue = 0xFFFFFFF1;
+        constexpr uint64_t ObjectAttributesTwoValue = 0xFFFFFFF2;
+        constexpr uint64_t ObjectAttributesTwoContentTwoValue = 0xFFFFFFF3;
+        constexpr uint64_t ObjectAttributesTwoContentOneValue = 0x4711;
+        constexpr uint64_t ObjectAttributesTwoContentTwoOffset = 0x8;
+        constexpr uint64_t ObjectAttributesTwoContentOneOffset = 0x0;
+        constexpr uint64_t ExtractedStringAddress = 0x420;
+
+        const auto extractedString = "extract me";
 
         // clang-format off
         // @formatter:off
         const auto testParams64 = std::vector<TestParameterInformation>{
-            {.parameterInformation{.basicType = "LPSTR_64", .name = "param1", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
+            {.parameterInformation{.basicType = "LPSTR_64", .name = "param1", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
              .expectedValue = param1Value},
-            {.parameterInformation{.basicType = "int", .name = "param2", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
+            {.parameterInformation{.basicType = "int", .name = "param2", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
              .expectedValue = param2Value},
-            {.parameterInformation{.basicType = "unsigned long", .name = "param3", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
+            {.parameterInformation{.basicType = "unsigned long", .name = "param3", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
              .expectedValue = param3Value},
-            {.parameterInformation{.basicType = "__int64", .name = "param4", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
+            {.parameterInformation{.basicType = "__int64", .name = "param4", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
              .expectedValue = param4Value},
-            {.parameterInformation{.basicType = "__ptr64", .name = "param5", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
+            {.parameterInformation{.basicType = "__ptr64", .name = "param5", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
              .expectedValue = param5Value},
-            {.parameterInformation{.basicType = "UNICODE_WSTR_64", .name = "param6", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
+            {.parameterInformation{.basicType = "UNICODE_WSTR_64", .name = "param6", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
              .expectedValue = param6Value},
         };
         // @formatter:on
@@ -53,44 +62,53 @@ namespace ApiTracing
         // @formatter:off
         const auto testParams32 = std::vector<TestParameterInformation>{
 
-            {.parameterInformation{.name = "param1", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
+            {.parameterInformation{.name = "param1", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
              .expectedValue = param1Value},
-            {.parameterInformation{.name = "param2", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
+            {.parameterInformation{.name = "param2", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
              .expectedValue = param2Value},
-            {.parameterInformation{.name = "param3", .parameterSize = TestConstantDefinitions::twoBytes, .backingParameters{}},
+            {.parameterInformation{.name = "param3", .size = TestConstantDefinitions::twoBytes, .backingParameters{}},
              .expectedValue = param3Value},
-            {.parameterInformation{.name = "param4", .parameterSize = TestConstantDefinitions::oneByte, .backingParameters{}},
+            {.parameterInformation{.name = "param4", .size = TestConstantDefinitions::oneByte, .backingParameters{}},
              .expectedValue = param4Value},
-            {.parameterInformation{.name = "param5", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
+            {.parameterInformation{.name = "param5", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
              .expectedValue = param5Value},
         };
         // @formatter:on
         // clang-format on
-        const auto objectAttributesBackingParametersLevelTwo = std::vector<TestParameterInformation>{
-            {.parameterInformation{.basicType = "LPSTR_64",
-                                   .name = "ObjectAttributesTwoContent",
-                                   .parameterSize = TestConstantDefinitions::eightBytes,
-                                   .backingParameters{}},
-             .expectedValue = 0xFFFFFFF3}};
+
+        const auto objectAttributesBackingParametersLevelTwo =
+            std::vector<TestParameterInformation>{{.parameterInformation{.basicType = "unsigned long",
+                                                                         .name = "ObjectAttributesTwoContentOne",
+                                                                         .size = TestConstantDefinitions::fourBytes,
+                                                                         .offset = ObjectAttributesTwoContentOneOffset,
+                                                                         .backingParameters{}},
+                                                   .expectedValue = ObjectAttributesTwoContentOneValue},
+                                                  {.parameterInformation{.basicType = "LPSTR_64",
+                                                                         .name = "ObjectAttributesTwoContentTwo",
+                                                                         .size = TestConstantDefinitions::eightBytes,
+                                                                         .offset = ObjectAttributesTwoContentTwoOffset,
+                                                                         .backingParameters{}},
+                                                   .expectedValue = ObjectAttributesTwoContentTwoValue}};
 
         const auto objectAttributesBackingParametersLevelOne = std::vector<TestParameterInformation>{
             {.parameterInformation{
                  .name = "ObjectAttributesTwo",
-                 .parameterSize = TestConstantDefinitions::eightBytes,
-                 .backingParameters{{objectAttributesBackingParametersLevelTwo.at(0).parameterInformation}}},
-             .expectedValue = 0xFFFFFFF2}};
+                 .size = TestConstantDefinitions::eightBytes,
+                 .backingParameters{{objectAttributesBackingParametersLevelTwo.at(0).parameterInformation},
+                                    {objectAttributesBackingParametersLevelTwo.at(1).parameterInformation}}},
+             .expectedValue = ObjectAttributesTwoValue}};
 
         const auto testNestedStruct = std::vector<TestParameterInformation>{
             {.parameterInformation{.basicType = "unsigned __int64",
                                    .name = "FileHandle",
-                                   .parameterSize = TestConstantDefinitions::eightBytes,
+                                   .size = TestConstantDefinitions::eightBytes,
                                    .backingParameters{}},
              .expectedValue = param1Value},
             {.parameterInformation{
                  .name = "ObjectAttributesOne",
-                 .parameterSize = TestConstantDefinitions::eightBytes,
+                 .size = TestConstantDefinitions::eightBytes,
                  .backingParameters{{objectAttributesBackingParametersLevelOne.at(0).parameterInformation}}},
-             .expectedValue = 0xFFFFFFF1}};
+             .expectedValue = ObjectAttributesOneValue}};
     }
 
     class ExtractorFixture : public testing::Test
@@ -121,10 +139,19 @@ namespace ApiTracing
 
         void SetupNestedStructPointerReads()
         {
-            ON_CALL(*introspectionAPI, read64VA(0xDEADBEEF, testDtb)).WillByDefault(Return(0xFFFFFFF1));
-            ON_CALL(*introspectionAPI, read64VA(0xFFFFFFF1, testDtb)).WillByDefault(Return(0xFFFFFFF2));
-            ON_CALL(*introspectionAPI, extractStringAtVA(0xFFFFFFF2, testDtb))
-                .WillByDefault([]() { return std::make_unique<std::string>("extract me"); });
+            ON_CALL(*introspectionAPI, read64VA(param2Value, testDtb)).WillByDefault(Return(ObjectAttributesOneValue));
+
+            ON_CALL(*introspectionAPI, read64VA(ObjectAttributesOneValue, testDtb))
+                .WillByDefault(Return(ObjectAttributesTwoValue));
+
+            ON_CALL(*introspectionAPI, readVA(ObjectAttributesTwoValue, testDtb, sizeof(uint32_t)))
+                .WillByDefault(Return(ObjectAttributesTwoContentOneValue));
+            ON_CALL(*introspectionAPI,
+                    readVA(ObjectAttributesTwoValue + ObjectAttributesTwoContentTwoOffset, testDtb, sizeof(uint64_t)))
+                .WillByDefault(Return(ExtractedStringAddress));
+
+            ON_CALL(*introspectionAPI, extractStringAtVA(ExtractedStringAddress, testDtb))
+                .WillByDefault([]() { return std::make_unique<std::string>(extractedString); });
         }
 
         std::vector<uint64_t> SetupParametersAndStack(const std::vector<TestParameterInformation>& parameters,
@@ -170,15 +197,19 @@ namespace ApiTracing
 
         static std::vector<ExtractedParameterInformation> SetupExpectedNestedParameters()
         {
-            auto dummyExtract = std::string("extract me");
             auto nestedStruct = ExtractedParameterInformation(
                 {.name = "ObjectAttributesOne",
                  .data = {},
                  .backingParameters = std::vector<ExtractedParameterInformation>{ExtractedParameterInformation{
                      .name = "ObjectAttributesTwo",
                      .data = {},
-                     .backingParameters = std::vector<ExtractedParameterInformation>{ExtractedParameterInformation{
-                         .name = "ObjectAttributesTwoContent", .data = dummyExtract, .backingParameters = {}}}}}});
+                     .backingParameters = std::vector<ExtractedParameterInformation>{
+                         ExtractedParameterInformation{.name = "ObjectAttributesTwoContentOne",
+                                                       .data = ObjectAttributesTwoContentOneValue,
+                                                       .backingParameters = {}},
+                         ExtractedParameterInformation{.name = "ObjectAttributesTwoContentTwo",
+                                                       .data = extractedString,
+                                                       .backingParameters = {}}}}}});
 
             return std::vector<ExtractedParameterInformation>{
                 ExtractedParameterInformation{

@@ -15,7 +15,8 @@ namespace ApiTracing
     {
         std::string basicType{};
         std::string name{};
-        uint8_t parameterSize{};
+        uint8_t size{};
+        std::size_t offset{};
         std::vector<ParameterInformation> backingParameters{};
 
         bool operator==(const ParameterInformation& rhs) const = default;
@@ -24,7 +25,7 @@ namespace ApiTracing
         {
             os << "basicType: \"" << pi.basicType << "\"";
             os << ", name: \"" << pi.name << "\"";
-            os << ", parameterSize: \"" << pi.parameterSize << "\"";
+            os << ", parameterSize: \"" << pi.size << "\"";
 
             if (!pi.backingParameters.empty())
             {
@@ -89,6 +90,8 @@ namespace ApiTracing
         YAML::Node getHighLevelParameterTypesNode(uint16_t addressWidth) const;
         std::map<std::string, std::string, std::less<>>& getParameterTypeCache(uint16_t addressWidth);
         std::vector<ParameterInformation> getParameterInformation(const YAML::Node& parameters, uint16_t addressWidth);
+        std::vector<ParameterInformation> getStructParameterInformation(const YAML::Node& parameters,
+                                                                        uint16_t addressWidth);
     };
 }
 #endif // APITRACING_FUNCTIONDEFINITIONS_H
