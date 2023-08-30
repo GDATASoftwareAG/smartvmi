@@ -25,25 +25,25 @@ namespace ApiTracing
         static std::vector<ParameterInformation> create64BitNtCreateFileFunctionDefinitions()
         {
             auto objectAttributesBackingParameters = std::vector<ParameterInformation>{
-                {.basicType = "unsigned long", .name = "Length", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                {.basicType = "unsigned __int64", .name = "RootDirectory", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "UNICODE_WSTR_64", .name = "ObjectName", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "Attributes", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                {.basicType = "unsigned __int64", .name = "SecurityDescriptor", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "unsigned __int64", .name = "SecurityQualityOfService", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}}
+                {.basicType = "unsigned long", .name = "Length", .size = TestConstantDefinitions::fourBytes,.offset = 0, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "RootDirectory", .size = TestConstantDefinitions::eightBytes,.offset = 8, .backingParameters{}},
+                {.basicType = "UNICODE_WSTR_64", .name = "ObjectName", .size = TestConstantDefinitions::eightBytes,.offset = 16, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "Attributes", .size = TestConstantDefinitions::fourBytes,.offset = 24, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "SecurityDescriptor", .size = TestConstantDefinitions::eightBytes,.offset = 32, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "SecurityQualityOfService", .size = TestConstantDefinitions::eightBytes,.offset = 40, .backingParameters{}}
             };
             return std::vector<ParameterInformation>{
-                {.basicType = "unsigned __int64", .name = "FileHandle", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "DesiredAccess", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                {.basicType = "unsigned __int64", .name = "ObjectAttributes", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{objectAttributesBackingParameters}},
-                {.basicType = "unsigned __int64", .name = "IoStatusBlock", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "unsigned __int64", .name = "AllocationSize", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "FileAttributes", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "ShareAccess", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "CreateDisposition", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "CreateOptions", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}},
-                {.basicType = "unsigned __int64", .name = "EaBuffer", .parameterSize = TestConstantDefinitions::eightBytes, .backingParameters{}},
-                {.basicType = "unsigned long", .name = "EaLength", .parameterSize = TestConstantDefinitions::fourBytes, .backingParameters{}}
+                {.basicType = "unsigned __int64", .name = "FileHandle", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "DesiredAccess", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "ObjectAttributes", .size = TestConstantDefinitions::eightBytes, .backingParameters{objectAttributesBackingParameters}},
+                {.basicType = "unsigned __int64", .name = "IoStatusBlock", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "AllocationSize", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "FileAttributes", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "ShareAccess", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "CreateDisposition", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "CreateOptions", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                {.basicType = "unsigned __int64", .name = "EaBuffer", .size = TestConstantDefinitions::eightBytes, .backingParameters{}},
+                {.basicType = "unsigned long", .name = "EaLength", .size = TestConstantDefinitions::fourBytes, .backingParameters{}}
             };
         }
         // @formatter:on
@@ -67,23 +67,22 @@ namespace ApiTracing
     TEST_F(FunctionDefinitionsTestFixture,
            getFunctionParameterDefinitions_validFunction32And64Bit_correctParameterInformation)
     {
-        std::vector<ParameterInformation> expectedParameterInformation32Bit{
-            {.basicType = "unsigned long",
-             .name = "hProv",
-             .parameterSize = TestConstantDefinitions::fourBytes,
-             .backingParameters{}},
-            {.basicType = "LPSTR_32",
-             .name = "szSubsystemProtocol",
-             .parameterSize = TestConstantDefinitions::fourBytes,
-             .backingParameters{}}};
+        std::vector<ParameterInformation> expectedParameterInformation32Bit{{.basicType = "unsigned long",
+                                                                             .name = "hProv",
+                                                                             .size = TestConstantDefinitions::fourBytes,
+                                                                             .backingParameters{}},
+                                                                            {.basicType = "LPSTR_32",
+                                                                             .name = "szSubsystemProtocol",
+                                                                             .size = TestConstantDefinitions::fourBytes,
+                                                                             .backingParameters{}}};
         std::vector<ParameterInformation> expectedParameterInformation64Bit{
             {.basicType = "unsigned long",
              .name = "hProv",
-             .parameterSize = TestConstantDefinitions::fourBytes,
+             .size = TestConstantDefinitions::fourBytes,
              .backingParameters{}},
             {.basicType = "LPSTR_64",
              .name = "szSubsystemProtocol",
-             .parameterSize = TestConstantDefinitions::eightBytes,
+             .size = TestConstantDefinitions::eightBytes,
              .backingParameters{}}};
 
         auto actualFunctionDefinitions32Bit = functionDefinitions->getFunctionParameterDefinitions(
@@ -96,13 +95,12 @@ namespace ApiTracing
     }
 
     TEST_F(FunctionDefinitionsTestFixture,
-           getFunctionParameterDefinitions_functionWith4ByteParameterSize_correctParameterInformation)
+           getFunctionParameterDefinitions_functionWith4Bytesize_correctParameterInformation)
     {
-        std::vector<ParameterInformation> expectedParameterInformation{
-            {.basicType = "unsigned long",
-             .name = "dwMilliseconds",
-             .parameterSize = TestConstantDefinitions::fourBytes,
-             .backingParameters{}}};
+        std::vector<ParameterInformation> expectedParameterInformation{{.basicType = "unsigned long",
+                                                                        .name = "dwMilliseconds",
+                                                                        .size = TestConstantDefinitions::fourBytes,
+                                                                        .backingParameters{}}};
 
         auto actualFunctionDefinitions = functionDefinitions->getFunctionParameterDefinitions(
             "KernelBase.dll", "Sleep", ConstantDefinitions::x64AddressWidth);
@@ -113,11 +111,10 @@ namespace ApiTracing
     TEST_F(FunctionDefinitionsTestFixture,
            getFunctionParameterDefinitions_functionWithTwoStepParameterTranslation_correctParameterInformation)
     {
-        std::vector<ParameterInformation> expectedParameterInformation{
-            {.basicType = "unsigned long",
-             .name = "testParameter",
-             .parameterSize = TestConstantDefinitions::fourBytes,
-             .backingParameters{}}};
+        std::vector<ParameterInformation> expectedParameterInformation{{.basicType = "unsigned long",
+                                                                        .name = "testParameter",
+                                                                        .size = TestConstantDefinitions::fourBytes,
+                                                                        .backingParameters{}}};
 
         auto actualFunctionDefinitions = functionDefinitions->getFunctionParameterDefinitions(
             "KernelBase.dll", "TestFunction", ConstantDefinitions::x64AddressWidth);
