@@ -4700,124 +4700,280 @@ Modules:
         pszPath: LPCTSTR
       ReturnValue: BOOL
 Structures:
-  CONTEXT:
-    CONTEXT: PVOID
   EXCEPTION_RECORD:
-    ExceptionCode: DWORD
-    ExceptionFlags: DWORD
-    ExceptionRecord: EXCEPTION_RECORD
-    ExceptionAddress: PVOID
-    NumberParameters: DWORD
-    ExceptionInformation: ULONG_PTR
+    ExceptionCode:
+      Type: DWORD
+      Offset: 0
+    ExceptionFlags:
+      Type: DWORD
+      Offset: 4
+    ExceptionRecord:
+      Type: EXCEPTION_RECORD
+      Offset: 8
+    ExceptionAddress:
+      Type: PVOID
+      Offset: 16
+    NumberParameters:
+      Type: DWORD
+      Offset: 24
+    ExceptionInformation:
+      Type: ULONG_PTR
+      Offset: 32
   ITEMIDLIST:
-    mkid: SHITEMID
-  PCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-   CONTEXT: CONTEXT
-  PKEY_VALUE_ENTRY:
-    KEY_VALUE_ENTRY: KEY_VALUE_ENTRY
-  KEY_VALUE_ENTRY:
-    ValueName: PUNICODE_STRING
-    DataLength: ULONG
-    DataOffnset: ULONG
-    Type: ULONG
+    mkid:
+      Type: PVOID # TODO Add real definition
+      Offset: 0
   LPCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-   CONTEXT: CONTEXT
-  LPDWORD:
-    DWORD: DWORD
-  PCLIENT_ID:
-    UniqueProcess: HANDLE
-    UniqueThread: HANDLE
-  PFILE_BASIC_INFORMATION:
-    CreationTime: LARGE_INTEGER
-    LastAccessTime: LARGE_INTEGER
-    LastWriteTime: LARGE_INTEGER
-    ChangeTime: LARGE_INTEGER
-    FileAttributes: ULONG
-  PFILE_NETWORK_OPEN_INFORMATION:
-    CreationTime: LARGE_INTEGER
-    LastAccessTime: LARGE_INTEGER
-    LastWriteTime: LARGE_INTEGER
-    ChangeTime: LARGE_INTEGER
-    AllocationSize: LARGE_INTEGER
-    EndOfFile: LARGE_INTEGER
-    FileAttributes: ULONG
-  PHANDLE:
-    HANDLE: HANDLE
-  PHARDERROR_RESPONSE:
-    HARDERROR_RESPONSE: HARDERROR_RESPONSE
-  PHKEY:
-    HKEY: HKEY
-  PIDLIST_ABSOLUTE:
-    ITEMIDLIST: ITEMIDLIST
-  PSIZE_T:
-    SIZE_T: SIZE_T
-  PUSHORT:
-    USHORT: USHORT
-  PWORD:
-    WORD: WORD
-  PLARGE_INTEGER:
-    LARGE_INTEGER: __int64
+    Type: PVOID # TODO Add real definition
+    Offset: 0
   LPPROCESS_INFORMATION:
-    hProcess: HANDLE
-    hThread: HANDLE
-    dwProcessId: DWORD
-    dwThreadId: DWORD
-  POBJECT_ATTRIBUTES:
-    Length: ULONG
-    RootDirectory: HANDLE
-    ObjectName: PUNICODE_STRING
-    Attributes: DWORD
-    SecurityDescriptor: PVOID
-    SecurityQualityOfService: PVOID
-  SHITEMID:
-    cb: USHORT
-    abID: BYTE
-  LPSTARTUPINFOA:
-    cb: DWORD
-    lpReserved: LPSTR
-    lpDesktop: LPSTR
-    lpTitle: LPSTR
-    dwX: DWORD
-    dwY: DWORD
-    dwXSize: DWORD
-    dwYSize: DWORD
-    dwXCountChars: DWORD
-    dwYCountChars: DWORD
-    dwFillAttribute: DWORD
-    dwFlags: DWORD
-    wShowWindow: WORD
-    cbReserved2: WORD
-    lpReserved2: LPBYTE
-    hStdInput: HANDLE
-    hStdOutput: HANDLE
-    hStdError: HANDLE
-  LPSTARTUPINFOW:
-    cb: DWORD
-    lpReserved: LPWSTR
-    lpDesktop: LPWSTR
-    lpTitle: LPWSTR
-    dwX: DWORD
-    dwY: DWORD
-    dwXSize: DWORD
-    dwYSize: DWORD
-    dwXCountChars: DWORD
-    dwYCountChars: DWORD
-    dwFillAttribute: DWORD
-    dwFlags: DWORD
-    wShowWindow: WORD
-    cbReserved2: WORD
-    lpReserved2: LPBYTE
-    hStdInput: HANDLE
-    hStdOutput: HANDLE
-    hStdError: HANDLE
+    hProcess:
+      Type: HANDLE
+      Offset: 0
+    hThread:
+      Type: HANDLE
+      Offset: 8
+    dwProcessId:
+      Type: DWORD
+      Offset: 16
+    dwThreadId:
+      Type: DWORD
+      Offset: 20
   LPSECURITY_ATTRIBUTES:
-    nLength: DWORD
-    lpSecurityDescriptor: LPVOID
-    bInheritHandle: BOOL
+    nLength:
+      Type: DWORD
+      Offset: 0
+    lpSecurityDescriptor:
+      Type: LPVOID
+      Offset: 8
+    bInheritHandle:
+      Type: BOOL
+      Offset: 16
+  LPSTARTUPINFOA:
+    cb:
+      type: DWORD
+      offset: 0
+    lpReserved:
+      type: LPSTR
+      offset: 8
+    lpDesktop:
+      type: LPSTR
+      offset: 16
+    lpTitle:
+      type: LPSTR
+      offset: 24
+    dwX:
+      type: DWORD
+      offset: 32
+    dwY:
+      type: DWORD
+      offset: 36
+    dwXSize:
+      type: DWORD
+      offset: 40
+    dwYSize:
+      type: DWORD
+      offset: 44
+    dwXCountChars:
+      type: DWORD
+      offset: 48
+    dwYCountChars:
+      type: DWORD
+      offset: 52
+    dwFillAttribute:
+      type: DWORD
+      offset: 56
+    dwFlags:
+      type: DWORD
+      offset: 60
+    wShowWindow:
+      type: WORD
+      offset: 64
+    cbReserved2:
+      type: WORD
+      offset: 66
+    lpReserved2:
+      type: LPBYTE
+      offset: 72
+    hStdInput:
+      type: HANDLE
+      offset: 80
+    hStdOutput:
+      type: HANDLE
+      offset: 88
+    hStdError:
+      type: HANDLE
+      offset: 96
+  LPSTARTUPINFOW:
+    cb:
+      type: DWORD
+      offset: 0
+    lpReserved:
+      type: LPWSTR
+      offset: 8
+    lpDesktop:
+      type: LPWSTR
+      offset: 16
+    lpTitle:
+      type: LPWSTR
+      offset: 24
+    dwX:
+      type: DWORD
+      offset: 32
+    dwY:
+      type: DWORD
+      offset: 36
+    dwXSize:
+      type: DWORD
+      offset: 40
+    dwYSize:
+      type: DWORD
+      offset: 44
+    dwXCountChars:
+      type: DWORD
+      offset: 48
+    dwYCountChars:
+      type: DWORD
+      offset: 52
+    dwFillAttribute:
+      type: DWORD
+      offset: 56
+    dwFlags:
+      type: DWORD
+      offset: 60
+    wShowWindow:
+      type: WORD
+      offset: 64
+    cbReserved2:
+      type: WORD
+      offset: 66
+    lpReserved2:
+      type: LPBYTE
+      offset: 72
+    hStdInput:
+      type: HANDLE
+      offset: 80
+    hStdOutput:
+      type: HANDLE
+      offset: 8
+    hStdError:
+      type: HANDLE
+      offset: 96
+  PCLIENT_ID:
+    UniqueProcess:
+      Type: HANDLE
+      Offset: 0
+    UniqueThread:
+      Type: HANDLE
+      Offset: 8
+    PCONTEXT: # TODO Add definition for CONTEXT https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
+      CONTEXT:
+        Type: PVOID
+        Offset: 0
+  PFILE_BASIC_INFORMATION:
+    CreationTime:
+      Type: LARGE_INTEGER
+      Offset: 0
+    LastAccessTime:
+      Type: LARGE_INTEGER
+      Offset: 8
+    LastWriteTime:
+      Type: LARGE_INTEGER
+      Offset: 16
+    ChangeTime:
+      Type: LARGE_INTEGER
+      Offset: 24
+    FileAttributes:
+      Type: ULONG
+      Offset: 32
+  PFILE_NETWORK_OPEN_INFORMATION:
+    CreationTime:
+      Type: LARGE_INTEGER
+      Offset: 0
+    LastAccessTime:
+      Type: LARGE_INTEGER
+      Offset: 8
+    LastWriteTime:
+      Type: LARGE_INTEGER
+      Offset: 16
+    ChangeTime:
+      Type: LARGE_INTEGER
+      Offset: 24
+    AllocationSize:
+      Type: LARGE_INTEGER
+      Offset: 32
+    EndOfFile:
+      Type: LARGE_INTEGER
+      Offset: 40
+    FileAttributes:
+      Type: ULONG
+      Offset: 48
+  PHANDLE:
+    HANDLE:
+      Type: HANDLE
+      Offset: 0
+  PHARDERROR_RESPONSE:
+    HARDERROR_RESPONSE:
+      Type: HARDERROR_RESPONSE
+      Offset: 0
+  PHKEY:
+    HKEY:
+      Type: HKEY
+      Offset: 0
+  PIDLIST_ABSOLUTE:
+    ITEMIDLIST:
+      Type: ITEMIDLIST
+      Offset: 0
+  PLARGE_INTEGER:
+    LARGE_INTEGER:
+      Type: __int64
+      Offset: 0
+  PKEY_VALUE_ENTRY:
+    KEY_VALUE_ENTRY:
+      Type: PVOID # TODO Add real definition
+      Offset: 0
+  POBJECT_ATTRIBUTES:
+    Length:
+      Type: ULONG
+      Offset: 0
+    RootDirectory:
+      Type: HANDLE
+      Offset: 8
+    ObjectName:
+      Type: PUNICODE_STRING
+      Offset: 16
+    Attributes:
+      Type: DWORD
+      Offset: 24
+    SecurityDescriptor:
+      Type: PVOID
+      Offset: 32
+    SecurityQualityOfService:
+      Type: PVOID
+      Offset: 40
   PPS_CREATE_INFO:
-    size: ULONG_PTR
-    state: PS_CREATE_STATE
-    union: UINT
+    size:
+      Type: ULONG_PTR
+      Offset: 0
+    state:
+      Type: PS_CREATE_STATE
+      Offset: 8 # TODO this only works for 64bit. ULONG_PTR on 32bit has a length of 4 byte thus rendering the alignment here invalid
+    union:
+      Type: UINT
+      Offset: 16
+  PSIZE_T:
+    SIZE_T:
+      Type: SIZE_T
+      Offset: 0
+  PUSHORT:
+    USHORT:
+      Type: USHORT
+      Offset: 0
+  PWORD:
+    WORD:
+      Type: WORD
+      Offset: 0
+
 HighLevelParameterTypes:
   AddressWidth32Bit:
     ACCESS_MASK: DWORD
