@@ -71,6 +71,7 @@ namespace InMemoryScanner
             runningProcesses->push_back(std::make_shared<ActiveProcessInformation>(
                 ActiveProcessInformation{0,
                                          0,
+                                         0,
                                          testPid,
                                          0,
                                          "System.exe",
@@ -82,6 +83,7 @@ namespace InMemoryScanner
             sharedBaseImageMemoryRegionExtractorRaw = m2.get();
             runningProcesses->push_back(std::make_shared<ActiveProcessInformation>(
                 ActiveProcessInformation{0,
+                                         0,
                                          0,
                                          processIdWithSharedBaseImageRegion,
                                          0,
@@ -229,6 +231,7 @@ namespace InMemoryScanner
         auto processWithLongName = std::make_shared<const ActiveProcessInformation>(
             ActiveProcessInformation{0,
                                      0,
+                                     0,
                                      pid,
                                      0,
                                      trimmedProcessName,
@@ -289,6 +292,7 @@ namespace InMemoryScanner
         auto processInfo = std::make_shared<ActiveProcessInformation>(
             ActiveProcessInformation{0,
                                      0,
+                                     0,
                                      testPid,
                                      0,
                                      "System.exe",
@@ -328,6 +332,7 @@ namespace InMemoryScanner
         auto* memoryRegionExtractorRaw = memoryRegionExtractor.get();
         auto processInfo = std::make_shared<ActiveProcessInformation>(
             ActiveProcessInformation{0,
+                                     0,
                                      0,
                                      pid,
                                      0,
