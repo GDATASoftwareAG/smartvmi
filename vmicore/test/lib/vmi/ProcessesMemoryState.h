@@ -125,7 +125,7 @@ namespace VmiCore
         std::string emptyFileName{};
         std::string emptyFullName{};
 
-        const processValues process0 = processValues{psActiveProcessHeadVA - _EPROCESS_OFFSETS::ActiveProcessLinks,
+        const processValues process0 = processValues{0xffffe00170130400,
                                                      0,
                                                      0,
                                                      0x32323232,
@@ -264,13 +264,13 @@ namespace VmiCore
                 .WillByDefault(testing::Return(4));
         }
 
-        void setupProcessWithLink(const processValues& process, uint64_t linkEprocessBase)
+        void setupProcessWithLink(const processValues& process, uint64_t link)
         {
             ON_CALL(*mockVmiInterface, read32VA(process.eprocessBase + _EPROCESS_OFFSETS::ExitStatus, systemCR3))
                 .WillByDefault(testing::Return(process.exitStatus));
             ON_CALL(*mockVmiInterface,
                     read64VA(process.eprocessBase + _EPROCESS_OFFSETS::ActiveProcessLinks, systemCR3))
-                .WillByDefault(testing::Return(linkEprocessBase + _EPROCESS_OFFSETS::ActiveProcessLinks));
+                .WillByDefault(testing::Return(link));
             ON_CALL(*mockVmiInterface,
                     extractStringAtVA(process.eprocessBase + _EPROCESS_OFFSETS::ImageFileName, systemCR3))
                 .WillByDefault([process = process](uint64_t, uint64_t)
@@ -284,15 +284,17 @@ namespace VmiCore
 
         void setupActiveProcessList(const std::vector<processValues>& processes)
         {
-            uint64_t psActiveProcessHeadVAReturn = processes[0].eprocessBase + _EPROCESS_OFFSETS::ActiveProcessLinks;
             ON_CALL(*mockVmiInterface, translateKernelSymbolToVA("PsActiveProcessHead"))
-                .WillByDefault(testing::Return(psActiveProcessHeadVAReturn));
+                .WillByDefault(testing::Return(psActiveProcessHeadVA));
+            ON_CALL(*mockVmiInterface, read64VA(psActiveProcessHeadVA, systemCR3))
+                .WillByDefault(testing::Return(processes[0].eprocessBase + _EPROCESS_OFFSETS::ActiveProcessLinks));
 
             for (auto process = processes.cbegin(); process != processes.cend()--; process++)
             {
-                setupProcessWithLink(*process, std::next(process)->eprocessBase);
+                setupProcessWithLink(*process,
+                                     std::next(process)->eprocessBase + _EPROCESS_OFFSETS::ActiveProcessLinks);
             }
-            setupProcessWithLink(processes.back(), processes.begin()->eprocessBase);
+            setupProcessWithLink(processes.back(), psActiveProcessHeadVA);
         }
 
         void setupExtractProcessPathReturns(const processValues& process)
