@@ -28,15 +28,17 @@ namespace VmiCore::Windows
         logger->info("--- Initialization ---");
         kernelAccess->initWindowsOffsets();
         auto psActiveProcessListHeadVA = vmiInterface->translateKernelSymbolToVA("PsActiveProcessHead");
-        auto currentListEntry = psActiveProcessListHeadVA;
         logger->debug("Got VA of PsActiveProcessHead",
-                      {{"PsActiveProcessHeadVA", fmt::format("{:#x}", currentListEntry)}});
+                      {{"PsActiveProcessHeadVA", fmt::format("{:#x}", psActiveProcessListHeadVA)}});
 
-        do
+        auto currentListEntry =
+            vmiInterface->read64VA(psActiveProcessListHeadVA, vmiInterface->convertPidToDtb(SYSTEM_PID));
+        while (currentListEntry != psActiveProcessListHeadVA)
         {
             addNewProcess(kernelAccess->getCurrentProcessEprocessBase(currentListEntry));
             currentListEntry = vmiInterface->read64VA(currentListEntry, vmiInterface->convertPidToDtb(SYSTEM_PID));
-        } while (currentListEntry != psActiveProcessListHeadVA);
+        }
+
         logger->info("--- End of Initialization ---");
     }
 
