@@ -136,13 +136,13 @@ namespace VmiCore::Linux
         std::shared_ptr<ActiveProcessInformation> processInformation(extractProcessInformation(taskStruct));
         std::string parentPid("unknownParentPid");
         std::string parentName("unknownParentName");
-        std::string parentCr3("unknownParentCr3");
+        std::string parentDtb("unknownParentDtb");
         auto parentProcessInformation = processInformationByPid.find(processInformation->parentPid);
         if (parentProcessInformation != processInformationByPid.end())
         {
             parentPid = std::to_string(parentProcessInformation->second->pid);
             parentName = parentProcessInformation->second->name;
-            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
+            parentDtb = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
         }
         eventStream->sendProcessEvent(::grpc::ProcessState::Started,
                                       processInformation->name,
@@ -151,10 +151,11 @@ namespace VmiCore::Linux
         logger->info("Discovered active process",
                      {{"ProcessName", processInformation->name},
                       {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
-                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processDtb)},
+                      {"ProcessDtb", fmt::format("{:#x}", processInformation->processDtb)},
+                      {"ProcessUserDtb", fmt::format("{:#x}", processInformation->processUserDtb)},
                       {"ParentProcessName", parentName},
                       {"ParentProcessId", parentPid},
-                      {"ParentProcessCr3", parentCr3}});
+                      {"ParentProcessDtb", parentDtb}});
         processInformationByPid[processInformation->pid] = processInformation;
         pidsByTaskStruct[processInformation->base] = processInformation->pid;
     }
@@ -175,14 +176,14 @@ namespace VmiCore::Linux
             {
                 std::string parentPid("unknownParentPid");
                 std::string parentName("unknownParentName");
-                std::string parentCr3("unknownParentCr3");
+                std::string parentDtb("unknownParentDtb");
                 auto parentProcessInformation =
                     processInformationByPid.find(processInformationIterator->second->parentPid);
                 if (parentProcessInformation != processInformationByPid.end())
                 {
                     parentPid = std::to_string(parentProcessInformation->second->pid);
                     parentName = parentProcessInformation->second->name;
-                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
+                    parentDtb = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
                 }
 
                 eventStream->sendProcessEvent(::grpc::ProcessState::Terminated,
@@ -193,10 +194,11 @@ namespace VmiCore::Linux
                     "Remove process from actives processes",
                     {{"ProcessName", processInformationIterator->second->name},
                      {"ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)},
-                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->processDtb)),
+                     {"ProcessDtb", fmt::format("{:#x}", processInformationIterator->second->processDtb)},
+                     {"ProcessUserDtb", fmt::format("{:#x}", processInformationIterator->second->processUserDtb)},
                      {"ParentProcessName", parentName},
                      {"ParentProcessId", parentPid},
-                     {"ParentProcessCr3", parentCr3}});
+                     {"ParentProcessDtb", parentDtb}});
 
                 processInformationByPid.erase(processInformationIterator);
             }
