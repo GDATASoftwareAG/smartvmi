@@ -74,6 +74,8 @@ namespace VmiCore
 
         uint64_t read64VA(addr_t virtualAddress, addr_t cr3) override;
 
+        uint64_t readVA(addr_t virtualAddress, addr_t dtb, std::size_t size) override;
+
         bool readXVA(const addr_t virtualAddress,
                      const addr_t cr3,
                      std::vector<uint8_t>& content,

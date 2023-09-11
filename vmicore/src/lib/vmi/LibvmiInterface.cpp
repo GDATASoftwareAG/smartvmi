@@ -143,6 +143,28 @@ namespace VmiCore
         return extractedValue;
     }
 
+    uint64_t LibvmiInterface::readVA(addr_t virtualAddress, addr_t dtb, std::size_t size)
+    {
+        if (size > sizeof(uint64_t))
+        {
+            throw VmiException(fmt::format("{}: Size parameter cannot be larger than return type of function",
+                                           std::source_location::current().function_name()));
+        }
+
+        uint64_t result = 0;
+        auto accessContext = createVirtualAddressAccessContext(virtualAddress, dtb);
+        std::scoped_lock<std::mutex> lock(libvmiLock);
+        if (vmi_read(vmiInstance, &accessContext, size, &result, nullptr) != VMI_SUCCESS)
+        {
+            throw VmiException(fmt::format("{}: Unable to read {} bytes from VA {:#x}",
+                                           std::source_location::current().function_name(),
+                                           size,
+                                           virtualAddress));
+        }
+
+        return result;
+    }
+
     bool LibvmiInterface::readXVA(const addr_t virtualAddress,
                                   const addr_t cr3,
                                   std::vector<uint8_t>& content,
