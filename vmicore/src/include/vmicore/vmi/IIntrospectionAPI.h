@@ -27,6 +27,8 @@ namespace VmiCore
 
         virtual uint64_t read64VA(addr_t virtualAddress, addr_t cr3) = 0;
 
+        virtual uint64_t readVA(addr_t virtualAddress, addr_t dtb, std::size_t size) = 0;
+
         virtual bool
         readXVA(const addr_t virtualAddress, const addr_t cr3, std::vector<uint8_t>& content, std::size_t size) = 0;
 
