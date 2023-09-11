@@ -114,13 +114,13 @@ namespace VmiCore::Windows
         std::shared_ptr<ActiveProcessInformation> processInformation(extractProcessInformation(eprocessBase));
         std::string parentPid("unknownParentPid");
         std::string parentName("unknownParentName");
-        std::string parentCr3("unknownParentCr3");
+        std::string parentDtb("unknownParentDtb");
         auto parentProcessInformation = processInformationByPid.find(processInformation->parentPid);
         if (parentProcessInformation != processInformationByPid.end())
         {
             parentPid = std::to_string(parentProcessInformation->second->pid);
             parentName = parentProcessInformation->second->name;
-            parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
+            parentDtb = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
         }
         eventStream->sendProcessEvent(::grpc::ProcessState::Started,
                                       processInformation->name,
@@ -129,10 +129,11 @@ namespace VmiCore::Windows
         logger->info("Discovered active process",
                      {{"ProcessName", processInformation->name},
                       {"ProcessId", static_cast<uint64_t>(processInformation->pid)},
-                      {"ProcessCr3", fmt::format("{:#x}", processInformation->processDtb)},
+                      {"ProcessDtb", fmt::format("{:#x}", processInformation->processDtb)},
+                      {"ProcessUserDtb", fmt::format("{:#x}", processInformation->processUserDtb)},
                       {"ParentProcessName", parentName},
                       {"ParentProcessId", parentPid},
-                      {"ParentProcessCr3", parentCr3}});
+                      {"ParentProcessDtb", parentDtb}});
         processInformationByPid[processInformation->pid] = processInformation;
         pidsByEprocessBase[processInformation->base] = processInformation->pid;
     }
@@ -147,9 +148,7 @@ namespace VmiCore::Windows
         logger->debug("Encountered a process that has got an exit status other than 'status pending'",
                       {{"_EPROCESS_base", fmt::format("{:#x}", eprocessBase)},
                        {"ProcessId", static_cast<uint64_t>(kernelAccess->extractPID(eprocessBase))},
-                       CxxLogField("ExitStatus", static_cast<uint64_t>(exitStatus))
-
-                      });
+                       {"ExitStatus", static_cast<uint64_t>(exitStatus)}});
         return false;
     }
 
@@ -163,22 +162,20 @@ namespace VmiCore::Windows
             {
                 logger->warning("Process information not found for process",
                                 {{"_EPROCESS_base", fmt::format("{:#x}", eprocessBase)},
-                                 CxxLogField("ProcessId", static_cast<uint64_t>(eprocessBaseIterator->second))
-
-                                });
+                                 {"ProcessId", static_cast<uint64_t>(eprocessBaseIterator->second)}});
             }
             else
             {
                 std::string parentPid("unknownParentPid");
                 std::string parentName("unknownParentName");
-                std::string parentCr3("unknownParentCr3");
+                std::string parentDtb("unknownParentDtb");
                 auto parentProcessInformation =
                     processInformationByPid.find(processInformationIterator->second->parentPid);
                 if (parentProcessInformation != processInformationByPid.end())
                 {
                     parentPid = std::to_string(parentProcessInformation->second->pid);
                     parentName = parentProcessInformation->second->name;
-                    parentCr3 = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
+                    parentDtb = fmt::format("{:#x}", parentProcessInformation->second->processDtb);
                 }
 
                 eventStream->sendProcessEvent(::grpc::ProcessState::Terminated,
@@ -189,10 +186,11 @@ namespace VmiCore::Windows
                     "Remove process from actives processes",
                     {{"ProcessName", processInformationIterator->second->name},
                      {"ProcessId", static_cast<uint64_t>(processInformationIterator->second->pid)},
-                     CxxLogField("ProcessCr3", fmt::format("{:#x}", processInformationIterator->second->processDtb)),
+                     {"ProcessDtb", fmt::format("{:#x}", processInformationIterator->second->processDtb)},
+                     {"ProcessUserDtb", fmt::format("{:#x}", processInformationIterator->second->processUserDtb)},
                      {"ParentProcessName", parentName},
                      {"ParentProcessId", parentPid},
-                     {"ParentProcessCr3", parentCr3}});
+                     {"ParentProcessCr3", parentDtb}});
 
                 processInformationByPid.erase(processInformationIterator);
             }
