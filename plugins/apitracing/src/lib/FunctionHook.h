@@ -23,7 +23,7 @@ namespace ApiTracing
         void hookFunction(VmiCore::addr_t moduleBaseAddress,
                           std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
 
-        VmiCore::BpResponse hookCallback(VmiCore::IInterruptEvent& event);
+        [[nodiscard]] VmiCore::BpResponse hookCallback(VmiCore::IInterruptEvent& event);
 
         void teardown() const;
 

@@ -109,6 +109,6 @@ namespace ApiTracing
         functionHook.hookFunction(testModuleBase, tracedProcessInformation);
         EXPECT_CALL(*extractor, extractParameters).Times(1);
 
-        functionHook.hookCallback(*interruptEvent);
+        static_cast<void>(functionHook.hookCallback(*interruptEvent));
     }
 }
