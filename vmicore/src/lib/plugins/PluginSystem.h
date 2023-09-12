@@ -93,7 +93,7 @@ namespace VmiCore
         void registerProcessTerminationEvent(
             const std::function<void(std::shared_ptr<const ActiveProcessInformation>)>& terminationCallback) override;
 
-        std::shared_ptr<IBreakpoint>
+        [[nodiscard]] std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
                          const ActiveProcessInformation& processInformation,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction) override;

@@ -16,9 +16,9 @@ namespace VmiCore
 
         void stop(const uint64_t&) override {}
 
-        std::unique_ptr<ILogger> newLogger() override;
+        [[nodiscard]] std::unique_ptr<ILogger> newLogger() override;
 
-        std::unique_ptr<ILogger> newNamedLogger(std::string_view name) override;
+        [[nodiscard]] std::unique_ptr<ILogger> newNamedLogger(std::string_view name) override;
 
         void setLogLevel(::logging::Level level) override;
 

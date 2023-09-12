@@ -17,28 +17,28 @@ namespace VmiCore
       public:
         virtual ~IIntrospectionAPI() = default;
 
-        virtual uint8_t read8PA(addr_t pyhsicalAddress) = 0;
+        [[nodiscard]] virtual uint8_t read8PA(addr_t pyhsicalAddress) = 0;
 
-        virtual uint64_t read64PA(const addr_t physicalAddress) = 0;
+        [[nodiscard]] virtual uint64_t read64PA(addr_t physicalAddress) = 0;
 
-        virtual uint8_t read8VA(addr_t virtualAddress, addr_t cr3) = 0;
+        [[nodiscard]] virtual uint8_t read8VA(addr_t virtualAddress, addr_t cr3) = 0;
 
-        virtual uint32_t read32VA(addr_t virtualAddress, addr_t cr3) = 0;
+        [[nodiscard]] virtual uint32_t read32VA(addr_t virtualAddress, addr_t cr3) = 0;
 
-        virtual uint64_t read64VA(addr_t virtualAddress, addr_t cr3) = 0;
+        [[nodiscard]] virtual uint64_t read64VA(addr_t virtualAddress, addr_t cr3) = 0;
 
-        virtual uint64_t readVA(addr_t virtualAddress, addr_t dtb, std::size_t size) = 0;
+        [[nodiscard]] virtual uint64_t readVA(addr_t virtualAddress, addr_t dtb, std::size_t size) = 0;
 
-        virtual bool
-        readXVA(const addr_t virtualAddress, const addr_t cr3, std::vector<uint8_t>& content, std::size_t size) = 0;
+        [[nodiscard]] virtual bool
+        readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content, std::size_t size) = 0;
 
         [[nodiscard]] virtual uint64_t getCurrentVmId() = 0;
 
         [[nodiscard]] virtual uint getNumberOfVCPUs() const = 0;
 
-        virtual addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) = 0;
+        [[nodiscard]] virtual addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) = 0;
 
-        virtual addr_t
+        [[nodiscard]] virtual addr_t
         translateUserlandSymbolToVA(addr_t moduleBaseAddress, addr_t dtb, const std::string& userlandSymbolName) = 0;
 
         [[nodiscard]] virtual addr_t convertVAToPA(addr_t virtualAddress, addr_t cr3Register) = 0;
@@ -49,12 +49,12 @@ namespace VmiCore
 
         [[nodiscard]] virtual std::optional<std::string> extractWStringAtVA(addr_t stringVA, addr_t cr3) = 0;
 
-        virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
+        [[nodiscard]] virtual std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) = 0;
 
-        [[nodiscard]] virtual std::optional<std::unique_ptr<std::string>>
-        tryExtractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3) = 0;
+        [[nodiscard]] virtual std::optional<std::unique_ptr<std::string>> tryExtractUnicodeStringAtVA(addr_t stringVA,
+                                                                                                      addr_t cr3) = 0;
 
-        virtual std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) = 0;
+        [[nodiscard]] virtual std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) = 0;
 
         [[nodiscard]] virtual OperatingSystem getOsType() = 0;
 

@@ -43,7 +43,7 @@ namespace VmiCore
 
         virtual void resumeVm() = 0;
 
-        virtual bool areEventsPending() = 0;
+        [[nodiscard]] virtual bool areEventsPending() = 0;
 
         virtual void stopSingleStepForVcpu(vmi_event_t* event, uint vcpuId) = 0;
 
@@ -64,22 +64,20 @@ namespace VmiCore
 
         void clearEvent(vmi_event_t& event, bool deallocate) override;
 
-        uint8_t read8PA(addr_t pyhsicalAddress) override;
+        [[nodiscard]] uint8_t read8PA(addr_t pyhsicalAddress) override;
 
-        uint64_t read64PA(const addr_t physicalAddress) override;
+        [[nodiscard]] uint64_t read64PA(addr_t physicalAddress) override;
 
-        uint8_t read8VA(addr_t virtualAddress, addr_t cr3) override;
+        [[nodiscard]] uint8_t read8VA(addr_t virtualAddress, addr_t cr3) override;
 
-        uint32_t read32VA(addr_t virtualAddress, addr_t cr3) override;
+        [[nodiscard]] uint32_t read32VA(addr_t virtualAddress, addr_t cr3) override;
 
-        uint64_t read64VA(addr_t virtualAddress, addr_t cr3) override;
+        [[nodiscard]] uint64_t read64VA(addr_t virtualAddress, addr_t cr3) override;
 
-        uint64_t readVA(addr_t virtualAddress, addr_t dtb, std::size_t size) override;
+        [[nodiscard]] uint64_t readVA(addr_t virtualAddress, addr_t dtb, std::size_t size) override;
 
-        bool readXVA(const addr_t virtualAddress,
-                     const addr_t cr3,
-                     std::vector<uint8_t>& content,
-                     std::size_t size) override;
+        [[nodiscard]] bool
+        readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content, std::size_t size) override;
 
         void write8PA(addr_t physicalAddress, uint8_t value) override;
 
@@ -91,11 +89,11 @@ namespace VmiCore
 
         [[nodiscard]] uint getNumberOfVCPUs() const override;
 
-        addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) override;
+        [[nodiscard]] addr_t translateKernelSymbolToVA(const std::string& kernelSymbolName) override;
 
-        addr_t translateUserlandSymbolToVA(addr_t moduleBaseAddress,
-                                           addr_t dtb,
-                                           const std::string& userlandSymbolName) override;
+        [[nodiscard]] addr_t translateUserlandSymbolToVA(addr_t moduleBaseAddress,
+                                                         addr_t dtb,
+                                                         const std::string& userlandSymbolName) override;
 
         [[nodiscard]] addr_t convertVAToPA(addr_t virtualAddress, addr_t processCr3) override;
 
@@ -111,10 +109,10 @@ namespace VmiCore
 
         [[nodiscard]] std::unique_ptr<std::string> extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3) override;
 
-        [[nodiscard]] std::optional<std::string> extractWStringAtVA(const addr_t stringVA, const addr_t cr3) override;
+        [[nodiscard]] std::optional<std::string> extractWStringAtVA(addr_t stringVA, addr_t cr3) override;
 
-        [[nodiscard]] std::optional<std::unique_ptr<std::string>>
-        tryExtractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3) override;
+        [[nodiscard]] std::optional<std::unique_ptr<std::string>> tryExtractUnicodeStringAtVA(addr_t stringVA,
+                                                                                              addr_t cr3) override;
 
         [[nodiscard]] std::unique_ptr<std::string> extractStringAtVA(addr_t virtualAddress, addr_t cr3) override;
 
@@ -124,7 +122,7 @@ namespace VmiCore
 
         [[nodiscard]] uint16_t getWindowsBuild() override;
 
-        template <typename T> std::unique_ptr<T> readVa(const addr_t virtualAddress, const addr_t cr3)
+        template <typename T> std::unique_ptr<T> readVa(addr_t virtualAddress, addr_t cr3)
         {
             auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
             auto exctractedValue = std::make_unique<T>();
@@ -160,13 +158,13 @@ namespace VmiCore
         std::mutex libvmiLock{};
         std::mutex eventsListenLock{};
 
-        static std::unique_ptr<std::string> createConfigString(const std::string& offsetsFile);
+        [[nodiscard]] static std::unique_ptr<std::string> createConfigString(const std::string& offsetsFile);
 
         static void freeEvent(vmi_event_t* event, status_t rc);
 
-        static access_context_t createPhysicalAddressAccessContext(addr_t physicalAddress);
+        [[nodiscard]] static access_context_t createPhysicalAddressAccessContext(addr_t physicalAddress);
 
-        static access_context_t createVirtualAddressAccessContext(addr_t virtualAddress, addr_t cr3);
+        [[nodiscard]] static access_context_t createVirtualAddressAccessContext(addr_t virtualAddress, addr_t cr3);
 
         void flushV2PCache(addr_t pt) override;
 

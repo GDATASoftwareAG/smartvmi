@@ -30,9 +30,9 @@ namespace VmiCore::Windows
 
         void initialize() override;
 
-        BpResponse pspCallProcessNotifyRoutinesCallback(IInterruptEvent& event);
+        [[nodiscard]] BpResponse pspCallProcessNotifyRoutinesCallback(IInterruptEvent& event);
 
-        BpResponse keBugCheck2Callback(IInterruptEvent& event);
+        [[nodiscard]] BpResponse keBugCheck2Callback(IInterruptEvent& event);
 
         void teardown() override;
 

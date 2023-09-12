@@ -14,7 +14,7 @@ namespace VmiCore
       public:
         virtual ~IBreakpoint() = default;
 
-        virtual addr_t getTargetPA() const = 0;
+        [[nodiscard]] virtual addr_t getTargetPA() const = 0;
 
         virtual void remove() = 0;
 

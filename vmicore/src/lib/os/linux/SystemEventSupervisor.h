@@ -30,11 +30,11 @@ namespace VmiCore::Linux
 
         void initialize() override;
 
-        BpResponse procForkConnectorCallback(IInterruptEvent& event);
+        [[nodiscard]] BpResponse procForkConnectorCallback(IInterruptEvent& event);
 
-        BpResponse procExecConnectorCallback(IInterruptEvent& event);
+        [[nodiscard]] BpResponse procExecConnectorCallback(IInterruptEvent& event);
 
-        BpResponse procExitConnectorCallback(IInterruptEvent& event);
+        [[nodiscard]] BpResponse procExitConnectorCallback(IInterruptEvent& event);
 
         void teardown() override;
 
