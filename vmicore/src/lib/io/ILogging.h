@@ -17,9 +17,9 @@ namespace VmiCore
 
         virtual void stop(const uint64_t& timeoutMillis) = 0;
 
-        virtual std::unique_ptr<ILogger> newLogger() = 0;
+        [[nodiscard]] virtual std::unique_ptr<ILogger> newLogger() = 0;
 
-        virtual std::unique_ptr<ILogger> newNamedLogger(std::string_view name) = 0;
+        [[nodiscard]] virtual std::unique_ptr<ILogger> newNamedLogger(std::string_view name) = 0;
 
         virtual void setLogLevel(::logging::Level level) = 0;
 

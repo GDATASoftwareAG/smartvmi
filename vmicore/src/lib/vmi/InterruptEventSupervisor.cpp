@@ -195,7 +195,8 @@ namespace VmiCore
             if (breakpointsAtEventPA != breakpointsAtEventGFN->second.Breakpoints.end())
             {
                 event->interrupt_event.reinject = DONT_REINJECT_INTERRUPT;
-                interruptEventSupervisor->interruptCallback(eventPA, event->vcpu_id, breakpointsAtEventPA->second);
+                return interruptEventSupervisor->interruptCallback(
+                    eventPA, event->vcpu_id, breakpointsAtEventPA->second);
             }
         }
 

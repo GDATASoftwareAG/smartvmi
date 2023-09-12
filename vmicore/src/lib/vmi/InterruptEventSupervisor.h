@@ -28,7 +28,7 @@ namespace VmiCore
 
         virtual void teardown() = 0;
 
-        virtual std::shared_ptr<IBreakpoint>
+        [[nodiscard]] virtual std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
                          const ActiveProcessInformation& processInformation,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction,
@@ -56,7 +56,7 @@ namespace VmiCore
 
         void teardown() override;
 
-        std::shared_ptr<IBreakpoint>
+        [[nodiscard]] std::shared_ptr<IBreakpoint>
         createBreakpoint(uint64_t targetVA,
                          const ActiveProcessInformation& processInformation,
                          const std::function<BpResponse(IInterruptEvent&)>& callbackFunction,
@@ -66,9 +66,9 @@ namespace VmiCore
 
         static event_response_t _defaultInterruptCallback(vmi_instance_t vmi, vmi_event_t* event);
 
-        event_response_t interruptCallback(addr_t interruptPA,
-                                           uint32_t vcpuId,
-                                           const std::vector<std::shared_ptr<Breakpoint>>& breakpoints);
+        [[nodiscard]] event_response_t interruptCallback(addr_t interruptPA,
+                                                         uint32_t vcpuId,
+                                                         const std::vector<std::shared_ptr<Breakpoint>>& breakpoints);
 
         void singleStepCallback(__attribute__((unused)) vmi_event_t* singleStepEvent);
 

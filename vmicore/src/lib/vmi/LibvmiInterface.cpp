@@ -83,7 +83,7 @@ namespace VmiCore
         }
     }
 
-    uint8_t LibvmiInterface::read8PA(const addr_t physicalAddress)
+    uint8_t LibvmiInterface::read8PA(addr_t physicalAddress)
     {
         uint8_t extractedValue = 0;
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
@@ -95,7 +95,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    uint64_t LibvmiInterface::read64PA(const addr_t physicalAddress)
+    uint64_t LibvmiInterface::read64PA(addr_t physicalAddress)
     {
         uint64_t extractedValue = 0;
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
@@ -107,7 +107,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    uint8_t LibvmiInterface::read8VA(const addr_t virtualAddress, const addr_t cr3)
+    uint8_t LibvmiInterface::read8VA(addr_t virtualAddress, addr_t cr3)
     {
         uint8_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
@@ -119,7 +119,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    uint32_t LibvmiInterface::read32VA(const addr_t virtualAddress, const addr_t cr3)
+    uint32_t LibvmiInterface::read32VA(addr_t virtualAddress, addr_t cr3)
     {
         uint32_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
@@ -131,7 +131,7 @@ namespace VmiCore
         return extractedValue;
     }
 
-    uint64_t LibvmiInterface::read64VA(const addr_t virtualAddress, const addr_t cr3)
+    uint64_t LibvmiInterface::read64VA(addr_t virtualAddress, addr_t cr3)
     {
         uint64_t extractedValue = 0;
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
@@ -165,10 +165,7 @@ namespace VmiCore
         return result;
     }
 
-    bool LibvmiInterface::readXVA(const addr_t virtualAddress,
-                                  const addr_t cr3,
-                                  std::vector<uint8_t>& content,
-                                  std::size_t size)
+    bool LibvmiInterface::readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content, std::size_t size)
     {
         if (size > content.size())
         {
@@ -185,7 +182,7 @@ namespace VmiCore
         return true;
     }
 
-    void LibvmiInterface::write8PA(const addr_t physicalAddress, uint8_t value)
+    void LibvmiInterface::write8PA(addr_t physicalAddress, uint8_t value)
     {
         auto accessContext = createPhysicalAddressAccessContext(physicalAddress);
         std::scoped_lock<std::mutex> lock(libvmiLock);
@@ -371,7 +368,7 @@ namespace VmiCore
         return pending;
     }
 
-    std::unique_ptr<std::string> LibvmiInterface::extractUnicodeStringAtVA(const addr_t stringVA, const addr_t cr3)
+    std::unique_ptr<std::string> LibvmiInterface::extractUnicodeStringAtVA(addr_t stringVA, addr_t cr3)
     {
         auto extractedString = tryExtractUnicodeStringAtVA(stringVA, cr3);
 
@@ -382,7 +379,7 @@ namespace VmiCore
         return std::move(extractedString.value());
     }
 
-    std::optional<std::string> LibvmiInterface::extractWStringAtVA(const addr_t stringVA, const addr_t cr3)
+    std::optional<std::string> LibvmiInterface::extractWStringAtVA(addr_t stringVA, addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
         std::scoped_lock<std::mutex> lock(libvmiLock);
@@ -399,8 +396,8 @@ namespace VmiCore
         return result;
     }
 
-    std::optional<std::unique_ptr<std::string>> LibvmiInterface::tryExtractUnicodeStringAtVA(const addr_t stringVA,
-                                                                                             const addr_t cr3)
+    std::optional<std::unique_ptr<std::string>> LibvmiInterface::tryExtractUnicodeStringAtVA(addr_t stringVA,
+                                                                                             addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(stringVA, cr3);
         std::scoped_lock<std::mutex> lock(libvmiLock);
@@ -418,7 +415,7 @@ namespace VmiCore
         return result;
     }
 
-    std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(const addr_t virtualAddress, const addr_t cr3)
+    std::unique_ptr<std::string> LibvmiInterface::extractStringAtVA(addr_t virtualAddress, addr_t cr3)
     {
         auto accessContext = createVirtualAddressAccessContext(virtualAddress, cr3);
         std::scoped_lock<std::mutex> lock(libvmiLock);
