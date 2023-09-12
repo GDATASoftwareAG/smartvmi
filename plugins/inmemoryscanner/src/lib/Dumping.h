@@ -54,7 +54,7 @@ namespace InMemoryScanner
         {
         }
 
-        std::string getMemFileName()
+        [[nodiscard]] std::string getMemFileName()
         {
             return processName.substr(0, maxProcNameLength)
                 .append("-")
@@ -69,7 +69,7 @@ namespace InMemoryScanner
                 .append(uid);
         }
 
-        std::string toString()
+        [[nodiscard]] std::string toString()
         {
             return std::string("{")
                 .append(R"("ProcessName": ")")
@@ -155,13 +155,13 @@ namespace InMemoryScanner
         int memoryRegionCounter{};
         std::mutex counterLock{};
 
-        static std::unique_ptr<MemoryRegionInformation>
+        [[nodiscard]] static std::unique_ptr<MemoryRegionInformation>
         createMemoryRegionInformation(const std::string& processName,
                                       pid_t pid,
                                       const VmiCore::MemoryRegion& memoryRegionDescriptor,
                                       int regionId);
 
-        int getNextRegionId();
+        [[nodiscard]] int getNextRegionId();
 
         void appendRegionInfo(const std::string& regionInfo);
     };

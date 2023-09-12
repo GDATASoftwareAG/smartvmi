@@ -20,7 +20,7 @@ namespace InMemoryScanner
                 std::unique_ptr<YaraInterface> yaraEngine,
                 std::unique_ptr<IDumping> dumping);
 
-        static std::unique_ptr<std::string> getFilenameFromPath(const std::string& path);
+        [[nodiscard]] static std::unique_ptr<std::string> getFilenameFromPath(const std::string& path);
 
         void scanProcess(std::shared_ptr<const VmiCore::ActiveProcessInformation> processInformation);
 
@@ -39,7 +39,7 @@ namespace InMemoryScanner
         Semaphore<std::mutex, std::condition_variable> semaphore =
             Semaphore<std::mutex, std::condition_variable>(YR_MAX_THREADS);
 
-        bool shouldRegionBeScanned(const VmiCore::MemoryRegion& memoryRegionDescriptor);
+        [[nodiscard]] bool shouldRegionBeScanned(const VmiCore::MemoryRegion& memoryRegionDescriptor);
 
         void scanMemoryRegion(pid_t pid,
                               const std::string& processName,

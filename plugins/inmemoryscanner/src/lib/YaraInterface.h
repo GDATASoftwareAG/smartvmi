@@ -16,7 +16,7 @@ namespace InMemoryScanner
       public:
         virtual ~YaraInterface() = default;
 
-        virtual std::unique_ptr<std::vector<Rule>> scanMemory(std::vector<uint8_t>& buffer) = 0;
+        [[nodiscard]] virtual std::unique_ptr<std::vector<Rule>> scanMemory(std::vector<uint8_t>& buffer) = 0;
 
       protected:
         YaraInterface() = default;
