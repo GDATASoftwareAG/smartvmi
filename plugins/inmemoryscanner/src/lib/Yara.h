@@ -17,8 +17,9 @@ namespace InMemoryScanner
       private:
         YR_RULES* rules = nullptr;
 
-        static int yaraCallback(YR_SCAN_CONTEXT* context, int message, void* message_data, void* user_data);
+        [[nodiscard]] static int
+        yaraCallback(YR_SCAN_CONTEXT* context, int message, void* message_data, void* user_data);
 
-        static int handleRuleMatch(YR_SCAN_CONTEXT* context, YR_RULE* rule, std::vector<Rule>* results);
+        [[nodiscard]] static int handleRuleMatch(YR_SCAN_CONTEXT* context, YR_RULE* rule, std::vector<Rule>* results);
     };
 }
