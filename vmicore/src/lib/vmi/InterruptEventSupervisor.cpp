@@ -157,14 +157,12 @@ namespace VmiCore
     {
         vmiInterface->write8PA(targetPA, INT3_BREAKPOINT);
         paToBreakpointStatus[targetPA] = BPStateResponse::Enable;
-        GlobalControl::logger()->debug("Enabled interrupt event", {{"targetPA", fmt::format("{:#x}", targetPA)}});
     }
 
     void InterruptEventSupervisor::disableEvent(addr_t targetPA)
     {
         vmiInterface->write8PA(targetPA, originalValuesByTargetPA[targetPA]);
         paToBreakpointStatus[targetPA] = BPStateResponse::Disable;
-        GlobalControl::logger()->debug("Disabled interrupt event", {{"targetPA", fmt::format("{:#x}", targetPA)}});
     }
 
     event_response_t InterruptEventSupervisor::_defaultInterruptCallback([[maybe_unused]] vmi_instance_t vmi,
@@ -229,8 +227,8 @@ namespace VmiCore
             }
             catch (const std::exception& e)
             {
-                GlobalControl::logger()->warning("Interrupt callback failed",
-                                                 {{"logger", loggerName}, {"exception", e.what()}});
+                GlobalControl::logger()->error("Interrupt callback failed",
+                                               {{"logger", loggerName}, {"exception", e.what()}});
                 GlobalControl::eventStream()->sendErrorEvent(e.what());
             }
         }
