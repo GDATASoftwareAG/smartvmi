@@ -46,12 +46,20 @@ namespace ApiTracing
 
         logger->debug("ApiTracing plugin version info", {{"Version", PLUGIN_VERSION}, {"BuildNumber", BUILD_VERSION}});
 
-        auto apiTracingConfig = std::make_unique<Config>(config);
+        auto apiTracingConfig = std::make_unique<Config>(pluginInterface, config);
+
+        std::string commandLine;
+        for (const auto& piece : args)
+        {
+            commandLine += " " + piece;
+        }
+        logger->info("ApiTracing command line", {{"commandLine:", commandLine}});
 
         if (functionDefinitionsPath.isSet())
         {
             apiTracingConfig->setFunctionDefinitionsPath(functionDefinitionsPath);
         }
+
         if (traceProcessName.isSet())
         {
             apiTracingConfig->addTracingTarget(traceProcessName);
