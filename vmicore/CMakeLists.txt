@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(src)
 target_compile_definitions(vmicore PRIVATE PROGRAM_VERSION="${VMICORE_PROGRAM_VERSION}" BUILD_VERSION="${VMICORE_PROGRAM_BUILD_NUMBER}")
 target_compile_options(vmicore-lib PUBLIC -Wall -Wunused -Wunreachable-code -Wextra)
+set_target_properties(vmicore PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "include-what-you-use;-Xiwyu;--no_fwd_decls;-Xiwyu;--cxx17ns;-Xiwyu;--mapping-file=mappings.imp")
 
 if (VMICORE_TRACE_MODE)
     target_compile_definitions(vmicore-lib PRIVATE TRACE_MODE)
