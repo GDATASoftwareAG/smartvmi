@@ -29,6 +29,7 @@ namespace ApiTracing
           logger(this->pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
     {
         logger->bind({{VmiCore::WRITE_TO_FILE_TAG, LOG_FILENAME}});
+        builder["indentation"] = "";
     }
 
     void FunctionHook::hookFunction(VmiCore::addr_t moduleBaseAddress,
@@ -52,25 +53,40 @@ namespace ApiTracing
         }
 
         auto extractedParameters = extractor->extractParameters(event, parameterInformation);
-        logParameterList(extractedParameters);
+        auto json = getParameterListAsJson(extractedParameters);
+        std::string unformattedTraces = Json::writeString(builder, json);
+
+        logger->info("Monitored function called",
+                     {{"FunctionName", functionName},
+                      {"ModuleName", moduleName},
+                      {"ProcessDtb", fmt::format("{:x}", event.getCr3())},
+                      {"ProcessTeb", fmt::format("{:x}", event.getGs())},
+                      {"Parameterlist", unformattedTraces}});
 
         return BpResponse::Continue;
     }
 
-    void FunctionHook::logParameterList(const std::vector<ExtractedParameterInformation>& extractedParameters)
+    Json::Value
+    FunctionHook::getParameterListAsJson(const std::vector<ExtractedParameterInformation>& extractedParameters)
     {
+        Json::Value parameterList;
+
         for (const auto& extractedParameter : extractedParameters)
         {
-            std::visit(
-                [&extractedParameter = extractedParameter, &logger = logger](auto&& arg)
-                {
-                    logger->info("Parameter",
-                                 {{"Name", extractedParameter.name},
-                                  {"Value", std::forward<std::remove_reference_t<decltype(arg)>>(arg)}});
-                },
-                extractedParameter.data);
-            // TODO: Log backing parameters
+            Json::Value parameter;
+            if (!extractedParameter.backingParameters.empty())
+            {
+                parameter[extractedParameter.name] = getParameterListAsJson(extractedParameter.backingParameters);
+            }
+            else
+            {
+                std::visit([&parameter = parameter, &extractedParameter = extractedParameter]<typename T>(T&& arg)
+                           { parameter[extractedParameter.name] = std::forward<T>(arg); },
+                           extractedParameter.data);
+            }
+            parameterList.append(parameter);
         }
+        return parameterList;
     }
 
     void FunctionHook::teardown() const

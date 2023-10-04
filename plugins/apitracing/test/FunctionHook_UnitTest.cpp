@@ -53,6 +53,11 @@ namespace ApiTracing
         std::shared_ptr<MockIntrospectionAPI> introspectionAPI = std::make_shared<NiceMock<MockIntrospectionAPI>>();
         std::shared_ptr<MockExtractor> extractor = std::make_shared<NiceMock<MockExtractor>>();
         std::shared_ptr<MockInterruptEvent> interruptEvent = std::make_shared<NiceMock<MockInterruptEvent>>();
+        std::vector<ExtractedParameterInformation> extractedParameterInformation{
+            {.name = "TestInt0", .data = 0},
+            {.name = "TestInt1",
+             .data = 3,
+             .backingParameters = {{.name = "TestInt2", .data = 4}, {.name = "TestString1", .data = "A"}}}};
 
         void SetUp() override
         {

@@ -4,6 +4,8 @@
 #include "ConstantDefinitions.h"
 #include "config/FunctionDefinitions.h"
 #include "os/Extractor.h"
+#include <json/value.h>
+#include <json/writer.h>
 #include <vmicore/io/ILogger.h>
 #include <vmicore/plugins/PluginInterface.h>
 #include <vmicore/vmi/IBreakpoint.h>
@@ -36,8 +38,9 @@ namespace ApiTracing
         std::shared_ptr<std::vector<ParameterInformation>> parameterInformation;
         VmiCore::Plugin::PluginInterface* pluginInterface;
         std::unique_ptr<VmiCore::ILogger> logger;
+        Json::StreamWriterBuilder builder;
 
-        void logParameterList(const std::vector<ExtractedParameterInformation>& extractedParameters);
+        Json::Value getParameterListAsJson(const std::vector<ExtractedParameterInformation>& extractedParameters);
     };
 }
 #endif // APITRACING_FUNCTIONHOOK_H
