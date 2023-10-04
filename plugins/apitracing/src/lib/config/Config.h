@@ -6,7 +6,9 @@
 #include <map>
 #include <optional>
 #include <string_view>
+#include <vmicore/io/ILogger.h>
 #include <vmicore/plugins/IPluginConfig.h>
+#include <vmicore/plugins/PluginInterface.h>
 #include <yaml-cpp/yaml.h>
 
 namespace ApiTracing
@@ -31,7 +33,8 @@ namespace ApiTracing
     class Config : public IConfig
     {
       public:
-        explicit Config(const VmiCore::Plugin::IPluginConfig& pluginConfig);
+        explicit Config(const VmiCore::Plugin::PluginInterface* pluginInterface,
+                        const VmiCore::Plugin::IPluginConfig& pluginConfig);
 
         ~Config() override = default;
 
@@ -44,6 +47,7 @@ namespace ApiTracing
         void setFunctionDefinitionsPath(const std::filesystem::path& path) override;
 
       private:
+        std::unique_ptr<VmiCore::ILogger> logger;
         std::filesystem::path configFileDir;
         std::filesystem::path functionDefinitions;
         std::map<std::string, TracingProfile, std::less<>> profiles;

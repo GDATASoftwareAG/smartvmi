@@ -55,10 +55,18 @@ Modules:
       ReturnValue: BOOL
 Structures:
   LPPROCESS_INFORMATION:
-    hProcess: HANDLE
-    hThread: HANDLE
-    dwProcessId: DWORD
-    dwThreadId: DWORD
+  hProcess:
+    Type: HANDLE
+    Offset: 0
+  hThread:
+    Type: HANDLE
+    Offset: 8
+  dwProcessId:
+    Type: DWORD
+    Offset: 16
+  dwThreadId:
+    Type: DWORD
+    Offset: 20
 HighLevelParameterTypes:
   AddressWidth32Bit:
     DWORD: unsigned long
@@ -89,3 +97,73 @@ For example the parameter *hProcess* is of the type *HANDLE*. Depending on the a
 resolved
 to either *unsigned int* or *unsigned _int64*. Those are *BackingParameterTypes* so either 8 or 4 byte are read when
 extracting this structure from the heap.
+
+## Extraction Format
+
+Function call traces are logged in an unindented json format which is illustrated indented below for better visibility.
+The parameter extraction logs are identified by the *key* ```Parameterlist:```.
+Its *value* is a list of all function call parameters, whereby the parameter names form the *keys* of the contained *key:value* pairs.
+Each *value* is either the value of the parameter as integer or string value, or it is a list containing
+the *key:value* pairs of backing parameters if it's a pointer to a struct.
+
+
+```json
+{
+    "Parameterlist": [
+                    {"FileHandle":[
+                                    {"HANDLE":45}]},
+                    {"DesiredAccess":1180063},
+                    {"ObjectAttributes":[
+                                    {"Length":48},
+                                    {"RootDirectory":0},
+                                    {"ObjectName":"\\Device\\ConDrv\\Server"},
+                                    {"Attributes":66},
+                                    {"SecurityDescriptor":0},
+                                    {"SecurityQualityOfService":0}]},
+                  {"IoStatusBlock":958106952720},
+                  {"AllocationSize":0},
+                  {"FileAttributes":0},
+                  {"ShareAccess":7},
+                  {"CreateDisposition":2},
+                  {"CreateOptions":0},
+                  {"EaBuffer":0},
+                  {"EaLength":0}]
+}
+```
+
+The log example above is a function call of *NtCreateFile* with these parameters:
+
+```c
+__kernel_entry NTSTATUS NtCreateFile(
+  [out]          PHANDLE            FileHandle,
+  [in]           ACCESS_MASK        DesiredAccess,
+  [in]           POBJECT_ATTRIBUTES ObjectAttributes,
+  [out]          PIO_STATUS_BLOCK   IoStatusBlock,
+  [in, optional] PLARGE_INTEGER     AllocationSize,
+  [in]           ULONG              FileAttributes,
+  [in]           ULONG              ShareAccess,
+  [in]           ULONG              CreateDisposition,
+  [in]           ULONG              CreateOptions,
+  [in]           PVOID              EaBuffer,
+  [in]           ULONG              EaLength
+);
+```
+
+*FileHandle, DesiredAccess, ObjectAttributues, IOStatusBlocck,AllocationSize, FileAttributes,ShareAccess, CreateDisposition,
+CreateOptions, EaBuffer* and *EaLength* are members of the list in parameterlist *value*.
+
+```c
+typedef struct _OBJECT_ATTRIBUTES {
+  ULONG           Length;
+  HANDLE          RootDirectory;
+  PUNICODE_STRING ObjectName;
+  ULONG           Attributes;
+  PVOID           SecurityDescriptor;
+  PVOID           SecurityQualityOfService;
+} OBJECT_ATTRIBUTES;
+```
+
+*ObjectAttributes* is a pointer to a struct, so its value is a list containing the backing parameters.
+The parameter *ObjectName* is a pointer to a unicode and forms an exception since it is extracted directly.
+Both *PVOID* at the end are structs, that are currently not covered by our definitions.
+You can find a list under the struct section in the [function definitions file](configuration/functiondefinitions/functionDefinitions.yaml).

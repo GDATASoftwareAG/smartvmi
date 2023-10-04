@@ -44,7 +44,22 @@ set_property(TARGET yaml-cpp PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 target_compile_definitions(apitracing-obj PUBLIC YAML_CPP_SUPPORT)
 target_link_libraries(apitracing-obj PUBLIC yaml-cpp)
 
+# Setup json-cpp
+
+FetchContent_Declare(
+        jsoncpp
+        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
+        GIT_TAG 1.9.5
+)
+option(JSONCPP_WITH_TESTS "" OFF)
+option(JSONCPP_WITH_POST_BUILD_UNITTEST "" OFF)
+option(JSONCPP_WITH_EXAMPLE "" OFF)
+FetchContent_MakeAvailable(jsoncpp)
+set_property(TARGET jsoncpp_static PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+target_link_libraries(apitracing-obj PUBLIC jsoncpp_static)
+
 # Add public vmicore headers
 
 add_subdirectory("${VMICORE_DIRECTORY_ROOT}/src/include" "${CMAKE_CURRENT_BINARY_DIR}/vmicore-public-headers")
 target_link_libraries(apitracing-obj PUBLIC vmicore-public-headers)
+

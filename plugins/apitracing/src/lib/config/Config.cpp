@@ -1,10 +1,14 @@
 #include "Config.h"
+#include "../Filenames.h"
 #include "TracingDefinitions.h"
 #include <vmicore/plugins/IPluginConfig.h>
+#include <vmicore/plugins/PluginInterface.h>
 
 namespace ApiTracing
 {
-    Config::Config(const VmiCore::Plugin::IPluginConfig& pluginConfig)
+    Config::Config(const VmiCore::Plugin::PluginInterface* pluginInterface,
+                   const VmiCore::Plugin::IPluginConfig& pluginConfig)
+        : logger(pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
     {
         auto configRootNode = pluginConfig.rootNode();
         if (auto configFilePath = pluginConfig.configFilePath())
@@ -96,7 +100,12 @@ namespace ApiTracing
 
     void Config::addTracingTarget(const std::string& name)
     {
+        logger->debug("addTracingTarget", {{"Name", name}});
         processTracingProfiles.emplace(name, profiles["default"]);
+        for (auto [processName, profile] : processTracingProfiles)
+        {
+            logger->debug("tracing profiles", {{"ProcessName", processName}, {"TracingProfile", profile.name}});
+        }
     }
 
     void Config::setFunctionDefinitionsPath(const std::filesystem::path& path)
