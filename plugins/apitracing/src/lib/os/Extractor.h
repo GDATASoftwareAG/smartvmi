@@ -6,6 +6,7 @@
 #include <ostream>
 #include <variant>
 #include <vector>
+#include <vmicore/plugins/PluginInterface.h>
 #include <vmicore/vmi/IIntrospectionAPI.h>
 #include <vmicore/vmi/events/IInterruptEvent.h>
 
@@ -26,6 +27,7 @@ namespace ApiTracing
         INT,
         LONG,
         __INT64,
+        UNSIGNED___INT32,
         UNSIGNED___INT64,
         UNSIGNED_LONG,
         UNSIGNED_INT,
@@ -86,7 +88,9 @@ namespace ApiTracing
     class Extractor : public IExtractor
     {
       public:
-        Extractor(std::shared_ptr<VmiCore::IIntrospectionAPI> introspectionApi, uint8_t addressWidth);
+        Extractor(std::shared_ptr<VmiCore::IIntrospectionAPI> introspectionApi,
+                  VmiCore::Plugin::PluginInterface* pluginInterface,
+                  uint8_t addressWidth);
 
         [[nodiscard]] std::vector<ExtractedParameterInformation>
         extractParameters(VmiCore::IInterruptEvent& event,
@@ -105,6 +109,8 @@ namespace ApiTracing
         uint8_t addressWidth;
         std::variant<std::string, uint64_t, int> extractedParameters;
         std::shared_ptr<VmiCore::IIntrospectionAPI> introspectionAPI;
+        VmiCore::Plugin::PluginInterface* pluginInterface;
+        std::unique_ptr<VmiCore::ILogger> logger;
         std::map<std::string, BasicTypes, std::less<>> basicTypeStringToEnum{
             {"LPSTR_32", BasicTypes::LPSTR_32},
             {"LPSTR_64", BasicTypes::LPSTR_64},
@@ -117,6 +123,7 @@ namespace ApiTracing
             {"int", BasicTypes::INT},
             {"long", BasicTypes::LONG},
             {"__int64", BasicTypes::__INT64},
+            {"unsigned __int32", BasicTypes::UNSIGNED___INT32},
             {"unsigned __int64", BasicTypes::UNSIGNED___INT64},
             {"unsigned long", BasicTypes::UNSIGNED_LONG},
             {"unsigned int", BasicTypes::UNSIGNED_INT},

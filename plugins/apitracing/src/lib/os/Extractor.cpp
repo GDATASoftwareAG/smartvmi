@@ -1,6 +1,8 @@
 #include "Extractor.h"
 #include "../ConstantDefinitions.h"
+#include "../Filenames.h"
 #include <fmt/core.h>
+#include <stdexcept>
 
 using VmiCore::addr_t;
 using VmiCore::IInterruptEvent;
@@ -8,8 +10,13 @@ using VmiCore::IIntrospectionAPI;
 
 namespace ApiTracing
 {
-    Extractor::Extractor(std::shared_ptr<IIntrospectionAPI> introspectionApi, uint8_t addressWidth)
-        : addressWidth(addressWidth), introspectionAPI(std::move(introspectionApi))
+    Extractor::Extractor(std::shared_ptr<VmiCore::IIntrospectionAPI> introspectionApi,
+                         VmiCore::Plugin::PluginInterface* pluginInterface,
+                         uint8_t addressWidth)
+        : addressWidth(addressWidth),
+          introspectionAPI(std::move(introspectionApi)),
+          pluginInterface(pluginInterface),
+          logger(this->pluginInterface->newNamedLogger(APITRACING_LOGGER_NAME))
     {
     }
 
@@ -74,23 +81,40 @@ namespace ApiTracing
 
         for (const auto& parameterInfo : *parameterInformation)
         {
-            if (!parameterInfo.basicType.empty())
+            if (parameterInfo.basicType.empty())
             {
-                extractedParameterInformation.emplace_back(
-                    extractSingleParameter(shallowParameters.at(parameterIndex), cr3, parameterInfo));
+                throw std::runtime_error("Malformed parameter information ! Aborting");
             }
-            else if (!parameterInfo.backingParameters.empty())
+
+            if (!parameterInfo.backingParameters.empty())
             {
-                addr_t structVA = dereferencePointer(shallowParameters.at(parameterIndex), cr3);
+                // skip optional parameters (e.g. AllocationSize in NtCreateFile)
+                if (auto pointerAddress = shallowParameters.at(parameterIndex); pointerAddress == 0)
+                {
+                    extractedParameterInformation.emplace_back(
+                        extractSingleParameter(pointerAddress, cr3, parameterInfo));
+                    parameterIndex++;
+                    continue;
+                }
+
                 ExtractedParameterInformation paramStruct{
                     .name = parameterInfo.name, .data = {}, .backingParameters = {}};
-                paramStruct.backingParameters =
-                    extractBackingParameters({parameterInfo.backingParameters}, structVA, cr3);
+                try
+                {
+                    paramStruct.backingParameters = extractBackingParameters(
+                        {parameterInfo.backingParameters}, shallowParameters.at(parameterIndex), cr3);
+                }
+                catch (const std::exception& e)
+                {
+                    logger->debug("Could not deep extract parameter",
+                                  {{"name", parameterInfo.name}, {"exception", e.what()}});
+                }
                 extractedParameterInformation.emplace_back(paramStruct);
             }
             else
             {
-                throw std::runtime_error("Malformed parameter information ! Aborting");
+                extractedParameterInformation.emplace_back(
+                    extractSingleParameter(shallowParameters.at(parameterIndex), cr3, parameterInfo));
             }
             parameterIndex++;
         }
@@ -103,8 +127,17 @@ namespace ApiTracing
     {
         ExtractedParameterInformation result{};
         result.name = parameterInfo.name;
-
-        switch (basicTypeStringToEnum.at(parameterInfo.basicType))
+        BasicTypes parameterType;
+        try
+        {
+            parameterType = basicTypeStringToEnum.at(parameterInfo.basicType);
+        }
+        catch (...)
+        {
+            std::throw_with_nested(
+                std::invalid_argument(fmt::format("Parameter not defined: {}", parameterInfo.basicType)));
+        }
+        switch (parameterType)
         {
             using enum BasicTypes;
 
@@ -123,11 +156,19 @@ namespace ApiTracing
             case UNICODE_WSTR_32:
             case UNICODE_WSTR_64:
             {
-                result.data = extractUnicodeString(shallowParameter, cr3);
+                try
+                {
+                    result.data = extractUnicodeString(shallowParameter, cr3);
+                }
+                catch (std::exception&)
+                {
+                    result.data = "";
+                }
                 break;
             }
             case __PTR32:
             case __PTR64:
+            case UNSIGNED___INT32:
             case UNSIGNED___INT64:
             case UNSIGNED_LONG:
             case UNSIGNED_INT:
@@ -145,7 +186,7 @@ namespace ApiTracing
             }
             default:
             {
-                break;
+                throw std::invalid_argument(fmt::format("Parameter not defined: {}", parameterInfo.basicType));
             }
         }
         return result;
@@ -202,21 +243,31 @@ namespace ApiTracing
         std::vector<ExtractedParameterInformation> extractedBackingParameters;
         for (const auto& parameter : backingParameters)
         {
-            if (parameter.backingParameters.empty())
+            ExtractedParameterInformation extraction{.name = parameter.name, .data = {}, .backingParameters = {}};
+            try
             {
-                auto parameterValue = introspectionAPI->readVA(address + parameter.offset, cr3, parameter.size);
-                extractedBackingParameters.emplace_back(extractSingleParameter(parameterValue, cr3, parameter));
+                if (parameter.backingParameters.empty())
+                {
+                    auto parameterValue = introspectionAPI->readVA(address + parameter.offset, cr3, parameter.size);
+                    extraction = extractSingleParameter(parameterValue, cr3, parameter);
+                }
+                else
+                {
+                    // Extract shallow parameters (based on size) from shallowParameters.at(parameterIndex). Then pass
+                    // those to the nexţ iteration
+                    addr_t structPointer = dereferencePointer(address + parameter.offset, cr3);
+
+                    extraction.backingParameters =
+                        extractBackingParameters(parameter.backingParameters, structPointer, cr3);
+                }
             }
-            else
+            // Don't stop extraction on first failed parameter. Instead, insert default element try to extract the rest.
+            catch (const std::exception& e)
             {
-                // Extract shallow parameters (based on size) from shallowParameters.at(parameterIndex). Then pass those
-                // to the nexţ iteration
-                addr_t structPointer = dereferencePointer(address + parameter.offset, cr3);
-                ExtractedParameterInformation extraction{.name = parameter.name, .data = {}, .backingParameters = {}};
-                extraction.backingParameters =
-                    extractBackingParameters(parameter.backingParameters, structPointer, cr3);
-                extractedBackingParameters.emplace_back(extraction);
+                logger->debug("Could not extract backing parameter",
+                              {{"name", parameter.name}, {"exception", e.what()}});
             }
+            extractedBackingParameters.emplace_back(extraction);
         }
         return extractedBackingParameters;
     }

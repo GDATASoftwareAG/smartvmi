@@ -3792,7 +3792,7 @@ Modules:
     NtSetContextThread:
       Parameters:
         ThreadHandle: HANDLE
-        Context: CONTEXT
+        Context: LPCONTEXT
       ReturnValue: NTSTATUS
     NtSuspendThread:
       Parameters:
@@ -4724,8 +4724,9 @@ Structures:
       Type: PVOID # TODO Add real definition
       Offset: 0
   LPCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-    Type: PVOID # TODO Add real definition
-    Offset: 0
+    CONTEXT:
+      Type: PVOID # TODO Add real definition
+      Offset: 0
   LPPROCESS_INFORMATION:
     hProcess:
       Type: HANDLE
@@ -4866,10 +4867,10 @@ Structures:
     UniqueThread:
       Type: HANDLE
       Offset: 8
-    PCONTEXT: # TODO Add definition for CONTEXT https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-      CONTEXT:
-        Type: PVOID
-        Offset: 0
+  PCONTEXT: # TODO Add definition for CONTEXT https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
+    CONTEXT:
+      Type: PVOID
+      Offset: 0
   PFILE_BASIC_INFORMATION:
     CreationTime:
       Type: LARGE_INTEGER
@@ -5002,13 +5003,11 @@ HighLevelParameterTypes:
     LPTHREAD_START_ROUTINE: PVOID
     LPWSTR: LPWSTR_32
     LPBYTE: unsigned int
-    LPCONTEXT: CONTEXT
     LPCVOID: unsigned int
     LPDWORD: unsigned int
     LPVOID: unsigned int
     NTSTATUS: unsigned __int32
     PANSI_STRING: PVOID
-    PHANDLE: HANDLE
     PIO_APC_ROUTINE: PVOID
     PIO_STATUS_BLOCK: PVOID
     PINITIAL_TEB: PVOID
@@ -5062,14 +5061,11 @@ HighLevelParameterTypes:
     LPTHREAD_START_ROUTINE: PVOID # Pointer to the starting address of a thread. E.g. https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createremotethreadex
     LPWSTR: LPWSTR_64
     LPBYTE: unsigned __int64
-    LPCONTEXT: CONTEXT
     LPCVOID: unsigned __int64
     LPDWORD: unsigned __int64
     LPVOID: unsigned __int64
     NTSTATUS: unsigned __int32
     PANSI_STRING: PVOID # TODO find definition
-    PCONTEXT: PVOID # TODO Add Context struct definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
-    PHANDLE: HANDLE
     PIO_APC_ROUTINE: PVOID # TODO find definition
     PIO_STATUS_BLOCK: PVOID # TODO add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
     PINITIAL_TEB: PVOID # TODO add struct definition from http://undocumented.ntinternals.net/
@@ -5108,6 +5104,7 @@ BackingParameterTypes:
   LPWSTR_64: 8
   UNICODE_WSTR_32: 4
   UNICODE_WSTR_64: 8
+  unsigned __int32: 4
   unsigned __int64: 8
   unsigned long: 4
   unsigned int: 4
