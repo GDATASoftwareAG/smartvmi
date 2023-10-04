@@ -76,6 +76,13 @@ namespace ApiTracing
                 throw std::runtime_error("Unknown operating system.");
             }
         }
+
+        // Hook process if it's already running
+        auto runningProcesses = pluginInterface->getRunningProcesses();
+        for (const auto& processInformation : *runningProcesses)
+        {
+            tracer->traceProcess(processInformation);
+        }
     }
 
     void ApiTracing::unload()
