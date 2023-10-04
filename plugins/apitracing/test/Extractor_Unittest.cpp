@@ -1,15 +1,22 @@
+#include "../../../vmicore/src/lib/vmi/VmiException.h"
 #include "../src/lib/os/Extractor.h"
 #include "ConstantDefinitions.h"
 #include "TestConstantDefinitions.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vmicore_test/io/mock_Logger.h>
+#include <vmicore_test/plugins/mock_PluginInterface.h>
 #include <vmicore_test/vmi/mock_InterruptEvent.h>
 #include <vmicore_test/vmi/mock_IntrospectionAPI.h>
 
+using testing::_; // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 using testing::ContainerEq;
+using testing::NiceMock;
 using testing::Return;
+using testing::Throw;
 using VmiCore::MockInterruptEvent;
 using VmiCore::MockIntrospectionAPI;
+using VmiCore::Plugin::MockPluginInterface;
 
 namespace ApiTracing
 {
@@ -61,7 +68,6 @@ namespace ApiTracing
         // clang-format off
         // @formatter:off
         const auto testParams32 = std::vector<TestParameterInformation>{
-
             {.parameterInformation{.name = "param1", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
              .expectedValue = param1Value},
             {.parameterInformation{.name = "param2", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
@@ -73,42 +79,57 @@ namespace ApiTracing
             {.parameterInformation{.name = "param5", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
              .expectedValue = param5Value},
         };
+
+        const auto testParamUnknownType = std::vector<TestParameterInformation>{
+            {.parameterInformation{.basicType = "__unknown int96", .name = "UnknownType", .size = TestConstantDefinitions::fourBytes, .backingParameters{}},
+                .expectedValue = param1Value},
+
+};
         // @formatter:on
         // clang-format on
 
-        const auto objectAttributesBackingParametersLevelTwo =
-            std::vector<TestParameterInformation>{{.parameterInformation{.basicType = "unsigned long",
-                                                                         .name = "ObjectAttributesTwoContentOne",
-                                                                         .size = TestConstantDefinitions::fourBytes,
-                                                                         .offset = ObjectAttributesTwoContentOneOffset,
-                                                                         .backingParameters{}},
-                                                   .expectedValue = ObjectAttributesTwoContentOneValue},
-                                                  {.parameterInformation{.basicType = "LPSTR_64",
-                                                                         .name = "ObjectAttributesTwoContentTwo",
-                                                                         .size = TestConstantDefinitions::eightBytes,
-                                                                         .offset = ObjectAttributesTwoContentTwoOffset,
-                                                                         .backingParameters{}},
-                                                   .expectedValue = ObjectAttributesTwoContentTwoValue}};
+        const auto objectAttributesBackingParametersLevelTwo = std::vector<TestParameterInformation>{
+            // resides on ObjectAttributesTwoValue, value is ObjectAttributesTwoContentOneValue
+            {.parameterInformation{.basicType = "unsigned long",
+                                   .name = "ObjectAttributesTwoContentOne",
+                                   .size = TestConstantDefinitions::fourBytes,
+                                   .offset = ObjectAttributesTwoContentOneOffset,
+                                   .backingParameters{}},
+             .expectedValue = ObjectAttributesTwoContentOneValue},
+            // resides on ObjectAttributesTwoValue + ObjectAttributesTwoContentTwoOffset,
+            // value is ObjectAttributesTwoContentTwoValue which is the address to a string
+            {.parameterInformation{.basicType = "LPSTR_64",
+                                   .name = "ObjectAttributesTwoContentTwo",
+                                   .size = TestConstantDefinitions::eightBytes,
+                                   .offset = ObjectAttributesTwoContentTwoOffset,
+                                   .backingParameters{}},
+             .expectedValue = ObjectAttributesTwoContentTwoValue}};
 
         const auto objectAttributesBackingParametersLevelOne = std::vector<TestParameterInformation>{
+            // resides on param2Value, value is ObjectAttributesTwoValue
             {.parameterInformation{
+                 .basicType = "LPSTR_64",
                  .name = "ObjectAttributesTwo",
                  .size = TestConstantDefinitions::eightBytes,
                  .backingParameters{{objectAttributesBackingParametersLevelTwo.at(0).parameterInformation},
                                     {objectAttributesBackingParametersLevelTwo.at(1).parameterInformation}}},
              .expectedValue = ObjectAttributesTwoValue}};
 
+        // Two function parameters in rcx and rdx
         const auto testNestedStruct = std::vector<TestParameterInformation>{
+            // resides in rcx, value is param1Value
             {.parameterInformation{.basicType = "unsigned __int64",
                                    .name = "FileHandle",
                                    .size = TestConstantDefinitions::eightBytes,
                                    .backingParameters{}},
              .expectedValue = param1Value},
+            // resides in rdx, value is param2Value
             {.parameterInformation{
+                 .basicType = "LPSTR_64",
                  .name = "ObjectAttributesOne",
                  .size = TestConstantDefinitions::eightBytes,
                  .backingParameters{{objectAttributesBackingParametersLevelOne.at(0).parameterInformation}}},
-             .expectedValue = ObjectAttributesOneValue}};
+             .expectedValue = param2Value}};
     }
 
     class ExtractorFixture : public testing::Test
@@ -116,10 +137,14 @@ namespace ApiTracing
       protected:
         std::shared_ptr<MockIntrospectionAPI> introspectionAPI = std::make_shared<MockIntrospectionAPI>();
         std::shared_ptr<MockInterruptEvent> interruptEvent = std::make_shared<MockInterruptEvent>();
+        std::unique_ptr<MockPluginInterface> pluginInterface = std::make_unique<NiceMock<MockPluginInterface>>();
         std::shared_ptr<std::vector<ParameterInformation>> paramInformation;
 
         void SetUp() override
         {
+            ON_CALL(*pluginInterface, newNamedLogger(_))
+                .WillByDefault([]() { return std::make_unique<NiceMock<VmiCore::MockLogger>>(); });
+
             ON_CALL(*interruptEvent, getCr3()).WillByDefault(Return(testDtb));
             ON_CALL(*interruptEvent, getRcx).WillByDefault(Return(testParams64[0].expectedValue));
             ON_CALL(*interruptEvent, getRdx).WillByDefault(Return(testParams64[1].expectedValue));
@@ -139,13 +164,15 @@ namespace ApiTracing
 
         void SetupNestedStructPointerReads()
         {
-            ON_CALL(*introspectionAPI, read64VA(param2Value, testDtb)).WillByDefault(Return(ObjectAttributesOneValue));
+            ON_CALL(*introspectionAPI, read64VA(param2Value, testDtb)).WillByDefault(Return(ObjectAttributesTwoValue));
 
             ON_CALL(*introspectionAPI, read64VA(ObjectAttributesOneValue, testDtb))
                 .WillByDefault(Return(ObjectAttributesTwoValue));
 
-            ON_CALL(*introspectionAPI, readVA(ObjectAttributesTwoValue, testDtb, sizeof(uint32_t)))
+            ON_CALL(*introspectionAPI,
+                    readVA(ObjectAttributesTwoValue + ObjectAttributesTwoContentOneOffset, testDtb, sizeof(uint32_t)))
                 .WillByDefault(Return(ObjectAttributesTwoContentOneValue));
+
             ON_CALL(*introspectionAPI,
                     readVA(ObjectAttributesTwoValue + ObjectAttributesTwoContentTwoOffset, testDtb, sizeof(uint64_t)))
                 .WillByDefault(Return(ExtractedStringAddress));
@@ -230,7 +257,8 @@ namespace ApiTracing
 
     TEST_F(ExtractorFixture, getShallowExtractedParams_64Bit0ParametersFunction_CorrectParametersExtracted)
     {
-        auto extractor = std::make_shared<Extractor>(introspectionAPI, ConstantDefinitions::x64AddressWidth);
+        auto extractor =
+            std::make_shared<Extractor>(introspectionAPI, pluginInterface.get(), ConstantDefinitions::x64AddressWidth);
         auto expectedExtractedParameters = SetupParametersAndStack({}, ConstantDefinitions::x64AddressWidth);
 
         auto extractedParameters = extractor->getShallowExtractedParams(*interruptEvent, paramInformation);
@@ -240,7 +268,8 @@ namespace ApiTracing
 
     TEST_F(ExtractorFixture, getShallowExtractedParams_32Bit0ParametersFunction_CorrectParametersExtracted)
     {
-        auto extractor = std::make_shared<Extractor>(introspectionAPI, ConstantDefinitions::x86AddressWidth);
+        auto extractor =
+            std::make_shared<Extractor>(introspectionAPI, pluginInterface.get(), ConstantDefinitions::x86AddressWidth);
         auto expectedExtractedParameters = SetupParametersAndStack({}, ConstantDefinitions::x86AddressWidth);
 
         auto extractedParameters = extractor->getShallowExtractedParams(*interruptEvent, paramInformation);
@@ -250,7 +279,8 @@ namespace ApiTracing
 
     TEST_F(ExtractorFixture, getShallowExtractedParams_32Bit4ParametersFunction_CorrectParametersExtracted)
     {
-        auto extractor = std::make_shared<Extractor>(introspectionAPI, ConstantDefinitions::x86AddressWidth);
+        auto extractor =
+            std::make_shared<Extractor>(introspectionAPI, pluginInterface.get(), ConstantDefinitions::x86AddressWidth);
         auto expectedExtractedParameters = SetupParametersAndStack(testParams32, ConstantDefinitions::x86AddressWidth);
 
         auto extractedParameters = extractor->getShallowExtractedParams(*interruptEvent, paramInformation);
@@ -260,7 +290,8 @@ namespace ApiTracing
 
     TEST_F(ExtractorFixture, getShallowExtractedParams_64Bit6ParametersFunction_CorrectParametersExtracted)
     {
-        auto extractor = std::make_shared<Extractor>(introspectionAPI, ConstantDefinitions::x64AddressWidth);
+        auto extractor =
+            std::make_shared<Extractor>(introspectionAPI, pluginInterface.get(), ConstantDefinitions::x64AddressWidth);
         auto expectedExtractedParameters = SetupParametersAndStack(testParams64, ConstantDefinitions::x64AddressWidth);
 
         auto extractedParameters = extractor->getShallowExtractedParams(*interruptEvent, paramInformation);
@@ -270,7 +301,8 @@ namespace ApiTracing
 
     TEST_F(ExtractorFixture, extractParameters_64Bit6ParametersFunction_CorrectParameters)
     {
-        auto extractor = std::make_shared<Extractor>(introspectionAPI, ConstantDefinitions::x64AddressWidth);
+        auto extractor =
+            std::make_shared<Extractor>(introspectionAPI, pluginInterface.get(), ConstantDefinitions::x64AddressWidth);
         auto expectedExtractedParameters = SetupExpectedNestedParameters();
         auto relevantParameters = std::vector<TestParameterInformation>(testNestedStruct);
         SetupParameterInformation(relevantParameters);
@@ -280,6 +312,44 @@ namespace ApiTracing
         auto actualParameters = extractor->getDeepExtractParameters(shallowParameters, paramInformation, testDtb);
 
         ASSERT_EQ(actualParameters.size(), expectedExtractedParameters.size());
-        EXPECT_THAT(expectedExtractedParameters, ContainerEq(actualParameters));
+        EXPECT_THAT(actualParameters, ContainerEq(expectedExtractedParameters));
+    }
+
+    TEST_F(ExtractorFixture, extractParameters_UnknownParameterType_NestedExceptionInvalidArgument)
+    {
+        auto extractor =
+            std::make_shared<Extractor>(introspectionAPI, pluginInterface.get(), ConstantDefinitions::x64AddressWidth);
+        SetupParameterInformation(std::vector<TestParameterInformation>(testParamUnknownType));
+
+        auto shallowParameters = extractor->getShallowExtractedParams(*interruptEvent, paramInformation);
+
+        EXPECT_THROW(auto extraction =
+                         extractor->getDeepExtractParameters(shallowParameters, paramInformation, testDtb),
+                     std::invalid_argument);
+    }
+
+    TEST_F(ExtractorFixture, extractParameters_OneFailedRead_RemainingParametersExtracted)
+    {
+        auto extractor =
+            std::make_shared<Extractor>(introspectionAPI, pluginInterface.get(), ConstantDefinitions::x64AddressWidth);
+        auto expectedExtractedParameters = SetupExpectedNestedParameters();
+        auto relevantParameters = std::vector<TestParameterInformation>(testNestedStruct);
+        SetupParameterInformation(relevantParameters);
+        SetupNestedStructPointerReads();
+        // Remove first ObjectAttributesTwo element and replace it with the default element
+        ON_CALL(*introspectionAPI, readVA(ObjectAttributesTwoValue, testDtb, sizeof(uint32_t)))
+            .WillByDefault(Throw(VmiCore::VmiException(("Unable to read bytes from VA"))));
+        auto* objectAttributesTwo = &expectedExtractedParameters[1].backingParameters[0].backingParameters;
+        auto removedElementName = objectAttributesTwo->begin()->name;
+        objectAttributesTwo->erase(objectAttributesTwo->begin());
+        objectAttributesTwo->emplace(
+            objectAttributesTwo->begin(),
+            ExtractedParameterInformation{.name = removedElementName, .data = {}, .backingParameters = {}});
+
+        auto shallowParameters = extractor->getShallowExtractedParams(*interruptEvent, paramInformation);
+        auto actualParameters = extractor->getDeepExtractParameters(shallowParameters, paramInformation, testDtb);
+
+        ASSERT_EQ(actualParameters.size(), expectedExtractedParameters.size());
+        EXPECT_THAT(actualParameters, ContainerEq(expectedExtractedParameters));
     }
 }

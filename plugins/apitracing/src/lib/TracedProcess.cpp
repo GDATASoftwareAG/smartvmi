@@ -91,7 +91,7 @@ namespace ApiTracing
                                                                            : ConstantDefinitions::x64AddressWidth;
                     auto definitions = functionDefinitions->getFunctionParameterDefinitions(
                         moduleHookTarget.name, functionName, addressWidth);
-                    auto extractor = std::make_shared<Extractor>(introspectionAPI, addressWidth);
+                    auto extractor = std::make_shared<Extractor>(introspectionAPI, pluginInterface, addressWidth);
                     auto functionHook = std::make_shared<FunctionHook>(
                         moduleHookTarget.name, functionName, extractor, introspectionAPI, definitions, pluginInterface);
                     functionHook->hookFunction(moduleBaseAddress, processInformation);
