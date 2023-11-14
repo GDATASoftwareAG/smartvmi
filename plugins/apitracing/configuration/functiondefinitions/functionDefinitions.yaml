@@ -3246,7 +3246,7 @@ Modules:
     NtRaiseException:
       Parameters:
         ExceptionRecord: EXCEPTION_RECORD
-        Context: CONTEXT
+        Context: LPCONTEXT
         HandleException: BOOLEAN
       ReturnValue: NTSTATUS
     NtCreateFile:
@@ -4700,56 +4700,67 @@ Modules:
         pszPath: LPCTSTR
       ReturnValue: BOOL
 Structures:
+  DATA_BLOB:
+    cbData:
+      type: DWORD
+      offset: 0
+    pbData:
+      type: BYTE
+      offset: 4
   EXCEPTION_RECORD:
     ExceptionCode:
-      Type: DWORD
-      Offset: 0
+      type: DWORD
+      offset: 0
     ExceptionFlags:
-      Type: DWORD
-      Offset: 4
+      type: DWORD
+      offset: 4
     ExceptionRecord:
-      Type: EXCEPTION_RECORD
-      Offset: 8
+      type: EXCEPTION_RECORD
+      offset: 8
     ExceptionAddress:
-      Type: PVOID
-      Offset: 16
+      type: PVOID
+      offset: 16
     NumberParameters:
-      Type: DWORD
-      Offset: 24
+      type: DWORD
+      offset: 24
     ExceptionInformation:
-      Type: ULONG_PTR
-      Offset: 32
+      type: ULONG_PTR
+      offset: 32
   ITEMIDLIST:
     mkid:
-      Type: PVOID # TODO Add real definition
-      Offset: 0
+      type: PVOID # TODO Add real definition
+      offset: 0
+  LPBOOL:
+    BOOL:
+      type: BOOL
+      offset: 0
   LPCONTEXT: # TODO Add definition https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
     CONTEXT:
-      Type: PVOID # TODO Add real definition
-      Offset: 0
+      type: PVOID # TODO Add real definition
+      offset: 0
   LPPROCESS_INFORMATION:
     hProcess:
-      Type: HANDLE
-      Offset: 0
+      type: HANDLE
+      offset: 0
     hThread:
-      Type: HANDLE
-      Offset: 8
+      type: HANDLE
+      offset: 8
     dwProcessId:
-      Type: DWORD
-      Offset: 16
+      type: DWORD
+      offset: 16
     dwThreadId:
-      Type: DWORD
-      Offset: 20
+      type: DWORD
+      offset: 20
   LPSECURITY_ATTRIBUTES:
     nLength:
-      Type: DWORD
-      Offset: 0
+      type: DWORD
+      offset: 0
     lpSecurityDescriptor:
-      Type: LPVOID
-      Offset: 8
+      type: LPVOID
+      offset: 8
     bInheritHandle:
-      Type: BOOL
-      Offset: 16
+      type: BOOL
+      offset: 16
   LPSTARTUPINFOA:
     cb:
       type: DWORD
@@ -4862,126 +4873,132 @@ Structures:
       offset: 96
   PCLIENT_ID:
     UniqueProcess:
-      Type: HANDLE
-      Offset: 0
+      type: HANDLE
+      offset: 0
     UniqueThread:
-      Type: HANDLE
-      Offset: 8
+      type: HANDLE
+      offset: 8
   PCONTEXT: # TODO Add definition for CONTEXT https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context
     CONTEXT:
-      Type: PVOID
-      Offset: 0
+      type: PVOID
+      offset: 0
   PFILE_BASIC_INFORMATION:
     CreationTime:
-      Type: LARGE_INTEGER
-      Offset: 0
+      type: LARGE_INTEGER
+      offset: 0
     LastAccessTime:
-      Type: LARGE_INTEGER
-      Offset: 8
+      type: LARGE_INTEGER
+      offset: 8
     LastWriteTime:
-      Type: LARGE_INTEGER
-      Offset: 16
+      type: LARGE_INTEGER
+      offset: 16
     ChangeTime:
-      Type: LARGE_INTEGER
-      Offset: 24
+      type: LARGE_INTEGER
+      offset: 24
     FileAttributes:
-      Type: ULONG
-      Offset: 32
+      type: ULONG
+      offset: 32
   PFILE_NETWORK_OPEN_INFORMATION:
     CreationTime:
-      Type: LARGE_INTEGER
-      Offset: 0
+      type: LARGE_INTEGER
+      offset: 0
     LastAccessTime:
-      Type: LARGE_INTEGER
-      Offset: 8
+      type: LARGE_INTEGER
+      offset: 8
     LastWriteTime:
-      Type: LARGE_INTEGER
-      Offset: 16
+      type: LARGE_INTEGER
+      offset: 16
     ChangeTime:
-      Type: LARGE_INTEGER
-      Offset: 24
+      type: LARGE_INTEGER
+      offset: 24
     AllocationSize:
-      Type: LARGE_INTEGER
-      Offset: 32
+      type: LARGE_INTEGER
+      offset: 32
     EndOfFile:
-      Type: LARGE_INTEGER
-      Offset: 40
+      type: LARGE_INTEGER
+      offset: 40
     FileAttributes:
-      Type: ULONG
-      Offset: 48
+      type: ULONG
+      offset: 48
   PHANDLE:
     HANDLE:
-      Type: HANDLE
-      Offset: 0
+      type: HANDLE
+      offset: 0
   PHARDERROR_RESPONSE:
     HARDERROR_RESPONSE:
-      Type: HARDERROR_RESPONSE
-      Offset: 0
+      type: HARDERROR_RESPONSE
+      offset: 0
   PHKEY:
     HKEY:
-      Type: HKEY
-      Offset: 0
+      type: HKEY
+      offset: 0
   PIDLIST_ABSOLUTE:
     ITEMIDLIST:
-      Type: ITEMIDLIST
-      Offset: 0
+      type: ITEMIDLIST
+      offset: 0
   PLARGE_INTEGER:
     LARGE_INTEGER:
-      Type: __int64
-      Offset: 0
+      type: __int64
+      offset: 0
+  PLONG:
+    LONG:
+      type: long
+      offset: 0
   PKEY_VALUE_ENTRY:
     KEY_VALUE_ENTRY:
-      Type: PVOID # TODO Add real definition
-      Offset: 0
+      type: PVOID # TODO Add real definition
+      offset: 0
   POBJECT_ATTRIBUTES:
     Length:
-      Type: ULONG
-      Offset: 0
+      type: ULONG
+      offset: 0
     RootDirectory:
-      Type: HANDLE
-      Offset: 8
+      type: HANDLE
+      offset: 8
     ObjectName:
-      Type: PUNICODE_STRING
-      Offset: 16
+      type: PUNICODE_STRING
+      offset: 16
     Attributes:
-      Type: DWORD
-      Offset: 24
+      type: DWORD
+      offset: 24
     SecurityDescriptor:
-      Type: PVOID
-      Offset: 32
+      type: PVOID
+      offset: 32
     SecurityQualityOfService:
-      Type: PVOID
-      Offset: 40
+      type: PVOID
+      offset: 40
   PPS_CREATE_INFO:
     size:
-      Type: ULONG_PTR
-      Offset: 0
+      type: ULONG_PTR
+      offset: 0
     state:
-      Type: PS_CREATE_STATE
-      Offset: 8 # TODO this only works for 64bit. ULONG_PTR on 32bit has a length of 4 byte thus rendering the alignment here invalid
+      type: PS_CREATE_STATE
+      offset: 8 # TODO this only works for 64bit. ULONG_PTR on 32bit has a length of 4 byte thus rendering the alignment here invalid
     union:
-      Type: UINT
-      Offset: 16
+      type: UINT
+      offset: 16
   PSIZE_T:
     SIZE_T:
-      Type: SIZE_T
-      Offset: 0
+      type: SIZE_T
+      offset: 0
   PUSHORT:
     USHORT:
-      Type: USHORT
-      Offset: 0
+      type: USHORT
+      offset: 0
   PWORD:
     WORD:
-      Type: WORD
-      Offset: 0
-
+      type: WORD
+      offset: 0
 HighLevelParameterTypes:
   AddressWidth32Bit:
     ACCESS_MASK: DWORD
     BOOLEAN: BOOL
     BOOL: int
+    BYTE: char
+    CHAR: char
     DEFAULT: unsigned int
     DWORD: unsigned long
+    DWORD_PTR: ULONG_PTR
     ENUM: unsigned short
     FARPROC: unsigned int
     FILE_INFORMATION_CLASS: ENUM
@@ -4992,14 +5009,15 @@ HighLevelParameterTypes:
     HINSTANCE: unsigned int
     HKEY: HANDLE
     HMODULE: unsigned int
+    INT: int
     KEY_INFORMATION_CLASS: ENUM
     KEY_VALUE_INFORMATION_CLASS: ENUM
-    LARGE_INTEGER: __int64
+    LARGE_INTEGER: __int64 # TODO this is a union https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-large_integer-r1
     LONG: long
     LPCSTR: LPSTR_32
     LPCWSTR: LPWSTR_32
+    LPMEMORYSTATUS: MEMORYSTATUS
     LPSTR: LPSTR_32
-    LPSECURITY_ATTRIBUTES: unsigned int
     LPTHREAD_START_ROUTINE: PVOID
     LPWSTR: LPWSTR_32
     LPBYTE: unsigned int
@@ -5008,6 +5026,7 @@ HighLevelParameterTypes:
     LPVOID: unsigned int
     NTSTATUS: unsigned __int32
     PANSI_STRING: PVOID
+    PCWSTR: LPWSTR_32
     PIO_APC_ROUTINE: PVOID
     PIO_STATUS_BLOCK: PVOID
     PINITIAL_TEB: PVOID
@@ -5027,6 +5046,7 @@ HighLevelParameterTypes:
     size_t: ULONG_PTR
     SIZE_T: size_t
     SYSTEM_INFORMATION_CLASS: unsigned short
+    u_long: ULONG
     UINT: unsigned int
     UINT_PTR: unsigned int
     ULONG_PTR: unsigned long
@@ -5037,9 +5057,12 @@ HighLevelParameterTypes:
   AddressWidth64Bit:
     ACCESS_MASK: DWORD
     BOOLEAN: BOOL
-    BOOL: __int64
+    BOOL: int
+    BYTE: char
+    CHAR: char
     DEFAULT: unsigned __int64
     DWORD: unsigned long
+    DWORD_PTR: ULONG_PTR
     ENUM: unsigned short
     FARPROC: unsigned __int64
     FILE_INFORMATION_CLASS: ENUM
@@ -5050,14 +5073,14 @@ HighLevelParameterTypes:
     HINSTANCE: unsigned __int64
     HKEY: HANDLE
     HMODULE: unsigned __int64
+    INT: int
     KEY_INFORMATION_CLASS: ENUM
     KEY_VALUE_INFORMATION_CLASS: ENUM
-    LARGE_INTEGER: __int64
+    LARGE_INTEGER: __int64 # TODO this is a union https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-large_integer-r1
     LONG: long
     LPCSTR: LPSTR_64
     LPCWSTR: LPWSTR_64
     LPSTR: LPSTR_64
-    LPSECURITY_ATTRIBUTES: unsigned __int64
     LPTHREAD_START_ROUTINE: PVOID # Pointer to the starting address of a thread. E.g. https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createremotethreadex
     LPWSTR: LPWSTR_64
     LPBYTE: unsigned __int64
@@ -5066,6 +5089,7 @@ HighLevelParameterTypes:
     LPVOID: unsigned __int64
     NTSTATUS: unsigned __int32
     PANSI_STRING: PVOID # TODO find definition
+    PCWSTR: LPWSTR_64
     PIO_APC_ROUTINE: PVOID # TODO find definition
     PIO_STATUS_BLOCK: PVOID # TODO add struct https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_status_block
     PINITIAL_TEB: PVOID # TODO add struct definition from http://undocumented.ntinternals.net/
@@ -5085,7 +5109,8 @@ HighLevelParameterTypes:
     size_t: ULONG_PTR
     SIZE_T: size_t
     SYSTEM_INFORMATION_CLASS: unsigned short
-    UINT: unsigned __int64
+    u_long: ULONG
+    UINT: unsigned int
     UINT_PTR: unsigned __int64
     ULONG_PTR: unsigned __int64
     ULONG: unsigned long
@@ -5095,6 +5120,7 @@ HighLevelParameterTypes:
 BackingParameterTypes:
   __ptr32: 4
   __ptr64: 8
+  char: 1
   int: 4
   long: 4
   LPSTR_32: 4
