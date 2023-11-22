@@ -171,20 +171,16 @@ namespace VmiCore
         auto eventResponse = VMI_EVENT_RESPONSE_NONE;
         event->interrupt_event.reinject = REINJECT_INTERRUPT;
 
-        // TODO: fix event gfn in kvmi
-        //        auto eventPA =
-        //            (event->interrupt_event.gfn << PagingDefinitions::numberOfPageIndexBits) +
-        //            event->interrupt_event.offset;
+        auto eventPA =
+            (event->interrupt_event.gfn << PagingDefinitions::numberOfPageIndexBits) + event->interrupt_event.offset;
         if (interruptEventSupervisor == nullptr)
         {
             GlobalControl::logger()->error(
                 "Caught interrupt event with destroyed InterruptEventSupervisor",
-                {CxxLogField("logger", loggerName) /*, CxxLogField("eventPA", fmt::format("{:#x}", eventPA))*/});
+                {CxxLogField("logger", loggerName), CxxLogField("eventPA", fmt::format("{:#x}", eventPA))});
             return eventResponse;
         }
-        interruptEventSupervisor->vmiInterface->flushV2PCache(LibvmiInterface::flushAllPTs);
-        auto eventPA =
-            interruptEventSupervisor->vmiInterface->convertVAToPA(event->interrupt_event.gla, event->x86_regs->cr3);
+
         auto breakpointsAtEventGFN =
             interruptEventSupervisor->breakpointsByGFN.find(eventPA >> PagingDefinitions::numberOfPageIndexBits);
         if (breakpointsAtEventGFN != interruptEventSupervisor->breakpointsByGFN.end())
