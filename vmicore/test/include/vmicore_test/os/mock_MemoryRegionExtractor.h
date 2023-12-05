@@ -9,7 +9,7 @@ namespace VmiCore
     class MockMemoryRegionExtractor : public IMemoryRegionExtractor
     {
       public:
-        MOCK_METHOD(std::unique_ptr<std::list<MemoryRegion>>, extractAllMemoryRegions, (), (const override));
+        MOCK_METHOD(std::unique_ptr<std::vector<MemoryRegion>>, extractAllMemoryRegions, (), (const override));
     };
 }
 
