@@ -16,7 +16,7 @@ namespace VmiCore::Linux
                     const std::shared_ptr<ILogging>& logging,
                     uint64_t mm);
 
-        [[nodiscard]] std::unique_ptr<std::list<MemoryRegion>> extractAllMemoryRegions() const override;
+        [[nodiscard]] std::unique_ptr<std::vector<MemoryRegion>> extractAllMemoryRegions() const override;
 
       private:
         std::shared_ptr<ILibvmiInterface> vmiInterface;

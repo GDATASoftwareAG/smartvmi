@@ -21,7 +21,7 @@ namespace VmiCore::Windows
                      std::string processName,
                      const std::shared_ptr<ILogging>& logging);
 
-        [[nodiscard]] std::unique_ptr<std::list<MemoryRegion>> extractAllMemoryRegions() const override;
+        [[nodiscard]] std::unique_ptr<std::vector<MemoryRegion>> extractAllMemoryRegions() const override;
 
       private:
         std::shared_ptr<IKernelAccess> kernelAccess;

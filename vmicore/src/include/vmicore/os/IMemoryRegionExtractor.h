@@ -2,8 +2,8 @@
 #define VMICORE_IMEMORYREGIONEXTRACTOR_H
 
 #include "MemoryRegion.h"
-#include <list>
 #include <memory>
+#include <vector>
 
 namespace VmiCore
 {
@@ -12,7 +12,7 @@ namespace VmiCore
       public:
         virtual ~IMemoryRegionExtractor() = default;
 
-        [[nodiscard]] virtual std::unique_ptr<std::list<MemoryRegion>> extractAllMemoryRegions() const = 0;
+        [[nodiscard]] virtual std::unique_ptr<std::vector<MemoryRegion>> extractAllMemoryRegions() const = 0;
 
       protected:
         IMemoryRegionExtractor() = default;

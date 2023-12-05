@@ -16,9 +16,9 @@ namespace VmiCore::Linux
     {
     }
 
-    std::unique_ptr<std::list<MemoryRegion>> MMExtractor::extractAllMemoryRegions() const
+    std::unique_ptr<std::vector<MemoryRegion>> MMExtractor::extractAllMemoryRegions() const
     {
-        auto regions = std::make_unique<std::list<MemoryRegion>>();
+        auto regions = std::make_unique<std::vector<MemoryRegion>>();
 
         for (auto area = vmiInterface->read64VA(mm, vmiInterface->convertPidToDtb(SYSTEM_PID)); area != 0;
              area = vmiInterface->read64VA(area + vmiInterface->getKernelStructOffset("vm_area_struct", "vm_next"),

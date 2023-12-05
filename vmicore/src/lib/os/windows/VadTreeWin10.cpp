@@ -22,9 +22,9 @@ namespace VmiCore::Windows
     {
     }
 
-    std::unique_ptr<std::list<MemoryRegion>> VadTreeWin10::extractAllMemoryRegions() const
+    std::unique_ptr<std::vector<MemoryRegion>> VadTreeWin10::extractAllMemoryRegions() const
     {
-        auto regions = std::make_unique<std::list<MemoryRegion>>();
+        auto regions = std::make_unique<std::vector<MemoryRegion>>();
         std::list<uint64_t> nextVadEntries;
         std::unordered_set<uint64_t> visitedVadVAs;
         auto nodeAddress = kernelAccess->extractVadTreeRootAddress(eprocessBase);
