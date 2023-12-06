@@ -5,6 +5,9 @@
 
 namespace VmiCore
 {
+    /**
+     * A base class for all events that allow access to registers.
+     */
     class IRegisterReadable
     {
       public:
