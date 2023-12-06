@@ -39,6 +39,9 @@ constexpr ::std::string_view filenameStem(const ::std::source_location& sourceLo
     return {fileName, lastDotAt(fileName)};
 }
 
+/**
+ * Retrieves the name of the current source file without the extension at compile time.
+ */
 #define FILENAME_STEM filenameStem(::std::source_location::current())
 
 #endif // VMICORE_FILENAME_H

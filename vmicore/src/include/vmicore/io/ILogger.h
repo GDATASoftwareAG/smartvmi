@@ -11,12 +11,19 @@ namespace VmiCore
 {
     constexpr auto WRITE_TO_FILE_TAG = "writeToFileTag";
 
+    /**
+     * Structured log field. Use this for providing variable context information.
+     */
     using CxxLogField = std::pair<std::string_view, std::variant<std::string_view, bool, int64_t, uint64_t, double>>;
 
     class ILogger
     {
       public:
         virtual ~ILogger() = default;
+
+        /**
+         * Bind additional default context information. Will be attached to every log call.
+         */
         virtual void bind(const std::initializer_list<CxxLogField>& fields) = 0;
 
         virtual void debug(std::string_view message) const = 0;

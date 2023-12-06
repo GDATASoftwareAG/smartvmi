@@ -19,10 +19,20 @@ namespace VmiCore
       public:
         virtual ~IPageProtection() = default;
 
+        /**
+         * Get an OS-agnostic representation of protection values.
+         */
         [[nodiscard]] virtual ProtectionValues get() const = 0;
 
+        /**
+         * Get protection values in exactly the same representation as they have been extracted from memory. Not
+         * OS-agnostic, but may provide more information.
+         */
         [[nodiscard]] virtual uint64_t getRaw() const = 0;
 
+        /**
+         * Returns a string representation of the protection values.
+         */
         [[nodiscard]] virtual std::string toString() const = 0;
 
       protected:

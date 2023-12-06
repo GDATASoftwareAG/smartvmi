@@ -12,6 +12,10 @@
 
 namespace VmiCore
 {
+    /**
+     * A thin, thread-safe wrapper around all low level introspection functionality that is deemed safe to access
+     * without interfering with VMICore or other plugins.
+     */
     class IIntrospectionAPI
     {
       public:
