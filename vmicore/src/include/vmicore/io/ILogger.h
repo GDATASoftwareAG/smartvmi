@@ -1,8 +1,10 @@
 #ifndef VMICORE_ILOGGER_H
 #define VMICORE_ILOGGER_H
 
-#include <memory>
+#include <cstdint>
+#include <initializer_list>
 #include <string_view>
+#include <utility>
 #include <variant>
 
 namespace VmiCore

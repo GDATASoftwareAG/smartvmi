@@ -2,10 +2,6 @@
 #define VMICORE_IBREAKPOINT_H
 
 #include "../types.h"
-#include "BpResponse.h"
-#include "events/IInterruptEvent.h"
-#include <functional>
-#include <memory>
 
 namespace VmiCore
 {
