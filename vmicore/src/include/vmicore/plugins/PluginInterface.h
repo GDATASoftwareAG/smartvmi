@@ -4,12 +4,12 @@
 #include "../io/ILogger.h"
 #include "../os/ActiveProcessInformation.h"
 #include "../types.h"
+#include "../vmi/BpResponse.h"
 #include "../vmi/IBreakpoint.h"
 #include "../vmi/IIntrospectionAPI.h"
-#include "IPluginConfig.h"
+#include "../vmi/events/IInterruptEvent.h"
 #include <functional>
 #include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>

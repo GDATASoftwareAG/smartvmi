@@ -1,7 +1,6 @@
 #ifndef VMICORE_WINDOWS_VADT_H
 #define VMICORE_WINDOWS_VADT_H
 
-#include "ProtectionValues.h"
 #include <string>
 
 namespace VmiCore::Windows
