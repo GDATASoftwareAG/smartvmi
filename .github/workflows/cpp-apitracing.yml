@@ -6,6 +6,8 @@ on:
     branches:
       - "main"
     paths:
+      - 'vmicore/src/include/**.h'
+      - 'vmicore/test/include/**.h'
       - 'plugins/apitracing/**.h'
       - 'plugins/apitracing/**.cpp'
       - 'plugins/apitracing/**/CMakeLists.txt'
@@ -17,6 +19,8 @@ on:
     branches:
       - "main"
     paths:
+      - 'vmicore/src/include/**.h'
+      - 'vmicore/test/include/**.h'
       - 'plugins/apitracing/**.h'
       - 'plugins/apitracing/**.cpp'
       - 'plugins/apitracing/**/CMakeLists.txt'

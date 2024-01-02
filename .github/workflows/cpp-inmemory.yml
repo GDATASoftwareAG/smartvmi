@@ -6,6 +6,8 @@ on:
     branches:
       - "main"
     paths:
+      - 'vmicore/src/include/**.h'
+      - 'vmicore/test/include/**.h'
       - 'plugins/inmemoryscanner/**.h'
       - 'plugins/inmemoryscanner/**.cpp'
       - 'plugins/inmemoryscanner/**/CMakeLists.txt'
@@ -17,6 +19,8 @@ on:
     branches:
       - "main"
     paths:
+      - 'vmicore/src/include/**.h'
+      - 'vmicore/test/include/**.h'
       - 'plugins/inmemoryscanner/**.h'
       - 'plugins/inmemoryscanner/**.cpp'
       - 'plugins/inmemoryscanner/**/CMakeLists.txt'
