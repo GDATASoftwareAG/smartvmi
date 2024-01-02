@@ -139,7 +139,7 @@ namespace InMemoryScanner
                 .WillByDefault(
                     [&memoryRegionDescriptor = memoryRegionDescriptor]()
                     {
-                        auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                        auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                         memoryRegions->push_back(std::move(memoryRegionDescriptor));
                         return memoryRegions;
                     });
@@ -147,7 +147,7 @@ namespace InMemoryScanner
                 .WillByDefault(
                     [&memoryRegionDescriptorForSharedMemory = memoryRegionDescriptorForSharedMemory]()
                     {
-                        auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                        auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                         memoryRegions->push_back(std::move(memoryRegionDescriptorForSharedMemory));
                         return memoryRegions;
                     });
@@ -175,7 +175,7 @@ namespace InMemoryScanner
             .WillByDefault(
                 [startAddress = startAddress, maxScanSize = maxScanSize]()
                 {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                     memoryRegions->emplace_back(
                         startAddress, maxScanSize + 1, "", std::make_unique<MockPageProtection>(), false, false, false);
                     return memoryRegions;
@@ -192,7 +192,7 @@ namespace InMemoryScanner
             .WillByDefault(
                 [startAddress = startAddress, size = size]()
                 {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                     memoryRegions->emplace_back(
                         startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
                     return memoryRegions;
@@ -209,7 +209,7 @@ namespace InMemoryScanner
             .WillByDefault(
                 [startAddress = startAddress, size = size]()
                 {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                     memoryRegions->emplace_back(
                         startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
                     return memoryRegions;
@@ -244,7 +244,7 @@ namespace InMemoryScanner
             .WillByDefault(
                 [&memoryRegionDescriptor = memoryRegionDescriptor]()
                 {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                     memoryRegions->push_back(std::move(memoryRegionDescriptor));
                     return memoryRegions;
                 });
@@ -311,7 +311,7 @@ namespace InMemoryScanner
             .WillByDefault(
                 [startAddress = startAddress, size = size]()
                 {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                     memoryRegions->emplace_back(
                         startAddress, size, "", std::make_unique<MockPageProtection>(), false, false, false);
 
@@ -364,7 +364,7 @@ namespace InMemoryScanner
             .WillByDefault(
                 [&memoryRegionDescriptor = memoryRegionDescriptor]()
                 {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                     memoryRegions->push_back(std::move(memoryRegionDescriptor));
 
                     return memoryRegions;

@@ -4,6 +4,7 @@
 #include <memory>
 #include <set>
 #include <stdexcept>
+#include <vmicore/plugins/IPluginConfig.h>
 #include <vmicore/plugins/PluginInterface.h>
 
 namespace InMemoryScanner
