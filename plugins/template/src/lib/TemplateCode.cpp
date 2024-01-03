@@ -22,10 +22,10 @@ namespace Template
     // available events.
     void TemplateCode::doStuffWithProcessStart(std::shared_ptr<const ActiveProcessInformation> processInformation)
     {
-        auto dtbContent = lowLevelIntrospectionApi->read64PA(processInformation->processCR3);
+        auto dtbContent = lowLevelIntrospectionApi->read64PA(processInformation->processUserDtb);
         // Example for structured logging calls
         logger->info("Process start triggered.",
-                     {{"processDtb", processInformation->processCR3},
+                     {{"processDtb", processInformation->processUserDtb},
                       {"processId", processInformation->pid},
                       {"dtbContent", dtbContent}});
     }
