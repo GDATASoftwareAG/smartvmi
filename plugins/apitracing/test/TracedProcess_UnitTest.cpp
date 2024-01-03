@@ -59,7 +59,7 @@ namespace ApiTracing
             .WillByDefault(
                 []()
                 {
-                    auto memoryRegions = std::make_unique<std::list<MemoryRegion>>();
+                    auto memoryRegions = std::make_unique<std::vector<MemoryRegion>>();
                     memoryRegions->push_back(
                         createMemoryRegionDescriptor(kernelDllBase, defaultDllSize, kernelDllName));
                     memoryRegions->push_back(createMemoryRegionDescriptor(ntdllBase, defaultDllSize, ntdllDllName));
