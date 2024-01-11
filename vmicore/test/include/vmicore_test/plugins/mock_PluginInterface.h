@@ -9,9 +9,9 @@ namespace VmiCore::Plugin
     class MockPluginInterface : public PluginInterface
     {
       public:
-        MOCK_METHOD(std::unique_ptr<std::vector<uint8_t>>,
-                    readProcessMemoryRegion,
-                    (pid_t, addr_t, size_t),
+        MOCK_METHOD(std::unique_ptr<IMemoryMapping>,
+                    mapProcessMemoryRegion,
+                    (addr_t, addr_t, std::size_t),
                     (const, override));
 
         MOCK_METHOD(std::unique_ptr<std::vector<std::shared_ptr<const ActiveProcessInformation>>>,

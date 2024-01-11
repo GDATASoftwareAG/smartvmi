@@ -33,6 +33,10 @@ namespace VmiCore
 
         virtual void clearEvent(vmi_event_t& event, bool deallocate) = 0;
 
+        virtual mapped_regions_t mmapGuest(addr_t baseVA, addr_t dtb, std::size_t numberOfPages) = 0;
+
+        virtual void freeMappedRegions(const mapped_regions_t& mappedRegions) = 0;
+
         virtual void write8PA(addr_t physicalAddress, uint8_t value) = 0;
 
         virtual void eventsListen(uint32_t timeout) = 0;
@@ -78,6 +82,10 @@ namespace VmiCore
 
         [[nodiscard]] bool
         readXVA(addr_t virtualAddress, addr_t cr3, std::vector<uint8_t>& content, std::size_t size) override;
+
+        mapped_regions_t mmapGuest(addr_t baseVA, addr_t dtb, std::size_t numberOfPages) override;
+
+        void freeMappedRegions(const mapped_regions_t& mappedRegions) override;
 
         void write8PA(addr_t physicalAddress, uint8_t value) override;
 
