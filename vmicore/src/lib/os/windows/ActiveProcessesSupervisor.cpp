@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 #include <string>
 #include <vmicore/filename.h>
+#include <vmicore/os/PagingDefinitions.h>
 
 namespace VmiCore::Windows
 {

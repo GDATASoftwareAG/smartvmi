@@ -7,6 +7,7 @@
 #include "../vmi/BpResponse.h"
 #include "../vmi/IBreakpoint.h"
 #include "../vmi/IIntrospectionAPI.h"
+#include "../vmi/IMemoryMapping.h"
 #include "../vmi/events/IInterruptEvent.h"
 #include <functional>
 #include <memory>
@@ -22,19 +23,21 @@ namespace VmiCore::Plugin
     class PluginInterface
     {
       public:
-        constexpr static uint8_t API_VERSION = 15;
+        constexpr static uint8_t API_VERSION = 16;
 
         virtual ~PluginInterface() = default;
 
         /**
-         * Reads a region of contiguous virtual memory from a process. The starting offset as well as the size must be
-         * 4kb page aligned.
+         * Map a guest memory region into the address space of the introspection application. See IMemoryMapping.h for
+         * more details.
          *
-         * @return A unique pointer to a byte vector containing the memory content. Subregions that could not be
-         * extracted (e.g. because they are paged out) will be replaced by a single all zero padding page.
+         * @param baseVA Start of the virtual address range inside the guest.
+         * @param dtb Process dtb
+         * @param numberOfPages Size of the region in 4kb pages.
+         * @return An instance of IMemoryMapping. See IMemoryMapping.h for details.
          */
-        [[nodiscard]] virtual std::unique_ptr<std::vector<uint8_t>>
-        readProcessMemoryRegion(pid_t pid, addr_t address, size_t numberOfBytes) const = 0;
+        [[nodiscard]] virtual std::unique_ptr<IMemoryMapping>
+        mapProcessMemoryRegion(addr_t baseVA, addr_t dtb, std::size_t numberOfPages) const = 0;
 
         /**
          * Obtain a vector containing an OS-agnostic representation of all currently running processes.

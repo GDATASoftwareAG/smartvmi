@@ -3,6 +3,7 @@
 #include "VmiException.h"
 #include "VmiInitData.h"
 #include "VmiInitError.h"
+#include <source_location>
 #include <utility>
 #include <vmicore/filename.h>
 
@@ -180,6 +181,26 @@ namespace VmiCore
             return false;
         }
         return true;
+    }
+
+    mapped_regions_t LibvmiInterface::mmapGuest(addr_t baseVA, addr_t dtb, std::size_t numberOfPages)
+    {
+        mapped_regions_t regions{};
+        auto accessContext = createVirtualAddressAccessContext(baseVA, dtb);
+        std::lock_guard lock(libvmiLock);
+        if (vmi_mmap_guest_2(vmiInstance, &accessContext, numberOfPages, PROT_READ, &regions) != VMI_SUCCESS)
+        {
+            throw VmiException(fmt::format("{}: Unable to create memory mapping for VA {:#x} with number of pages {}",
+                                           std::source_location::current().function_name(),
+                                           baseVA,
+                                           numberOfPages));
+        }
+        return regions;
+    }
+
+    void LibvmiInterface::freeMappedRegions(const mapped_regions_t& mappedRegions)
+    {
+        vmi_free_mapped_regions(vmiInstance, &mappedRegions);
     }
 
     void LibvmiInterface::write8PA(addr_t physicalAddress, uint8_t value)

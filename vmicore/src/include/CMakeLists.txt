@@ -17,6 +17,8 @@ target_sources(vmicore-public-headers INTERFACE
         vmicore/callback.h
         vmicore/vmi/IBreakpoint.h
         vmicore/vmi/IIntrospectionAPI.h
+        vmicore/vmi/IMemoryMapping.h
+        vmicore/vmi/MappedRegion.h
         vmicore/vmi/events/IInterruptEvent.h
         vmicore/vmi/events/IRegisterReadable.h
         vmicore/filename.h
