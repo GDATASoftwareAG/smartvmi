@@ -71,8 +71,6 @@ For example the following diagram shows the memory padding of one VAD region con
 
 Shared memory regions that are not the base image of the process are skipped by default in order to reduce scanning time.
 This behavior can be controlled via the `scan_all_regions` config option.
-To further optimize scan duration, memory regions >50MB will be ignored as well.
-If desired, it is possible to increase or reduce the threshold via the `maximum_scan_size` config option.
 
 ### In Depth Example
 
@@ -89,7 +87,7 @@ Consider the following VAD entry from the vad tree of a process `winlogon.exe` w
 | `EndAddress`   | 1f43b599000  |
 
 This region has a size of `0x1f43b599000` - `0x1f43b593000` = `0x6000`.
-However the pages from `0x1f43b596000` to `0x1f43b598000` (size `0x2000`) are not mapped into memory.
+However, the pages from `0x1f43b596000` to `0x1f43b598000` (size `0x2000`) are not mapped into memory.
 Therefore, the resulting files will have the size of `0x5000` (mapped size + one zero-page). Note that the start and end address however are the original ones.
 
 ```console
@@ -130,7 +128,6 @@ For this, add the following parts to the _VMICore_ config and tweak them to your
 | `directory`         | Path to the folder where the compiled _VMICore_ plugins are located.                                                                                                       |
 | `dump_memory`       | Boolean. If set to `true` will result in scanned memory being dumped to files. Regions will be dumped to an `inmemorydumps` subfolder in the output directory.             |
 | `ignored_processes` | List with processes that will not be scanned (or dumped) during the final scan.                                                                                            |
-| `maximum_scan_size` | Number of bytes for the size of the largest contiguous memory region that will still be scanned. Defaults to `52428800` (50MB).                                            |
 | `output_path`       | Optional output path. If this is a relative path it is interpreted relatively to the _VMICore_ results directory.                                                          |
 | `plugins`           | Add your plugin here by the exact name of your shared library (e.g. `libinmemoryscanner.so`). All plugin specific config keys should be added as sub-keys under this name. |
 | `scan_all_regions`  | Optional boolean (defaults to `false`). Indicates whether to eagerly scan all memory regions as opposed to ignoring shared memory.                                         |
@@ -147,7 +144,6 @@ plugin_system:
       signature_file: /usr/local/share/inmemsigs/sigs.sig
       dump_memory: false
       scan_all_regions: false
-      maximum_scan_size: 52428800
       output_path: ""
       ignored_processes:
         - SearchUI.exe

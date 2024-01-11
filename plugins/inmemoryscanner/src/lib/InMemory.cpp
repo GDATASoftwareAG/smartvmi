@@ -11,7 +11,7 @@
 #include "Config.h"
 #include "Dumping.h"
 #include "Filenames.h"
-#include "Yara.h"
+#include "YaraInterface.h"
 #include <memory>
 #include <string>
 #include <tclap/CmdLine.h>
@@ -44,7 +44,7 @@ namespace InMemoryScanner
         {
             configuration->overrideDumpMemoryFlag(dumpMemoryArgument.getValue());
         }
-        auto yara = std::make_unique<Yara>(configuration->getSignatureFile());
+        auto yara = std::make_unique<YaraInterface>(configuration->getSignatureFile());
         auto dumping = std::make_unique<Dumping>(pluginInterface, configuration);
         scanner = std::make_unique<Scanner>(pluginInterface, configuration, std::move(yara), std::move(dumping));
     }

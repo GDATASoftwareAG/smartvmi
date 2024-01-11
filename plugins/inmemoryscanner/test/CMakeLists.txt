@@ -1,6 +1,7 @@
 add_executable(inmemoryscanner-test
-        FakeYara.cpp
-        Scanner_unittest.cpp)
+        FakeYaraInterface.cpp
+        Scanner_unittest.cpp
+        YaraInterface_unittest.cpp)
 target_link_libraries(inmemoryscanner-test inmemoryscanner-obj pthread)
 
 # Setup bundled google test framework
