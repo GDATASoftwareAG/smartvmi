@@ -132,6 +132,7 @@ For this, add the following parts to the _VMICore_ config and tweak them to your
 | `plugins`           | Add your plugin here by the exact name of your shared library (e.g. `libinmemoryscanner.so`). All plugin specific config keys should be added as sub-keys under this name. |
 | `scan_all_regions`  | Optional boolean (defaults to `false`). Indicates whether to eagerly scan all memory regions as opposed to ignoring shared memory.                                         |
 | `signature_file`    | Path to the compiled signatures with which to scan the memory regions.                                                                                                     |
+| `scan_timeout`      | Timeout in seconds that determines when libyara will cancel the scan process for a single memory region.                                                                   |
 
 Example configuration:
 
@@ -145,6 +146,7 @@ plugin_system:
       dump_memory: false
       scan_all_regions: false
       output_path: ""
+      scan_timeout: 10
       ignored_processes:
         - SearchUI.exe
         - system

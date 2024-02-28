@@ -11,6 +11,7 @@ namespace InMemoryScanner
         MOCK_METHOD(void, parseConfiguration, (const VmiCore::Plugin::IPluginConfig&), (override));
         MOCK_METHOD(std::filesystem::path, getSignatureFile, (), (const, override));
         MOCK_METHOD(std::filesystem::path, getOutputPath, (), (const, override));
+        MOCK_METHOD(int, getScanTimeout, (), (const, override));
         MOCK_METHOD(bool, isProcessIgnored, (const std::string& processName), (const, override));
         MOCK_METHOD(bool, isScanAllRegionsActivated, (), (const, override));
         MOCK_METHOD(bool, isDumpingMemoryActivated, (), (const, override));

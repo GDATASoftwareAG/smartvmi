@@ -14,6 +14,11 @@ namespace InMemoryScanner
         using std::runtime_error::runtime_error;
     };
 
+    class YaraTimeoutException final : public YaraException
+    {
+        using YaraException::YaraException;
+    };
+
     class IYaraInterface
     {
       public:

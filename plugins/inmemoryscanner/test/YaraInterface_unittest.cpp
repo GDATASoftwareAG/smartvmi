@@ -63,7 +63,7 @@ namespace InMemoryScanner
                                 all of them
                         }
                     )";
-        auto yaraInterface = YaraInterface(compileYaraRules(rules));
+        auto yaraInterface = YaraInterface(compileYaraRules(rules), 0);
         auto subRegion1 = constructPageWithContent("ABCD");
         std::vector<VmiCore::MappedRegion> memoryRegions{{0x0, subRegion1}};
 
@@ -84,7 +84,7 @@ namespace InMemoryScanner
                                 all of them
                         }
                     )";
-        auto yaraInterface = YaraInterface(compileYaraRules(rules));
+        auto yaraInterface = YaraInterface(compileYaraRules(rules), 0);
         auto subRegion1 = constructPageWithContent("ABCD", true);
         auto subRegion2 = constructPageWithContent("DCBA", false);
         std::vector<VmiCore::MappedRegion> memoryRegions{{0x0, subRegion1}, {pageSizeInBytes, subRegion2}};
@@ -107,7 +107,7 @@ namespace InMemoryScanner
                                 all of them
                         }
                     )";
-        auto yaraInterface = YaraInterface(compileYaraRules(rules));
+        auto yaraInterface = YaraInterface(compileYaraRules(rules), 0);
         auto subRegion1 = constructPageWithContent("ABCD");
         auto subRegion2 = constructPageWithContent("DCBA");
         std::vector<VmiCore::MappedRegion> memoryRegion1{{0x0, subRegion1}};
@@ -133,7 +133,7 @@ namespace InMemoryScanner
                                 all of them
                         }
                     )";
-        auto yaraInterface = YaraInterface(compileYaraRules(rules));
+        auto yaraInterface = YaraInterface(compileYaraRules(rules), 0);
         auto subRegion1 = constructPageWithContent("ABCD");
         auto subRegion2 = constructPageWithContent("DCBA");
         std::vector<VmiCore::MappedRegion> memoryRegions{{0x0, subRegion1}, {4 * pageSizeInBytes, subRegion2}};
@@ -168,7 +168,7 @@ namespace InMemoryScanner
                                 all of them
                         }
                     )";
-        auto yaraInterface = YaraInterface(compileYaraRules(rules));
+        auto yaraInterface = YaraInterface(compileYaraRules(rules), 0);
         auto subRegion1 = constructPageWithContent("ABCD");
         auto subRegion2 = constructPageWithContent("DCBA");
         auto subRegion3 = constructPageWithContent("EFGH");

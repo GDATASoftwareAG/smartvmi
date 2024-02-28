@@ -40,7 +40,7 @@ namespace
 
 namespace InMemoryScanner
 {
-    YaraInterface::YaraInterface(const std::string& rulesFile)
+    YaraInterface::YaraInterface(const std::string& rulesFile, int scanTimeout) : scanTimeout(scanTimeout)
     {
         auto err = yr_initialize();
         if (err != ERROR_SUCCESS)
@@ -89,9 +89,14 @@ namespace InMemoryScanner
                                                 SCAN_FLAGS_PROCESS_MEMORY | SCAN_FLAGS_REPORT_RULES_MATCHING,
                                                 yaraCallback,
                                                 &results,
-                                                0);
+                                                scanTimeout);
             err != ERROR_SUCCESS)
         {
+            if (err == ERROR_SCAN_TIMEOUT)
+            {
+                throw YaraTimeoutException("Scan timeout");
+            }
+
             throw YaraException(fmt::format("Error scanning memory. Error code: {}", err));
         }
 

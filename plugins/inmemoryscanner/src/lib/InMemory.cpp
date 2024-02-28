@@ -44,7 +44,7 @@ namespace InMemoryScanner
         {
             configuration->overrideDumpMemoryFlag(dumpMemoryArgument.getValue());
         }
-        auto yara = std::make_unique<YaraInterface>(configuration->getSignatureFile());
+        auto yara = std::make_unique<YaraInterface>(configuration->getSignatureFile(), configuration->getScanTimeout());
         auto dumping = std::make_unique<Dumping>(pluginInterface, configuration);
         scanner = std::make_unique<Scanner>(pluginInterface, configuration, std::move(yara), std::move(dumping));
     }
