@@ -5,8 +5,7 @@
 namespace InMemoryScanner
 {
     std::vector<Rule>
-    FakeYaraInterface::scanMemory([[maybe_unused]] VmiCore::addr_t regionBase,
-                                  [[maybe_unused]] std::span<const VmiCore::MappedRegion> mappedRegions)
+    FakeYaraInterface::scanMemory([[maybe_unused]] std::span<const VmiCore::MappedRegion> mappedRegions)
     {
         concurrentThreads++;
         if (concurrentThreads > YR_MAX_THREADS)

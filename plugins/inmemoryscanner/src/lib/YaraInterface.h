@@ -36,8 +36,7 @@ namespace InMemoryScanner
 
         ~YaraInterface() override;
 
-        std::vector<Rule> scanMemory(VmiCore::addr_t regionBase,
-                                     std::span<const VmiCore::MappedRegion> mappedRegions) override;
+        std::vector<Rule> scanMemory(std::span<const VmiCore::MappedRegion> mappedRegions) override;
 
       private:
         YR_RULES* rules = nullptr;

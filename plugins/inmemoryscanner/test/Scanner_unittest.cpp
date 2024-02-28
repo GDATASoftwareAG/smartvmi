@@ -134,7 +134,7 @@ namespace InMemoryScanner
             auto dumping = std::make_unique<NiceMock<MockDumping>>();
             dumpingRawPointer = dumping.get();
             auto yara = std::make_unique<NiceMock<MockYaraInterface>>();
-            ON_CALL(*yara, scanMemory(_, _)).WillByDefault(Return(std::vector<Rule>{}));
+            ON_CALL(*yara, scanMemory(_)).WillByDefault(Return(std::vector<Rule>{}));
             scanner.emplace(pluginInterface.get(), configuration, std::move(yara), std::move(dumping));
         };
     };
@@ -173,7 +173,7 @@ namespace InMemoryScanner
                     });
             auto dumping = std::make_unique<Dumping>(pluginInterface.get(), configuration);
             auto yara = std::make_unique<NiceMock<MockYaraInterface>>();
-            ON_CALL(*yara, scanMemory(_, _)).WillByDefault(Return(std::vector<Rule>{}));
+            ON_CALL(*yara, scanMemory(_)).WillByDefault(Return(std::vector<Rule>{}));
             scanner.emplace(pluginInterface.get(), configuration, std::move(yara), std::move(dumping));
         };
 

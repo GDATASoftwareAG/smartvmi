@@ -19,8 +19,7 @@ namespace InMemoryScanner
       public:
         virtual ~IYaraInterface() = default;
 
-        virtual std::vector<Rule> scanMemory(VmiCore::addr_t regionBase,
-                                             std::span<const VmiCore::MappedRegion> mappedRegions) = 0;
+        virtual std::vector<Rule> scanMemory(std::span<const VmiCore::MappedRegion> mappedRegions) = 0;
 
       protected:
         IYaraInterface() = default;
