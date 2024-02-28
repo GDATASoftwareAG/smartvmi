@@ -177,6 +177,13 @@ namespace InMemoryScanner
                                          *processInformation->fullName,
                                          memoryRegionDescriptor);
                     }
+                    catch (const YaraTimeoutException&)
+                    {
+                        logger->warning("Scan timeout reached",
+                                        {{"Process", *processInformation->fullName},
+                                         {"BaseVA", memoryRegionDescriptor.base},
+                                         {"Size", memoryRegionDescriptor.size}});
+                    }
                     catch (const std::exception& exc)
                     {
                         logger->error("Error scanning memory region of process",

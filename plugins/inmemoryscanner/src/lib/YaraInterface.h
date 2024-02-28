@@ -10,7 +10,7 @@ namespace InMemoryScanner
     class YaraInterface : public IYaraInterface
     {
       public:
-        explicit YaraInterface(const std::string& rulesFile);
+        YaraInterface(const std::string& rulesFile, int scanTimeout);
 
         YaraInterface(const YaraInterface& other) = delete;
 
@@ -39,6 +39,7 @@ namespace InMemoryScanner
         std::vector<Rule> scanMemory(std::span<const VmiCore::MappedRegion> mappedRegions) override;
 
       private:
+        int scanTimeout;
         YR_RULES* rules = nullptr;
 
         static int yaraCallback(YR_SCAN_CONTEXT* context, int message, void* message_data, void* user_data);

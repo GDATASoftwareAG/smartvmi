@@ -26,6 +26,8 @@ namespace InMemoryScanner
 
         [[nodiscard]] virtual std::filesystem::path getOutputPath() const = 0;
 
+        [[nodiscard]] virtual int getScanTimeout() const = 0;
+
         [[nodiscard]] virtual bool isProcessIgnored(const std::string& processName) const = 0;
 
         [[nodiscard]] virtual bool isScanAllRegionsActivated() const = 0;
@@ -51,6 +53,8 @@ namespace InMemoryScanner
 
         [[nodiscard]] std::filesystem::path getOutputPath() const override;
 
+        [[nodiscard]] int getScanTimeout() const override;
+
         [[nodiscard]] bool isProcessIgnored(const std::string& processName) const override;
 
         [[nodiscard]] bool isScanAllRegionsActivated() const override;
@@ -66,5 +70,6 @@ namespace InMemoryScanner
         std::set<std::string> ignoredProcesses;
         bool dumpMemory{};
         bool scanAllRegions{};
+        int scanTimeout;
     };
 }

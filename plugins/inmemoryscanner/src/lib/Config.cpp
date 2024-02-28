@@ -21,6 +21,7 @@ namespace InMemoryScanner
         outputPath = rootNode["output_path"].as<std::string>();
         dumpMemory = rootNode["dump_memory"].as<bool>(false);
         scanAllRegions = rootNode["scan_all_regions"].as<bool>(false);
+        scanTimeout = rootNode["scan_timeout"].as<int>(10);
 
         auto ignoredProcessesVec =
             rootNode["ignored_processes"].as<std::vector<std::string>>(std::vector<std::string>());
@@ -41,6 +42,11 @@ namespace InMemoryScanner
     std::filesystem::path Config::getOutputPath() const
     {
         return outputPath;
+    }
+
+    int Config::getScanTimeout() const
+    {
+        return scanTimeout;
     }
 
     bool Config::isProcessIgnored(const std::string& processName) const
