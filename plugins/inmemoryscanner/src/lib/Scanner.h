@@ -4,9 +4,8 @@
 #include "Dumping.h"
 #include "IYaraInterface.h"
 #include "OutputXML.h"
-#include "Semaphore.h"
-#include <condition_variable>
 #include <memory>
+#include <semaphore>
 #include <span>
 #include <vmicore/plugins/PluginInterface.h>
 #include <yara/limits.h> // NOLINT(modernize-deprecated-headers)
@@ -37,8 +36,7 @@ namespace InMemoryScanner
         std::unique_ptr<IDumping> dumping;
         std::unique_ptr<VmiCore::ILogger> logger;
         std::unique_ptr<VmiCore::ILogger> inMemResultsLogger;
-        Semaphore<std::mutex, std::condition_variable> semaphore =
-            Semaphore<std::mutex, std::condition_variable>(YR_MAX_THREADS);
+        std::counting_semaphore<> semaphore{YR_MAX_THREADS};
 
         [[nodiscard]] bool shouldRegionBeScanned(const VmiCore::MemoryRegion& memoryRegionDescriptor);
 
