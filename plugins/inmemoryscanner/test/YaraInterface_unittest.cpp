@@ -67,7 +67,7 @@ namespace InMemoryScanner
         auto subRegion1 = constructPageWithContent("ABCD");
         std::vector<VmiCore::MappedRegion> memoryRegions{{0x0, subRegion1}};
 
-        auto matches = yaraInterface.scanMemory(memoryRegions.front().guestBaseVA, memoryRegions);
+        auto matches = yaraInterface.scanMemory(memoryRegions);
 
         EXPECT_EQ(matches.size(), 0);
     }
@@ -89,7 +89,7 @@ namespace InMemoryScanner
         auto subRegion2 = constructPageWithContent("DCBA", false);
         std::vector<VmiCore::MappedRegion> memoryRegions{{0x0, subRegion1}, {pageSizeInBytes, subRegion2}};
 
-        auto matches = yaraInterface.scanMemory(memoryRegions.front().guestBaseVA, memoryRegions);
+        auto matches = yaraInterface.scanMemory(memoryRegions);
 
         EXPECT_EQ(matches.size(), 0);
     }
@@ -113,8 +113,8 @@ namespace InMemoryScanner
         std::vector<VmiCore::MappedRegion> memoryRegion1{{0x0, subRegion1}};
         std::vector<VmiCore::MappedRegion> memoryRegion2{{4 * pageSizeInBytes, subRegion2}};
 
-        auto matches1 = yaraInterface.scanMemory(memoryRegion1.front().guestBaseVA, memoryRegion1);
-        auto matches2 = yaraInterface.scanMemory(memoryRegion2.front().guestBaseVA, memoryRegion2);
+        auto matches1 = yaraInterface.scanMemory(memoryRegion1);
+        auto matches2 = yaraInterface.scanMemory(memoryRegion2);
 
         EXPECT_EQ(matches1.size(), 0);
         EXPECT_EQ(matches2.size(), 0);
@@ -139,7 +139,7 @@ namespace InMemoryScanner
         std::vector<VmiCore::MappedRegion> memoryRegions{{0x0, subRegion1}, {4 * pageSizeInBytes, subRegion2}};
         Rule expectedMatch{"testRule", "default", {{"$test", 0x0}, {"$test2", 4 * pageSizeInBytes}}};
 
-        auto matches = yaraInterface.scanMemory(memoryRegions.front().guestBaseVA, memoryRegions);
+        auto matches = yaraInterface.scanMemory(memoryRegions);
 
         ASSERT_EQ(matches.size(), 1);
         EXPECT_THAT(matches, UnorderedElementsAre(expectedMatch));
@@ -178,7 +178,7 @@ namespace InMemoryScanner
         Rule expectedMatch2{
             "testRule2", "default", {{"$test", 8 * pageSizeInBytes}, {"$test2", 8 * pageSizeInBytes + 1}}};
 
-        auto matches = yaraInterface.scanMemory(memoryRegions.front().guestBaseVA, memoryRegions);
+        auto matches = yaraInterface.scanMemory(memoryRegions);
 
         ASSERT_EQ(matches.size(), 2);
         EXPECT_THAT(matches, UnorderedElementsAre(expectedMatch1, expectedMatch2));

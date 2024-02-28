@@ -64,7 +64,7 @@ namespace InMemoryScanner
         }
     }
 
-    std::vector<Rule> YaraInterface::scanMemory(addr_t regionBase, std::span<const MappedRegion> mappedRegions)
+    std::vector<Rule> YaraInterface::scanMemory(std::span<const MappedRegion> mappedRegions)
     {
         std::vector<Rule> results;
 
@@ -73,7 +73,7 @@ namespace InMemoryScanner
         for (const auto& mappedRegion : mappedRegions)
         {
             iteratorContext.blocks.emplace_back(mappedRegion.num_pages * pageSizeInBytes,
-                                                mappedRegion.guestBaseVA - regionBase,
+                                                mappedRegion.guestBaseVA,
                                                 mappedRegion.mappingBase,
                                                 &fetch_block_data);
         }
@@ -88,7 +88,13 @@ namespace InMemoryScanner
             .context = &iteratorContext, .first = &get_first_block, .next = &get_next_block};
 #endif
 
-        if (auto err = yr_rules_scan_mem_blocks(rules, &iterator, 0, yaraCallback, &results, 0); err != ERROR_SUCCESS)
+        if (auto err = yr_rules_scan_mem_blocks(rules,
+                                                &iterator,
+                                                SCAN_FLAGS_PROCESS_MEMORY | SCAN_FLAGS_REPORT_RULES_MATCHING,
+                                                yaraCallback,
+                                                &results,
+                                                0);
+            err != ERROR_SUCCESS)
         {
             throw YaraException(fmt::format("Error scanning memory. Error code: {}", err));
         }
