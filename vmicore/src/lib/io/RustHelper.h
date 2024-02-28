@@ -1,19 +1,39 @@
 #ifndef VMICORE_RUSTHELPER_H
 #define VMICORE_RUSTHELPER_H
 
+#include "../GlobalControl.h"
+#include <backward.hpp>
+#include <base64.hpp>
 #include <cstdint>
 #include <cxx_rust_part/bridge.h>
-#include <fmt/core.h>
 #include <initializer_list>
 #include <rust/cxx.h>
 #include <string_view>
-#include <type_traits>
 
 namespace VmiCore
 {
     inline ::rust::Str toRustStr(std::string_view stringView)
     {
-        return {stringView.data(), stringView.size()};
+        try
+        {
+            return {stringView.data(), stringView.size()};
+        }
+        catch (...)
+        {
+            backward::StackTrace st;
+            st.load_here(50);
+            backward::Printer p;
+            std::stringstream traceStream;
+            p.color_mode = backward::ColorMode::never;
+            p.snippet = false;
+            p.print(st, traceStream);
+
+            GlobalControl::logger()->error(
+                "Rust str stacktrace",
+                {{"stacktrace", traceStream.str()}, {"content_encoded", base64::to_base64(stringView)}});
+
+            throw;
+        }
     }
 
     // Helper for overload pattern

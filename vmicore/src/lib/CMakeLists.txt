@@ -100,3 +100,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(backward-cpp)
 target_link_libraries(vmicore-lib PUBLIC Backward::Interface)
+
+# Base64 encoder
+
+FetchContent_Declare(
+        base64
+        GIT_REPOSITORY https://github.com/tobiaslocker/base64.git
+)
+FetchContent_MakeAvailable(base64)
+target_include_directories(vmicore-lib PUBLIC ${base64_SOURCE_DIR}/include)
