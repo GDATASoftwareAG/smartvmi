@@ -14,12 +14,8 @@ target_include_directories(inmemoryscanner-obj INTERFACE $<BUILD_INTERFACE:${CMA
 
 include(FindPkgConfig)
 
-pkg_check_modules(YARA REQUIRED yara>=4)
+pkg_check_modules(YARA REQUIRED yara>=4.2)
 target_link_libraries(inmemoryscanner-obj PUBLIC ${YARA_LINK_LIBRARIES})
-
-if (${YARA_VERSION} VERSION_GREATER_EQUAL 4.1)
-    target_compile_definitions(inmemoryscanner-obj PRIVATE LIBYARA_4_1)
-endif ()
 
 pkg_check_modules(TCLAP REQUIRED tclap>=1.2)
 

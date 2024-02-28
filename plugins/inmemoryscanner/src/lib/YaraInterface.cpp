@@ -77,16 +77,12 @@ namespace InMemoryScanner
                                                 mappedRegion.mappingBase,
                                                 &fetch_block_data);
         }
-#ifdef LIBYARA_4_1
+
         YR_MEMORY_BLOCK_ITERATOR iterator{.context = &iteratorContext,
                                           .first = &get_first_block,
                                           .next = &get_next_block,
                                           .file_size = nullptr,
                                           .last_error = ERROR_SUCCESS};
-#else
-        YR_MEMORY_BLOCK_ITERATOR iterator{
-            .context = &iteratorContext, .first = &get_first_block, .next = &get_next_block};
-#endif
 
         if (auto err = yr_rules_scan_mem_blocks(rules,
                                                 &iterator,
