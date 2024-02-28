@@ -91,3 +91,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(fmt)
 target_link_libraries(vmicore-lib PUBLIC fmt-header-only)
+
+# Setup backward-cpp
+
+FetchContent_Declare(
+        backward-cpp
+        GIT_REPOSITORY https://github.com/bombela/backward-cpp.git
+)
+FetchContent_MakeAvailable(backward-cpp)
+target_link_libraries(vmicore-lib PUBLIC Backward::Interface)
