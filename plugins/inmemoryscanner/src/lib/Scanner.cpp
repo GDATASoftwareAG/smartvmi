@@ -132,9 +132,9 @@ namespace InMemoryScanner
 
         // The semaphore protects the yara rules from being accessed more than YR_MAX_THREADS (32 atm.) times in
         // parallel.
-        semaphore.wait();
+        semaphore.acquire();
         auto results = yaraInterface->scanMemory(memoryRegionDescriptor.base, mappedRegions);
-        semaphore.notify();
+        semaphore.release();
 
         logger->debug("End scanMemory");
 
