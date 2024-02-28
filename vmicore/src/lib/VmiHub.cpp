@@ -9,6 +9,7 @@
 #include <memory>
 #include <utility>
 #include <vmicore/filename.h>
+#include <backward.hpp>
 
 namespace VmiCore
 {
@@ -99,6 +100,31 @@ namespace VmiCore
         }
     }
 
+    void segfaultHandler(int signal)
+    {
+        if (GlobalControl::logger())
+        {
+            try
+            {
+                backward::StackTrace st;
+                st.load_here(50);
+                backward::Printer p;
+                std::stringstream traceStream;
+                p.color_mode = backward::ColorMode::never;
+                p.snippet = false;
+                p.print(st, traceStream);
+
+                GlobalControl::logger()->error("SEGFAULT", {{"stacktrace", traceStream.str()}});
+            }
+            catch (...)
+            {
+            }
+        }
+
+        // exit immediately to avoid an infinite loop
+        exit(128 + signal);
+    }
+
     void externalInterruptHandler(int signal)
     {
         exitCode = 128 + signal;
@@ -121,6 +147,12 @@ namespace VmiCore
         if (status != 0)
         {
             throw std::runtime_error("Unable to register SIGTERM action handler.");
+        }
+        sigactionStruct.sa_handler = &segfaultHandler;
+        status = sigaction(SIGSEGV, &sigactionStruct, nullptr);
+        if (status != 0)
+        {
+            throw std::runtime_error("Unable to register SIGSEGV action handler.");
         }
     }
 
