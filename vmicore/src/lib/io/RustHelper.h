@@ -1,19 +1,24 @@
 #ifndef VMICORE_RUSTHELPER_H
 #define VMICORE_RUSTHELPER_H
 
+#include <bit>
 #include <cstdint>
 #include <cxx_rust_part/bridge.h>
-#include <fmt/core.h>
 #include <initializer_list>
 #include <rust/cxx.h>
 #include <string_view>
-#include <type_traits>
+#include <variant>
 
 namespace VmiCore
 {
     inline ::rust::Str toRustStr(std::string_view stringView)
     {
         return {stringView.data(), stringView.size()};
+    }
+
+    inline ::rust::Slice<const uint8_t> toRustSlice(std::string_view stringView)
+    {
+        return {std::bit_cast<const uint8_t*>(stringView.data()), stringView.size()};
     }
 
     // Helper for overload pattern
@@ -27,7 +32,7 @@ namespace VmiCore
     {
         std::visit(
             overload{[&vec, &field](std::string_view arg)
-                     { ::logging::add_field_str(vec, toRustStr(field.first), toRustStr(arg)); },
+                     { ::logging::add_field_str(vec, toRustStr(field.first), toRustSlice(arg)); },
                      [&vec, &field](bool arg) { ::logging::add_field_bool(vec, toRustStr(field.first), arg); },
                      [&vec, &field](int64_t arg) { ::logging::add_field_i64(vec, toRustStr(field.first), arg); },
                      [&vec, &field](uint64_t arg) { ::logging::add_field_uint64(vec, toRustStr(field.first), arg); },
