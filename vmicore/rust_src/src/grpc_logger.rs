@@ -31,7 +31,7 @@ impl GrpcLogger {
     }
 
     pub fn bind(&mut self, fields: Vec<LogField>) {
-        self.base_fields.extend(fields.into_iter());
+        self.base_fields.extend(fields);
     }
 
     pub fn clone_base_fields(&self, capacity: usize) -> Vec<LogField> {
