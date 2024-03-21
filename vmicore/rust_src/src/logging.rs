@@ -21,10 +21,10 @@ pub fn convert_to_log_level(level: &str) -> Result<Level, Box<dyn std::error::Er
     }
 }
 
-pub fn add_field_str(fields: &mut Vec<LogField>, name: &str, val: &str) {
+pub fn add_field_str(fields: &mut Vec<LogField>, name: &str, val: &[u8]) {
     fields.push(LogField {
         name: name.to_string(),
-        field: Some(Field::StrField(val.to_string())),
+        field: Some(Field::StrField(String::from_utf8_lossy(val).into_owned())),
     });
 }
 

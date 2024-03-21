@@ -28,7 +28,7 @@ pub mod ffi {
         fn convert_to_log_level(level: &str) -> Result<Level>;
 
         type LogField;
-        fn add_field_str(fields: &mut Vec<LogField>, name: &str, val: &str);
+        fn add_field_str(fields: &mut Vec<LogField>, name: &str, val: &[u8]);
         fn add_field_i64(fields: &mut Vec<LogField>, name: &str, val: i64);
         fn add_field_float64(fields: &mut Vec<LogField>, name: &str, val: f64);
         fn add_field_uint64(fields: &mut Vec<LogField>, name: &str, val: u64);
