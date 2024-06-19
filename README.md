@@ -32,20 +32,27 @@ In the German economy alone, computer crime causes damage of more than 10 billio
 
 ### Accepted Publications
 
-* Sentanoe, S., Dangl, T. and Reiser, H.P., 2022. KVMIveggur: Flexible, secure, and efficient support for self-service virtual machine introspection. Forensic Science International: Digital Investigation
-* Dangl, T., Sentanoe, S. and Reiser, H.P., 2022, August. VMIFresh: Efficient and Fresh Caches for Virtual Machine Introspection. In The 17th International Conference on Availability, Reliability and Security
-* Sentanoe, S., Fellicious, C., Reiser, H.P. and Granitzer, M., 2022, December. “The Need for Speed”: Extracting Session Keys From the Main Memory Using Brute-force and Machine Learning. In 2022 IEEE International Conference on Trust, Security and Privacy in Computing and Communications (TrustCom) (pp. 1028-1035). IEEE.
-* Fellicious, C., Wendlinger, L. and Granitzer, M., 2023, March. Neural Network Based Drift Detection. In Machine Learning, Optimization, and Data Science: 8th International Workshop, LOD 2022, Certosa di Pontignano, Italy, September 19–22, 2022, Revised Selected Papers, Part I (pp. 370-383). Cham: Springer Nature Switzerland.
+* Thomas Dangl, Stewart Sentanoe, Hans P. Reiser: [VMIFresh: Efficient and Fresh Caches for Virtual Machine Introspection](https://doi.org/10.1145/3538969.3539002). In Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES), ACM, 2022. 
+* Christofer Fellicious, Lorenz Wendlinger, Michael Granitzer: [Neural Network based Drift Detection](https://doi.org/10.1007/978-3-031-25599-1_28). In Proceedings of the the 8th International Online & Onsite Conference on Machine Learning, Optimization, and Data Science, 2022.  
+* Stewart Sentanoe, Thomas Dangl, Hans P. Reiser. KVMIveggur: [Flexible, secure, and efficient support for self-service virtual machine introspection](https://doi.org/10.1016/j.fsidi.2022.301397). In: Forensic Science International: Digital Investigation, Volume 42S, 2022.  
+* Stewart Sentanoe, Christofer Fellicious, Hans P. Reiser, Michael Granitzer: [“The Need for Speed”: Extracting Session Keys From the Main Memory Using Brute-force and Machine Learning](https://doi.org/10.1109/TrustCom56396.2022.00140). In Proceedings of 21st IEEE International Conference on Trust, Security and Privacy in Computing and Communications (TrustCom), 2022.	  
+* Thomas Dangl, Stewart Sentanoe, Hans P. Reiser: [VMIFresh: Efficient and fresh caches for virtual machine introspection](https://doi.org/10.1016/j.cose.2023.103527). In Computers & Security, Volume 135, 2023.	 
+. [extended version of the publication in 2022]
+* Thomas Dangl, Stewart Sentanoe, Hans P. Reiser: [Retrofitting AMD x86 Processors with Active Virtual Machine Introspection Capabilities](https://doi.org/10.1007/978-3-031-42785-5_12). In: Proc. of Architecture of Computing Systems. Lecture Notes in Computer Science, vol 13949. Springer, ARCS 2023. 
+* Thomas Dangl, Stewart Sentanoe, Hans P. Reiser: [Active and passive virtual machine introspection on AMD and ARM processors](https://doi.org/10.1016/j.sysarc.2024.103101). Journal of Systems Architecture, Vol. 149, 103101, JSA 2024.	 
+* Fellicious, Christofer, Sahib Julka, Lorenz Wendlinger, and Michael Granitzer. "DriftGAN: Using historical data for Unsupervised Recurring Drift Detection." In Proceedings of the 39th ACM/SIGAPP Symposium on Applied Computing, pp. 368-369, ACM/SIGAPP, 2024 
+* Christofer Fellicious, Stewart Sentanoe, Hans P. Reiser, Michael Granitzer PointerKex: A Pointer-based SSH Key Extraction method. In: Proceedings of the 10th International Conference on Machine Learning, Optimization and Data science (LOD), 2024 – accepted for publication 
+* Christofer Fellicious, Mario Gancarski, Michael Granitzer SUDS: SUDS: a new Strategy for Unsupervised Drift Sampling, 2024 - submitted to ICTAI 	
 
 ### Accepted Poster
 
-* Sentanoe, S., Reiser, H.P., Fellicious, C., Granitzer, M., Dangl, T., Beierl, N., Hausotte, S., Bischof, M., Eikenberg, D., Mayer, K., Pavic, A. and Dambeck, S., 2022. SmartVMI: Reconstructing meaningful kernel-level and application-level information about a target system using machine learning. NordSec 2022, Iceland.
+* S. Sentanoe, H. P. Reiser, C. Fellicious, M. Granitzer, T. Dangl, N. Beierl, S. Hausotte, M. Bischof, D. Eikenberg, K. Mayer, A. Pavic, S. Dambeck: "SmartVMI: Reconstructing meaningful kernel-level and application-level information about a target system using machine learning", NordSec 2022, Iceland
 
 ### Data Sets
 
-* Fellicious, C., Sentanoe, S., Granitzer, M. and Reiser, H.P., 2022. Machine Learning Assisted SSH Keys Extraction From The Heap Dump (V0.1) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.6537904
-* Sentanoe, S., Fellicious, C., Reiser, H.P. and Michael, G., 2022. Extracting Session Keys From the Main Memory Using Brute-force and Machine Learning (V0.1) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7014775
-
+* Christofer Fellicious, Stewart Sentanoe, Michael Granitzer, und Hans P. Reiser. [Machine Learning Assisted SSH Keys Extraction From The Heap Dump (0.1)](https://doi.org/10.5281/zenodo.6537904). Zenodo, 2022  
+* Stewart Sentanoe, Christofer Fellicious, Hans P. Reiser, Michael Granitzer: [Extracting Session Keys From the Main Memory Using Brute-force and Machine Learning (0.1)](https://doi.org/10.5281/zenodo.7014775). Zenodo. , 2022 
+* Fellicious, Christofer, Beierl, Niklas, Hans P. Reiser, Michael Granitzer, Innowerk-IT GmbH, and University of Passau. [VM Dumps for Memory Structure Identification](https://console.share-smartvmi.pads.fim.uni-passau.de/browser/datasets ). Minio, June 25, 2024, 
 
 ___
 
