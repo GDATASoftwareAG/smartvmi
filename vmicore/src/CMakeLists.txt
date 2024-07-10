@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.24)
 project(vmicore)
 
 include(CheckPIESupported)
@@ -16,6 +16,13 @@ set_target_properties(vmicore PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_link_libraries(vmicore vmicore-lib)
 
 # Setup Boost DI
+
+FetchContent_Declare(
+        Boost
+        GIT_REPOSITORY https://github.com/boostorg/headers
+        GIT_TAG master
+        OVERRIDE_FIND_PACKAGE
+)
 
 FetchContent_Declare(
         boost-di
