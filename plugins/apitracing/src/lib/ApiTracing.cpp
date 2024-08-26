@@ -99,10 +99,10 @@ namespace ApiTracing
     }
 }
 
-std::unique_ptr<IPlugin>
-VmiCore::Plugin::init(PluginInterface* pluginInterface,
-                      std::shared_ptr<IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
-                      std::vector<std::string> args)
+extern "C" std::unique_ptr<IPlugin> VmiCore::Plugin::vmicore_plugin_init(
+    PluginInterface* pluginInterface,
+    std::shared_ptr<IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
+    std::vector<std::string> args)
 {
     return std::make_unique<ApiTracing::ApiTracing>(pluginInterface, *config, args);
 }

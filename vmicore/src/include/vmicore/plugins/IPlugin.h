@@ -44,8 +44,9 @@ namespace VmiCore::Plugin
      * @param args Commandline arguments passed to this specific plugin. Elements are whitespace separated.
      * @return An instance of the plugin. Has to implement the IPlugin interface. Lifetime will be managed by VMICore.
      */
-    extern std::unique_ptr<IPlugin>
-    init(PluginInterface* pluginInterface, std::shared_ptr<IPluginConfig> config, std::vector<std::string> args);
+    extern "C" std::unique_ptr<IPlugin> vmicore_plugin_init(PluginInterface* pluginInterface,
+                                                            std::shared_ptr<IPluginConfig> config,
+                                                            std::vector<std::string> args);
 }
 
 #endif // APITRACING_IPLUGIN_H

@@ -161,10 +161,8 @@ namespace VmiCore
                                               Plugin::PluginInterface::API_VERSION));
         }
 
-        auto pluginInitFunction = std::bit_cast<decltype(Plugin::init)*>(
-            dlsym(libraryHandle,
-                  "_ZN7VmiCore6Plugin4initEPNS0_15PluginInterfaceENSt3__110shared_ptrINS0_13IPluginConfigEEENS3_"
-                  "6vectorINS3_12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENSB_ISD_EEEE"));
+        auto pluginInitFunction =
+            std::bit_cast<decltype(Plugin::vmicore_plugin_init)*>(dlsym(libraryHandle, PLUGIN_INIT_FUNCTION.data()));
         dlErrorMessage = dlerror();
         if (dlErrorMessage != nullptr)
         {

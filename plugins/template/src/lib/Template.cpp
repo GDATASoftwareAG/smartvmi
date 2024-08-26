@@ -51,12 +51,13 @@ namespace Template
     }
 }
 
-// This is the init function. It is called by VmiCore and is responsible for creating an instance of a plugin.
+// This is the init function. It is linked and called dynamically at runtime by
+// VmiCore and is responsible for creating an instance of a plugin.
 // All plugins have to inherit from IPlugin.
-std::unique_ptr<IPlugin>
-VmiCore::Plugin::init(PluginInterface* pluginInterface,
-                      std::shared_ptr<IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
-                      std::vector<std::string> args)
+extern "C" std::unique_ptr<IPlugin> VmiCore::Plugin::vmicore_plugin_init(
+    PluginInterface* pluginInterface,
+    std::shared_ptr<IPluginConfig> config, // NOLINT(performance-unnecessary-value-param)
+    std::vector<std::string> args)
 {
     return std::make_unique<Template::Template>(pluginInterface, *config, args);
 }
