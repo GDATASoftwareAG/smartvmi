@@ -17,6 +17,8 @@
 
 namespace VmiCore
 {
+    constexpr std::string_view PLUGIN_INIT_FUNCTION = "vmicore_plugin_init";
+
     class IPluginSystem : public Plugin::PluginInterface
     {
       public:
