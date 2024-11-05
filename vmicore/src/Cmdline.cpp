@@ -1,5 +1,6 @@
 #include "Cmdline.h"
 #include <fmt/core.h>
+#include <iterator>
 
 std::istream& operator>>(std::istream& is, std::pair<std::string, std::string>& p)
 {
