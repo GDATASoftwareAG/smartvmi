@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use hyper_util::rt::TokioIo;
 use tokio::{net::UnixStream, try_join};
 use tonic::{
     transport::{Channel, Endpoint, Uri},
@@ -13,6 +14,8 @@ use rust_grpc_server::pkg::logging::{
     service::v1::log_service_client::LogServiceClient,
 };
 use rust_grpc_server::pkg::vmi::v1::{vmi_service_client::VmiServiceClient, ListenForEventsRequest};
+
+const UNIX_SOCKET_ADDR: &str = "/tmp/vmi.sock";
 
 async fn log_client(channel: Channel, trigger: Trigger, listener: Listener) -> Result<(), Box<dyn Error>> {
     let mut client = LogServiceClient::new(channel);
@@ -59,13 +62,11 @@ async fn vmi_client(channel: Channel, trigger: Trigger, listener: Listener) -> R
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let addr = "/tmp/vmi.sock";
-
     // Url not used
     let channel = Endpoint::try_from("http://[::]:50051")?
-        .connect_with_connector(service_fn(move |_: Uri| {
+        .connect_with_connector(service_fn(|_: Uri| async {
             // Connect to a Uds socket
-            UnixStream::connect(addr)
+            Ok::<_, std::io::Error>(TokioIo::new(UnixStream::connect(UNIX_SOCKET_ADDR).await?))
         }))
         .await?;
 

@@ -13,13 +13,13 @@ use crate::pkg::vmi::v1::{
 use async_std::channel::{unbounded, Receiver, Sender};
 use async_std::task;
 use cxx::CxxVector;
-use futures::TryFutureExt;
 use std::error::Error;
 use std::fmt::Debug;
 use std::pin::Pin;
 use std::result;
 use std::time::SystemTime;
 use tokio::net::UnixListener;
+use tokio_stream::wrappers::UnixListenerStream;
 use tonic::transport::Server;
 use tonic::{Status, Streaming};
 
@@ -78,11 +78,7 @@ impl GRPCServer {
             }
             let uds = UnixListener::bind(addr_ref)?;
 
-            async_stream::stream! {
-                loop {
-                    yield uds.accept().map_ok(|(st, _)| crate::unix_socket::UnixStream(st)).await;
-                }
-            }
+            UnixListenerStream::new(uds)
         };
 
         Server::builder()
