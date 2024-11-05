@@ -5,7 +5,6 @@ mod grpc_logger;
 pub mod grpc_server;
 mod grpc_vmi_service;
 mod logging;
-mod unix_socket;
 
 pub mod pkg {
     #![allow(clippy::derive_partial_eq_without_eq)]
