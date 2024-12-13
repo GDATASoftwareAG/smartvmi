@@ -1,6 +1,6 @@
-FROM ubuntu:lunar
+FROM ubuntu:latest
 
-ARG LLVM_MAJOR=16
+ARG LLVM_MAJOR=18
 ENV LLVM_MAJOR=${LLVM_MAJOR}
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
@@ -16,10 +16,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     libc++-${LLVM_MAJOR}-dev \
     libglib2.0-dev \
     libjson-c-dev \
-    libtclap-dev \
     libtool \
     libvirt-dev \
-    libyara-dev \
     libxen-dev \
     lld-${LLVM_MAJOR} \
     make \
@@ -29,6 +27,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
     sudo \
     unzip \
     wget \
+    zip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_MAJOR} 100 \
@@ -45,15 +44,20 @@ RUN git clone https://github.com/bitdefender/libkvmi.git \
     && cd - \
     && rm -rf libkvmi
 
+RUN cd /usr/local/share/ && \
+    git clone https://github.com/microsoft/vcpkg.git && \
+    cd vcpkg && \
+    ./bootstrap-vcpkg.sh --disableMetrics && \
+    mv vcpkg /usr/local/bin/
+ENV VCPKG_ROOT=/usr/local/share/vcpkg
+
 COPY rust_exec.sh /root/rust_exec.sh
-SHELL ["/bin/bash", "-c"]
-RUN RUSTUP_HOME=/opt/rust \
-    && export RUSTUP_HOME \
-    && CARGO_HOME=/opt/rust \
-    && export CARGO_HOME \
-    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path \
-    && cargo_binaries=($(ls ${RUSTUP_HOME}/bin/)); \
+RUN export RUSTUP_HOME=/opt/rust && \
+    export CARGO_HOME=/opt/rust && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path  && \
+    bash -c \
+    'cargo_binaries=($(ls ${RUSTUP_HOME}/bin/)); \
     for i in "${cargo_binaries[@]}"; do \
         cp /root/rust_exec.sh "/usr/local/bin/$i" && chmod +x "/usr/local/bin/$i"; \
-    done \
-    && rm -f /root/rust_exec.sh
+    done' && \
+    rm -f /root/rust_exec.sh
