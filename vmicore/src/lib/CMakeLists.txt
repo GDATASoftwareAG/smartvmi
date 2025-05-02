@@ -42,20 +42,25 @@ target_include_directories(vmicore-lib INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRE
 add_subdirectory(../../rust_src rust_src)
 target_link_libraries(vmicore-lib PUBLIC cxx_rust_part)
 
-include(FetchContent)
 
 # Setup libvmi
 
-FetchContent_Declare(
-        libvmi
-        GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
-        GIT_TAG test
-)
-option(ENABLE_STATIC "" OFF)
-option(BUILD_EXAMPLES "" OFF)
-FetchContent_MakeAvailable(libvmi)
-target_include_directories(vmicore-lib BEFORE PUBLIC ${libvmi_SOURCE_DIR})
-target_link_libraries(vmicore-lib PUBLIC vmi_shared)
+find_package(libvmi CONFIG)
+if (libvmi_FOUND)
+    target_link_libraries(vmicore-lib PUBLIC libvmi::libvmi)
+else()
+    include(FetchContent)
+    FetchContent_Declare(
+            libvmi
+            GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
+            GIT_TAG test
+    )
+    option(ENABLE_STATIC "" OFF)
+    option(BUILD_EXAMPLES "" OFF)
+    FetchContent_MakeAvailable(libvmi)
+    target_include_directories(vmicore-lib BEFORE PUBLIC ${libvmi_SOURCE_DIR})
+    target_link_libraries(vmicore-lib PUBLIC vmi_shared)
+endif ()
 
 # Setup yaml-cpp
 
