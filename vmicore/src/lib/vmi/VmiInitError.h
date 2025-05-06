@@ -1,8 +1,8 @@
 #ifndef VMICORE_VMIINITERROR_H
 #define VMICORE_VMIINITERROR_H
 
-#include <vmicore/vmi/VmiException.h>
 #include <libvmi/events.h>
+#include <vmicore/vmi/VmiException.h>
 
 namespace VmiCore
 {

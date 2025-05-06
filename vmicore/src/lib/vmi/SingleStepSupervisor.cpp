@@ -97,9 +97,9 @@ namespace VmiCore
         vmiInterface->registerEvent(singleStepEvents[vcpuId]);
     }
 
-    event_response_t SingleStepSupervisor::_defaultSingleStepCallback(__attribute__((unused))
-                                                                      vmi_instance_t vmiInstance,
-                                                                      vmi_event_t* event)
+    event_response_t
+    SingleStepSupervisor::_defaultSingleStepCallback(__attribute__((unused)) vmi_instance_t vmiInstance,
+                                                     vmi_event_t* event)
     {
         auto eventResponse = VMI_EVENT_RESPONSE_NONE;
         try

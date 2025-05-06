@@ -108,9 +108,7 @@ namespace VmiCore
 
     void setupSignalHandling()
     {
-        struct sigaction sigactionStruct
-        {
-        };
+        struct sigaction sigactionStruct{};
         sigactionStruct.sa_handler = &externalInterruptHandler;
         auto status = sigaction(SIGINT, &sigactionStruct, nullptr);
         if (status != 0)

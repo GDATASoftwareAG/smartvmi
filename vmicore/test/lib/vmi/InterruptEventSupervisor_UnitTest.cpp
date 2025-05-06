@@ -3,8 +3,8 @@
 #include "../os/windows/mock_ActiveProcessesSupervisor.h"
 #include "mock_LibvmiInterface.h"
 #include "mock_SingleStepSupervisor.h"
-#include <gtest/gtest.h>
 #include <GlobalControl.h>
+#include <gtest/gtest.h>
 #include <plugins/PluginSystem.h>
 #include <vmicore/os/PagingDefinitions.h>
 #include <vmicore/vmi/IBreakpoint.h>
