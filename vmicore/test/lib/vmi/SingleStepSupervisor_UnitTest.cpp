@@ -1,8 +1,8 @@
 #include "../io/mock_EventStream.h"
 #include "../io/mock_Logging.h"
 #include "mock_LibvmiInterface.h"
-#include <gtest/gtest.h>
 #include <GlobalControl.h>
+#include <gtest/gtest.h>
 #include <vmi/SingleStepSupervisor.h>
 #include <vmicore/vmi/VmiException.h>
 #include <vmicore_test/io/mock_Logger.h>

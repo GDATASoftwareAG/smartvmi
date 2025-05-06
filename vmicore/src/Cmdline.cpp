@@ -4,7 +4,6 @@
 
 std::istream& operator>>(std::istream& is, std::pair<std::string, std::string>& p)
 {
-
     std::string paramValue;
     std::getline(is, paramValue, {});
     auto index = paramValue.find(':');

@@ -9,7 +9,6 @@
 
 namespace VmiCore
 {
-
     namespace
     {
         InterruptEventSupervisor* interruptEventSupervisor = nullptr;

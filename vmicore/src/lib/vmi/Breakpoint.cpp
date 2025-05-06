@@ -47,6 +47,7 @@ namespace VmiCore
                 fmt::format("{}: {} Target physical address = {:#x}", __func__, e.what(), targetPA));
         }
     }
+
     BPStateResponse Breakpoint::getNewBreakpointState(uint64_t newDtb) const
     {
         using enum VmiCore::BPStateResponse;

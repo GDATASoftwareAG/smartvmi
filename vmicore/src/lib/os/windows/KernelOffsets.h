@@ -81,7 +81,7 @@ namespace VmiCore::Windows
             _flag() = default;
 
             _flag(const std::tuple<addr_t, size_t, size_t>& flagInfo) // NOLINT(google-explicit-constructor)
-                : offset(std::get<0>(flagInfo)), startBit(std::get<1>(flagInfo)), endBit(std::get<2>(flagInfo)){};
+                : offset(std::get<0>(flagInfo)), startBit(std::get<1>(flagInfo)), endBit(std::get<2>(flagInfo)) {};
 
             addr_t offset;
             size_t startBit;
