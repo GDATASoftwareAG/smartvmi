@@ -16,7 +16,7 @@ namespace Template
 
         ~Template() override = default;
 
-        void unload() override{};
+        void unload() override {};
 
       private:
         std::unique_ptr<VmiCore::ILogger> logger;
