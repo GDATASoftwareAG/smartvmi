@@ -2,7 +2,7 @@ include(FetchContent)
 FetchContent_Declare(
         Corrosion
         GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
-        GIT_TAG stable/v0.4  # Newer versions require cmake 3.22 which is not available on Debian 11
+        GIT_TAG stable/v0.5  # Newer versions require cmake 3.22 which is not available on Debian 11
 )
 FetchContent_MakeAvailable(Corrosion)
 
