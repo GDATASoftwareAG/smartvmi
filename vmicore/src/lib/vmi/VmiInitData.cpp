@@ -1,6 +1,6 @@
 #include "VmiInitData.h"
-#include "VmiException.h"
 #include <cstring>
+#include <vmicore/vmi/VmiException.h>
 
 // NOLINTBEGIN(cppcoreguidelines-no-malloc)
 

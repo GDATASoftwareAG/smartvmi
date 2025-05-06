@@ -18,7 +18,6 @@
 #include "lib/io/grpc/GRPCServer.h"
 #include "lib/vmi/InterruptEventSupervisor.h"
 #include "lib/vmi/LibvmiInterface.h"
-#include "lib/vmi/VmiException.h"
 #include <boost/di.hpp>
 #include <cxx_rust_part/bridge.h>
 #include <iostream>

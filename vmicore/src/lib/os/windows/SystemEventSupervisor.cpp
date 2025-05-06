@@ -1,5 +1,4 @@
 #include "SystemEventSupervisor.h"
-#include "../../vmi/VmiException.h"
 #include <fmt/core.h>
 #include <utility>
 #include <vmicore/callback.h>
