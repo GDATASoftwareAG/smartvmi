@@ -380,7 +380,8 @@ namespace InMemoryScanner
             "\" " + "}";
         ON_CALL(*pluginInterface, getRunningProcesses())
             .WillByDefault(
-                [&processInfo]() {
+                [&processInfo]()
+                {
                     return std::make_unique<std::vector<std::shared_ptr<const ActiveProcessInformation>>>(1,
                                                                                                           processInfo);
                 });

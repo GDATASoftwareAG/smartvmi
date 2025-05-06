@@ -12,7 +12,7 @@ namespace InMemoryScanner
     class ConfigException : public std::runtime_error
     {
       public:
-        explicit ConfigException(const std::string& Message) : std::runtime_error(Message.c_str()){};
+        explicit ConfigException(const std::string& Message) : std::runtime_error(Message.c_str()) {};
     };
 
     class IConfig
