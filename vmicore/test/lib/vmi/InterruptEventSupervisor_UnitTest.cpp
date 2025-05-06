@@ -3,12 +3,12 @@
 #include "../os/windows/mock_ActiveProcessesSupervisor.h"
 #include "mock_LibvmiInterface.h"
 #include "mock_SingleStepSupervisor.h"
-#include <GlobalControl.h>
 #include <gtest/gtest.h>
+#include <GlobalControl.h>
 #include <plugins/PluginSystem.h>
-#include <vmi/VmiException.h>
 #include <vmicore/os/PagingDefinitions.h>
 #include <vmicore/vmi/IBreakpoint.h>
+#include <vmicore/vmi/VmiException.h>
 #include <vmicore_test/io/mock_Logger.h>
 
 using testing::_;

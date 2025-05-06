@@ -1,11 +1,11 @@
 #include "LibvmiInterface.h"
 #include "../GlobalControl.h"
-#include "VmiException.h"
 #include "VmiInitData.h"
 #include "VmiInitError.h"
 #include <source_location>
 #include <utility>
 #include <vmicore/filename.h>
+#include <vmicore/vmi/VmiException.h>
 
 namespace VmiCore
 {

@@ -3,8 +3,6 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include <vmi/LibvmiInterface.h>
-#include <vmi/VmiException.h>
-#include <vmicore_test/io/mock_Logger.h>
 
 using testing::_;
 using testing::Invoke;

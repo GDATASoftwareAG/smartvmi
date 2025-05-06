@@ -1,8 +1,8 @@
 #include "KernelAccess.h"
-#include "../../vmi/VmiException.h"
 #include "Constants.h"
 #include <fmt/core.h>
 #include <vmicore/os/PagingDefinitions.h>
+#include <vmicore/vmi/VmiException.h>
 
 namespace
 {

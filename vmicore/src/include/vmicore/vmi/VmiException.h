@@ -7,8 +7,7 @@ namespace VmiCore
 {
     class VmiException : public std::runtime_error
     {
-      public:
-        explicit VmiException(const std::string& message) : runtime_error(message) {}
+        using std::runtime_error::runtime_error;
     };
 }
 

@@ -1,8 +1,8 @@
 #include "SingleStepSupervisor.h"
 #include "../GlobalControl.h"
-#include "VmiException.h"
 #include <cmath>
 #include <vmicore/filename.h>
+#include <vmicore/vmi/VmiException.h>
 
 namespace VmiCore
 {

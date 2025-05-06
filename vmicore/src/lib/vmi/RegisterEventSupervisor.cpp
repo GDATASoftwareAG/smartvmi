@@ -1,8 +1,8 @@
 #include "RegisterEventSupervisor.h"
-#include "VmiException.h"
 #include <bit>
 #include <source_location>
 #include <vmicore/filename.h>
+#include <vmicore/vmi/VmiException.h>
 
 namespace VmiCore
 {
