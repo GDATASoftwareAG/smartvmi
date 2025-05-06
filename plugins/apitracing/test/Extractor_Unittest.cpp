@@ -1,9 +1,9 @@
-#include "../../../vmicore/src/lib/vmi/VmiException.h"
 #include "../src/lib/os/Extractor.h"
 #include "ConstantDefinitions.h"
 #include "TestConstantDefinitions.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vmicore/vmi/VmiException.h>
 #include <vmicore_test/io/mock_Logger.h>
 #include <vmicore_test/plugins/mock_PluginInterface.h>
 #include <vmicore_test/vmi/mock_InterruptEvent.h>
@@ -338,7 +338,7 @@ namespace ApiTracing
         SetupNestedStructPointerReads();
         // Remove first ObjectAttributesTwo element and replace it with the default element
         ON_CALL(*introspectionAPI, readVA(ObjectAttributesTwoValue, testDtb, sizeof(uint32_t)))
-            .WillByDefault(Throw(VmiCore::VmiException(("Unable to read bytes from VA"))));
+            .WillByDefault(Throw(VmiCore::VmiException("Unable to read bytes from VA")));
         auto* objectAttributesTwo = &expectedExtractedParameters[1].backingParameters[0].backingParameters;
         auto removedElementName = objectAttributesTwo->begin()->name;
         objectAttributesTwo->erase(objectAttributesTwo->begin());
