@@ -48,6 +48,17 @@ target_link_libraries(vmicore-lib PUBLIC cxx_rust_part)
 find_package(libvmi CONFIG)
 if (libvmi_FOUND)
     target_link_libraries(vmicore-lib PUBLIC libvmi::libvmi)
+    include(CheckCXXSourceCompiles)
+    check_cxx_source_compiles("
+        #include <libvmi/libvmi.h>
+        int main() {
+          (void)&vmi_mmap_guest_2;
+          (void)&vmi_read_w_str;
+          return 0;
+          }" HAVE_LIBVMI_GDATA)
+    if (NOT HAVE_LIBVMI_GDATA)
+        message(FATAL_ERROR "libvmi has to offer vmi_mmap_guest_2 and vmi_read_w_str")
+    endif()
 else()
     include(FetchContent)
     FetchContent_Declare(
