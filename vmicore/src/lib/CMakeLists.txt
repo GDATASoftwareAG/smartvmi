@@ -42,20 +42,36 @@ target_include_directories(vmicore-lib INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRE
 add_subdirectory(../../rust_src rust_src)
 target_link_libraries(vmicore-lib PUBLIC cxx_rust_part)
 
-include(FetchContent)
 
 # Setup libvmi
 
-FetchContent_Declare(
-        libvmi
-        GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
-        GIT_TAG test
-)
-option(ENABLE_STATIC "" OFF)
-option(BUILD_EXAMPLES "" OFF)
-FetchContent_MakeAvailable(libvmi)
-target_include_directories(vmicore-lib BEFORE PUBLIC ${libvmi_SOURCE_DIR})
-target_link_libraries(vmicore-lib PUBLIC vmi_shared)
+find_package(libvmi CONFIG)
+if (libvmi_FOUND)
+    target_link_libraries(vmicore-lib PUBLIC libvmi::libvmi)
+    include(CheckCXXSourceCompiles)
+    check_cxx_source_compiles("
+        #include <libvmi/libvmi.h>
+        int main() {
+          (void)&vmi_mmap_guest_2;
+          (void)&vmi_read_w_str;
+          return 0;
+          }" HAVE_LIBVMI_GDATA)
+    if (NOT HAVE_LIBVMI_GDATA)
+        message(FATAL_ERROR "libvmi has to offer vmi_mmap_guest_2 and vmi_read_w_str")
+    endif()
+else()
+    include(FetchContent)
+    FetchContent_Declare(
+            libvmi
+            GIT_REPOSITORY https://github.com/GDATASoftwareAG/libvmi
+            GIT_TAG test
+    )
+    option(ENABLE_STATIC "" OFF)
+    option(BUILD_EXAMPLES "" OFF)
+    FetchContent_MakeAvailable(libvmi)
+    target_include_directories(vmicore-lib BEFORE PUBLIC ${libvmi_SOURCE_DIR})
+    target_link_libraries(vmicore-lib PUBLIC vmi_shared)
+endif ()
 
 # Setup yaml-cpp
 
